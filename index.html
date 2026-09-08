@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Open Canvas</title>
+  </head>
+  <body>
+    <div id="authGate" class="auth-gate" hidden>
+      <form id="authForm" class="auth-card" autocomplete="on">
+        <h1>Open Canvas</h1>
+        <p class="auth-sub">Email + a code you choose. First time creates your board; same pair unlocks it later. Everything saves on this computer.</p>
+
+        <label class="auth-label" for="emailInput">Email</label>
+        <input id="emailInput" type="email" name="email" required placeholder="you@example.com" autocomplete="username" />
+
+        <label class="auth-label" for="codeInput">Code</label>
+        <input id="codeInput" type="password" name="password" required minlength="4" placeholder="pick a code you’ll remember" autocomplete="current-password" />
+
+        <button id="authSubmit" type="submit">Sign in</button>
+        <p id="authMsg" class="auth-msg" role="status"></p>
+      </form>
+    </div>
+
+    <div id="appShell" hidden>
+      <div id="topBar">
+        <button id="homeBtn" type="button" title="All pages">Home</button>
+        <input id="pageTitleInput" type="text" placeholder="Untitled" spellcheck="true" hidden />
+        <button id="addPageBtn" type="button" title="New page" aria-label="New page">+</button>
+      </div>
+
+      <div id="library" hidden>
+        <div class="library-inner">
+          <h1>Home</h1>
+          <p class="library-sub">Your pages</p>
+          <div id="libraryGrid"></div>
+        </div>
+      </div>
+
+      <div id="viewport">
+        <div id="world">
+          <div id="guides" aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <div id="empty">
+        <h1>An open space</h1>
+        <p>Double-click to write &nbsp;·&nbsp; <kbd>/</kbd> for types &nbsp;·&nbsp; Home for your library</p>
+      </div>
+
+      <div id="elToolbar"></div>
+
+      <div id="pill">
+        <button id="undoBtn" title="Undo (⌘Z)" type="button" disabled>↶</button>
+        <button id="redoBtn" title="Redo (⌘⇧Z)" type="button" disabled>↷</button>
+        <div class="sep"></div>
+        <button id="titleBtn" title="Add a title (no box)" type="button">Title</button>
+        <button id="noteBtn" title="Add a note card" type="button">Note</button>
+        <button id="linkBtn" title="Paste a product link — adds image, price & link" type="button">Link</button>
+        <button id="organizeBtn" title="Organize like Pinterest" type="button">Organize</button>
+        <button id="magnetBtn" title="Magnetic snap while dragging" type="button" class="on">Magnet</button>
+        <div class="sep"></div>
+        <button id="cartBtn" title="Toggle cart" type="button">Cart<span id="cartBadge" class="cart-badge" hidden>0</span></button>
+        <div class="sep"></div>
+        <button id="zoomOut" title="Zoom out" type="button">−</button>
+        <div id="zoomLabel" title="Reset zoom">100%</div>
+        <button id="zoomIn" title="Zoom in" type="button">+</button>
+        <div class="sep"></div>
+        <span class="hint">Group selection, then drag corner to scale</span>
+      </div>
+
+      <aside id="cartPanel" class="cart-panel" hidden aria-label="Shopping cart">
+        <div class="cart-panel-head">
+          <h2>Cart</h2>
+          <button id="cartClose" type="button" title="Close cart" aria-label="Close">×</button>
+        </div>
+        <div id="cartBody" class="cart-panel-body"></div>
+      </aside>
+
+      <div id="accountBar">
+        <span id="accountEmail"></span>
+        <button id="pinHelpBtn" type="button" title="Pin images from other sites">Pin bookmark</button>
+        <button id="signOutBtn" type="button">Sign out</button>
+      </div>
+
+      <div id="saveDot">Saved</div>
+
+      <div id="pinHelp" class="pin-help" hidden>
+        <div class="pin-help-card" role="dialog" aria-labelledby="pinHelpTitle">
+          <button id="pinHelpClose" type="button" class="pin-help-close" aria-label="Close">×</button>
+          <h2 id="pinHelpTitle">Pin from any site</h2>
+          <p>Pinterest’s Pin It bookmark needs a public image URL — it fails on local boards and data images with “Invalid parameters.”</p>
+          <p>Use this Open Canvas bookmark instead. Drag it to your bookmarks bar, then on a shopping site click the bookmark and click an image.</p>
+          <p class="pin-help-drag">
+            <a id="pinBookmarklet" href="#">Pin to Open Canvas</a>
+            <span>← drag to bookmarks bar</span>
+          </p>
+          <p class="pin-help-note">Keep <code>npm run dev</code> running so the board is at <code>127.0.0.1:5173</code>.</p>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
