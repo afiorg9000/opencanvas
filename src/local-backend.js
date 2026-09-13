@@ -1,8 +1,37 @@
 const USERS_KEY = 'open-canvas-local-users'
+const SNAPSHOT_APPLIED_KEY = 'open-canvas-applied-snapshot'
 const BOARD_KEY = (email) => `open-canvas-local-board:${email}`
+
+let snapshotPromise = null
 
 function emptyDoc() {
   return { elements: [], nextId: 1, scale: 1, ox: 0, oy: 0 }
+}
+
+function boardWeight(doc) {
+  if (!doc || typeof doc !== 'object') return 0
+  const pages = Array.isArray(doc.pages) ? doc.pages : []
+  const top = Array.isArray(doc.elements) ? doc.elements.length : 0
+  const nested = pages.reduce((n, p) => n + (Array.isArray(p?.elements) ? p.elements.length : 0), 0)
+  return top + nested
+}
+
+export async function getPublishedSnapshot() {
+  if (!snapshotPromise) {
+    snapshotPromise = (async () => {
+      const url = `${import.meta.env.BASE_URL}snapshot.json`
+      try {
+        const res = await fetch(url, { cache: 'no-store' })
+        if (!res.ok) return null
+        const data = await res.json()
+        if (!data?.doc || !data?.email) return null
+        return data
+      } catch {
+        return null
+      }
+    })()
+  }
+  return snapshotPromise
 }
 
 function readUsers() {
@@ -38,7 +67,7 @@ export async function localLogin(email, code) {
   return { token: `local.${crypto.randomUUID()}`, email }
 }
 
-export function localLoadCanvas(email) {
+function readLocalBoard(email) {
   try {
     const raw = localStorage.getItem(BOARD_KEY(email))
     if (!raw) return emptyDoc()
@@ -47,6 +76,21 @@ export function localLoadCanvas(email) {
   } catch {
     return emptyDoc()
   }
+}
+
+export async function localLoadCanvas(email) {
+  const snap = await getPublishedSnapshot()
+  const local = readLocalBoard(email)
+  if (!snap?.doc) return local
+
+  const applied = localStorage.getItem(SNAPSHOT_APPLIED_KEY)
+  const snapNewer = snap.exportedAt && snap.exportedAt !== applied
+  if (snapNewer || boardWeight(snap.doc) >= boardWeight(local)) {
+    if (snap.exportedAt) localStorage.setItem(SNAPSHOT_APPLIED_KEY, snap.exportedAt)
+    localStorage.setItem(BOARD_KEY(email), JSON.stringify(snap.doc))
+    return snap.doc
+  }
+  return local
 }
 
 export function localSaveCanvas(email, doc) {

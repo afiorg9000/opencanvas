@@ -1,9 +1,16 @@
 import { api, getSession, hasRemoteApi, isLocalSession } from './api.js'
 import { blobToDataUrl, localLoadCanvas, localSaveCanvas } from './local-backend.js'
 
+function onThisComputer() {
+  const host = location.hostname
+  return host === '127.0.0.1' || host === 'localhost'
+}
+
 async function useLocalStore() {
   const session = getSession()
   if (!session) throw new Error('Not signed in.')
+  // This Mac’s boards live in SQLite. Never swap in an empty browser copy.
+  if (onThisComputer()) return false
   if (isLocalSession(session)) return true
   return !(await hasRemoteApi())
 }
@@ -12,7 +19,7 @@ export async function loadCanvas() {
   const session = getSession()
   if (!session) throw new Error('Not signed in.')
   const doc = (await useLocalStore())
-    ? localLoadCanvas(session.email)
+    ? await localLoadCanvas(session.email)
     : await api('/api/canvas', { token: session.token })
   return {
     mode: doc.mode || null,

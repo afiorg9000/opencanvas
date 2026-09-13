@@ -11,10 +11,13 @@ node_modules
 dist
 dist-ssr
 *.local
+public/snapshot.json
+public/api/
 .env
 .env.*
 !.env.example
 data/
+.netlify/
 
 # Editor directories and files
 .vscode/*

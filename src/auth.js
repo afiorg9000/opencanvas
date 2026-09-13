@@ -1,5 +1,5 @@
 import { api, clearSession, getSession, hasRemoteApi, isLocalSession, setSession } from './api.js'
-import { localLogin } from './local-backend.js'
+import { localLogin, getPublishedSnapshot } from './local-backend.js'
 
 const gate = document.getElementById('authGate')
 const shell = document.getElementById('appShell')
@@ -62,7 +62,11 @@ export async function startAuth({ onReady, onSignedOut }) {
     submitBtn.disabled = true
     setMsg('Signing you in…')
     try {
-      const data = (await hasRemoteApi())
+      const remote = await hasRemoteApi()
+      if (!remote && (location.hostname === '127.0.0.1' || location.hostname === 'localhost')) {
+        throw new Error('Board server isn’t running. Start npm run dev, then try again.')
+      }
+      const data = remote
         ? await api('/api/login', {
             method: 'POST',
             body: { email, code },
@@ -93,22 +97,33 @@ export async function startAuth({ onReady, onSignedOut }) {
     emailInput.focus()
   })
 
+  const snapshot = await getPublishedSnapshot()
   const existing = getSession()
   if (existing) {
     try {
-      if ((await hasRemoteApi()) && !isLocalSession(existing)) {
+      if (await hasRemoteApi()) {
+        if (isLocalSession(existing)) throw new Error('Not signed in.')
         const me = await api('/api/me', { token: existing.token })
         handleSession({ email: me.email })
         return
       }
-      if (!existing.email) throw new Error('Not signed in.')
-      handleSession({ email: existing.email })
-      return
+      if (existing.email && location.hostname !== '127.0.0.1' && location.hostname !== 'localhost') {
+        handleSession({ email: existing.email })
+        return
+      }
+      throw new Error('Not signed in.')
     } catch {
       clearSession()
     }
   }
 
+  if (!(await hasRemoteApi()) && snapshot?.email) {
+    setSession({ token: 'local.snapshot', email: snapshot.email })
+    handleSession({ email: snapshot.email })
+    return
+  }
+
   showGate()
+  if (snapshot?.email) emailInput.value = snapshot.email
   emailInput.focus()
 }
