@@ -1,4 +1,5 @@
-import { api, clearSession, getSession, setSession } from './api.js'
+import { api, clearSession, getSession, hasRemoteApi, isLocalSession, setSession } from './api.js'
+import { localLogin } from './local-backend.js'
 
 const gate = document.getElementById('authGate')
 const shell = document.getElementById('appShell')
@@ -61,10 +62,12 @@ export async function startAuth({ onReady, onSignedOut }) {
     submitBtn.disabled = true
     setMsg('Signing you in…')
     try {
-      const data = await api('/api/login', {
-        method: 'POST',
-        body: { email, code },
-      })
+      const data = (await hasRemoteApi())
+        ? await api('/api/login', {
+            method: 'POST',
+            body: { email, code },
+          })
+        : await localLogin(email, code)
       setSession({ token: data.token, email: data.email })
       setMsg('')
       handleSession({ email: data.email })
@@ -78,7 +81,7 @@ export async function startAuth({ onReady, onSignedOut }) {
   signOutBtn.addEventListener('click', async () => {
     const session = getSession()
     try {
-      if (session?.token) {
+      if (session?.token && !isLocalSession(session) && (await hasRemoteApi())) {
         await api('/api/logout', { method: 'POST', token: session.token })
       }
     } catch {
@@ -93,8 +96,13 @@ export async function startAuth({ onReady, onSignedOut }) {
   const existing = getSession()
   if (existing) {
     try {
-      const me = await api('/api/me', { token: existing.token })
-      handleSession({ email: me.email })
+      if ((await hasRemoteApi()) && !isLocalSession(existing)) {
+        const me = await api('/api/me', { token: existing.token })
+        handleSession({ email: me.email })
+        return
+      }
+      if (!existing.email) throw new Error('Not signed in.')
+      handleSession({ email: existing.email })
       return
     } catch {
       clearSession()

@@ -1,5 +1,24 @@
 const SESSION_KEY = 'open-canvas-session'
 
+let remoteApi = null
+
+/** True when the Express/SQLite API is reachable (local npm run, or a hosted Node server). */
+export async function hasRemoteApi() {
+  if (remoteApi !== null) return remoteApi
+  try {
+    const res = await fetch('/api/health', { cache: 'no-store' })
+    const data = await res.json()
+    remoteApi = Boolean(res.ok && data?.ok)
+  } catch {
+    remoteApi = false
+  }
+  return remoteApi
+}
+
+export function isLocalSession(session = getSession()) {
+  return Boolean(session?.token?.startsWith('local.'))
+}
+
 export function getSession() {
   try {
     const raw = localStorage.getItem(SESSION_KEY)

@@ -79,12 +79,9 @@ function externalizeImageDataUrls(doc) {
         const mime = match[1]
         const buf = Buffer.from(match[2].replace(/\s/g, ''), 'base64')
         if (!buf.length || buf.length > 8_000_000) return e
-        const hash = crypto.createHash('sha256').update(buf).digest('hex').slice(0, 40)
-        const file = `${hash}${mimeToExt(mime)}`
-        const fp = path.join(assetsDir, file)
-        if (!fs.existsSync(fp)) fs.writeFileSync(fp, buf)
+        const src = storeAssetBuffer(buf, mime)
         changed = true
-        return { ...e, src: `/api/assets/${file}` }
+        return { ...e, src }
       } catch {
         return e
       }
@@ -145,8 +142,32 @@ function getEmailFromAuth(req) {
   return row?.email || null
 }
 
+function storeAssetBuffer(buf, mime) {
+  if (!buf?.length) throw new Error('Empty image.')
+  if (buf.length > 8_000_000) throw new Error('Image too large.')
+  const hash = crypto.createHash('sha256').update(buf).digest('hex').slice(0, 40)
+  const file = `${hash}${mimeToExt(mime)}`
+  const fp = path.join(assetsDir, file)
+  if (!fs.existsSync(fp)) fs.writeFileSync(fp, buf)
+  return `/api/assets/${file}`
+}
+
 const app = express()
 app.use(cors())
+
+app.post('/api/assets', express.raw({ type: () => true, limit: '8mb' }), (req, res) => {
+  const email = getEmailFromAuth(req)
+  if (!email) return res.status(401).json({ error: 'Not signed in.' })
+  try {
+    const buf = Buffer.isBuffer(req.body) ? req.body : Buffer.from(req.body || [])
+    const mime = String(req.headers['content-type'] || 'image/jpeg').split(';')[0].trim()
+    const src = storeAssetBuffer(buf, mime.startsWith('image/') ? mime : 'image/jpeg')
+    res.json({ src })
+  } catch (err) {
+    res.status(400).json({ error: err.message || 'Couldn’t save image.' })
+  }
+})
+
 app.use(express.json({ limit: '100mb' }))
 
 app.get('/api/health', (_req, res) => {
@@ -726,6 +747,17 @@ app.post('/api/fetch-image', async (req, res) => {
 })
 
 const port = Number(process.env.PORT || 8787)
-app.listen(port, '127.0.0.1', () => {
-  console.log(`Open Canvas API on http://127.0.0.1:${port}`)
+const host = process.env.HOST || '0.0.0.0'
+const distDir = path.join(__dirname, '..', 'dist')
+if (fs.existsSync(path.join(distDir, 'index.html'))) {
+  app.use(express.static(distDir))
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/api')) return next()
+    if (req.method !== 'GET' && req.method !== 'HEAD') return next()
+    res.sendFile(path.join(distDir, 'index.html'))
+  })
+}
+
+app.listen(port, host, () => {
+  console.log(`Open Canvas on http://${host}:${port}`)
 })

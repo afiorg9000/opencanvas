@@ -1,4 +1,4 @@
-import { loadCanvas, saveCanvas, fetchProduct, fetchRemoteImage } from './db.js'
+import { loadCanvas, saveCanvas, fetchProduct, fetchRemoteImage, uploadBoardImage } from './db.js'
 import { removeBackground, subscribeToProgress } from 'rembg-webgpu'
 
 /**
@@ -356,7 +356,6 @@ export function startCanvas(user) {
         data = await fetchProduct(url)
       } catch (err) {
         console.error(err)
-        // Still add the link even when the store blocks scraping
         flashSave('Couldn’t read that page — adding link only', 3200)
       }
       let e = null
@@ -578,37 +577,48 @@ export function startCanvas(user) {
   }
 
   function fileToBoardSrc(fileOrBlob) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = () => {
-        const img = new Image()
-        img.onload = () => {
-          const MAX = 1600
-          let { width: w, height: h } = img
-          if (Math.max(w, h) > MAX) {
-            const k = MAX / Math.max(w, h)
-            w = Math.round(w * k)
-            h = Math.round(h * k)
-          }
-          const c = document.createElement('canvas')
-          c.width = w
-          c.height = h
-          c.getContext('2d').drawImage(img, 0, 0, w, h)
-          let src
-          try {
-            src = c.toDataURL('image/webp', 0.87)
-          } catch {
-            src = c.toDataURL('image/png')
-          }
-          if (src.length < 200) src = reader.result
-          resolve(src)
-        }
-        img.onerror = () => reject(new Error('Couldn’t read image'))
-        img.src = reader.result
+    const preview = URL.createObjectURL(fileOrBlob)
+    persistPastedBlob(preview, fileOrBlob)
+    return preview
+  }
+
+  function swapImageSrc(from, to) {
+    if (!from || !to || from === to) return
+    let hit = false
+    for (const e of elements) {
+      if (e.type === 'image' && e.src === from) {
+        e.src = to
+        render(e)
+        hit = true
       }
-      reader.onerror = () => reject(new Error('Couldn’t read image'))
-      reader.readAsDataURL(fileOrBlob)
-    })
+      if (e.type === 'container' && Array.isArray(e.blocks)) {
+        let blockHit = false
+        for (const b of e.blocks) {
+          if (b.kind === 'image' && b.src === from) {
+            b.src = to
+            blockHit = true
+          }
+        }
+        if (blockHit) {
+          render(e)
+          hit = true
+        }
+      }
+    }
+    if (hit) scheduleSave()
+    if (from.startsWith('blob:')) {
+      try {
+        URL.revokeObjectURL(from)
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+
+  function persistPastedBlob(preview, fileOrBlob) {
+    uploadBoardImage(fileOrBlob)
+      .then((src) => swapImageSrc(preview, src))
+      .catch((err) => console.error(err))
   }
 
   function focusBlock(containerId, blockId) {
@@ -661,18 +671,17 @@ export function startCanvas(user) {
 
   async function insertImagesIntoFlow(afterLine, files) {
     if (!afterLine || !files?.length) return
-    flashSave(files.length === 1 ? 'Adding image…' : `Adding ${files.length} images…`, 4000)
     let line = afterLine
     for (const file of files) {
       if (!file) continue
       try {
-        const src = await fileToBoardSrc(file)
+        const src = fileToBoardSrc(file)
         line = (await insertSrcIntoFlow(line, src)) || line
       } catch (err) {
         console.error(err)
       }
     }
-    flashSave(files.length === 1 ? 'Image on its own line' : 'Images added')
+    flashSave(files.length === 1 ? 'Image added' : 'Images added')
   }
 
   /** Put pictures on their own line in a Doc; text continues in the block below. */
@@ -680,13 +689,12 @@ export function startCanvas(user) {
     const e = model(containerId)
     if (!e || !files?.length) return
     ensureContainerBlocks(e)
-    flashSave(files.length === 1 ? 'Adding image…' : `Adding ${files.length} images…`, 4000)
     let after = afterBlockId
     let focusId = null
     for (const file of files) {
       if (!file) continue
       try {
-        const src = await fileToBoardSrc(file)
+        const src = fileToBoardSrc(file)
         const imgBlock = newBlock('image')
         imgBlock.src = src
         const textBlock = newBlock('p', '')
@@ -709,7 +717,7 @@ export function startCanvas(user) {
     select(containerId)
     scheduleSave()
     if (focusId) focusBlock(containerId, focusId)
-    flashSave(files.length === 1 ? 'Image on its own line' : 'Images added')
+    flashSave(files.length === 1 ? 'Image added' : 'Images added')
   }
 
   function activeDocEdit() {
@@ -4073,33 +4081,17 @@ export function startCanvas(user) {
   }
 
   function loadImageFile(fileOrBlob, wx, wy) {
-    const reader = new FileReader()
-    reader.onload = () => {
-      const img = new Image()
-      img.onload = () => {
-        const MAX = 1600
-        let { width: w, height: h } = img
-        if (Math.max(w, h) > MAX) {
-          const k = MAX / Math.max(w, h)
-          w = Math.round(w * k)
-          h = Math.round(h * k)
-        }
-        const c = document.createElement('canvas')
-        c.width = w
-        c.height = h
-        c.getContext('2d').drawImage(img, 0, 0, w, h)
-        let src
-        try {
-          src = c.toDataURL('image/webp', 0.87)
-        } catch {
-          src = c.toDataURL('image/png')
-        }
-        if (src.length < 200) src = reader.result
-        createImage(src, w, h, wx, wy)
-      }
-      img.src = reader.result
+    const preview = URL.createObjectURL(fileOrBlob)
+    const img = new Image()
+    img.onload = () => {
+      createImage(preview, img.naturalWidth || img.width || 420, img.naturalHeight || img.height || 420, wx, wy)
+      persistPastedBlob(preview, fileOrBlob)
     }
-    reader.readAsDataURL(fileOrBlob)
+    img.onerror = () => {
+      URL.revokeObjectURL(preview)
+      flashSave('Couldn’t read image', 2800)
+    }
+    img.src = preview
   }
 
   function snapshotSelection() {
@@ -4357,6 +4349,19 @@ export function startCanvas(user) {
     return files
   }
 
+  function clipboardHtmlImageUrls(dt) {
+    const html = dt?.getData('text/html') || ''
+    if (!html || !html.includes('<img')) return []
+    const urls = []
+    const re = /<img\b[^>]*\bsrc\s*=\s*["']([^"']+)["']/gi
+    let m
+    while ((m = re.exec(html))) {
+      const src = m[1].trim().replace(/&amp;/g, '&')
+      if (src.startsWith('data:image') || /^https?:\/\//i.test(src)) urls.push(src)
+    }
+    return urls
+  }
+
   function onPaste(ev) {
     const dt = ev.clipboardData
     const text = dt?.getData('text/plain') || ''
@@ -4400,6 +4405,20 @@ export function startCanvas(user) {
       ev.preventDefault()
       const { x, y } = lastPointerWorld
       imageFiles.forEach((file, i) => loadImageFile(file, x + i * 28, y + i * 28))
+      return
+    }
+
+    const htmlImgs = clipboardHtmlImageUrls(dt)
+    if (htmlImgs.length && viewMode !== 'library' && !document.activeElement?.isContentEditable) {
+      ev.preventDefault()
+      const { x, y } = lastPointerWorld
+      htmlImgs.forEach((src, i) => {
+        if (src.startsWith('data:')) {
+          createImageFromSrc(src, x + i * 28, y + i * 28).catch((err) => console.error(err))
+        } else {
+          importPinnedImage({ src, page: src }).catch((err) => console.error(err))
+        }
+      })
       return
     }
 
@@ -5280,23 +5299,25 @@ export function startCanvas(user) {
       return null
     }
     if (viewMode !== 'page') createLibraryPage()
-    flashSave('Saving pin…', 6000)
-    const x = 48 + viewport.scrollLeft / scale + 220
-    const y = 90 + viewport.scrollTop / scale + 180
+    const x = lastPointerWorld?.x ?? 48 + viewport.scrollLeft / scale + 220
+    const y = lastPointerWorld?.y ?? 90 + viewport.scrollTop / scale + 180
+    const pageUrl = page ? normalizeUrl(page) : null
+    const extras = { href: pageUrl || null, label: title || null, maxW: 780 }
     try {
-      const data = await fetchRemoteImage(imageUrl)
-      const src = data?.imageDataUrl || data?.image
-      if (!src) throw new Error('Couldn’t download that image')
-      const pageUrl = page ? normalizeUrl(page) : null
-      const e = await createImageFromSrc(src, x, y, {
-        href: pageUrl || null,
-        label: title || null,
-        maxW: 780,
-      })
-      if (pageUrl) {
-        await enrichElementFromLink(e.id, { quietFail: true, priceOnly: true })
-      }
-      flashSave('Pinned to board')
+      const e = await createImageFromSrc(imageUrl, x, y, extras)
+      fetchRemoteImage(imageUrl)
+        .then((data) => {
+          const next = data?.image || data?.imageDataUrl
+          if (next && next !== e.src) {
+            e.src = next
+            byId(e.id)?.classList.remove('loading')
+            render(e)
+            scheduleSave()
+          }
+        })
+        .catch((err) => console.error(err))
+      flashSave('Pasted')
+      if (pageUrl) enrichElementFromLink(e.id, { quietFail: true, priceOnly: true }).catch(() => {})
       return e
     } catch (err) {
       console.error(err)

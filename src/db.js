@@ -1,9 +1,19 @@
-import { api, getSession } from './api.js'
+import { api, getSession, hasRemoteApi, isLocalSession } from './api.js'
+import { blobToDataUrl, localLoadCanvas, localSaveCanvas } from './local-backend.js'
+
+async function useLocalStore() {
+  const session = getSession()
+  if (!session) throw new Error('Not signed in.')
+  if (isLocalSession(session)) return true
+  return !(await hasRemoteApi())
+}
 
 export async function loadCanvas() {
   const session = getSession()
   if (!session) throw new Error('Not signed in.')
-  const doc = await api('/api/canvas', { token: session.token })
+  const doc = (await useLocalStore())
+    ? localLoadCanvas(session.email)
+    : await api('/api/canvas', { token: session.token })
   return {
     mode: doc.mode || null,
     blocks: doc.blocks || null,
@@ -22,6 +32,10 @@ export async function loadCanvas() {
 export async function saveCanvas(doc) {
   const session = getSession()
   if (!session) throw new Error('Not signed in.')
+  if (await useLocalStore()) {
+    localSaveCanvas(session.email, doc)
+    return
+  }
   await api('/api/canvas', {
     method: 'PUT',
     token: session.token,
@@ -32,6 +46,18 @@ export async function saveCanvas(doc) {
 export async function fetchProductPrice(url) {
   const session = getSession()
   if (!session) throw new Error('Not signed in.')
+  if (await useLocalStore()) {
+    return {
+      url,
+      price: null,
+      currency: null,
+      title: null,
+      image: null,
+      imageDataUrl: null,
+      source: null,
+      warning: 'Couldn’t fetch that product page',
+    }
+  }
   return api('/api/fetch-product', {
     method: 'POST',
     token: session.token,
@@ -46,9 +72,35 @@ export async function fetchProduct(url) {
 export async function fetchRemoteImage(url) {
   const session = getSession()
   if (!session) throw new Error('Not signed in.')
+  if (await useLocalStore()) {
+    return { url, image: url, imageDataUrl: url }
+  }
   return api('/api/fetch-image', {
     method: 'POST',
     token: session.token,
     body: { url },
   })
+}
+
+export async function uploadBoardImage(blob) {
+  const session = getSession()
+  if (!session) throw new Error('Not signed in.')
+  if (await useLocalStore()) return blobToDataUrl(blob)
+  const res = await fetch('/api/assets', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${session.token}`,
+      'Content-Type': blob.type || 'application/octet-stream',
+    },
+    body: blob,
+  })
+  let data = null
+  try {
+    data = await res.json()
+  } catch {
+    data = null
+  }
+  if (!res.ok) throw new Error(data?.error || 'Couldn’t save image')
+  if (!data?.src) throw new Error('Couldn’t save image')
+  return data.src
 }
