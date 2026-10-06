@@ -49,6 +49,19 @@ function verifyCode(code, stored) {
   }
 }
 
+/** Pages plus items on them (and legacy top-level elements/blocks). */
+function boardWeight(doc) {
+  if (!doc || typeof doc !== 'object') return 0
+  const count = (list) => (Array.isArray(list) ? list.length : 0)
+  const pages = Array.isArray(doc.pages) ? doc.pages : []
+  return (
+    count(doc.elements) +
+    count(doc.blocks) +
+    pages.length +
+    pages.reduce((n, p) => n + count(p?.elements), 0)
+  )
+}
+
 function emptyDoc() {
   return { elements: [], nextId: 1, scale: 1, ox: 0, oy: 0 }
 }
@@ -245,21 +258,14 @@ app.put('/api/canvas', (req, res) => {
     return res.status(400).json({ error: 'Missing canvas document.' })
   }
 
-  const nextEls = Array.isArray(doc.elements) ? doc.elements.length : 0
-  const nextBlocks = Array.isArray(doc.blocks) ? doc.blocks.length : 0
   const existing = db.prepare('select doc from boards where email = ?').get(email)
   if (existing) {
     try {
       const prev = JSON.parse(existing.doc)
-      const prevEls = Array.isArray(prev.elements) ? prev.elements.length : 0
-      const prevBlocks = Array.isArray(prev.blocks) ? prev.blocks.length : 0
-      // Guard against reload races wiping a full board with an empty one
-      if (
-        (prevEls > 0 || prevBlocks > 0) &&
-        nextEls === 0 &&
-        nextBlocks === 0 &&
-        !req.body?.allowEmpty
-      ) {
+      // Guard against reload races wiping a full board with an empty one.
+      // Count every page: the top-level `elements` is only the open page, so an
+      // empty page, a cleared page or the library view must not look like a wipe.
+      if (boardWeight(prev) > 0 && boardWeight(doc) === 0 && !req.body?.allowEmpty) {
         return res.status(409).json({
           error: 'Refusing to overwrite your board with an empty canvas. Refresh to reload.',
         })

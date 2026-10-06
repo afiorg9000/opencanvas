@@ -23,6 +23,9 @@ export function startCanvas(user) {
   let nextId = 1
   let lastPointerWorld = { x: 120, y: 120 }
   let saveTimer = null
+  let saving = null
+  let saveQueued = false
+  let dirty = false
   let gesture = null
   let disposed = false
   let booted = false
@@ -2718,6 +2721,7 @@ export function startCanvas(user) {
   function scheduleSave({ soft = false } = {}) {
     if (disposed || applyingHistory || !hydrated) return
     clearTimeout(saveTimer)
+    dirty = true
     if (soft) {
       // Persist without bloating undo (avoids cloning huge image payloads every keystroke)
       saveTimer = setTimeout(persist, 900)
@@ -2731,37 +2735,79 @@ export function startCanvas(user) {
 
   async function persist() {
     if (disposed || !hydrated) return
-    try {
-      flushCurrentPage()
-      const current = pages.find((p) => p.id === currentPageId)
-      const doc = {
-        mode: 'canvas',
-        pages: pages.map((p) => ({
-          id: p.id,
-          title: p.title || '',
-          elements: p.id === currentPageId ? liveElements() : p.elements || [],
-          scrollTop: p.scrollTop || 0,
-          scale: p.scale || 1,
-        })),
-        currentPageId,
-        view: viewMode,
-        elements: current ? (currentPageId ? liveElements() : current.elements) : pages[0]?.elements || liveElements(),
-        nextId,
-        scale,
-        scrollTop: viewport.scrollTop,
-      }
-      await saveCanvas(doc)
-      flashSave('Saved')
-    } catch (err) {
-      console.error(err)
-      const msg = String(err?.message || err)
-      if (/Refusing to overwrite/i.test(msg)) {
-        flashSave('Save blocked — refresh to reload your board', 5000)
-        return
-      }
-      const missing = /canvas_boards|PGRST205|schema cache|Failed to fetch|ECONNREFUSED/i.test(msg)
-      flashSave(missing ? 'Server offline — run npm run dev' : 'Couldn’t save', 4000)
+    clearTimeout(saveTimer)
+    saveTimer = null
+    // One request at a time: an older PUT finishing after a newer one would
+    // overwrite fresh edits. Queue a single follow-up save instead.
+    if (saving) {
+      saveQueued = true
+      return saving
     }
+    saving = (async () => {
+      try {
+        flushCurrentPage()
+        const live = currentPageId ? liveElements() : null
+        const current = pages.find((p) => p.id === currentPageId)
+        const doc = {
+          mode: 'canvas',
+          pages: pages.map((p) => ({
+            id: p.id,
+            title: p.title || '',
+            elements: p.id === currentPageId ? live : p.elements || [],
+            scrollTop: p.scrollTop || 0,
+            scale: p.scale || 1,
+          })),
+          currentPageId,
+          view: viewMode,
+          elements: current ? live : pages[0]?.elements || [],
+          nextId,
+          scale,
+          scrollTop: viewport.scrollTop,
+        }
+        dirty = false
+        await saveCanvas(doc)
+        if (!saveQueued) flashSave('Saved')
+      } catch (err) {
+        dirty = true
+        console.error(err)
+        const msg = String(err?.message || err)
+        if (/Refusing to overwrite/i.test(msg)) {
+          flashSave('Save blocked — refresh to reload your board', 5000)
+          return
+        }
+        if (/quota/i.test(msg)) {
+          flashSave('Browser storage is full — remove some images to keep saving', 5000)
+          return
+        }
+        const missing = /canvas_boards|PGRST205|schema cache|Failed to fetch|ECONNREFUSED/i.test(msg)
+        flashSave(missing ? 'Server offline — run npm run dev' : 'Couldn’t save', 4000)
+      }
+    })()
+    try {
+      await saving
+    } finally {
+      saving = null
+    }
+    if (saveQueued && !disposed) {
+      saveQueued = false
+      return persist()
+    }
+  }
+
+  /** Save right away when the tab is hidden or closed, instead of losing the last 900ms. */
+  function flushPendingSave() {
+    if (saveTimer || dirty) persist()
+  }
+
+  function onVisibilityChange() {
+    if (document.visibilityState === 'hidden') flushPendingSave()
+  }
+
+  function onBeforeUnload(ev) {
+    if (!hydrated || disposed || (!saveTimer && !dirty && !saving)) return
+    flushPendingSave()
+    ev.preventDefault()
+    ev.returnValue = ''
   }
 
   function clearWorld() {
@@ -5036,7 +5082,8 @@ export function startCanvas(user) {
     const vr = viewport.getBoundingClientRect()
     viewport.scrollLeft = before.x * scale - (sx - vr.left)
     viewport.scrollTop = before.y * scale - (sy - vr.top)
-    scheduleSave()
+    // Zoom isn't undoable; a full board snapshot per wheel tick made pinch-zoom lag
+    scheduleSave({ soft: true })
   }
 
   function onZoomIn() {
@@ -5239,6 +5286,9 @@ export function startCanvas(user) {
     resizeObserver.observe(document.body)
     world.addEventListener('input', onWorldInput)
     addEventListener('resize', onResize)
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    addEventListener('pagehide', flushPendingSave)
+    addEventListener('beforeunload', onBeforeUnload)
   }
 
   function onDocPointerDown(ev) {
@@ -5277,6 +5327,9 @@ export function startCanvas(user) {
     resizeObserver.disconnect()
     world.removeEventListener('input', onWorldInput)
     removeEventListener('resize', onResize)
+    document.removeEventListener('visibilitychange', onVisibilityChange)
+    removeEventListener('pagehide', flushPendingSave)
+    removeEventListener('beforeunload', onBeforeUnload)
   }
 
   function reset() {

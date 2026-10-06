@@ -85,7 +85,9 @@ export async function localLoadCanvas(email) {
 
   const applied = localStorage.getItem(SNAPSHOT_APPLIED_KEY)
   const snapNewer = snap.exportedAt && snap.exportedAt !== applied
-  if (snapNewer || boardWeight(snap.doc) >= boardWeight(local)) {
+  // Only take the published copy when it's a fresh export or this browser has
+  // nothing yet — otherwise edits made here would be replaced on every reload.
+  if (snapNewer || boardWeight(local) === 0) {
     if (snap.exportedAt) localStorage.setItem(SNAPSHOT_APPLIED_KEY, snap.exportedAt)
     localStorage.setItem(BOARD_KEY(email), JSON.stringify(snap.doc))
     return snap.doc
