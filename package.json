@@ -9,7 +9,6 @@
     "dev:web": "vite",
     "build": "vite build",
     "export-board": "node scripts/export-board.js",
-    "build:netlify": "node scripts/export-board.js && vite build",
     "preview": "vite preview",
     "start": "node server/index.js"
   },

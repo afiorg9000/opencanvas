@@ -1,5 +1,4 @@
 import { loadCanvas, saveCanvas, fetchProduct, fetchRemoteImage, uploadBoardImage } from './db.js'
-import { removeBackground, subscribeToProgress } from 'rembg-webgpu'
 
 /**
  * Boot the vertically scrolling canvas for a signed-in user.
@@ -23,6 +22,9 @@ export function startCanvas(user) {
   let nextId = 1
   let lastPointerWorld = { x: 120, y: 120 }
   let saveTimer = null
+  let saving = null
+  let saveQueued = false
+  let dirty = false
   let gesture = null
   let disposed = false
   let booted = false
@@ -244,7 +246,111 @@ export function startCanvas(user) {
 
   function looksLikeUrl(raw) {
     const t = String(raw || '').trim()
-    return /^https?:\/\//i.test(t) || /^www\./i.test(t)
+    return /^https?:\/\//i.test(t) || /^www\./i.test(t) || /^spotify:/i.test(t)
+  }
+
+  function parseSpotifyUrl(raw) {
+    const t = String(raw || '').trim()
+    if (!t) return null
+    const pack = (kind, id) => {
+      if (!['playlist', 'track', 'album', 'artist', 'episode', 'show'].includes(kind)) return null
+      if (!/^[a-zA-Z0-9]{11,34}$/.test(id)) return null
+      return {
+        kind,
+        id,
+        href: `https://open.spotify.com/${kind}/${id}`,
+        embed: `https://open.spotify.com/embed/${kind}/${id}?utm_source=generator`,
+      }
+    }
+    const uri = t.match(/^spotify:(playlist|track|album|artist|episode|show):([a-zA-Z0-9]+)$/i)
+    if (uri) return pack(uri[1].toLowerCase(), uri[2])
+    try {
+      const u = new URL(normalizeUrl(t))
+      if (!/(^|\.)spotify\.com$/i.test(u.hostname)) return null
+      const parts = u.pathname.split('/').filter(Boolean)
+      let i = 0
+      if (parts[0]?.startsWith('intl-')) i = 1
+      if (parts[i] === 'embed') i += 1
+      return pack(String(parts[i] || '').toLowerCase(), String(parts[i + 1] || '').split('?')[0])
+    } catch {
+      return null
+    }
+  }
+
+  function spotifyEmbedSrc(e) {
+    const kind = String(e?.kind || '').toLowerCase()
+    const id = String(e?.spotifyId || '').trim()
+    if (kind && id) return `https://open.spotify.com/embed/${kind}/${id}?utm_source=generator`
+    const raw = String(e?.embed || '').trim()
+    if (!raw) return ''
+    try {
+      const u = new URL(raw)
+      u.searchParams.set('utm_source', 'generator')
+      u.searchParams.delete('theme')
+      return u.toString()
+    } catch {
+      return raw
+    }
+  }
+
+  function parseGifUrl(raw) {
+    const t = String(raw || '').trim()
+    if (!t) return null
+    let u
+    try {
+      u = new URL(normalizeUrl(t))
+    } catch {
+      return null
+    }
+    const host = u.hostname.replace(/^www\./i, '').toLowerCase()
+    const path = u.pathname || ''
+
+    if (/\.(gif)(\?|$)/i.test(path) || /[?&](?:format|fm)=gif\b/i.test(u.search)) {
+      return { kind: 'file', src: u.toString(), href: u.toString() }
+    }
+
+    if (host === 'giphy.com' || host.endsWith('.giphy.com')) {
+      const parts = path.split('/').filter(Boolean)
+      const embedIdx = parts.indexOf('embed')
+      const mediaIdx = parts.indexOf('media')
+      const gifsIdx = parts.indexOf('gifs')
+      let id = null
+      if (embedIdx >= 0 && parts[embedIdx + 1]) id = parts[embedIdx + 1]
+      else if (mediaIdx >= 0 && parts[mediaIdx + 1]) id = parts[mediaIdx + 1]
+      else if (gifsIdx >= 0 && parts[gifsIdx + 1]) {
+        const slug = parts[gifsIdx + 1].replace(/\.gif$/i, '')
+        id = slug.split('-').pop()
+      } else if (parts.length === 1) id = parts[0].replace(/\.gif$/i, '')
+      id = String(id || '').split('?')[0]
+      if (/^[a-zA-Z0-9]{4,32}$/.test(id)) {
+        return {
+          kind: 'giphy',
+          id,
+          href: `https://giphy.com/gifs/${id}`,
+          src: `https://media.giphy.com/media/${id}/giphy.gif`,
+          embed: `https://giphy.com/embed/${id}`,
+        }
+      }
+    }
+
+    if (host === 'tenor.com' || host.endsWith('.tenor.com')) {
+      const embed = path.match(/\/embed\/(\d+)/)
+      const view = path.match(/-gif-(\d+)/i) || path.match(/\/view\/[^/]*?(\d+)\s*$/)
+      const id = (embed?.[1] || view?.[1] || '').trim()
+      if (/^\d{4,18}$/.test(id)) {
+        return {
+          kind: 'tenor',
+          id,
+          href: u.toString(),
+          embed: `https://tenor.com/embed/${id}`,
+        }
+      }
+      if (/\.(gif|mp4|webm)(\?|$)/i.test(path)) {
+        return { kind: 'file', src: u.toString(), href: u.toString() }
+      }
+    }
+
+    return null
   }
 
   function looksLikeImageUrl(text) {
@@ -252,8 +358,9 @@ export function startCanvas(user) {
       const u = new URL(normalizeUrl(text))
       if (/\.(png|jpe?g|webp|gif|avif|svg)(\?|$)/i.test(u.pathname)) return true
       if (/\/(?:image|images|img|media|cdn|static)\//i.test(u.pathname) && !/\.html?$/i.test(u.pathname)) {
-        return /format=|\.cdn\.|cloudfront|cloudinary|shopify|imgix/i.test(u.href)
+        return /format=|\.cdn\.|cloudfront|cloudinary|shopify|imgix|giphy|tenor/i.test(u.href)
       }
+      if (parseGifUrl(text)) return true
       return false
     } catch {
       return false
@@ -339,7 +446,87 @@ export function startCanvas(user) {
     return enrichElementFromLink(id, { ...opts, priceOnly: true })
   }
 
+  function addSpotifyFromUrl(rawUrl, wx, wy) {
+    const spotify = parseSpotifyUrl(rawUrl)
+    if (!spotify) {
+      flashSave('Need a Spotify link')
+      return null
+    }
+    if (viewMode !== 'page') createLibraryPage()
+    const compact = spotify.kind === 'track' || spotify.kind === 'episode'
+    const w = 352
+    const h = compact ? 152 : 352
+    const x = (wx ?? lastPointerWorld.x) - w / 2
+    const y = Math.max(0, (wy ?? lastPointerWorld.y) - 24)
+    const e = {
+      id: uid(),
+      type: 'spotify',
+      x: Math.max(0, x),
+      y,
+      w,
+      h,
+      href: spotify.href,
+      embed: spotify.embed,
+      kind: spotify.kind,
+      spotifyId: spotify.id,
+    }
+    elements.push(e)
+    render(e)
+    select(e.id)
+    scheduleSave()
+    flashSave('Spotify card added')
+    return e
+  }
+
+  function addGifFromUrl(rawUrl, wx, wy) {
+    const gif = parseGifUrl(rawUrl)
+    if (!gif) {
+      flashSave('Need a GIF, Giphy, or Tenor link')
+      return null
+    }
+    if (viewMode !== 'page') createLibraryPage()
+    const x = wx ?? lastPointerWorld.x
+    const y = wy ?? lastPointerWorld.y
+    if (gif.embed) {
+      const w = 360
+      const h = 280
+      const e = {
+        id: uid(),
+        type: 'gif',
+        x: Math.max(0, x - w / 2),
+        y: Math.max(0, y - 24),
+        w,
+        h,
+        href: gif.href,
+        embed: gif.embed,
+        kind: gif.kind,
+        gifId: gif.id,
+      }
+      elements.push(e)
+      render(e)
+      select(e.id)
+      scheduleSave()
+      flashSave('GIF added')
+      return e
+    }
+    flashSave('Adding GIF…')
+    if (!gif.src) {
+      flashSave('Couldn’t embed that GIF')
+      return null
+    }
+    return createImageFromSrc(gif.src, x, y, {
+      href: gif.href || gif.src,
+      label: 'GIF',
+      maxW: 480,
+    }).then((e) => {
+      flashSave('GIF added')
+      return e
+    })
+  }
+
   async function addProductFromUrl(rawUrl, wx, wy) {
+    if (parseSpotifyUrl(rawUrl)) return addSpotifyFromUrl(rawUrl, wx, wy)
+    if (parseGifUrl(rawUrl)) return addGifFromUrl(rawUrl, wx, wy)
     const url = normalizeUrl(rawUrl)
     if (!url) {
       flashSave('Need a full product URL (https://…)')
@@ -1615,7 +1802,7 @@ export function startCanvas(user) {
   }
 
   function elSize(e) {
-    if (e.type === 'image' || e.type === 'container') return { w: e.w, h: e.h }
+    if (e.type === 'image' || e.type === 'container' || e.type === 'spotify' || e.type === 'gif') return { w: e.w, h: e.h }
     const node = byId(e.id)
     if (e.type === 'flow') {
       return { w: e.width || FLOW_W, h: node?.offsetHeight || (e.kind === 'h1' ? 52 : 34) }
@@ -1736,6 +1923,14 @@ export function startCanvas(user) {
         const ratio = e.h / Math.max(e.w, 1)
         e.w = colW
         e.h = colW * ratio
+      } else if (e.type === 'spotify') {
+        const ratio = e.h / Math.max(e.w, 1)
+        e.w = colW
+        e.h = Math.max(152, colW * ratio)
+      } else if (e.type === 'gif') {
+        const ratio = e.h / Math.max(e.w, 1)
+        e.w = colW
+        e.h = Math.max(120, colW * ratio)
       } else if (e.type === 'text' || e.type === 'title') {
         e.width = colW
       } else if (e.type === 'container') {
@@ -1846,6 +2041,7 @@ export function startCanvas(user) {
     stage.style.width = b.w + 'px'
     stage.style.height = b.h + 'px'
     stage.style.transform = `scale(${s})`
+    let previewImgs = 0
     for (const e of els) {
       try {
         const node = document.createElement('div')
@@ -1856,11 +2052,26 @@ export function startCanvas(user) {
         if (e.type === 'image' && e.src) {
           node.style.width = (e.w || 160) + 'px'
           node.style.height = (e.h || 160) + 'px'
-          const img = document.createElement('img')
-          img.src = e.src
-          img.alt = ''
-          img.draggable = false
-          node.appendChild(img)
+          if (previewImgs < 4) {
+            previewImgs += 1
+            const img = document.createElement('img')
+            img.src = e.src
+            img.alt = ''
+            img.draggable = false
+            img.loading = 'lazy'
+            img.decoding = 'async'
+            node.appendChild(img)
+          }
+        } else if (e.type === 'spotify') {
+          node.style.width = (e.w || 200) + 'px'
+          node.style.height = Math.min(e.h || 80, 120) + 'px'
+          node.classList.add('spotify')
+          node.textContent = e.kind === 'track' ? 'Track' : e.kind === 'album' ? 'Album' : 'Playlist'
+        } else if (e.type === 'gif') {
+          node.style.width = (e.w || 160) + 'px'
+          node.style.height = Math.min(e.h || 80, 120) + 'px'
+          node.classList.add('gif')
+          node.textContent = 'GIF'
         } else if (e.type === 'container') {
           node.style.width = Math.min(Number(e.w) || 480, 640) + 'px'
           for (const bl of (e.blocks || []).slice(0, 8)) {
@@ -1869,9 +2080,14 @@ export function startCanvas(user) {
             line.className = 'pv-block ' + lineKind
             if (bl.kind === 'divider') continue
             if (bl.kind === 'image' && bl.src) {
-              const im = document.createElement('img')
-              im.src = bl.src
-              line.appendChild(im)
+              if (previewImgs < 4) {
+                previewImgs += 1
+                const im = document.createElement('img')
+                im.src = bl.src
+                im.loading = 'lazy'
+                im.decoding = 'async'
+                line.appendChild(im)
+              }
             } else {
               line.textContent = stripHtml(bl.html || '')
             }
@@ -2666,7 +2882,7 @@ export function startCanvas(user) {
     const minPage = viewport.clientHeight * 3
     let bottom = minPage
     for (const e of elements) {
-      if (e.type === 'image' || e.type === 'container') {
+      if (e.type === 'image' || e.type === 'container' || e.type === 'spotify' || e.type === 'gif') {
         bottom = Math.max(bottom, e.y + e.h + viewport.clientHeight)
       } else {
         const node = byId(e.id)
@@ -2710,14 +2926,18 @@ export function startCanvas(user) {
   }
 
   function flashSave(text, ms = 1200) {
+    if (!saveDot) return
     saveDot.textContent = text
-    saveDot.classList.add('show')
-    setTimeout(() => saveDot.classList.remove('show'), ms)
+    const err = /couldn|blocked|offline|full/i.test(text)
+    saveDot.classList.toggle('error', err)
+    saveDot.classList.toggle('ok', !err && /saved/i.test(text))
   }
 
   function scheduleSave({ soft = false } = {}) {
     if (disposed || applyingHistory || !hydrated) return
+    flashSave('Saving…')
     clearTimeout(saveTimer)
+    dirty = true
     if (soft) {
       // Persist without bloating undo (avoids cloning huge image payloads every keystroke)
       saveTimer = setTimeout(persist, 900)
@@ -2731,37 +2951,79 @@ export function startCanvas(user) {
 
   async function persist() {
     if (disposed || !hydrated) return
-    try {
-      flushCurrentPage()
-      const current = pages.find((p) => p.id === currentPageId)
-      const doc = {
-        mode: 'canvas',
-        pages: pages.map((p) => ({
+    clearTimeout(saveTimer)
+    saveTimer = null
+    // One request at a time: an older PUT finishing after a newer one would
+    // overwrite fresh edits. Queue a single follow-up save instead.
+    if (saving) {
+      saveQueued = true
+      return saving
+    }
+    saving = (async () => {
+      try {
+        flushCurrentPage()
+        const live = currentPageId ? liveElements() : null
+        const pageList = pages.map((p) => ({
           id: p.id,
           title: p.title || '',
-          elements: p.id === currentPageId ? liveElements() : p.elements || [],
+          elements: p.id === currentPageId ? live : p.elements || [],
           scrollTop: p.scrollTop || 0,
           scale: p.scale || 1,
-        })),
-        currentPageId,
-        view: viewMode,
-        elements: current ? (currentPageId ? liveElements() : current.elements) : pages[0]?.elements || liveElements(),
-        nextId,
-        scale,
-        scrollTop: viewport.scrollTop,
+        }))
+        const richest = pageList.reduce(
+          (a, p) => ((p.elements?.length || 0) > (a?.elements?.length || 0) ? p : a),
+          pageList[0] || null
+        )
+        const doc = {
+          mode: 'canvas',
+          pages: pageList,
+          currentPageId,
+          view: viewMode,
+          elements: currentPageId && viewMode === 'page' ? live : richest?.elements || [],
+          nextId,
+          scale,
+          scrollTop: viewport.scrollTop,
+        }
+        dirty = false
+        await saveCanvas(doc)
+        if (!saveQueued) flashSave('Saved')
+      } catch (err) {
+        dirty = true
+        console.error(err)
+        const msg = String(err?.message || err)
+        if (/Refusing to overwrite/i.test(msg)) {
+          flashSave('Save blocked — refresh to reload your board', 5000)
+          return
+        }
+        const missing = /canvas_boards|PGRST205|schema cache|Failed to fetch|ECONNREFUSED/i.test(msg)
+        flashSave(missing ? 'Server offline — run npm run dev' : 'Couldn’t save', 4000)
       }
-      await saveCanvas(doc)
-      flashSave('Saved')
-    } catch (err) {
-      console.error(err)
-      const msg = String(err?.message || err)
-      if (/Refusing to overwrite/i.test(msg)) {
-        flashSave('Save blocked — refresh to reload your board', 5000)
-        return
-      }
-      const missing = /canvas_boards|PGRST205|schema cache|Failed to fetch|ECONNREFUSED/i.test(msg)
-      flashSave(missing ? 'Server offline — run npm run dev' : 'Couldn’t save', 4000)
+    })()
+    try {
+      await saving
+    } finally {
+      saving = null
     }
+    if (saveQueued && !disposed) {
+      saveQueued = false
+      return persist()
+    }
+  }
+
+  /** Save right away when the tab is hidden or closed, instead of losing the last 900ms. */
+  function flushPendingSave() {
+    if (saveTimer || dirty) persist()
+  }
+
+  function onVisibilityChange() {
+    if (document.visibilityState === 'hidden') flushPendingSave()
+  }
+
+  function onBeforeUnload(ev) {
+    if (!hydrated || disposed || (!saveTimer && !dirty && !saving)) return
+    flushPendingSave()
+    ev.preventDefault()
+    ev.returnValue = ''
   }
 
   function clearWorld() {
@@ -2917,10 +3179,42 @@ export function startCanvas(user) {
       if (e.type === 'image') {
         const img = document.createElement('img')
         img.draggable = false
+        img.loading = 'lazy'
+        img.decoding = 'async'
         node.appendChild(img)
         const rh = document.createElement('div')
         rh.className = 'resize-handle'
         node.appendChild(rh)
+      } else if (e.type === 'spotify') {
+        const drag = document.createElement('div')
+        drag.className = 'drag-dots'
+        drag.title = 'Drag to move'
+        drag.textContent = '⋮⋮'
+        const frame = document.createElement('iframe')
+        frame.className = 'spotify-frame'
+        frame.setAttribute(
+          'allow',
+          'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture'
+        )
+        frame.setAttribute('allowfullscreen', '')
+        frame.setAttribute('loading', 'lazy')
+        frame.setAttribute('frameborder', '0')
+        frame.title = 'Spotify player'
+        const rh = document.createElement('div')
+        rh.className = 'resize-handle'
+        node.append(drag, frame, rh)
+      } else if (e.type === 'gif') {
+        const drag = document.createElement('div')
+        drag.className = 'gif-drag'
+        drag.title = 'Drag to move'
+        drag.textContent = 'GIF'
+        const frame = document.createElement('iframe')
+        frame.className = 'gif-frame'
+        frame.setAttribute('loading', 'lazy')
+        frame.title = 'GIF'
+        const rh = document.createElement('div')
+        rh.className = 'resize-handle'
+        node.append(drag, frame, rh)
       } else if (e.type === 'container') {
         const bar = document.createElement('div')
         bar.className = 'drag-bar'
@@ -2979,6 +3273,23 @@ export function startCanvas(user) {
       const sx = e.flipX ? -1 : 1
       const sy = e.flipY ? -1 : 1
       img.style.transform = sx === 1 && sy === 1 ? '' : `scale(${sx}, ${sy})`
+    } else if (e.type === 'spotify') {
+      node.style.width = e.w + 'px'
+      node.style.height = e.h + 'px'
+      const oldBar = node.querySelector('.spotify-drag')
+      if (oldBar) {
+        oldBar.className = 'drag-dots'
+        oldBar.title = 'Drag to move'
+        oldBar.textContent = '⋮⋮'
+      }
+      const frame = node.querySelector('.spotify-frame')
+      const src = spotifyEmbedSrc(e)
+      if (frame && src && frame.getAttribute('src') !== src) frame.setAttribute('src', src)
+    } else if (e.type === 'gif') {
+      node.style.width = e.w + 'px'
+      node.style.height = e.h + 'px'
+      const frame = node.querySelector('.gif-frame')
+      if (frame && frame.getAttribute('src') !== e.embed) frame.setAttribute('src', e.embed)
     } else if (e.type === 'container') {
       node.classList.toggle('column', Boolean(e.column))
       node.classList.toggle('notion', Boolean(e.notion || e.column))
@@ -3367,7 +3678,7 @@ export function startCanvas(user) {
     for (const e of items) {
       e.x = ox + (e.x - ox) * factor
       e.y = Math.max(0, oy + (e.y - oy) * factor)
-      if (e.type === 'image' || e.type === 'container') {
+      if (e.type === 'image' || e.type === 'container' || e.type === 'spotify' || e.type === 'gif') {
         e.w = Math.max(28, e.w * factor)
         e.h = Math.max(28, e.h * factor)
       } else if (isTextLike(e)) {
@@ -3406,7 +3717,7 @@ export function startCanvas(user) {
       if (!e) continue
       e.x = ox + (o.x - ox) * factor
       e.y = Math.max(0, oy + (o.y - oy) * factor)
-      if (e.type === 'image' || e.type === 'container') {
+      if (e.type === 'image' || e.type === 'container' || e.type === 'spotify' || e.type === 'gif') {
         e.w = Math.max(28, o.w * factor)
         e.h = Math.max(28, o.h * factor)
       } else if (isTextLike(e)) {
@@ -3523,6 +3834,24 @@ export function startCanvas(user) {
       } else if (!e.href) {
         addBtn('Add link', () => editElementLink(e.id))
       }
+      addSep()
+      addBtn('Delete', () => removeElement(e.id), 'danger')
+    } else if (e.type === 'spotify') {
+      addBtn('Open in Spotify', () => openExternalLink(e.href), 'primary')
+      addSep()
+      addBtn('Copy', () => copySelected(), null, 'Copy (⌘C)')
+      addSep()
+      addBtn('Front', () => bringToFront(e.id))
+      addBtn('Back', () => sendToBack(e.id))
+      addSep()
+      addBtn('Delete', () => removeElement(e.id), 'danger')
+    } else if (e.type === 'gif') {
+      addBtn('Open GIF', () => openExternalLink(e.href || e.embed), 'primary')
+      addSep()
+      addBtn('Copy', () => copySelected(), null, 'Copy (⌘C)')
+      addSep()
+      addBtn('Front', () => bringToFront(e.id))
+      addBtn('Back', () => sendToBack(e.id))
       addSep()
       addBtn('Delete', () => removeElement(e.id), 'danger')
     } else if (e.type === 'container' || e.type === 'flow') {
@@ -3820,16 +4149,17 @@ export function startCanvas(user) {
     positionToolbar()
     flashSave('Loading better remover… first time can take a minute', 5000)
 
-    const unsub = subscribeToProgress(({ phase, progress }) => {
-      if (phase === 'downloading') flashSave(`Downloading model… ${Math.round(progress)}%`, 2000)
-      else if (phase === 'building') flashSave(`Preparing model… ${Math.round(progress)}%`, 2000)
-      else if (phase === 'ready') flashSave('Cutting sticker…', 2000)
-    })
-
+    let unsub = () => {}
     let input = null
     try {
+      const rembg = await import('rembg-webgpu')
+      unsub = rembg.subscribeToProgress(({ phase, progress }) => {
+        if (phase === 'downloading') flashSave(`Downloading model… ${Math.round(progress)}%`, 2000)
+        else if (phase === 'building') flashSave(`Preparing model… ${Math.round(progress)}%`, 2000)
+        else if (phase === 'ready') flashSave('Cutting sticker…', 2000)
+      })
       input = await srcToObjectUrl(e.src)
-      const result = await removeBackground(input.url)
+      const result = await rembg.removeBackground(input.url)
       const raw = await blobToDataUrl(await fetch(result.blobUrl).then((r) => r.blob()))
 
       URL.revokeObjectURL(result.blobUrl)
@@ -4478,6 +4808,17 @@ export function startCanvas(user) {
       return
     }
 
+    if (text && parseSpotifyUrl(text.trim())) {
+      ev.preventDefault()
+      addSpotifyFromUrl(text.trim(), lastPointerWorld.x, lastPointerWorld.y)
+      return
+    }
+    if (text && parseGifUrl(text.trim())) {
+      ev.preventDefault()
+      addGifFromUrl(text.trim(), lastPointerWorld.x, lastPointerWorld.y)
+      return
+    }
+
     if (document.activeElement?.isContentEditable) return
 
     if (readAppClipboard().length && !osHasMedia && !text.trim() && !types.length) {
@@ -4601,6 +4942,13 @@ export function startCanvas(user) {
         ev.preventDefault()
         ev.stopPropagation()
         closeNotionPage(id)
+        return
+      }
+      if (
+        (e.type === 'spotify' && target.closest('iframe, .spotify-frame')) ||
+        (e.type === 'gif' && target.closest('iframe, .gif-frame'))
+      ) {
+        select(id)
         return
       }
       if (target.closest('.block-handle')) {
@@ -5036,7 +5384,8 @@ export function startCanvas(user) {
     const vr = viewport.getBoundingClientRect()
     viewport.scrollLeft = before.x * scale - (sx - vr.left)
     viewport.scrollTop = before.y * scale - (sy - vr.top)
-    scheduleSave()
+    // Zoom isn't undoable; a full board snapshot per wheel tick made pinch-zoom lag
+    scheduleSave({ soft: true })
   }
 
   function onZoomIn() {
@@ -5239,6 +5588,9 @@ export function startCanvas(user) {
     resizeObserver.observe(document.body)
     world.addEventListener('input', onWorldInput)
     addEventListener('resize', onResize)
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    addEventListener('pagehide', flushPendingSave)
+    addEventListener('beforeunload', onBeforeUnload)
   }
 
   function onDocPointerDown(ev) {
@@ -5277,6 +5629,9 @@ export function startCanvas(user) {
     resizeObserver.disconnect()
     world.removeEventListener('input', onWorldInput)
     removeEventListener('resize', onResize)
+    document.removeEventListener('visibilitychange', onVisibilityChange)
+    removeEventListener('pagehide', flushPendingSave)
+    removeEventListener('beforeunload', onBeforeUnload)
   }
 
   function reset() {

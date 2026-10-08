@@ -20,3 +20,16 @@ Open [http://127.0.0.1:5173](http://127.0.0.1:5173).
 - Vite frontend
 - Express API on port `8787`
 - SQLite via `better-sqlite3`
+
+## Publish to Netlify
+
+Netlify builds from GitHub, but your board lives only in `data/canvas.db` on this computer. To update the live site:
+
+```bash
+npm run export-board
+git add public
+git commit -m "Update board"
+git push
+```
+
+`export-board` writes `public/snapshot.json` and copies images into `public/api/assets`. Don't commit `data/` — it holds login codes and session tokens.

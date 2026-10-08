@@ -1,5 +1,5 @@
 import { api, getSession, hasRemoteApi, isLocalSession } from './api.js'
-import { blobToDataUrl, localLoadCanvas, localSaveCanvas } from './local-backend.js'
+import { blobToDataUrl, loadLocalBoard, localLoadCanvas, localSaveCanvas } from './local-backend.js'
 
 function onThisComputer() {
   const host = location.hostname
@@ -18,9 +18,36 @@ async function useLocalStore() {
 export async function loadCanvas() {
   const session = getSession()
   if (!session) throw new Error('Not signed in.')
-  const doc = (await useLocalStore())
-    ? await localLoadCanvas(session.email)
-    : await api('/api/canvas', { token: session.token })
+  if (await useLocalStore()) {
+    const doc = await localLoadCanvas(session.email)
+    return normalize(doc)
+  }
+  try {
+    const remote = await api('/api/canvas', { token: session.token })
+    const backup = await loadLocalBoard(session.email)
+    const pick = heavier(backup, remote)
+    return normalize(pick)
+  } catch (err) {
+    const backup = await loadLocalBoard(session.email)
+    if (heavier(backup, null)) return normalize(backup)
+    throw err
+  }
+}
+
+function boardWeight(doc) {
+  if (!doc || typeof doc !== 'object') return 0
+  const pages = Array.isArray(doc.pages) ? doc.pages : []
+  const top = Array.isArray(doc.elements) ? doc.elements.length : 0
+  return top + pages.reduce((n, p) => n + (Array.isArray(p?.elements) ? p.elements.length : 0), 0)
+}
+
+function heavier(a, b) {
+  if (!a) return b
+  if (!b) return a
+  return boardWeight(a) >= boardWeight(b) ? a : b
+}
+
+function normalize(doc) {
   return {
     mode: doc.mode || null,
     blocks: doc.blocks || null,
@@ -39,10 +66,8 @@ export async function loadCanvas() {
 export async function saveCanvas(doc) {
   const session = getSession()
   if (!session) throw new Error('Not signed in.')
-  if (await useLocalStore()) {
-    localSaveCanvas(session.email, doc)
-    return
-  }
+  await localSaveCanvas(session.email, doc)
+  if (await useLocalStore()) return
   await api('/api/canvas', {
     method: 'PUT',
     token: session.token,
