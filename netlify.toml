@@ -1,5 +1,7 @@
 [build]
-  command = "node scripts/export-board.js && npm run build"
+  # The board is exported on your computer (npm run export-board) and committed,
+  # because data/canvas.db never leaves your machine.
+  command = "npm run build"
   publish = "dist"
 
 [[headers]]
