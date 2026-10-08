@@ -1,6 +1,9 @@
 const USERS_KEY = 'open-canvas-local-users'
 const SNAPSHOT_APPLIED_KEY = 'open-canvas-applied-snapshot'
+const SNAPSHOT_DIRTY_KEY = 'open-canvas-dirty'
 const BOARD_KEY = (email) => `open-canvas-local-board:${email}`
+const IDB_NAME = 'open-canvas'
+const IDB_STORE = 'kv'
 
 let snapshotPromise = null
 
@@ -14,6 +17,66 @@ function boardWeight(doc) {
   const top = Array.isArray(doc.elements) ? doc.elements.length : 0
   const nested = pages.reduce((n, p) => n + (Array.isArray(p?.elements) ? p.elements.length : 0), 0)
   return top + nested
+}
+
+function heavier(a, b) {
+  if (!a || boardWeight(a) === 0) return b && boardWeight(b) > 0 ? b : a || b
+  if (!b || boardWeight(b) === 0) return a
+  return boardWeight(a) >= boardWeight(b) ? a : b
+}
+
+let idbPromise = null
+
+/** One shared connection; opening a new one on every save leaks them. */
+function openIdb() {
+  if (!idbPromise) {
+    idbPromise = openIdbOnce().catch((err) => {
+      idbPromise = null
+      throw err
+    })
+  }
+  return idbPromise
+}
+
+function openIdbOnce() {
+  return new Promise((resolve, reject) => {
+    if (!globalThis.indexedDB) {
+      reject(new Error('No IndexedDB'))
+      return
+    }
+    const req = indexedDB.open(IDB_NAME, 1)
+    req.onupgradeneeded = () => {
+      if (!req.result.objectStoreNames.contains(IDB_STORE)) {
+        req.result.createObjectStore(IDB_STORE)
+      }
+    }
+    req.onsuccess = () => resolve(req.result)
+    req.onerror = () => reject(req.error)
+  })
+}
+
+async function idbGet(key) {
+  try {
+    const db = await openIdb()
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction(IDB_STORE, 'readonly')
+      const req = tx.objectStore(IDB_STORE).get(key)
+      req.onsuccess = () => resolve(req.result ?? null)
+      req.onerror = () => reject(req.error)
+    })
+  } catch {
+    return null
+  }
+}
+
+async function idbSet(key, value) {
+  const db = await openIdb()
+  await new Promise((resolve, reject) => {
+    const tx = db.transaction(IDB_STORE, 'readwrite')
+    tx.oncomplete = () => resolve()
+    tx.onerror = () => reject(tx.error)
+    tx.objectStore(IDB_STORE).put(value, key)
+  })
 }
 
 export async function getPublishedSnapshot() {
@@ -67,36 +130,65 @@ export async function localLogin(email, code) {
   return { token: `local.${crypto.randomUUID()}`, email }
 }
 
-function readLocalBoard(email) {
+function readLocalStorageBoard(email) {
   try {
     const raw = localStorage.getItem(BOARD_KEY(email))
-    if (!raw) return emptyDoc()
+    if (!raw) return null
     const doc = JSON.parse(raw)
-    return doc && typeof doc === 'object' ? doc : emptyDoc()
+    return doc && typeof doc === 'object' ? doc : null
   } catch {
-    return emptyDoc()
+    return null
   }
+}
+
+export async function loadLocalBoard(email) {
+  const idbDoc = await idbGet(BOARD_KEY(email))
+  const lsDoc = readLocalStorageBoard(email)
+  const picked = heavier(idbDoc, lsDoc)
+  return picked && boardWeight(picked) > 0 ? picked : emptyDoc()
 }
 
 export async function localLoadCanvas(email) {
   const snap = await getPublishedSnapshot()
-  const local = readLocalBoard(email)
-  if (!snap?.doc) return local
+  const local = await loadLocalBoard(email)
+  const dirty = localStorage.getItem(SNAPSHOT_DIRTY_KEY) === '1'
+  const localHasWork = boardWeight(local) > 0
 
   const applied = localStorage.getItem(SNAPSHOT_APPLIED_KEY)
-  const snapNewer = snap.exportedAt && snap.exportedAt !== applied
-  // Only take the published copy when it's a fresh export or this browser has
-  // nothing yet — otherwise edits made here would be replaced on every reload.
-  if (snapNewer || boardWeight(local) === 0) {
+  const snapNewer = Boolean(snap?.exportedAt && snap.exportedAt !== applied)
+
+  // Edits made in this browser stay. A new export only replaces a copy that
+  // hasn't been edited here, so publishing from your computer still shows up.
+  if (localHasWork && (dirty || !snapNewer)) return local
+
+  if (snap?.doc) {
+    // Store it too, or the next reload would fall back to the older copy here.
+    await writeLocalBoard(email, snap.doc).catch(() => {})
+    localStorage.removeItem(SNAPSHOT_DIRTY_KEY)
     if (snap.exportedAt) localStorage.setItem(SNAPSHOT_APPLIED_KEY, snap.exportedAt)
-    localStorage.setItem(BOARD_KEY(email), JSON.stringify(snap.doc))
     return snap.doc
   }
   return local
 }
 
-export function localSaveCanvas(email, doc) {
-  localStorage.setItem(BOARD_KEY(email), JSON.stringify(doc))
+async function writeLocalBoard(email, doc) {
+  let lsOk = false
+  try {
+    localStorage.setItem(BOARD_KEY(email), JSON.stringify(doc))
+    lsOk = true
+  } catch {
+    /* storage quota — IndexedDB is the real store on Netlify */
+  }
+  try {
+    await idbSet(BOARD_KEY(email), doc)
+  } catch (err) {
+    if (!lsOk) throw new Error('Couldn’t save in this browser.')
+  }
+}
+
+export async function localSaveCanvas(email, doc) {
+  localStorage.setItem(SNAPSHOT_DIRTY_KEY, '1')
+  await writeLocalBoard(email, doc)
 }
 
 export function blobToDataUrl(blob) {

@@ -79,10 +79,12 @@ export function startPage(_user) {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(num)
   }
 
-  function flashSave(text, ms = 1200) {
+  function flashSave(text, _ms = 1200) {
+    if (!saveDot) return
     saveDot.textContent = text
-    saveDot.classList.add('show')
-    setTimeout(() => saveDot.classList.remove('show'), ms)
+    const err = /couldn|blocked|offline|full/i.test(text)
+    saveDot.classList.toggle('error', err)
+    saveDot.classList.toggle('ok', !err && /saved/i.test(text))
   }
 
   function updateEmpty() {
