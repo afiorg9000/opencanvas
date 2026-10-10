@@ -192,6 +192,23 @@ async function writeLocalBoard(email, doc) {
   }
 }
 
+/** True when this browser saved edits that the server hasn't confirmed yet. */
+export function hasUnsyncedLocalEdits() {
+  try {
+    return localStorage.getItem(SNAPSHOT_DIRTY_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+export function markLocalSynced() {
+  try {
+    localStorage.removeItem(SNAPSHOT_DIRTY_KEY)
+  } catch {
+    /* storage unavailable */
+  }
+}
+
 export async function localSaveCanvas(email, doc) {
   localStorage.setItem(SNAPSHOT_DIRTY_KEY, '1')
   await writeLocalBoard(email, doc)

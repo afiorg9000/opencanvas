@@ -17,6 +17,7 @@
     "vite": "^8.2.0"
   },
   "dependencies": {
+    "@netlify/blobs": "^11.1.4",
     "better-sqlite3": "^12.6.2",
     "cors": "^2.8.6",
     "express": "^5.2.1",

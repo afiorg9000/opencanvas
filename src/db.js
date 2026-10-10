@@ -1,5 +1,12 @@
 import { api, getSession, hasRemoteApi, isLocalSession } from './api.js'
-import { blobToDataUrl, loadLocalBoard, localLoadCanvas, localSaveCanvas } from './local-backend.js'
+import {
+  blobToDataUrl,
+  hasUnsyncedLocalEdits,
+  loadLocalBoard,
+  localLoadCanvas,
+  localSaveCanvas,
+  markLocalSynced,
+} from './local-backend.js'
 
 function onThisComputer() {
   const host = location.hostname
@@ -24,12 +31,16 @@ export async function loadCanvas() {
   }
   try {
     const remote = await api('/api/canvas', { token: session.token })
-    const backup = await loadLocalBoard(session.email)
-    const pick = heavier(backup, remote)
-    return normalize(pick)
+    // The server copy wins unless this browser has edits that never reached it
+    // (offline, a failed save, or work done on the site before cloud saving).
+    if (hasUnsyncedLocalEdits()) {
+      const backup = await loadLocalBoard(session.email)
+      if (boardWeight(backup) > 0) return normalize(backup)
+    }
+    return normalize(remote)
   } catch (err) {
     const backup = await loadLocalBoard(session.email)
-    if (heavier(backup, null)) return normalize(backup)
+    if (boardWeight(backup) > 0) return normalize(backup)
     throw err
   }
 }
@@ -39,12 +50,6 @@ function boardWeight(doc) {
   const pages = Array.isArray(doc.pages) ? doc.pages : []
   const top = Array.isArray(doc.elements) ? doc.elements.length : 0
   return top + pages.reduce((n, p) => n + (Array.isArray(p?.elements) ? p.elements.length : 0), 0)
-}
-
-function heavier(a, b) {
-  if (!a) return b
-  if (!b) return a
-  return boardWeight(a) >= boardWeight(b) ? a : b
 }
 
 function normalize(doc) {
@@ -71,8 +76,49 @@ export async function saveCanvas(doc) {
   await api('/api/canvas', {
     method: 'PUT',
     token: session.token,
-    body: { doc },
+    body: { doc: await withUploadedImages(doc) },
   })
+  markLocalSynced()
+}
+
+const uploadedDataUrls = new Map()
+
+/**
+ * Upload inline (data:) images first and send their URLs instead, so the board
+ * stays small enough for the hosted API's request limit. Each image is sent once.
+ */
+async function withUploadedImages(doc) {
+  async function upload(item) {
+    if (!item || typeof item.src !== 'string' || !item.src.startsWith('data:')) return item
+    let src = uploadedDataUrls.get(item.src)
+    if (!src) {
+      try {
+        src = await uploadBoardImage(await (await fetch(item.src)).blob())
+        uploadedDataUrls.set(item.src, src)
+      } catch {
+        return item
+      }
+    }
+    return { ...item, src }
+  }
+  async function swap(list) {
+    if (!Array.isArray(list)) return list
+    return Promise.all(
+      list.map(async (e) => {
+        if (e?.type === 'image') return upload(e)
+        // Writing columns keep their pictures as image blocks
+        if (e?.type === 'container' && Array.isArray(e.blocks)) {
+          return { ...e, blocks: await Promise.all(e.blocks.map((b) => (b?.kind === 'image' ? upload(b) : b))) }
+        }
+        return e
+      })
+    )
+  }
+  const next = { ...doc, elements: await swap(doc.elements) }
+  if (Array.isArray(doc.pages)) {
+    next.pages = await Promise.all(doc.pages.map(async (p) => (p ? { ...p, elements: await swap(p.elements) } : p)))
+  }
+  return next
 }
 
 export async function fetchProductPrice(url) {
