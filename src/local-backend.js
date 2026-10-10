@@ -2,6 +2,7 @@ const USERS_KEY = 'open-canvas-local-users'
 const SNAPSHOT_APPLIED_KEY = 'open-canvas-applied-snapshot'
 const SNAPSHOT_DIRTY_KEY = 'open-canvas-dirty'
 const BOARD_KEY = (email) => `open-canvas-local-board:${email}`
+const BACKUP_KEY = (email) => `open-canvas-board-backup:${email}`
 const IDB_NAME = 'open-canvas'
 const IDB_STORE = 'kv'
 
@@ -162,6 +163,11 @@ export async function localLoadCanvas(email) {
   if (localHasWork && (dirty || !snapNewer)) return local
 
   if (snap?.doc) {
+    // Never drop this browser's copy outright: older versions of the site
+    // didn't mark edits, so keep it under a backup key before replacing it.
+    if (localHasWork) {
+      await idbSet(BACKUP_KEY(email), { savedAt: new Date().toISOString(), doc: local }).catch(() => {})
+    }
     // Store it too, or the next reload would fall back to the older copy here.
     await writeLocalBoard(email, snap.doc).catch(() => {})
     localStorage.removeItem(SNAPSHOT_DIRTY_KEY)
