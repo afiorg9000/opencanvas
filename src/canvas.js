@@ -4669,8 +4669,11 @@ export function startCanvas(user) {
       files.push(f)
     }
     if (dt?.files) for (const f of dt.files) add(f)
-    // Safari often yields the file only once from DataTransferItem.getAsFile()
-    if (dt?.items) {
+    // The same image usually shows up in both `files` and `items`, and each
+    // getAsFile() call returns a fresh File with a new lastModified, so the key
+    // above can't match them. Only read items when files came back empty
+    // (Safari sometimes exposes the image only there).
+    if (!files.length && dt?.items) {
       for (const it of dt.items) {
         if (!it.type?.startsWith('image/')) continue
         add(it.getAsFile())

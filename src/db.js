@@ -79,15 +79,20 @@ export async function fetchProductPrice(url) {
   const session = getSession()
   if (!session) throw new Error('Not signed in.')
   if (await useLocalStore()) {
-    return {
-      url,
-      price: null,
-      currency: null,
-      title: null,
-      image: null,
-      imageDataUrl: null,
-      source: null,
-      warning: 'Couldn’t fetch that product page',
+    // No Express API on the published site; a Netlify function reads the page instead.
+    try {
+      return await api('/.netlify/functions/fetch-product', { method: 'POST', body: { url } })
+    } catch {
+      return {
+        url,
+        price: null,
+        currency: null,
+        title: null,
+        image: null,
+        imageDataUrl: null,
+        source: null,
+        warning: 'Couldn’t fetch that product page',
+      }
     }
   }
   return api('/api/fetch-product', {
