@@ -21,9 +21,15 @@ Open [http://127.0.0.1:5173](http://127.0.0.1:5173).
 - Express API on port `8787`
 - SQLite via `better-sqlite3`
 
-## Publish to Netlify
+## Live site (Netlify)
 
-Netlify builds from GitHub, but your board lives only in `data/canvas.db` on this computer. To update the live site:
+The published site saves to the cloud (Netlify Blobs), so the same board shows up on every device:
+
+- Sign in with your email + code. The first sign-in creates the account; only the owner of the published board (or emails listed in the `ALLOWED_EMAILS` environment variable) can create one.
+- On your first cloud sign-in the board starts from `public/snapshot.json`; after that the cloud copy is the board.
+- After 8 wrong codes, sign-in is paused for 15 minutes.
+
+The `npm run dev` app on your computer still keeps its own board in `data/canvas.db`, separate from the cloud one. To publish that board as the starting point for a fresh cloud account:
 
 ```bash
 npm run export-board
