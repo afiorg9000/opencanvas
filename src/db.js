@@ -33,11 +33,12 @@ export async function loadCanvas() {
     const remote = await api('/api/canvas', { token: session.token })
     // The server copy wins unless this browser has edits that never reached it
     // (offline, a failed save, or work done on the site before cloud saving).
+    let doc = remote
     if (hasUnsyncedLocalEdits()) {
       const backup = await loadLocalBoard(session.email)
-      if (boardWeight(backup) > 0) return normalize(backup)
+      if (boardWeight(backup) > 0) doc = backup
     }
-    return normalize(remote)
+    return normalize(await withoutInlineImages(session, doc))
   } catch (err) {
     const backup = await loadLocalBoard(session.email)
     if (boardWeight(backup) > 0) return normalize(backup)
@@ -79,6 +80,34 @@ export async function saveCanvas(doc) {
     body: { doc: await withUploadedImages(doc) },
   })
   markLocalSynced()
+}
+
+/**
+ * Pictures added on the old browser-only site are stored inline as data: URLs.
+ * Every undo step and save copies the whole page, so a board full of them can
+ * run the tab out of memory. Upload them once on load and save the light copy.
+ */
+async function withoutInlineImages(session, doc) {
+  if (!hasInlineImages(doc)) return doc
+  const light = await withUploadedImages(doc)
+  try {
+    await localSaveCanvas(session.email, light)
+    await api('/api/canvas', { method: 'PUT', token: session.token, body: { doc: light } })
+    markLocalSynced()
+  } catch (err) {
+    console.error(err)
+  }
+  return light
+}
+
+function hasInlineImages(doc) {
+  const inline = (x) => typeof x?.src === 'string' && x.src.startsWith('data:')
+  const lists = [doc?.elements, ...(Array.isArray(doc?.pages) ? doc.pages.map((p) => p?.elements) : [])]
+  return lists.some(
+    (list) =>
+      Array.isArray(list) &&
+      list.some((e) => inline(e) || (Array.isArray(e?.blocks) && e.blocks.some((b) => b?.kind === 'image' && inline(b))))
+  )
 }
 
 const uploadedDataUrls = new Map()
