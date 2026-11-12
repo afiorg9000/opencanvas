@@ -219,21 +219,75 @@
         return data
       }
 
-      /** Upload inline pictures first so the board fits the server's size limit. */
-      async function lighten(doc, token) {
+      // The upload limit for one picture; bigger ones are shrunk first.
+      const MAX_UPLOAD = 4_000_000
+
+      /** Re-encode a picture smaller (max 2400px side, WebP) until it fits the upload limit. */
+      async function shrink(blob) {
+        const bmp = await createImageBitmap(blob)
+        for (const [side, q] of [[2400, 0.85], [2000, 0.8], [1600, 0.75], [1200, 0.7]]) {
+          const k = Math.min(1, side / Math.max(bmp.width, bmp.height))
+          const c = document.createElement('canvas')
+          c.width = Math.round(bmp.width * k)
+          c.height = Math.round(bmp.height * k)
+          c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height)
+          const out = await new Promise((res) => c.toBlob(res, 'image/webp', q))
+          if (out && out.size <= MAX_UPLOAD) return out
+        }
+        throw new Error('Picture too large')
+      }
+
+      function countInline(doc) {
+        let n = 0
+        const each = (l) =>
+          Array.isArray(l) &&
+          l.forEach((e) => {
+            if (typeof e?.src === 'string' && e.src.startsWith('data:')) n++
+            if (Array.isArray(e?.blocks)) e.blocks.forEach((b) => typeof b?.src === 'string' && b.src.startsWith('data:') && n++)
+          })
+        each(doc.elements)
+        ;(doc.pages || []).forEach((p) => each(p?.elements))
+        return n
+      }
+
+      /**
+       * Upload inline pictures first so the board fits the server's size limit.
+       * Oversized pictures are shrunk; one that still fails is left out (the
+       * downloaded copy keeps it) instead of stopping the whole restore.
+       */
+      async function lighten(doc, token, progress) {
         const cache = new Map()
+        const total = countInline(doc)
+        let done = 0
+        let failed = 0
+        async function upload(blob) {
+          return api('/api/assets', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}`, 'Content-Type': blob.type || 'image/png' },
+            body: blob,
+          })
+        }
         async function fix(item) {
           if (!item || typeof item.src !== 'string' || !item.src.startsWith('data:')) return item
           if (!cache.has(item.src)) {
-            const blob = await (await fetch(item.src)).blob()
-            const out = await api('/api/assets', {
-              method: 'POST',
-              headers: { Authorization: `Bearer ${token}`, 'Content-Type': blob.type || 'image/png' },
-              body: blob,
-            })
-            cache.set(item.src, out.src)
+            progress(++done, total)
+            let src = null
+            try {
+              let blob = await (await fetch(item.src)).blob()
+              if (blob.size > MAX_UPLOAD) blob = await shrink(blob)
+              try {
+                src = (await upload(blob)).src
+              } catch {
+                src = (await upload(await shrink(blob))).src
+              }
+            } catch (err) {
+              console.error(err)
+              failed++
+            }
+            cache.set(item.src, src)
           }
-          return { ...item, src: cache.get(item.src) }
+          const src = cache.get(item.src)
+          return src ? { ...item, src } : { ...item, src: '', missingPicture: true }
         }
         async function list(l) {
           if (!Array.isArray(l)) return l
@@ -252,7 +306,14 @@
           next.pages = []
           for (const p of doc.pages) next.pages.push(p ? { ...p, elements: await list(p.elements) } : p)
         }
-        return next
+        return { doc: next, total, failed, uploaded: cache }
+      }
+
+      /** Pictures also sit inside page text (writing columns); point those at the uploads too. */
+      function bodyWithoutInline(doc, uploaded) {
+        let body = JSON.stringify({ doc })
+        for (const [from, to] of uploaded) if (to) body = body.split(from).join(to)
+        return body
       }
 
       $('file').onchange = async () => {
@@ -296,18 +357,23 @@
           const current = await api('/api/canvas', { headers: { Authorization: `Bearer ${token}` } })
           download(`online-board-before-restore-${stamp()}.json`, current)
           say('Uploading pictures…')
-          const doc = await lighten(picked.doc, token)
+          const { doc, total, failed, uploaded } = await lighten(picked.doc, token, (i, n) =>
+            say(`Uploading pictures… ${i} of ${n}. Keep this tab open.`)
+          )
           say('Saving…')
           await api('/api/canvas', {
             method: 'PUT',
             headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ doc }),
+            body: bodyWithoutInline(doc, uploaded),
           })
           // Older copies in this browser must not win over the board just restored.
           try {
             localStorage.removeItem('open-canvas-dirty')
           } catch {}
-          say('Restored. Open the live site and reload to see it. The board that was online before is in your Downloads.')
+          say(
+            'Restored. Open the live site and reload to see it. The board that was online before is in your Downloads.' +
+              (failed ? `\n${failed} of ${total} pictures couldn’t be uploaded; they’re still in the copy you downloaded.` : '')
+          )
           $('restoreBox').hidden = true
         } catch (err) {
           say(err.message || 'Something went wrong.', true)
