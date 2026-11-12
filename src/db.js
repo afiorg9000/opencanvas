@@ -3,6 +3,7 @@ import {
   blobToDataUrl,
   hasUnsyncedLocalEdits,
   loadLocalBoard,
+  savedTime,
   localLoadCanvas,
   localSaveCanvas,
   markLocalSynced,
@@ -31,12 +32,13 @@ export async function loadCanvas() {
   }
   try {
     const remote = await api('/api/canvas', { token: session.token })
-    // The server copy wins unless this browser has edits that never reached it
-    // (offline, a failed save, or work done on the site before cloud saving).
+    // The server copy wins unless this browser saved edits after it that never
+    // reached it (offline or a failed save). Copies without a save time are older
+    // than this rule and never replace the server copy; recover.html lists them.
     let doc = remote
     if (hasUnsyncedLocalEdits()) {
       const backup = await loadLocalBoard(session.email)
-      if (boardWeight(backup) > 0) doc = backup
+      if (boardWeight(backup) > 0 && savedTime(backup) > savedTime(remote)) doc = backup
     }
     return normalize(await withoutInlineImages(session, doc))
   } catch (err) {

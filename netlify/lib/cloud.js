@@ -209,7 +209,7 @@ export function createApi(stores, { allowedEmails = [] } = {}) {
       if (prev && boardWeight(prev) > 0 && boardWeight(doc) === 0 && !body?.allowEmpty) {
         return json({ error: 'Refusing to overwrite your board with an empty canvas. Refresh to reload.' }, 409)
       }
-      const stored = await externalizeImages(doc)
+      const stored = { ...(await externalizeImages(doc)), savedAt: Date.now() }
       await stores.boards.setJSON(email, stored)
       return json({ ok: true, elements: Array.isArray(stored.elements) ? stored.elements.length : 0 })
     },

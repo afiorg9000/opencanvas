@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <title>Board recovery</title>
+    <style>
+      :root {
+        --bg: #f6f5f2;
+        --card: #fff;
+        --ink: #1c1c1e;
+        --muted: #6b6b70;
+        --line: #e3e1dc;
+        --accent: #2f5bea;
+        --warn: #b4441c;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #18181a;
+          --card: #222225;
+          --ink: #ececee;
+          --muted: #a0a0a8;
+          --line: #34343a;
+          --accent: #7f9cff;
+          --warn: #ff8a5b;
+        }
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font: 15px/1.5 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      }
+      main { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
+      h1 { font-size: 24px; margin: 0 0 6px; }
+      p { margin: 0 0 12px; }
+      .muted { color: var(--muted); }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 16px;
+        margin: 14px 0;
+      }
+      .card h2 { font-size: 16px; margin: 0 0 4px; }
+      .pages { margin: 8px 0 12px; padding-left: 18px; color: var(--muted); }
+      .row { display: flex; flex-wrap: wrap; gap: 8px; }
+      button {
+        font: inherit;
+        border: 1px solid var(--line);
+        background: var(--card);
+        color: var(--ink);
+        border-radius: 8px;
+        padding: 7px 12px;
+        cursor: pointer;
+      }
+      button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+      button:disabled { opacity: 0.5; cursor: default; }
+      input {
+        font: inherit;
+        padding: 7px 10px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--bg);
+        color: var(--ink);
+        min-width: 0;
+        flex: 1 1 180px;
+      }
+      #status { white-space: pre-wrap; }
+      .warn { color: var(--warn); }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Board recovery</h1>
+      <p class="muted">
+        Every copy of your board that this browser has saved for <b id="origin"></b>. Opening this page changes
+        nothing. Download a copy to keep it safe, or restore it as your online board.
+      </p>
+      <div id="list"><p class="muted">Looking…</p></div>
+
+      <div class="card">
+        <h2>Restore from a downloaded file</h2>
+        <p class="muted">Pick a board file this page downloaded earlier (it ends in .json). It's added to the list above.</p>
+        <input id="file" type="file" accept=".json,application/json" />
+      </div>
+
+      <div class="card" id="restoreBox" hidden>
+        <h2>Restore <span id="restoreName"></span> as your online board</h2>
+        <p class="muted">
+          Sign in with your email and code. Your current online board is downloaded first, so nothing is lost.
+        </p>
+        <div class="row">
+          <input id="email" type="email" placeholder="Email" autocomplete="username" />
+          <input id="code" type="password" placeholder="Code" autocomplete="current-password" />
+          <button class="primary" id="restoreGo">Restore</button>
+          <button id="restoreCancel">Cancel</button>
+        </div>
+      </div>
+      <p id="status"></p>
+    </main>
+
+    <script>
+      const $ = (id) => document.getElementById(id)
+      $('origin').textContent = location.host
+      const found = []
+      let picked = null
+
+      function isBoard(v) {
+        return v && typeof v === 'object' && (Array.isArray(v.pages) || Array.isArray(v.elements) || Array.isArray(v.blocks))
+      }
+      function describe(doc) {
+        const pages = Array.isArray(doc.pages) ? doc.pages : []
+        const items = pages.reduce((n, p) => n + (p?.elements?.length || 0), 0) || doc.elements?.length || 0
+        const titles = pages.map((p) => (p?.title || '').trim() || 'Untitled')
+        return { pages: pages.length, items, titles }
+      }
+      function sizeOf(doc) {
+        const n = JSON.stringify(doc).length
+        return n > 1e6 ? (n / 1e6).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1e3)) + ' KB'
+      }
+      function label(key, where) {
+        if (where === 'file') return `From file ${key}`
+        if (key.startsWith('open-canvas-board-backup:')) return 'Backup kept before an update replaced it'
+        if (key.startsWith('open-canvas-local-board:')) return `Saved board (${where})`
+        return `${key} (${where})`
+      }
+
+      async function readIdb() {
+        if (!window.indexedDB) return []
+        // Don't create the database just by looking.
+        if (indexedDB.databases) {
+          const dbs = await indexedDB.databases().catch(() => [])
+          if (!dbs.some((d) => d.name === 'open-canvas')) return []
+        }
+        const db = await new Promise((res, rej) => {
+          const r = indexedDB.open('open-canvas')
+          r.onsuccess = () => res(r.result)
+          r.onerror = () => rej(r.error)
+        })
+        if (!db.objectStoreNames.contains('kv')) return []
+        return new Promise((res) => {
+          const out = []
+          const req = db.transaction('kv', 'readonly').objectStore('kv').openCursor()
+          req.onsuccess = () => {
+            const c = req.result
+            if (!c) return res(out)
+            const v = c.value
+            const doc = isBoard(v) ? v : isBoard(v?.doc) ? v.doc : null
+            if (doc) out.push({ key: String(c.key), where: 'browser database', doc, savedAt: v?.savedAt || null })
+            c.continue()
+          }
+          req.onerror = () => res(out)
+        })
+      }
+
+      function readLocalStorage() {
+        const out = []
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i)
+          if (!key.startsWith('open-canvas')) continue
+          try {
+            const v = JSON.parse(localStorage.getItem(key))
+            if (isBoard(v)) out.push({ key, where: 'browser storage', doc: v })
+          } catch {}
+        }
+        return out
+      }
+
+      function download(name, data) {
+        const blob = new Blob([JSON.stringify(data)], { type: 'application/json' })
+        const a = document.createElement('a')
+        a.href = URL.createObjectURL(blob)
+        a.download = name
+        a.click()
+        setTimeout(() => URL.revokeObjectURL(a.href), 2000)
+      }
+      const stamp = () => new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-')
+
+      function render() {
+        const list = $('list')
+        list.innerHTML = ''
+        if (!found.length) {
+          list.innerHTML = `<div class="card"><h2>No saved board here</h2><p class="muted">This browser has no copy of your board for ${location.host}. If you used a private window, its copies were erased when it closed.</p></div>`
+          return
+        }
+        found.forEach((f, i) => {
+          const d = describe(f.doc)
+          const card = document.createElement('div')
+          card.className = 'card'
+          card.innerHTML = `<h2></h2><p class="muted"></p><ul class="pages"></ul><div class="row"><button data-act="dl">Download this copy</button><button class="primary" data-act="restore">Restore as my online board</button></div>`
+          card.querySelector('h2').textContent = `Copy ${i + 1}: ${label(f.key, f.where)}`
+          card.querySelector('p').textContent = `${d.pages} page${d.pages === 1 ? '' : 's'} · ${d.items} items · ${sizeOf(f.doc)}${f.savedAt ? ' · saved ' + new Date(f.savedAt).toLocaleString() : ''}`
+          const ul = card.querySelector('ul')
+          d.titles.slice(0, 12).forEach((t) => {
+            const li = document.createElement('li')
+            li.textContent = t
+            ul.appendChild(li)
+          })
+          if (d.titles.length > 12) ul.insertAdjacentHTML('beforeend', `<li>…and ${d.titles.length - 12} more</li>`)
+          card.querySelector('[data-act="dl"]').onclick = () => download(`board-copy-${i + 1}-${stamp()}.json`, f.doc)
+          card.querySelector('[data-act="restore"]').onclick = () => {
+            picked = f
+            $('restoreName').textContent = `copy ${i + 1}`
+            $('restoreBox').hidden = false
+            $('email').value = f.where === 'file' ? $('email').value : f.key.split(':')[1] || ''
+            $('restoreBox').scrollIntoView({ behavior: 'smooth' })
+          }
+          list.appendChild(card)
+        })
+      }
+
+      async function api(path, opts = {}) {
+        const res = await fetch(path, opts)
+        const data = await res.json().catch(() => ({}))
+        if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`)
+        return data
+      }
+
+      /** Upload inline pictures first so the board fits the server's size limit. */
+      async function lighten(doc, token) {
+        const cache = new Map()
+        async function fix(item) {
+          if (!item || typeof item.src !== 'string' || !item.src.startsWith('data:')) return item
+          if (!cache.has(item.src)) {
+            const blob = await (await fetch(item.src)).blob()
+            const out = await api('/api/assets', {
+              method: 'POST',
+              headers: { Authorization: `Bearer ${token}`, 'Content-Type': blob.type || 'image/png' },
+              body: blob,
+            })
+            cache.set(item.src, out.src)
+          }
+          return { ...item, src: cache.get(item.src) }
+        }
+        async function list(l) {
+          if (!Array.isArray(l)) return l
+          const out = []
+          for (const e of l) {
+            if (e?.type === 'container' && Array.isArray(e.blocks)) {
+              const blocks = []
+              for (const b of e.blocks) blocks.push(b?.kind === 'image' ? await fix(b) : b)
+              out.push({ ...e, blocks })
+            } else out.push(e?.type === 'image' ? await fix(e) : e)
+          }
+          return out
+        }
+        const next = { ...doc, elements: await list(doc.elements) }
+        if (Array.isArray(doc.pages)) {
+          next.pages = []
+          for (const p of doc.pages) next.pages.push(p ? { ...p, elements: await list(p.elements) } : p)
+        }
+        return next
+      }
+
+      $('file').onchange = async () => {
+        const file = $('file').files[0]
+        if (!file) return
+        try {
+          const doc = JSON.parse(await file.text())
+          if (!isBoard(doc)) throw new Error('That file isn’t a board.')
+          found.unshift({ key: file.name, where: 'file', doc, savedAt: doc.savedAt || null })
+          render()
+          $('status').textContent = ''
+        } catch (err) {
+          $('status').textContent = err.message || 'Couldn’t read that file.'
+          $('status').className = 'warn'
+        }
+        $('file').value = ''
+      }
+
+      $('restoreCancel').onclick = () => {
+        $('restoreBox').hidden = true
+        picked = null
+      }
+      $('restoreGo').onclick = async () => {
+        if (!picked) return
+        const btn = $('restoreGo')
+        btn.disabled = true
+        const say = (t, warn) => {
+          $('status').textContent = t
+          $('status').className = warn ? 'warn' : 'muted'
+        }
+        try {
+          const health = await fetch('/api/health').then((r) => r.ok).catch(() => false)
+          if (!health) throw new Error('This address has no online saving. Download the copy instead and send it to me.')
+          say('Signing in…')
+          const { token } = await api('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: $('email').value.trim().toLowerCase(), code: $('code').value }),
+          })
+          say('Downloading your current online board first…')
+          const current = await api('/api/canvas', { headers: { Authorization: `Bearer ${token}` } })
+          download(`online-board-before-restore-${stamp()}.json`, current)
+          say('Uploading pictures…')
+          const doc = await lighten(picked.doc, token)
+          say('Saving…')
+          await api('/api/canvas', {
+            method: 'PUT',
+            headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ doc }),
+          })
+          // Older copies in this browser must not win over the board just restored.
+          try {
+            localStorage.removeItem('open-canvas-dirty')
+          } catch {}
+          say('Restored. Open the live site and reload to see it. The board that was online before is in your Downloads.')
+          $('restoreBox').hidden = true
+        } catch (err) {
+          say(err.message || 'Something went wrong.', true)
+        } finally {
+          btn.disabled = false
+        }
+      }
+
+      ;(async () => {
+        try {
+          found.push(...(await readIdb()))
+        } catch (err) {
+          console.error(err)
+        }
+        found.push(...readLocalStorage())
+        render()
+      })()
+    </script>
+  </body>
+</html>
