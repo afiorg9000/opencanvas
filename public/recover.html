@@ -237,28 +237,20 @@
         throw new Error('Picture too large')
       }
 
-      function countInline(doc) {
-        let n = 0
-        const each = (l) =>
-          Array.isArray(l) &&
-          l.forEach((e) => {
-            if (typeof e?.src === 'string' && e.src.startsWith('data:')) n++
-            if (Array.isArray(e?.blocks)) e.blocks.forEach((b) => typeof b?.src === 'string' && b.src.startsWith('data:') && n++)
-          })
-        each(doc.elements)
-        ;(doc.pages || []).forEach((p) => each(p?.elements))
-        return n
-      }
+      const DATA_URL = /data:image\/[a-z0-9.+-]+;base64,[A-Za-z0-9+/=]+/gi
+      const MAX_BOARD = 5_500_000
 
       /**
-       * Upload inline pictures first so the board fits the server's size limit.
-       * Oversized pictures are shrunk; one that still fails is left out (the
-       * downloaded copy keeps it) instead of stopping the whole restore.
+       * Upload every inline picture in the board, wherever it sits (picture items,
+       * writing columns, pictures pasted into notes), and return the board as
+       * JSON text with each one replaced by its uploaded link. Oversized pictures
+       * are shrunk; one that still fails is dropped (the downloaded copy keeps it)
+       * instead of stopping the whole restore.
        */
       async function lighten(doc, token, progress) {
-        const cache = new Map()
-        const total = countInline(doc)
-        let done = 0
+        let text = JSON.stringify(doc)
+        const found = [...new Set(text.match(DATA_URL) || [])]
+        const links = new Map()
         let failed = 0
         async function upload(blob) {
           return api('/api/assets', {
@@ -267,53 +259,25 @@
             body: blob,
           })
         }
-        async function fix(item) {
-          if (!item || typeof item.src !== 'string' || !item.src.startsWith('data:')) return item
-          if (!cache.has(item.src)) {
-            progress(++done, total)
-            let src = null
+        for (let i = 0; i < found.length; i++) {
+          progress(i + 1, found.length)
+          try {
+            let blob = await (await fetch(found[i])).blob()
+            if (blob.size > MAX_UPLOAD) blob = await shrink(blob)
+            let out
             try {
-              let blob = await (await fetch(item.src)).blob()
-              if (blob.size > MAX_UPLOAD) blob = await shrink(blob)
-              try {
-                src = (await upload(blob)).src
-              } catch {
-                src = (await upload(await shrink(blob))).src
-              }
-            } catch (err) {
-              console.error(err)
-              failed++
+              out = await upload(blob)
+            } catch {
+              out = await upload(await shrink(blob))
             }
-            cache.set(item.src, src)
+            links.set(found[i], out.src)
+          } catch (err) {
+            console.error(err)
+            failed++
           }
-          const src = cache.get(item.src)
-          return src ? { ...item, src } : { ...item, src: '', missingPicture: true }
         }
-        async function list(l) {
-          if (!Array.isArray(l)) return l
-          const out = []
-          for (const e of l) {
-            if (e?.type === 'container' && Array.isArray(e.blocks)) {
-              const blocks = []
-              for (const b of e.blocks) blocks.push(b?.kind === 'image' ? await fix(b) : b)
-              out.push({ ...e, blocks })
-            } else out.push(e?.type === 'image' ? await fix(e) : e)
-          }
-          return out
-        }
-        const next = { ...doc, elements: await list(doc.elements) }
-        if (Array.isArray(doc.pages)) {
-          next.pages = []
-          for (const p of doc.pages) next.pages.push(p ? { ...p, elements: await list(p.elements) } : p)
-        }
-        return { doc: next, total, failed, uploaded: cache }
-      }
-
-      /** Pictures also sit inside page text (writing columns); point those at the uploads too. */
-      function bodyWithoutInline(doc, uploaded) {
-        let body = JSON.stringify({ doc })
-        for (const [from, to] of uploaded) if (to) body = body.split(from).join(to)
-        return body
+        text = text.replace(DATA_URL, (m) => links.get(m) || '')
+        return { body: `{"doc":${text}}`, total: found.length, failed }
       }
 
       $('file').onchange = async () => {
@@ -357,14 +321,19 @@
           const current = await api('/api/canvas', { headers: { Authorization: `Bearer ${token}` } })
           download(`online-board-before-restore-${stamp()}.json`, current)
           say('Uploading pictures…')
-          const { doc, total, failed, uploaded } = await lighten(picked.doc, token, (i, n) =>
+          const { body, total, failed } = await lighten(picked.doc, token, (i, n) =>
             say(`Uploading pictures… ${i} of ${n}. Keep this tab open.`)
           )
+          if (body.length > MAX_BOARD) {
+            throw new Error(
+              `After uploading the pictures, this board is still ${(body.length / 1e6).toFixed(1)} MB, more than the 5.5 MB the server accepts. Nothing was changed. Download this copy and send it to me.`
+            )
+          }
           say('Saving…')
           await api('/api/canvas', {
             method: 'PUT',
             headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-            body: bodyWithoutInline(doc, uploaded),
+            body,
           })
           // Older copies in this browser must not win over the board just restored.
           try {
