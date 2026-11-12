@@ -20,12 +20,6 @@ function boardWeight(doc) {
   return top + nested
 }
 
-function heavier(a, b) {
-  if (!a || boardWeight(a) === 0) return b && boardWeight(b) > 0 ? b : a || b
-  if (!b || boardWeight(b) === 0) return a
-  return boardWeight(a) >= boardWeight(b) ? a : b
-}
-
 let idbPromise = null
 
 /** One shared connection; opening a new one on every save leaks them. */
@@ -145,8 +139,21 @@ function readLocalStorageBoard(email) {
 export async function loadLocalBoard(email) {
   const idbDoc = await idbGet(BOARD_KEY(email))
   const lsDoc = readLocalStorageBoard(email)
-  const picked = heavier(idbDoc, lsDoc)
+  const picked = newer(idbDoc, lsDoc)
   return picked && boardWeight(picked) > 0 ? picked : emptyDoc()
+}
+
+/** When a save timestamp is known (savedAt), the newest copy wins; otherwise the
+ *  IndexedDB copy, which is written on every save (localStorage can be full). */
+export function savedTime(doc) {
+  const t = Number(doc?.savedAt) || Date.parse(doc?.savedAt) || 0
+  return Number.isFinite(t) ? t : 0
+}
+
+function newer(idbDoc, lsDoc) {
+  if (boardWeight(idbDoc) === 0) return lsDoc
+  if (boardWeight(lsDoc) === 0) return idbDoc
+  return savedTime(lsDoc) > savedTime(idbDoc) ? lsDoc : idbDoc
 }
 
 export async function localLoadCanvas(email) {
@@ -211,7 +218,7 @@ export function markLocalSynced() {
 
 export async function localSaveCanvas(email, doc) {
   localStorage.setItem(SNAPSHOT_DIRTY_KEY, '1')
-  await writeLocalBoard(email, doc)
+  await writeLocalBoard(email, { ...doc, savedAt: Date.now() })
 }
 
 export function blobToDataUrl(blob) {

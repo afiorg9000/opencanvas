@@ -276,7 +276,8 @@ app.put('/api/canvas', (req, res) => {
     }
   }
 
-  const { doc: stored } = externalizeImageDataUrls(doc)
+  const { doc: externalized } = externalizeImageDataUrls(doc)
+  const stored = { ...externalized, savedAt: Date.now() }
   db.prepare(
     `insert into boards (email, doc, updated_at) values (?, ?, ?)
      on conflict(email) do update set doc = excluded.doc, updated_at = excluded.updated_at`
