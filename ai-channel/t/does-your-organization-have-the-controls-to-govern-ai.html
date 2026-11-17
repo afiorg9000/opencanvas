@@ -1,0 +1,983 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>does-your-organization-have-the-controls-to-govern-ai</title><style>html,body{margin:0;background:#F7F8FA}@media (prefers-color-scheme:dark){html,body{background:#F7F8FA}}</style></head><body>
+<!--
+Copy rewritten in house voice, 3 Nov 2026.
+Updated 4 Nov 2026 after comparison with the aidoomsdayguide.com AI Governance Control Checker (8 tick boxes, % score,
+  three fixed actions). Ported its two controls this tool lacked as one new core question, "Limits on access and actions"
+  (least-privilege access + human approval for irreversible actions; Monitoring and human oversight area), and folded
+  three of its wordings into existing actions: revoke credentials at switch-off, a fresh approval when use changes,
+  and naming applicable laws/sector rules on the approval form. Now 22 questions. Result labels, levels and scoring
+  method unchanged. Omnibus note updated: Regulation (EU) 2026/1744 adopted July 2026.
+TOOL: Does Your Organization Have the Controls to Govern the AI It Uses?
+FILE: does-your-organization-have-the-controls-to-govern-ai.html
+AUDIENCE: Government (primary tool) — public bodies of any level. Also Executives / company leadership via the
+  organisation-type switch on the first screen ("Public body" / "Company"), which changes wording and examples.
+  Events report audience "government" (public body) or "executives" (company).
+
+WHAT IT DOES: A 22-question self-assessment in eight areas: ownership and inventory, approvals before go-live,
+  procurement and vendor terms, evaluation and testing, logging and records, monitoring and human oversight,
+  escalation and redress, shutdown and fallback. A first question on how much the organisation relies on AI
+  tailors the advice (proportionality: "you don't need a heavy framework yet" for light use). Results: 0–100 score
+  and level, a bar per area, top three gaps (core controls weighted first), a control-by-control action list
+  (filter: needs action / all), one contextual next step, one solution step (matchUrl: governance advisory),
+  "Email me my results" (resultsFormUrl) and a separate newsletter link. Printable (print stylesheet).
+
+DATA / SOURCES (as of November 2026): No statistics are used. Control content draws on: EU AI Act, Regulation (EU)
+  2024/1689, as amended by Regulation (EU) 2026/1744 (Art. 4 AI literacy, applies from 2 Feb 2025, reworded 2026
+  to "take measures to support", Art. 4 hint updated 4 Nov 2026; Art. 26 deployer duties incl. logs kept at
+  least six months; Art. 27 fundamental rights impact assessment; Art. 50 transparency, from 2 Aug 2026; Art. 73
+  serious incidents). Note: the "Digital Omnibus on AI", Regulation (EU) 2026/1744 (8 July 2026, in force 27 July 2026), moved high-risk duties to 2 Dec 2027 / 2 Aug 2028 and changes some
+  AI Act dates and duties; the tool tells users to check the official text. US OMB M-25-21 / M-25-22 (April 2025;
+  Chief AI Officers, use-case inventories, acquisition). UK Algorithmic Transparency Recording Standard (ATRS).
+  OECD, Governing with AI (2025). Scoring is an unvalidated orientation heuristic (each answer 0–3; "Not sure" = 0
+  and flagged).
+
+PRIVACY: Runs entirely in the browser. No network requests, cookies or storage. Nothing is sent unless the user
+  clicks a CTA link (which carries the result label/score as query parameters).
+
+HOW TO EMBED IN WORDPRESS:
+  Option A — Custom HTML block: paste everything between the AIC:START and AIC:END comments below
+    (the <style>, the <div class="aic-tool">, and the <script>). All CSS is scoped to .aic-tool and all
+    classes are prefixed aic-; JS runs in an IIFE.
+  Option B — iframe: upload this file and embed with
+    <iframe src="/path/does-your-organization-have-the-controls-to-govern-ai.html" title="AI governance controls check"
+            style="width:100%;min-height:1100px;border:0" loading="lazy"></iframe>
+    (iframe gives the cleanest printing, because the theme's header/footer are not printed.)
+
+CONFIG URLS TO SET (window.AICHANNEL_CONFIG, top of the script, or define window.AICHANNEL_CONFIG before it):
+  resultsFormUrl — "Email me my results" form page
+  matchUrl       — "Get matched to someone" (governance advisory) — this tool's solution step
+  newsletterUrl  — separate newsletter opt-in
+  coursesUrl     — not used by this tool (kept for consistency)
+  Query params added to CTA links: lead_type, audience, source_page, source_content_or_tool, cta_clicked,
+  assessment_name, assessment_result, score, plus any utm_* from the page URL.
+
+TRACKING: window 'aichannel:event' CustomEvent + parent.postMessage({type:'aichannel:event', ...}) for
+  tool_started, tool_completed, result_viewed, cta_clicked.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Does Your Organization Have the Controls to Govern the AI It Uses? | AI Channel</title>
+<meta name="description" content="Check ownership, access, approvals, logging, procurement, evaluation, monitoring and escalation controls. Twenty-two plain questions, about six minutes, no email required.">
+<!-- AI Channel design A: tool design system v2 (visual layer only; no behaviour changes) -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style id="aic-theme">
+/* ---------- tokens ---------- */
+:root,html{color-scheme:light!important;
+ --pine:#2859c7!important;--pine-deep:#1945ac!important;--accent:#2859c7!important;--accent-deep:#1945ac!important;--primary:#2859c7!important;--blue:#2859c7!important;--blue-d:#1945ac!important;
+ --paper:#ffffff!important;--bg:#ffffff!important;--white:#fff!important;--card:#fff!important;--ink:#14213d!important;--ink-soft:#3f4a5c!important;--ink-mute:#5b6577!important;--muted:#3f4a5c!important;
+ --line:#d9e2f0!important;--sage:#eef3fc!important;--amber-soft:#fbf3e4!important;--accent-wash:#eef3fc!important;--blue-wash:#eef3fc!important;--sky:#eef3fc!important;--pale:#f4f7fc!important;--warm:#f4f7fc!important;
+ --serif:"Newsreader",Georgia,serif!important;--sans:"Inter",system-ui,sans-serif!important;--mono:"IBM Plex Mono",ui-monospace,monospace!important}
+html body .aic-tool,html body .aic-article{
+ --aic-paper:#ffffff!important;--aic-white:#ffffff!important;--aic-ink:#14213d!important;--aic-soft:#46526a!important;--aic-line:#d9e2f0!important;--aic-sage:#eef3fc!important;
+ --aic-blue:#2859c7!important;--aic-blue-deep:#1945ac!important;--aic-blue-soft:#eef3fc!important;--aic-on-blue:#ffffff!important;--aic-focus:#9fbcff!important;
+ --aic-grey:#46526a!important;--aic-grey-soft:#f4f7fc!important;
+ --aic-radius:16px!important;--aic-radius-sm:12px!important;--aic-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important;
+ color-scheme:light!important;background:#fff!important;color:#14213d!important;
+ font-family:"Inter",system-ui,sans-serif!important;-webkit-font-smoothing:antialiased}
+html,body{background:#fff!important}
+html body .aic-tool{padding:56px 0 96px!important}
+html body .aic-article{padding:0 0 112px!important}
+html body .aic-tool .aic-col,html body .aic-article .aic-col{max-width:860px!important}
+@media(min-width:600px){html body .aic-tool .aic-col,html body .aic-article .aic-col{padding-inline:32px!important}}
+
+/* ---------- type ---------- */
+html body .aic-tool .aic-h1,html body .aic-article h1,body h1{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important;line-height:1.02!important;font-size:clamp(38px,5.4vw,62px)!important;color:#14213d}
+html body .aic-tool .aic-h2,html body .aic-article h2,body h2{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important;line-height:1.1!important}
+html body .aic-article h2{font-size:clamp(28px,3.6vw,38px)!important;margin-top:72px!important}
+html body .aic-tool .aic-h2{font-size:clamp(26px,3.4vw,36px)!important}
+html body .aic-tool .aic-h3,html body .aic-article h3,body h3{font-family:"Newsreader",Georgia,serif!important;font-weight:550!important;letter-spacing:-.01em!important;font-size:22px!important;line-height:1.2!important}
+body h4,body h5,body h6{font-family:"Inter",system-ui,sans-serif!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow,html body .aic-tool .aic-qnum,html body .aic-tool .aic-nav-hint,.aic-mono{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;letter-spacing:.06em!important;text-transform:uppercase;font-size:12px!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow{color:#2859c7!important;display:flex!important;align-items:center;gap:12px}
+html body .aic-tool .aic-eyebrow::before,html body .aic-article .aic-head .aic-eyebrow::before{content:"";width:28px;height:1px;background:#2859c7;flex:none}
+html body .aic-tool .aic-lede,html body .aic-article .aic-lede,html body .aic-article .aic-dek{font-size:20px!important;line-height:1.55!important;color:#3f4a5c!important;max-width:60ch}
+html body .aic-tool .aic-soft,html body .aic-tool .aic-small{color:#46526a!important}
+html body .aic-tool .aic-small{font-size:14px!important}
+html body .aic-article{font-size:18.5px!important;line-height:1.72!important}
+html body .aic-article p+p{margin-top:22px!important}
+html body .aic-article .aic-head{padding:72px 0 40px!important;border-bottom:1px solid #d9e2f0;margin-bottom:48px}
+html body .aic-article .aic-meta,html body .aic-article .aic-head p:not(.aic-lede):not(.aic-dek){font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px!important;letter-spacing:.03em;color:#5b6577!important}
+html body .aic-tool a,html body .aic-article a{color:#2859c7}
+
+/* ---------- panels ---------- */
+html body .aic-tool .aic-card,html body .aic-article .aic-card{background:#fff!important;border:1px solid #d9e2f0!important;border-radius:16px!important;box-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important}
+@media(min-width:600px){html body .aic-tool .aic-card{padding:36px 40px!important}html body .aic-article .aic-card{padding:32px 36px!important}}
+html body .aic-tool .aic-stack>*+*{margin-top:20px!important}
+html body .aic-tool .aic-grid2,html body .aic-article .aic-grid{gap:16px!important}
+/* the short answer: a framed figure, like the site's tool previews */
+html body .aic-article .aic-short{background:#fff!important;border:1px solid #d9e2f0!important;box-shadow:0 0 0 10px #eef3fc,0 0 0 11px #d9e2f0!important;margin:12px 11px 56px!important;border-radius:12px!important;border-left:1px solid #d9e2f0!important}
+html body .aic-article .aic-short .aic-eyebrow,html body .aic-article .aic-short>:first-child{color:#2859c7!important}
+/* notes and callouts */
+html body .aic-tool .aic-note,html body .aic-article .aic-note,html body .aic-article .aic-callout{background:#f4f7fc!important;border-left:3px solid #2859c7!important;border-radius:0 12px 12px 0!important;padding:18px 22px!important;font-size:15.5px!important;color:#14213d!important}
+html body .aic-tool .aic-note.aic-warn{background:#fdf7ec!important;border-left-color:#a46207!important}
+html body .aic-tool .aic-note.aic-bad{background:#fdf0ee!important;border-left-color:#b42318!important}
+html body .aic-tool .aic-note.aic-good{background:#eef8f1!important;border-left-color:#2f7a4e!important}
+/* calls to action become navy bands */
+html body .aic-tool .aic-cta,html body .aic-article .aic-cta,html body .aic-tool .aic-dark,html body .aic-article .aic-dark{--aic-ink:#ffffff!important;--aic-soft:#c9d6ee!important;--aic-white:#13264a!important;--aic-line:#2a3f6a!important;--aic-blue:#9fbcff!important;--aic-blue-soft:#1d3563!important;--aic-on-blue:#13264a!important;
+ background:#13264a!important;color:#fff!important;border-color:#13264a!important;box-shadow:none!important}
+html body .aic-tool .aic-cta *:not(.aic-btn):not(.aic-btn *),html body .aic-article .aic-cta *:not(.aic-btn):not(.aic-btn *){color:inherit}
+html body .aic-tool .aic-cta .aic-btn-primary,html body .aic-article .aic-cta .aic-btn-primary{background:#fff!important;color:#13264a!important;border-color:#fff!important}
+html body .aic-tool .aic-cta a:not(.aic-btn),html body .aic-article .aic-cta a:not(.aic-btn){color:#9fbcff!important}
+
+/* ---------- questions and answer options ---------- */
+html body .aic-tool .aic-q{margin-top:28px!important}
+html body .aic-tool .aic-qnum{color:#2859c7!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;font-size:clamp(22px,2.6vw,27px)!important;line-height:1.22!important;letter-spacing:-.01em!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qhint{font-size:15px!important;color:#46526a!important;margin-bottom:18px!important}
+html body .aic-tool .aic-opts{gap:10px!important;margin-top:18px!important}
+html body .aic-tool .aic-opt,html body .aic-tool .aic-pick,html body .aic-tool .aic-check{background:#fff!important;border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:16px 18px!important;font-size:16px!important;gap:14px!important;transition:border-color .15s,box-shadow .15s,background-color .15s,transform .15s!important}
+html body .aic-tool .aic-opt:hover,html body .aic-tool .aic-pick:hover,html body .aic-tool .aic-check:hover{border-color:#2859c7!important;box-shadow:0 6px 18px rgba(40,89,199,.10)!important;transform:translateY(-1px)}
+html body .aic-tool .aic-opt[aria-checked="true"],html body .aic-tool .aic-opt[aria-pressed="true"],html body .aic-tool .aic-pick:has(input:checked),html body .aic-tool .aic-check:has(input:checked),html body .aic-tool .aic-opt:has(input:checked){border-color:#2859c7!important;background:#f4f7fc!important;box-shadow:0 0 0 3px #dbe6fb!important}
+html body .aic-tool .aic-dot{width:22px!important;height:22px!important;border:2px solid #9aa8c0!important}
+html body .aic-tool .aic-dot::after{inset:4px!important;background:#2859c7!important}
+html body .aic-tool .aic-opt[aria-checked="true"] .aic-dot{border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-size:14px!important;color:#46526a!important;margin-top:4px!important}
+html body .aic-tool .aic-opt.aic-opt-unsure{background:transparent!important;border-style:dashed!important}
+html body .aic-tool input[type=text],html body .aic-tool input[type=search],html body .aic-tool input[type=email],html body .aic-tool textarea,html body .aic-tool select,html body .aic-tool .aic-input{border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:14px 16px!important;background:#fff!important;font-size:16px!important}
+html body .aic-tool input:focus,html body .aic-tool textarea:focus,html body .aic-tool select:focus{border-color:#2859c7!important;outline:none!important;box-shadow:0 0 0 3px #dbe6fb!important}
+
+/* ---------- controls ---------- */
+html body .aic-tool .aic-btn,html body .aic-article .aic-btn{min-height:50px!important;padding:14px 24px!important;font-weight:600!important;font-size:15px!important;border-radius:999px!important;border:1.5px solid #c9d6ee!important;box-shadow:none!important}
+html body .aic-tool .aic-btn:hover,html body .aic-article .aic-btn:hover{border-color:#2859c7!important}
+html body .aic-tool .aic-btn-primary,html body .aic-article .aic-btn-primary{background:#2859c7!important;border-color:#2859c7!important;color:#fff!important}
+html body .aic-tool .aic-btn-primary:hover,html body .aic-article .aic-btn-primary:hover{background:#1945ac!important;border-color:#1945ac!important}
+html body .aic-tool .aic-btn-ghost{border-color:transparent!important;text-decoration:underline;text-underline-offset:4px;color:#3f4a5c!important}
+html body .aic-tool .aic-btn[disabled]{opacity:.4!important}
+html body .aic-tool .aic-nav{margin-top:36px!important;padding-top:24px!important;border-top:1px solid #d9e2f0!important}
+html body .aic-tool .aic-actions{gap:12px!important}
+html body .aic-tool .aic-seg{border:1.5px solid #d9e2f0!important;padding:4px!important}
+html body .aic-tool .aic-seg button{font-weight:600!important;color:#3f4a5c!important}
+html body .aic-tool .aic-seg button[aria-pressed="true"],html body .aic-tool .aic-seg button[aria-checked="true"]{background:#13264a!important;color:#fff!important}
+html body .aic-tool .aic-progress{height:4px!important;background:#e3eaf6!important;margin:20px 0 8px!important}
+html body .aic-tool .aic-progress span,html body .aic-tool .aic-progress i{background:#2859c7!important}
+html body .aic-tool .aic-chip,html body .aic-tool .aic-pill{border:1.5px solid #d9e2f0!important;background:#fff!important;font-weight:600!important;border-radius:999px!important}
+html body .aic-tool .aic-chip[aria-pressed="true"],html body .aic-tool .aic-chip.aic-on,html body .aic-tool .aic-pill.aic-on{background:#eef3fc!important;border-color:#2859c7!important;color:#1945ac!important}
+html body .aic-tool .aic-tag,html body .aic-article .aic-tag{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;padding:5px 11px!important}
+html body .aic-tool .aic-privacy{font-size:14px!important;color:#46526a!important;margin-top:20px!important}
+
+/* ---------- results ---------- */
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-stat b,html body .aic-tool .aic-stat strong,html body .aic-tool .aic-display{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important}
+html body .aic-tool .aic-bar{height:8px!important;background:#e3eaf6!important}
+html body .aic-tool .aic-bar-row{padding:14px 0!important;border-bottom-color:#e3eaf6!important}
+html body .aic-tool .aic-bar-label{font-weight:600!important}
+html body .aic-tool table,html body .aic-article table{border-collapse:collapse}
+html body .aic-tool th,html body .aic-article th{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;text-transform:uppercase;color:#2859c7!important;background:#f4f7fc!important}
+html body .aic-tool td,html body .aic-article td{border-color:#e3eaf6!important}
+html body .aic-article .aic-sources,html body .aic-tool .aic-sources{font-size:14px!important;color:#46526a!important;border-top:1px solid #d9e2f0;padding-top:32px!important;margin-top:72px!important}
+html body .aic-article .aic-related,html body .aic-article .aic-deeper{margin-top:72px!important}
+
+/* ---------- pages outside the shared system ---------- */
+body:not(:has(.aic-tool)):not(:has(.aic-article)) h1,body:not(:has(.aic-tool)):not(:has(.aic-article)) h2,body:not(:has(.aic-tool)):not(:has(.aic-article)) h3{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important}
+html,body{font-family:"Inter",system-ui,sans-serif}
+input[type=range],input[type=checkbox],input[type=radio]{accent-color:#2859c7!important}
+:focus-visible{outline-color:#2859c7!important}
+[tabindex="-1"]:focus,h1:focus,h2:focus,h3:focus{outline:none!important;box-shadow:none!important}
+
+/* ================= v3: product-grade tool shell ================= */
+html,body{background:#f4f7fc!important}
+html body .aic-tool{background:#f4f7fc!important}
+html body .aic-tool .aic-col{max-width:980px!important}
+html body .aic-tool .aic-h1{font-size:clamp(40px,5vw,62px)!important;max-width:20ch}
+html body .aic-tool .aic-grid2>.aic-card{box-shadow:none!important;background:#fff!important;border-radius:14px!important}
+html body .aic-tool.aic-in-q .aic-h1{font-size:22px!important;line-height:1.2!important;max-width:none;margin:6px 0 20px!important;font-weight:500!important}
+html body .aic-tool.aic-in-q .aic-lede,html body .aic-tool.aic-in-q > .aic-col > .aic-privacy,html body .aic-tool.aic-in-q .aic-col > * > .aic-privacy{display:none!important}
+html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:56px 64px 44px!important;border:0!important;border-radius:24px!important;box-shadow:0 1px 0 rgba(19,38,74,.05),0 30px 70px rgba(19,38,74,.10)!important;min-height:460px}
+@media(max-width:700px){html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:32px 22px 28px!important;border-radius:18px!important;min-height:0}}
+html body .aic-tool .aic-progress{height:3px!important;background:#e3eaf6!important;border-radius:0!important;margin:14px 0 36px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-size:clamp(26px,3.2vw,38px)!important;line-height:1.12!important;letter-spacing:-.02em!important;margin-bottom:12px!important;max-width:28ch}
+html body .aic-tool .aic-qhint{font-size:16px!important;margin-bottom:24px!important}
+html body .aic-tool .aic-opts{counter-reset:aicopt;gap:12px!important}
+html body .aic-tool .aic-opt{counter-increment:aicopt;align-items:center!important;min-height:64px;padding:16px 20px!important;font-size:17px!important;font-weight:500;border-radius:14px!important}
+html body .aic-tool .aic-opt .aic-dot{display:none!important}
+html body .aic-tool .aic-opt::before{content:counter(aicopt,upper-alpha);flex:none;width:30px;height:30px;display:grid;place-items:center;border:1.5px solid #c9d6ee;border-radius:8px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;font-weight:500;color:#2859c7;background:#fff;transition:all .15s}
+html body .aic-tool .aic-opt:hover::before{border-color:#2859c7}
+html body .aic-tool .aic-opt[aria-checked="true"]::before{background:#2859c7;border-color:#2859c7;color:#fff;content:"\2713"}
+html body .aic-tool .aic-opt[aria-checked="true"]{background:#eef3fc!important;box-shadow:0 0 0 2px #2859c7!important;border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-weight:400}
+html body .aic-tool .aic-nav{border-top:0!important;margin-top:40px!important;padding-top:0!important}
+html body .aic-tool .aic-nav .aic-btn-primary{min-width:150px}
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-display{font-size:clamp(56px,8vw,96px)!important;line-height:.95!important;color:#14213d}
+
+/* ================= v4: legibility ================= */
+html body .aic-tool{font-size:17px!important;line-height:1.6!important}
+html body .aic-tool,html body .aic-article{--aic-soft:#334055!important}
+html body .aic-tool .aic-small,html body .aic-tool .aic-opt-sub,html body .aic-tool .aic-privacy,html body .aic-tool .aic-nav-hint{font-size:15px!important;color:#334055!important}
+html body .aic-tool p,html body .aic-tool li{color:#1d2a44}
+html body .aic-tool .aic-lede{font-size:20px!important;color:#2a364d!important}
+html body .aic-tool .aic-note{font-size:16.5px!important}
+html body .aic-tool .aic-opt{font-size:18px!important;color:#14213d!important}
+html body .aic-tool .aic-qhint{font-size:17px!important;color:#334055!important}
+html body .aic-tool .aic-eyebrow,html body .aic-tool .aic-qnum,.aic-mono{font-size:12.5px!important;color:#2859c7!important;letter-spacing:.05em!important}
+html body .aic-tool .aic-tag{font-size:12.5px!important}
+html body .aic-tool th,html body .aic-article th{font-size:12.5px!important}
+html body .aic-tool td{font-size:16px}
+html body .aic-article{color:#14213d!important}
+html body .aic-article p,html body .aic-article li{color:#1d2a44}
+</style>
+<script>
+(function(){
+  function hsl(c){var m=c&&c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/);if(!m)return null;var r=m[1]/255,g=m[2]/255,b=m[3]/255,a=m[4]===undefined?1:+m[4];
+    var mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn,s=d?d/(1-Math.abs(2*l-1)):0,h=0;
+    if(d){h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;if(h<0)h+=360}return {h:h,s:s,l:l,a:a}}
+  function blue(c){var x=hsl(c);return x&&x.a>0.05&&x.s>0.3&&x.l>0.28&&x.l<0.95&&x.h>=205&&x.h<=240?x:null}
+  function N(x,dark,light){return x.a<0.95?"rgba(40,89,199,"+Math.min(x.a,0.12).toFixed(3)+")":(x.l>0.82?light:dark)}
+  function fix(el){var c0=getComputedStyle(el),bg=hsl(c0.backgroundColor),fg=hsl(c0.color);if(bg&&fg&&bg.a>0.9&&bg.l<0.6&&bg.s>0.3&&bg.h>=205&&bg.h<=240&&fg.l<0.6)el.style.setProperty("color","#ffffff","important");
+    if(el.closest(".aic-cta,.aic-dark")||el.matches(".aic-opt,.aic-pick,.aic-check,.aic-btn,.aic-chip,.aic-pill,.aic-seg button,.aic-card,.aic-note"))return;var cs=getComputedStyle(el),x;
+    if((x=blue(cs.color)))el.style.setProperty("color",x.l>0.75?"#eef3fc":"#2859c7","important");
+    if((x=blue(cs.backgroundColor)))el.style.setProperty("background-color",N(x,"#2859c7",x.l>0.9?"#eef3fc":"#d6e2f8"),"important");
+    if(el instanceof SVGElement){if((x=blue(cs.fill)))el.style.setProperty("fill",N(x,"#2859c7","#eef3fc"),"important");if((x=blue(cs.stroke)))el.style.setProperty("stroke",N(x,"#2859c7","#d6e2f8"),"important")}
+    if(cs.textTransform==="uppercase"&&parseFloat(cs.fontSize)<=13.5&&!el.closest("button")&&!el.classList.contains("aic-mono"))el.classList.add("aic-mono");}
+  var t;function mode(){document.querySelectorAll(".aic-tool").forEach(function(r){var q=[].some.call(r.querySelectorAll(".aic-progress,.aic-qtext,.aic-q-text"),function(e){return e.offsetParent!==null});if(q!==r.classList.contains("aic-in-q"))r.classList.toggle("aic-in-q",q)})}
+  function run(){clearTimeout(t);t=setTimeout(function(){mode();document.querySelectorAll("body *").forEach(fix)},30)}
+  document.addEventListener("DOMContentLoaded",function(){run();new MutationObserver(run).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class","aria-pressed","aria-checked","data-state"]});
+    document.addEventListener("change",run,true);document.addEventListener("click",run,true);});
+})();
+</script>
+</head>
+<body style="margin:0;background:#F7F8FA">
+<!-- ===== AIC:START — for a WordPress Custom HTML block, paste everything from here to AIC:END ===== -->
+<style>
+/* ===== AI Channel tool base (scoped to .aic-tool) ===== */
+.aic-tool{
+  --aic-paper:#F7F8FA; --aic-white:#FFFFFF; --aic-ink:#162033; --aic-soft:#667085; --aic-line:#DEE3EA; --aic-sage:#EEF1F6;
+  --aic-blue:#315EFB; --aic-blue-deep:#2448C9; --aic-blue-soft:#EEF3FF; --aic-on-blue:#FFFFFF;
+  --aic-amber:#A46207; --aic-amber-soft:#FBF3E4; --aic-green:#2F7A4E; --aic-green-soft:#E9F5EE;
+  --aic-red:#B42318; --aic-red-soft:#FDEDEB; --aic-violet:#6D5BD0; --aic-violet-soft:#F1EFFC;
+  --aic-radius:18px; --aic-radius-sm:12px; --aic-shadow:0 10px 28px rgba(21,32,51,.055);
+  background:var(--aic-paper); color:var(--aic-ink);
+  font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size:16px; line-height:1.55; padding:32px 0 56px; -webkit-text-size-adjust:100%; text-align:left;
+}
+@media (prefers-color-scheme:dark){
+  .aic-tool{
+    --aic-paper:#101B2D; --aic-white:#162033; --aic-ink:#F2F4F8; --aic-soft:#A6B3C7; --aic-line:#2A3850; --aic-sage:#1E2A40;
+    --aic-blue:#7A97FF; --aic-blue-deep:#9BB2FF; --aic-blue-soft:#1F2B45; --aic-on-blue:#0B1426;
+    --aic-amber:#E0A34A; --aic-amber-soft:#2D2617; --aic-green:#6FC592; --aic-green-soft:#15302A;
+    --aic-red:#F97066; --aic-red-soft:#3A1E22; --aic-violet:#A99CF0; --aic-violet-soft:#25223F; --aic-shadow:none; color-scheme:dark;
+  }
+}
+.aic-tool *,.aic-tool *::before,.aic-tool *::after{box-sizing:border-box}
+.aic-tool h1,.aic-tool h2,.aic-tool h3,.aic-tool h4,.aic-tool p,.aic-tool ul,.aic-tool ol,.aic-tool li,.aic-tool fieldset,.aic-tool legend{margin:0;padding:0}
+.aic-tool ul,.aic-tool ol{list-style:none}
+.aic-tool fieldset{border:0;min-width:0}
+.aic-tool button,.aic-tool input,.aic-tool textarea,.aic-tool select{font:inherit;color:inherit}
+.aic-tool a{color:var(--aic-blue);font-weight:700;text-decoration:none}
+.aic-tool a:hover{text-decoration:underline}
+.aic-tool :focus-visible{outline:3px solid #9DB2FF;outline-offset:2px;border-radius:8px}
+.aic-tool [hidden]{display:none!important}
+.aic-tool .aic-sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;margin:-1px;padding:0;border:0}
+.aic-tool .aic-col{max-width:800px;margin:0 auto;padding-inline:16px}
+@media (min-width:600px){.aic-tool .aic-col{padding-inline:24px}}
+.aic-tool .aic-eyebrow{display:block;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--aic-blue)}
+.aic-tool .aic-h1{font-size:clamp(30px,6.4vw,50px);line-height:1.04;font-weight:800;letter-spacing:-.035em;margin:12px 0 16px}
+.aic-tool .aic-h2{font-size:clamp(24px,4.4vw,34px);line-height:1.1;font-weight:800;letter-spacing:-.035em;margin:8px 0 10px}
+.aic-tool .aic-h3{font-size:19px;line-height:1.25;font-weight:800;letter-spacing:-.02em;margin:0 0 6px}
+.aic-tool .aic-lede{font-size:18px;color:var(--aic-soft);max-width:640px}
+.aic-tool .aic-soft{color:var(--aic-soft)}
+.aic-tool .aic-small{font-size:13.5px;color:var(--aic-soft);line-height:1.55}
+.aic-tool .aic-card{background:var(--aic-white);border:1px solid var(--aic-line);border-radius:var(--aic-radius);box-shadow:var(--aic-shadow);padding:22px}
+@media (min-width:600px){.aic-tool .aic-card{padding:26px 28px}}
+.aic-tool .aic-stack>*+*{margin-top:14px}
+.aic-tool .aic-grid2{display:grid;gap:12px;grid-template-columns:1fr}
+@media (min-width:640px){.aic-tool .aic-grid2{grid-template-columns:1fr 1fr}}
+.aic-tool .aic-fade{animation:aicFade .35s ease both}
+@keyframes aicFade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* Buttons */
+.aic-tool .aic-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;min-height:46px;border-radius:999px;border:1px solid var(--aic-line);background:var(--aic-white);color:var(--aic-ink);font-weight:750;font-size:15px;cursor:pointer;text-decoration:none;line-height:1.2;transition:background .15s,border-color .15s,transform .15s}
+.aic-tool .aic-btn:hover{border-color:#B8C7FF;text-decoration:none}
+.aic-tool .aic-btn-primary{background:var(--aic-blue);border-color:var(--aic-blue);color:var(--aic-on-blue);box-shadow:0 6px 16px rgba(49,94,251,.14)}
+.aic-tool .aic-btn-primary:hover{background:var(--aic-blue-deep);border-color:var(--aic-blue-deep);color:var(--aic-on-blue)}
+.aic-tool .aic-btn-ghost{background:none;border-color:transparent;color:var(--aic-soft);padding-inline:10px}
+.aic-tool .aic-btn-ghost:hover{color:var(--aic-ink);border-color:transparent}
+.aic-tool .aic-btn[disabled]{opacity:.45;cursor:not-allowed;box-shadow:none}
+.aic-tool .aic-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.aic-tool .aic-nav{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-top:22px;padding-top:18px;border-top:1px solid var(--aic-line)}
+.aic-tool .aic-nav-hint{font-size:13px;color:var(--aic-soft);font-weight:650}
+
+/* Segmented switch */
+.aic-tool .aic-seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--aic-line);border-radius:999px;background:var(--aic-white);padding:3px;gap:2px}
+.aic-tool .aic-seg button{border:0;background:none;padding:9px 15px;border-radius:999px;font-size:14px;font-weight:750;color:var(--aic-soft);cursor:pointer;min-height:40px}
+.aic-tool .aic-seg button[aria-pressed="true"],.aic-tool .aic-seg button[aria-checked="true"]{background:var(--aic-blue);color:var(--aic-on-blue)}
+
+/* Progress */
+.aic-tool .aic-progress{height:6px;border-radius:999px;background:var(--aic-sage);overflow:hidden;margin:14px 0 4px}
+.aic-tool .aic-progress span{display:block;height:100%;width:0;background:var(--aic-blue);border-radius:999px;transition:width .35s ease}
+
+/* Radio-style options */
+.aic-tool .aic-q{margin-top:14px}
+.aic-tool .aic-qnum{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--aic-soft);margin-bottom:6px}
+.aic-tool .aic-qtext{font-size:18px;font-weight:750;line-height:1.35;letter-spacing:-.01em;margin-bottom:6px}
+.aic-tool .aic-qhint{font-size:14px;color:var(--aic-soft);margin-bottom:12px}
+.aic-tool .aic-opts{display:grid;gap:8px;margin-top:12px}
+.aic-tool .aic-opt{display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;padding:12px 14px;border:1px solid var(--aic-line);border-radius:var(--aic-radius-sm);background:var(--aic-paper);cursor:pointer;font-size:15.5px;line-height:1.4;transition:border-color .15s,background .15s}
+.aic-tool .aic-opt:hover{border-color:#B8C7FF;background:var(--aic-white)}
+.aic-tool .aic-dot{flex:none;width:18px;height:18px;border-radius:50%;border:2px solid #A9B4C6;margin-top:1px;position:relative}
+.aic-tool .aic-opt[data-multi] .aic-dot{border-radius:5px}
+.aic-tool .aic-dot::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--aic-blue);transform:scale(0);transition:transform .15s}
+.aic-tool .aic-opt[data-multi] .aic-dot::after{border-radius:2px}
+.aic-tool .aic-opt[aria-checked="true"]{border-color:var(--aic-blue);background:var(--aic-white);box-shadow:0 0 0 3px var(--aic-blue-soft)}
+.aic-tool .aic-opt[aria-checked="true"] .aic-dot{border-color:var(--aic-blue)}
+.aic-tool .aic-opt[aria-checked="true"] .aic-dot::after{transform:scale(1)}
+.aic-tool .aic-opt-sub{display:block;font-size:13.5px;color:var(--aic-soft);margin-top:2px}
+.aic-tool .aic-opt.aic-opt-unsure{background:none;border-style:dashed}
+
+/* Callouts and tags */
+.aic-tool .aic-note{border-radius:var(--aic-radius-sm);padding:14px 16px;background:var(--aic-blue-soft);border-left:3px solid var(--aic-blue);font-size:15px;color:var(--aic-ink)}
+.aic-tool .aic-note.aic-warn{background:var(--aic-amber-soft);border-left-color:var(--aic-amber)}
+.aic-tool .aic-note.aic-bad{background:var(--aic-red-soft);border-left-color:var(--aic-red)}
+.aic-tool .aic-note.aic-good{background:var(--aic-green-soft);border-left-color:var(--aic-green)}
+.aic-tool .aic-note strong{font-weight:800}
+.aic-tool .aic-tag{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:5px 10px;border-radius:999px;background:var(--aic-sage);color:var(--aic-soft);max-width:100%;white-space:normal;line-height:1.35}
+.aic-tool .aic-tag.aic-t-good{background:var(--aic-green-soft);color:var(--aic-green)}
+.aic-tool .aic-tag.aic-t-warn{background:var(--aic-amber-soft);color:var(--aic-amber)}
+.aic-tool .aic-tag.aic-t-bad{background:var(--aic-red-soft);color:var(--aic-red)}
+.aic-tool .aic-tag.aic-t-blue{background:var(--aic-blue-soft);color:var(--aic-blue)}
+.aic-tool .aic-privacy{display:flex;gap:8px;align-items:flex-start;font-size:13.5px;color:var(--aic-soft);margin-top:14px}
+.aic-tool .aic-privacy svg{flex:none;margin-top:3px}
+
+/* Bars */
+.aic-tool .aic-bars{display:grid;gap:4px}
+.aic-tool .aic-bar-row{display:grid;grid-template-columns:1fr 48px;gap:6px 12px;align-items:center;padding:9px 0;border-bottom:1px solid var(--aic-line)}
+.aic-tool .aic-bar-row:last-child{border-bottom:0}
+.aic-tool .aic-bar-label{grid-column:1/-1;font-weight:750;font-size:15px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+@media (min-width:640px){.aic-tool .aic-bar-row{grid-template-columns:230px 1fr 48px}.aic-tool .aic-bar-label{grid-column:auto}}
+.aic-tool .aic-bar{display:block;height:10px;border-radius:999px;background:var(--aic-sage);overflow:hidden}
+.aic-tool .aic-bar i{display:block;height:100%;border-radius:999px;background:var(--aic-green);width:0;transition:width .8s ease}
+.aic-tool .aic-bar i.aic-mid{background:var(--aic-amber)}
+.aic-tool .aic-bar i.aic-low{background:var(--aic-red)}
+.aic-tool .aic-bar-pct{font-weight:800;font-variant-numeric:tabular-nums;text-align:right;font-size:14px}
+
+.aic-tool .aic-list li{position:relative;padding-left:18px;margin-top:8px}
+.aic-tool .aic-list li::before{content:"";position:absolute;left:2px;top:.62em;width:7px;height:7px;border-radius:50%;background:var(--aic-blue)}
+/* Results hand-off */
+.aic-tool .aic-next{display:grid;gap:12px;grid-template-columns:1fr}
+@media (min-width:700px){.aic-tool .aic-next{grid-template-columns:1fr 1fr}}
+.aic-tool .aic-next .aic-card{display:flex;flex-direction:column;gap:10px}
+.aic-tool .aic-next .aic-card .aic-btn{align-self:flex-start;margin-top:auto}
+.aic-tool .aic-solution{border-color:#C7D3FF;background:linear-gradient(180deg,var(--aic-blue-soft),var(--aic-white) 70%)}
+.aic-tool .aic-handoff{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;font-size:14px;margin-top:6px}
+.aic-tool .aic-linkbtn{background:none;border:0;padding:4px 0;color:var(--aic-blue);font-weight:750;cursor:pointer;text-decoration:underline;text-underline-offset:3px;font-size:14px}
+.aic-tool .aic-sources{font-size:13px;color:var(--aic-soft);line-height:1.6}
+.aic-tool .aic-sources a{font-weight:650}
+.aic-tool details.aic-more{border-top:1px solid var(--aic-line);padding-top:4px}
+.aic-tool details.aic-more summary{cursor:pointer;padding:12px 0;font-weight:800;list-style:none;display:flex;justify-content:space-between;gap:10px}
+.aic-tool details.aic-more summary::-webkit-details-marker{display:none}
+.aic-tool details.aic-more summary::after{content:"+";color:var(--aic-soft)}
+.aic-tool details.aic-more[open] summary::after{content:"\2013"}
+
+@media (prefers-reduced-motion:reduce){
+  .aic-tool .aic-fade{animation:none}
+  .aic-tool *{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+}
+@media print{
+  .aic-tool{--aic-paper:#fff;--aic-white:#fff;--aic-ink:#000;--aic-soft:#444;--aic-line:#bbb;--aic-sage:#eee;--aic-blue:#2448C9;--aic-blue-soft:#EEF3FF;--aic-amber:#8A5206;--aic-amber-soft:#FBF3E4;--aic-green:#2F7A4E;--aic-green-soft:#E9F5EE;--aic-red:#B42318;--aic-red-soft:#FDEDEB;--aic-shadow:none;background:#fff!important;color:#000;padding:0;font-size:11pt}
+  .aic-tool .aic-noprint{display:none!important}
+  .aic-tool .aic-card{box-shadow:none;border-color:#bbb;break-inside:avoid;padding:14px 16px}
+  .aic-tool .aic-col{max-width:none;padding:0}
+  .aic-tool .aic-bar i,.aic-tool .aic-tag,.aic-tool .aic-note{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .aic-tool a{color:#000;text-decoration:underline}
+}
+
+/* governance check */
+.aic-tool .aic-gov-score{display:grid;gap:20px;grid-template-columns:1fr;align-items:center}
+@media (min-width:600px){.aic-tool .aic-gov-score{grid-template-columns:150px 1fr}}
+.aic-tool .aic-gov-dial{position:relative;width:150px;height:150px;justify-self:center}
+.aic-tool .aic-gov-dial svg{width:100%;height:100%;transform:rotate(-90deg)}
+.aic-tool .aic-gov-track{fill:none;stroke:var(--aic-sage);stroke-width:11}
+.aic-tool .aic-gov-arc{fill:none;stroke:var(--aic-blue);stroke-width:11;stroke-linecap:round}
+.aic-tool .aic-gov-arc.aic-tone-bad{stroke:var(--aic-red)}
+.aic-tool .aic-gov-arc.aic-tone-warn{stroke:var(--aic-amber)}
+.aic-tool .aic-gov-arc.aic-tone-good{stroke:var(--aic-green)}
+.aic-tool .aic-gov-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.aic-tool .aic-gov-num b{font-size:44px;font-weight:800;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
+.aic-tool .aic-gov-num span{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--aic-soft)}
+.aic-tool .aic-gaps{display:grid;gap:10px;margin-top:12px}
+.aic-tool .aic-gaps li{display:grid;grid-template-columns:36px 1fr;gap:12px;align-items:start}
+.aic-tool .aic-gap-n{width:32px;height:32px;border-radius:50%;background:var(--aic-blue-soft);color:var(--aic-blue);font-weight:800;display:flex;align-items:center;justify-content:center}
+.aic-tool .aic-gaps .aic-tag{vertical-align:2px;margin-left:4px}
+.aic-tool .aic-ctllist{padding-top:6px;padding-bottom:6px}
+.aic-tool .aic-ctl{padding:14px 0;border-bottom:1px solid var(--aic-line)}
+.aic-tool .aic-ctl:last-of-type{border-bottom:0}
+.aic-tool .aic-ctl-head{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-bottom:6px}
+.aic-tool .aic-ctl p+p{margin-top:4px}
+@media print{.aic-tool .aic-ctl[hidden]{display:block!important}.aic-tool .aic-gov-dial{width:110px;height:110px}}
+</style>
+<div class="aic-tool" id="aic-does-your-organization-have-the-controls-to-govern-ai"><noscript><div class="aic-col"><p>This check needs JavaScript to run. It all happens in your browser, and nothing is sent.</p></div></noscript></div>
+<script>
+window.AICHANNEL_CONFIG = Object.assign({
+  resultsFormUrl: "#",      // "Email me my results" form (WordPress form page)
+  coursesUrl: "#",          // "Learn with a member" (Central AI course schedule)
+  matchUrl: "#",            // "Get matched to someone" (advisory/consulting form)
+  newsletterUrl: "#"        // separate newsletter opt-in
+}, window.AICHANNEL_CONFIG || {});
+(function () {
+  'use strict';
+  /* ---------- Shared helpers (results hand-off, events, DOM) ---------- */
+  var CFG = window.AICHANNEL_CONFIG;
+  var reducedMotion = false;
+  try { reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function $(sel, ctx) { return (ctx || ROOT).querySelector(sel); }
+  function $$(sel, ctx) { return Array.prototype.slice.call((ctx || ROOT).querySelectorAll(sel)); }
+
+  function utmParams() {
+    var out = {};
+    try {
+      var sp = new URLSearchParams(window.location.search);
+      sp.forEach(function (v, k) { if (/^utm_/i.test(k)) out[k] = v; });
+    } catch (e) {}
+    return out;
+  }
+
+  /* Fires a DOM event and a postMessage so GA4/GTM on the host page can track. No direct analytics calls. */
+  function emit(name, extra) {
+    var detail = { event: name, tool: SLUG, assessment_name: TOOL_NAME, audience: currentAudience() };
+    if (extra) for (var k in extra) if (Object.prototype.hasOwnProperty.call(extra, k)) detail[k] = extra[k];
+    try { window.dispatchEvent(new CustomEvent('aichannel:event', { detail: detail })); } catch (e) {}
+    try {
+      var msg = { type: 'aichannel:event' };
+      for (var j in detail) msg[j] = detail[j];
+      window.parent.postMessage(msg, '*');
+    } catch (e) {}
+  }
+
+  /* Builds the "Email me my results" / CTA URL with the lead fields from the brief. */
+  function buildUrl(base, cta, result) {
+    var params = {
+      lead_type: result.lead_type || 'tool_result',
+      audience: currentAudience(),
+      source_page: window.location.href,
+      source_content_or_tool: SLUG,
+      cta_clicked: cta,
+      assessment_name: TOOL_NAME,
+      assessment_result: result.label || ''
+    };
+    if (result.score != null) params.score = String(result.score);
+    var utm = utmParams();
+    for (var u in utm) params[u] = utm[u];
+    var url;
+    try {
+      url = new URL(base || '#', window.location.href);
+      for (var p in params) url.searchParams.set(p, params[p]);
+      return url.toString();
+    } catch (e) {
+      var qs = Object.keys(params).map(function (k) { return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]); }).join('&');
+      return (base || '#') + (String(base).indexOf('?') > -1 ? '&' : '?') + qs;
+    }
+  }
+
+  /* Wires every [data-aic-cta] link inside a container: sets href and tracks the click. */
+  function wireCtas(container, result) {
+    $$('[data-aic-cta]', container).forEach(function (a) {
+      var kind = a.getAttribute('data-aic-cta');
+      var base = CFG[a.getAttribute('data-aic-url')] || '#';
+      a.setAttribute('href', kind === 'newsletter' ? base : buildUrl(base, kind, result));
+      a.addEventListener('click', function () {
+        emit('cta_clicked', { cta_clicked: kind, assessment_result: result.label || '', score: result.score == null ? null : result.score });
+      });
+    });
+  }
+
+  function focusHeading(el) {
+    if (!el) return;
+    el.setAttribute('tabindex', '-1');
+    try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
+  }
+  function scrollToEl(el) {
+    if (!el) return;
+    try { el.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' }); } catch (e) { el.scrollIntoView(); }
+  }
+
+  /* Arrow-key movement inside role=radiogroup option lists */
+  function radioKeys(container, onSelect) {
+    container.addEventListener('keydown', function (e) {
+      var opt = e.target.closest && e.target.closest('[role="radio"]');
+      if (!opt) return;
+      var group = opt.closest('[role="radiogroup"]');
+      var opts = $$('[role="radio"]', group);
+      var i = opts.indexOf(opt), n = null;
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') n = opts[(i + 1) % opts.length];
+      if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') n = opts[(i - 1 + opts.length) % opts.length];
+      if (n) { e.preventDefault(); n.focus(); onSelect(n); }
+    });
+  }
+  /* Roving tabindex so each radiogroup is one tab stop */
+  function rovingTabs(group) {
+    var opts = $$('[role="radio"]', group);
+    var checked = opts.filter(function (o) { return o.getAttribute('aria-checked') === 'true'; })[0] || opts[0];
+    opts.forEach(function (o) { o.setAttribute('tabindex', o === checked ? '0' : '-1'); });
+  }
+
+  var LOCK_SVG = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="2" y="6" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M4.5 6V4.5a2.5 2.5 0 015 0V6" stroke="currentColor" stroke-width="1.5"/></svg>';
+
+  /* ---------- Tool: AI governance controls check ---------- */
+  var SLUG = 'does-your-organization-have-the-controls-to-govern-ai';
+  var TOOL_NAME = 'Does Your Organization Have the Controls to Govern the AI It Uses?';
+  var ROOT = document.getElementById('aic-' + SLUG);
+  if (!ROOT) return;
+
+  var state = { org: 'pub', scale: null, answers: {}, started: false, screen: 'intro' };
+  function currentAudience() { return state.org === 'pub' ? 'government' : 'executives'; }
+  function tx(v) { return (v && typeof v === 'object') ? v[state.org] : v; }
+
+  /* Each question = one control. o = four answers scored 0..3; "Not sure" is appended and scores 0 but is reported as unknown. */
+  var AREAS = [
+    { id: 'own', title: 'Ownership and inventory',
+      why: { pub: 'You can’t govern what you haven’t listed. Audits of public bodies keep finding the same first gap: no complete record of which AI systems are in use, and no one clearly answerable for each.',
+             co: 'You can’t govern what you haven’t listed. AI now arrives inside software you already pay for, so the usual first gap is an incomplete list, with no one clearly answerable for each system.' },
+      qs: [
+        { ctl: 'AI inventory', crit: true,
+          t: 'If an auditor asked tomorrow, could you hand over one up-to-date list of the AI systems your organization uses, including AI features built into software you already buy?',
+          o: ['No list exists', 'A partial list, mostly of systems IT bought', 'A list covering most systems, updated now and then', 'A maintained inventory, including embedded AI features and staff tools, reviewed on a schedule'],
+          act: { pub: 'Ask every department to list each AI tool and AI feature in use (chatbots, copilots, "smart" features in case-management or HR software). For each, record owner, purpose, data used, vendor and who is affected. Public registers such as the UK Algorithmic Transparency Recording Standard (ATRS) are a good template for the fields.',
+                 co: 'Ask every team lead to list each AI tool and AI feature in use (chatbots, copilots, AI features in CRM, HR or finance software). For each, record owner, purpose, data used, vendor and who is affected. Keep it in one shared place and review it quarterly.' } },
+        { ctl: 'Named owner per system', crit: true,
+          t: 'Does each AI system have a named owner who is accountable for how it performs and for the decisions it feeds into?',
+          o: ['Nobody in particular', 'IT or the vendor, by default', 'A named owner for the main systems', 'A named business owner for every system, with written responsibilities'],
+          act: 'Give every system on the inventory a named business owner (not IT, not the vendor) who signs off on its use, watches its performance and can pause it. Write the responsibilities down in five lines.' },
+        { ctl: 'Senior accountability', crit: false,
+          t: { pub: 'Is there a senior official with the authority to set AI rules across the organization (for example a Chief AI Officer or an equivalent named role)?',
+               co: 'Is there an executive or a committee with the authority to set AI rules across the company?' },
+          o: ['No', 'It’s discussed, but nobody is formally in charge', 'Someone is nominally responsible, with little time or authority', 'Yes — named, with a mandate, resources and a line to the top'],
+          act: { pub: 'Name one senior official as accountable for AI use across the organization, with a written mandate and a regular slot with leadership. US federal agencies are required to name a Chief AI Officer; the role is a useful model at any level of government.',
+                 co: 'Name one executive as accountable for AI use across the company, with a written mandate, a small budget and a standing item at leadership meetings.' } }
+      ] },
+    { id: 'appr', title: 'Approvals before go-live',
+      why: 'Most AI problems are cheapest to stop before launch. The trick is proportion: small tools get a quick check, and anything that shapes decisions about people gets a proper review.',
+      qs: [
+        { ctl: 'Approval gate', crit: true,
+          t: 'Before a new AI system or AI feature goes live, does it have to pass a formal approval step?',
+          o: ['No — teams switch things on as they like', 'Only large IT projects are reviewed', 'There is an approval step, but small or free tools often skip it', 'Every system, including pilots and free tools, goes through a proportionate approval'],
+          act: 'Set up a one-page approval form (purpose, data, who is affected, which laws and sector rules apply, risk tier, owner, human review, switch-off plan). Light-touch sign-off for low-risk tools; full review for anything that affects decisions about people.' },
+        { ctl: 'Impact assessment', crit: true,
+          t: { pub: 'Before using AI that affects decisions about people, do you assess the impact on their rights, fairness and privacy?',
+               co: 'Before using AI that affects decisions about customers, applicants or staff, do you assess the impact on fairness and privacy?' },
+          hint: { pub: 'Under the EU AI Act, bodies governed by public law that deploy high-risk AI must carry out a fundamental rights impact assessment (Article 27), alongside any data protection impact assessment.',
+                  co: 'Where personal data is involved, a data protection impact assessment may already be required. Some private deployers of high-risk AI under the EU AI Act (for example in credit scoring or life and health insurance) must also assess fundamental rights impact.' },
+          o: ['Never', 'Only a data-protection check', 'An impact assessment for some higher-risk uses', 'A documented risk tiering, with a full impact assessment and sign-off for higher-risk uses'],
+          act: { pub: 'Add a short risk-tiering step to approval. For any system that affects eligibility, enforcement, benefits, services or staff, complete an impact assessment covering who is affected, possible harms, mitigations and human oversight. Check whether the EU AI Act fundamental rights impact assessment applies.',
+                 co: 'Add a short risk-tiering step to approval. For any system that affects hiring, pay, credit, pricing or access to services, complete an impact assessment covering who is affected, possible harms, mitigations and human oversight.' } },
+        { ctl: 'Staff AI-use rules', crit: false,
+          t: 'Is there a written rule on what staff may use general AI tools (chatbots, copilots) for, and what data must never go into them?',
+          o: ['No rule', 'Informal guidance only', 'A written policy that few people know about', 'A written policy, with approved tools provided and staff walked through it'],
+          act: { pub: 'Write a one-page rule: approved tools, data that must never go in (personal data of residents, case files, classified or sensitive material), when outputs must be checked, and who to ask. Provide an approved tool so staff aren’t pushed onto personal accounts.',
+                 co: 'Write a one-page rule: approved tools, data that must never go in (customer details, financials, anything under NDA), when outputs must be checked, and who to ask. Provide an approved business account so staff aren’t pushed onto personal ones.' } },
+        { ctl: 'Telling people it is AI', crit: false,
+          t: { pub: 'Do you decide, before launch, how residents will be told when they are dealing with AI or receiving AI-generated content?',
+               co: 'Do you decide, before launch, how customers or staff will be told when they are dealing with AI or receiving AI-generated content?' },
+          hint: 'EU AI Act Article 50 sets transparency duties for chatbots, deepfakes and some AI-generated text, which have applied since 2 August 2026.',
+          o: ['Not considered', 'Left to each team', 'Decided for public-facing chatbots only', 'A standard rule for disclosure and labelling, applied at approval'],
+          act: 'Add a disclosure line to the approval form: will people interact with AI or see AI-generated content, and how will they be told? Use one plain standard wording across services.' }
+      ] },
+    { id: 'proc', title: 'Procurement and vendor terms',
+      why: { pub: 'Most public-sector AI is bought, not built. The contract is where you get the information, rights and way out you’ll need to oversee a system you don’t control.',
+             co: 'Most company AI is bought, not built. The contract is where you get the information, rights and way out you’ll need to oversee a system you don’t control.' },
+      qs: [
+        { ctl: 'AI procurement questions', crit: false,
+          t: 'When you buy AI, or software with AI inside, do your procurement questions cover how the AI works, how it was tested and what data it uses?',
+          o: ['We buy it like any other software', 'Ad hoc questions, depending on who buys', 'Standard AI questions for larger purchases', 'Standard AI questions and clauses for all purchases, including renewals that add AI features'],
+          act: 'Add a standard AI annex to procurement: intended purpose, known limitations, test results on comparable cases, training-data sources, human-oversight features, and the vendor\'s own risk classification. Apply it to renewals too, since AI features often arrive in updates.' },
+        { ctl: 'Data-use terms', crit: true,
+          t: 'Do your contracts say what the vendor may do with your data, including whether it can be used to train their models?',
+          o: ['We haven’t checked', 'We rely on the vendor\'s standard terms', 'Negotiated for the main contracts', 'Explicit terms in every contract: no training without consent, data location, retention, deletion and sub-processors'],
+          act: 'Review the data terms of every AI contract on the inventory. Require: no training on your data without written consent, stated data location, retention and deletion on exit, a list of sub-processors, and breach notification.' },
+        { ctl: 'Oversight and exit rights', crit: false,
+          t: 'Can you get what you need from the vendor to oversee the system: documentation, logs, notice of model changes, and help when something goes wrong?',
+          o: ['No', 'Whatever the vendor happens to offer', 'Some of these rights in the main contracts', 'Contract rights to documentation, logs, change notice, incident cooperation, audit and exit with data return'],
+          act: 'At the next renewal, add rights to: instructions for use and documentation, access to logs, advance notice of model changes, cooperation during incidents, audit, and an exit clause with data and configuration returned.' }
+      ] },
+    { id: 'eval', title: 'Evaluation and testing',
+      why: 'A vendor demo shows a system at its best. Your own cases show the errors you’ll actually get, on your data and with the people you serve.',
+      qs: [
+        { ctl: 'Pre-launch testing', crit: true,
+          t: 'Before go-live, is the system tested on your own cases, not just the vendor\'s demo?',
+          o: ['We rely on the vendor', 'Tried it out informally', 'Tested for accuracy on real cases', 'A structured test on representative cases, including errors across different groups, edge cases and misuse, with a pass threshold recorded'],
+          act: 'Before launch, run the system on 50 to 200 representative past cases with known outcomes. Record error rates overall and for the groups most affected, set a pass threshold in advance, and keep the results with the approval.' },
+        { ctl: 'Re-testing after changes', crit: false,
+          t: 'Do you re-test after the vendor updates the model, or when you change how the system is used?',
+          o: ['No', 'Only if problems appear', 'For major changes', 'Defined triggers for re-testing (model update, new use, drift) plus a regular schedule'],
+          act: 'Keep the pre-launch test set and re-run it when the vendor changes the model, when you extend the use to new cases, and at least once a year. If the purpose, the data or the people affected change, send it back through approval as well.' }
+      ] },
+    { id: 'log', title: 'Logging and records',
+      why: { pub: 'When a resident, auditor, ombudsman or court asks what happened, records are the only answer. Logs also show you problems before complaints do.',
+             co: 'When a customer, regulator or auditor asks what happened, records are the only answer. Logs also show you problems before complaints do.' },
+      qs: [
+        { ctl: 'Usable logs', crit: true,
+          t: 'Does each system keep logs you can actually use: inputs, outputs, who acted on them, and when?',
+          hint: 'Under the EU AI Act, deployers of high-risk AI systems must keep the logs the system generates for at least six months, where those logs are under their control (Article 26).',
+          o: ['No logs we can access', 'The vendor holds logs, but we can’t easily get them', 'Logs kept for the main systems', 'Logs for every material system, kept for a defined period and searchable'],
+          act: 'For each system that affects decisions, confirm what is logged, where, for how long and who can search it. Set a retention period (at least six months for EU high-risk systems) and test that you can retrieve one case.' },
+        { ctl: 'Decision reconstruction', crit: false,
+          t: { pub: 'If a resident or auditor asked why AI contributed to a specific decision, could you reconstruct what happened?',
+               co: 'If a customer or regulator asked why AI contributed to a specific decision, could you reconstruct what happened?' },
+          o: ['No', 'Only with great difficulty', 'For most systems', 'Yes — documented, with a process for handling explanation requests'],
+          act: 'Pick one recent AI-assisted decision and try to reconstruct it end to end: input, output, who reviewed it, what was decided. Fix whatever was missing, then write a short process for explanation requests.' }
+      ] },
+    { id: 'mon', title: 'Monitoring and human oversight',
+      why: 'Systems change after launch: vendors update models, inputs drift, people start trusting outputs more than they should. Oversight only works if reviewers are trained, have time, and are allowed to overrule.',
+      qs: [
+        { ctl: 'Human review', crit: true,
+          t: 'Where AI influences decisions about people, does a trained person review the output before it takes effect?',
+          o: ['No', 'On paper, but in practice it’s a rubber stamp', 'Real review for the higher-stakes uses', 'Defined review points, with trained reviewers who have the time and authority to overrule'],
+          act: 'For each system that affects people, define where a human reviews the output, what they check, and that they can overrule it. Track how often reviewers disagree with the AI; a rate near zero is a warning sign of rubber-stamping.' },
+        { ctl: 'Limits on access and actions', crit: true,
+          t: 'Can each AI system reach only the data and systems it needs, and do actions that are hard to undo (payments, deleting records, messages sent outside) need a person to approve them?',
+          hint: 'This matters most for AI assistants and agents connected to email, files or business systems, where a wrong instruction becomes a wrong action.',
+          o: ['We haven’t looked at what our AI tools can reach', 'Whatever the vendor’s default settings allow', 'Access is limited for the main systems, and some actions need approval', 'Every system has the least access that works, reviewed regularly, and irreversible actions always need a person'],
+          act: 'For each AI tool connected to your systems, list what it can read and what it can do. Cut that back to what the task needs (read-only by default), give it its own account or key rather than a person’s login, and require a named person to approve payments, deletions and anything sent outside. Review the access whenever the use changes.' },
+        { ctl: 'Performance monitoring', crit: false,
+          t: 'Once live, does anyone track whether the system is still performing: errors, complaints, drift, unequal outcomes?',
+          o: ['No', 'Only when complaints arrive', 'Periodic checks on the main systems', 'Defined measures and thresholds, reviewed by the owner on a schedule'],
+          act: 'Agree three or four measures per system (error rate, override rate, complaints, outcome differences between groups), a threshold that triggers review, and a monthly or quarterly check by the owner.' },
+        { ctl: 'AI literacy of staff', crit: false,
+          t: 'Do staff who use AI know its limits, including when not to trust it, and have they been trained?',
+          hint: 'The EU AI Act requires providers and deployers to take measures to support the AI literacy of staff who use AI systems (Article 4, applying since 2 February 2025 and reworded in July 2026).',
+          o: ['No training', 'Self-taught', 'Some training for some staff', 'Role-based training for everyone who uses or oversees AI, recorded and refreshed'],
+          act: 'Run short role-based training: everyone who uses AI learns its typical failure modes and the data rules; reviewers and owners learn how to check outputs and when to escalate. Keep a record of who was trained and when.' }
+      ] },
+    { id: 'esc', title: 'Escalation and redress',
+      why: 'Every organization using AI will have a bad day eventually. What matters is whether staff know how to raise it, someone has the authority to act, and the people affected can reach a human.',
+      qs: [
+        { ctl: 'Incident route', crit: true,
+          t: 'If AI gets something wrong, do staff know how to report it, and who decides what happens next?',
+          hint: 'Deployers of high-risk systems under the EU AI Act must inform the provider and the relevant authority of serious incidents (Articles 26 and 73).',
+          o: ['There’s no route', 'The general IT helpdesk', 'A route exists, but nobody’s sure it covers AI', 'A clear AI incident route, with severity levels, named decision-makers and response times'],
+          act: 'Write a one-page AI incident procedure: how to report, severity levels, who decides to pause, who informs the vendor, regulators and affected people, and target response times. Tell staff where it is.' },
+        { ctl: 'Challenge and human contact', crit: false,
+          t: { pub: 'Can residents affected by an AI-assisted decision challenge it and reach a human?',
+               co: 'Can customers, applicants or employees affected by an AI-assisted decision challenge it and reach a human?' },
+          o: ['No', 'Only through general complaints', 'Yes, for some systems', 'Yes — clearly signposted, reviewed by a person, and complaints feed back into monitoring'],
+          act: 'For every system that affects people, publish how to challenge a decision and reach a person. Route those complaints to the system owner and count them in monitoring.' }
+      ] },
+    { id: 'stop', title: 'Shutdown and fallback',
+      why: 'The off-switch is the control people assume exists and rarely test. It needs a person authorized to use it, a way to do it quickly, and a way to keep the service running afterwards.',
+      qs: [
+        { ctl: 'Switch-off authority', crit: true,
+          t: 'If one AI system started causing harm this afternoon, could you switch it off or suspend it quickly?',
+          o: ['We wouldn’t know how', 'Only through the vendor, with no clear timing', 'Technically yes, but nobody is clearly authorized to decide', 'Yes — named people are authorized, and switch-off has been tested'],
+          act: 'For each material system, name who may suspend it, record exactly how (setting, vendor contact, contract clause), how to revoke its access (API keys, service accounts, connected apps) and how long it all takes. Test it once, ideally in a tabletop exercise.' },
+        { ctl: 'Fallback and exit plan', crit: false,
+          t: 'If an AI system had to be switched off, could the service keep running?',
+          o: ['No — we’d be stuck', 'We’d improvise', 'A manual fallback exists for the main systems', 'A documented, rehearsed fallback and exit plan, including getting data back from the vendor'],
+          act: 'Write the fallback for each system that a service depends on: who does the work manually, how long that can last, and how you would move to another vendor with your data.' }
+      ] }
+  ];
+
+  var TOTAL_Q = AREAS.reduce(function (n, a) { return n + a.qs.length; }, 0);
+
+  var SCALES = [
+    { id: 'light', label: 'A few general tools', sub: 'Staff use chatbots or copilots; no AI makes or shapes decisions about people.' },
+    { id: 'mid', label: 'Several systems, some affecting people', sub: 'AI helps with triage, screening, drafting decisions or customer contact.' },
+    { id: 'heavy', label: 'AI in core services or decisions', sub: 'AI shapes eligibility, enforcement, hiring, pricing, credit or similar decisions.' }
+  ];
+
+  var LEVELS = [
+    { max: 30, label: 'Controls mostly missing', tone: 'bad',
+      desc: 'AI is in use, and the basic controls around it aren’t there yet. That’s common, and fixable. Start with the three gaps below — none of them needs new software.' },
+    { max: 55, label: 'Partial controls', tone: 'warn',
+      desc: 'Some controls exist, but they’re uneven: strong in places, missing in others. The risk is that the gaps sit exactly where a problem would hurt most. Close the top three first.' },
+    { max: 80, label: 'Controls in place, gaps to close', tone: 'blue',
+      desc: 'You have a working governance base. The remaining gaps are specific rather than general, so the action list below is mostly about tightening and testing what exists.' },
+    { max: 100, label: 'Well-governed: keep testing it', tone: 'good',
+      desc: 'Strong answers across the board. The risk now is controls that exist on paper and have never been tried. Rehearse an incident and a switch-off at least once a year.' }
+  ];
+
+  /* ---------- Render ---------- */
+  function intro() {
+    return '<section class="aic-screen aic-fade" data-screen="intro" aria-labelledby="aic-gov-h1">' +
+      '<span class="aic-eyebrow" data-org-text="eyebrow"></span>' +
+      '<h1 class="aic-h1" id="aic-gov-h1">Does your organization have the controls to govern the AI it uses?</h1>' +
+      '<p class="aic-lede">Twenty-two plain questions about who owns your AI, what it can reach, what gets approved and logged, and whether anyone can switch it off. In about six minutes you’ll see where you stand in eight areas, your top three gaps, and what to do about each control.</p>' +
+      '<div class="aic-card" style="margin-top:22px">' +
+        '<div class="aic-qtext" id="aic-gov-orglbl">What kind of organization is this for?</div>' +
+        '<div class="aic-seg" role="radiogroup" aria-labelledby="aic-gov-orglbl" id="aic-gov-org">' +
+          '<button type="button" role="radio" data-org="pub" aria-checked="true">Public body</button>' +
+          '<button type="button" role="radio" data-org="co" aria-checked="false">Company</button>' +
+        '</div>' +
+        '<p class="aic-small" style="margin-top:8px" data-org-text="orgnote"></p>' +
+        '<div class="aic-qtext" style="margin-top:20px" id="aic-gov-scalelbl">How much does your organization rely on AI today?</div>' +
+        '<p class="aic-qhint">This sets how much governance we suggest. A team using one chatbot doesn’t need a committee.</p>' +
+        '<div class="aic-opts" role="radiogroup" aria-labelledby="aic-gov-scalelbl" id="aic-gov-scale">' +
+          SCALES.map(function (s) {
+            return '<button type="button" class="aic-opt" role="radio" aria-checked="false" data-scale="' + s.id + '"><span class="aic-dot" aria-hidden="true"></span><span><b>' + esc(s.label) + '</b><span class="aic-opt-sub">' + esc(s.sub) + '</span></span></button>';
+          }).join('') +
+        '</div>' +
+        '<div class="aic-nav"><span class="aic-nav-hint" id="aic-gov-starthint">Choose one to start</span><button type="button" class="aic-btn aic-btn-primary" id="aic-gov-start" disabled>Start the check</button></div>' +
+      '</div>' +
+      '<p class="aic-privacy">' + LOCK_SVG + '<span>Answers stay in your browser for this session only. Nothing is stored or sent.</span></p>' +
+    '</section>';
+  }
+
+  function areaScreen(ai) {
+    var a = AREAS[ai], n = 0;
+    for (var i = 0; i < ai; i++) n += AREAS[i].qs.length;
+    var html = '<section class="aic-screen aic-fade" data-screen="' + ai + '" aria-labelledby="aic-gov-a' + ai + '" hidden>' +
+      '<span class="aic-eyebrow">Area ' + (ai + 1) + ' of ' + AREAS.length + '</span>' +
+      '<h2 class="aic-h2" id="aic-gov-a' + ai + '">' + esc(a.title) + '</h2>' +
+      '<p class="aic-note" data-why="' + ai + '"></p>';
+    a.qs.forEach(function (q, qi) {
+      n++;
+      var gid = 'aic-gov-q' + ai + '-' + qi;
+      html += '<div class="aic-card aic-q">' +
+        '<div class="aic-qnum">Question ' + n + ' of ' + TOTAL_Q + ' · ' + esc(q.ctl) + '</div>' +
+        '<div class="aic-qtext" id="' + gid + '" data-qt="' + ai + '-' + qi + '"></div>' +
+        (q.hint ? '<p class="aic-qhint" data-qh="' + ai + '-' + qi + '"></p>' : '') +
+        '<div class="aic-opts" role="radiogroup" aria-labelledby="' + gid + '">' +
+        q.o.map(function (t, oi) {
+          return '<button type="button" class="aic-opt" role="radio" aria-checked="false" data-a="' + ai + '" data-q="' + qi + '" data-v="' + oi + '"><span class="aic-dot" aria-hidden="true"></span><span>' + esc(t) + '</span></button>';
+        }).join('') +
+        '<button type="button" class="aic-opt aic-opt-unsure" role="radio" aria-checked="false" data-a="' + ai + '" data-q="' + qi + '" data-v="u"><span class="aic-dot" aria-hidden="true"></span><span>Not sure</span></button>' +
+        '</div></div>';
+    });
+    var last = ai === AREAS.length - 1;
+    html += '<div class="aic-nav"><button type="button" class="aic-btn aic-btn-ghost" data-nav="back">&larr; Back</button>' +
+      '<span class="aic-nav-hint" data-hint="' + ai + '"></span>' +
+      '<button type="button" class="aic-btn aic-btn-primary" data-nav="next" disabled>' + (last ? 'See my results' : 'Next area &rarr;') + '</button></div>' +
+      '</section>';
+    return html;
+  }
+
+  var ORG_TEXT = {
+    eyebrow: { pub: 'For government and public bodies', co: 'For company leadership and risk teams' },
+    orgnote: { pub: 'One edition for ministries, agencies, cities and regulators — from bodies still getting a chatbot past procurement to those running AI in public services.',
+               co: 'Same controls, company wording: customers and staff instead of residents, boards instead of ministers.' }
+  };
+
+  function applyOrgText() {
+    $$('[data-org-text]').forEach(function (el) { el.textContent = tx(ORG_TEXT[el.getAttribute('data-org-text')]); });
+    $$('[data-why]').forEach(function (el) { el.textContent = tx(AREAS[+el.getAttribute('data-why')].why); });
+    $$('[data-qt]').forEach(function (el) { var p = el.getAttribute('data-qt').split('-'); el.textContent = tx(AREAS[+p[0]].qs[+p[1]].t); });
+    $$('[data-qh]').forEach(function (el) { var p = el.getAttribute('data-qh').split('-'); el.textContent = tx(AREAS[+p[0]].qs[+p[1]].hint); });
+  }
+
+  var shell = '<div class="aic-col">' + intro() + AREAS.map(function (_, i) { return areaScreen(i); }).join('') +
+    '<div class="aic-progresswrap aic-noprint" hidden><div class="aic-progress" role="progressbar" aria-label="Questions answered" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div></div>' +
+    '<section class="aic-screen" data-screen="results" aria-labelledby="aic-gov-rh" hidden></section></div>';
+  ROOT.innerHTML = shell;
+  applyOrgText();
+  $$('[role="radiogroup"]').forEach(rovingTabs);
+
+  /* ---------- Interaction ---------- */
+  function key(a, q) { return a + '-' + q; }
+  function areaDone(ai) { return AREAS[ai].qs.every(function (_, qi) { return state.answers[key(ai, qi)] !== undefined; }); }
+  function refreshNav(ai) {
+    var scr = $('[data-screen="' + ai + '"]');
+    var answered = AREAS[ai].qs.filter(function (_, qi) { return state.answers[key(ai, qi)] !== undefined; }).length;
+    $('[data-nav="next"]', scr).disabled = !areaDone(ai);
+    $('[data-hint="' + ai + '"]', scr).textContent = answered + ' of ' + AREAS[ai].qs.length + ' answered';
+  }
+  function progress() {
+    var pct = Math.round(Object.keys(state.answers).length / TOTAL_Q * 100);
+    var bar = $('.aic-progress');
+    bar.setAttribute('aria-valuenow', pct);
+    bar.firstChild.style.width = pct + '%';
+  }
+  function select(opt) {
+    var group = opt.closest('[role="radiogroup"]');
+    $$('[role="radio"]', group).forEach(function (o) { o.setAttribute('aria-checked', o === opt ? 'true' : 'false'); });
+    rovingTabs(group);
+    if (opt.hasAttribute('data-org')) {
+      state.org = opt.getAttribute('data-org');
+      applyOrgText();
+      return;
+    }
+    if (opt.hasAttribute('data-scale')) {
+      state.scale = opt.getAttribute('data-scale');
+      $('#aic-gov-start').disabled = false;
+      $('#aic-gov-starthint').textContent = 'About 6 minutes';
+      return;
+    }
+    var ai = +opt.getAttribute('data-a'), qi = +opt.getAttribute('data-q'), v = opt.getAttribute('data-v');
+    state.answers[key(ai, qi)] = v === 'u' ? 'u' : +v;
+    refreshNav(ai); progress();
+  }
+  function show(id) {
+    $$('.aic-screen').forEach(function (s) { s.hidden = s.getAttribute('data-screen') !== String(id); });
+    $('.aic-progresswrap').hidden = (id === 'intro' || id === 'results');
+    state.screen = id;
+    var scr = $('[data-screen="' + id + '"]');
+    if (id === 'results') renderResults();
+    scrollToEl(ROOT);
+    focusHeading($('h1,h2', scr));
+  }
+
+  ROOT.addEventListener('click', function (e) {
+    var opt = e.target.closest('[role="radio"]');
+    if (opt && ROOT.contains(opt)) { select(opt); return; }
+    var nav = e.target.closest('[data-nav]');
+    if (nav) {
+      var cur = state.screen;
+      if (nav.getAttribute('data-nav') === 'back') show(cur === 0 ? 'intro' : cur - 1);
+      else if (areaDone(cur)) show(cur === AREAS.length - 1 ? 'results' : cur + 1);
+      return;
+    }
+    if (e.target.closest('#aic-gov-start')) {
+      if (!state.started) { state.started = true; emit('tool_started', { org_type: state.org, ai_use: state.scale }); }
+      show(0);
+      return;
+    }
+    if (e.target.closest('[data-act="print"]')) { window.print(); return; }
+    if (e.target.closest('[data-act="restart"]')) {
+      state.answers = {}; state.started = false;
+      $$('.aic-opt[data-a]').forEach(function (o) { o.setAttribute('aria-checked', 'false'); });
+      $$('[role="radiogroup"]').forEach(rovingTabs);
+      AREAS.forEach(function (_, i) { refreshNav(i); });
+      progress(); show('intro');
+      return;
+    }
+    var f = e.target.closest('[data-filter]');
+    if (f) {
+      var val = f.getAttribute('data-filter');
+      $$('[data-filter]').forEach(function (b) { b.setAttribute('aria-pressed', b === f ? 'true' : 'false'); });
+      var anyTodo = false;
+      $$('.aic-ctl').forEach(function (row) {
+        var todo = row.getAttribute('data-status') !== 'in';
+        if (todo) anyTodo = true;
+        row.hidden = !(val === 'all' || todo);
+      });
+      var empty = $('.aic-ctl-empty');
+      if (empty) empty.hidden = val === 'all' || anyTodo;
+    }
+  });
+  radioKeys(ROOT, select);
+  AREAS.forEach(function (_, i) { refreshNav(i); });
+
+  /* ---------- Scoring ---------- */
+  function statusOf(v) {
+    if (v === 'u') return { id: 'unk', label: 'Not known', tone: 'warn', rank: 1 };
+    if (v === 3) return { id: 'in', label: 'In place', tone: 'good', rank: 4 };
+    if (v === 2) return { id: 'part', label: 'Partly in place', tone: 'blue', rank: 3 };
+    if (v === 1) return { id: 'weak', label: 'Weak', tone: 'warn', rank: 2 };
+    return { id: 'miss', label: 'Missing', tone: 'bad', rank: 0 };
+  }
+  function compute() {
+    var controls = [], areas = [];
+    AREAS.forEach(function (a, ai) {
+      var pts = 0;
+      a.qs.forEach(function (q, qi) {
+        var v = state.answers[key(ai, qi)];
+        var num = v === 'u' ? 0 : v;
+        pts += num;
+        var st = statusOf(v);
+        /* priority: lower is more urgent. critical controls first, unknown treated like missing for critical ones */
+        var pr = (st.id === 'miss' ? 0 : st.id === 'unk' ? 1 : st.id === 'weak' ? 2 : st.id === 'part' ? 4 : 9) - (q.crit ? 0.5 : 0);
+        controls.push({ ai: ai, qi: qi, q: q, v: v, st: st, pr: pr, area: a.title });
+      });
+      areas.push({ ai: ai, title: a.title, pct: Math.round(pts / (a.qs.length * 3) * 100), unknown: a.qs.filter(function (_, qi) { return state.answers[key(ai, qi)] === 'u'; }).length });
+    });
+    var total = controls.reduce(function (n, c) { return n + (c.v === 'u' ? 0 : c.v); }, 0);
+    var score = Math.round(total / (TOTAL_Q * 3) * 100);
+    var level = LEVELS.filter(function (l) { return score <= l.max; })[0];
+    var gaps = controls.filter(function (c) { return c.pr < 4; }).sort(function (x, y) { return x.pr - y.pr || x.ai - y.ai; }).slice(0, 3);
+    var unknown = controls.filter(function (c) { return c.v === 'u'; }).length;
+    return { controls: controls, areas: areas, score: score, level: level, gaps: gaps, unknown: unknown };
+  }
+
+  function scaleAdvice(r) {
+    if (state.scale === 'light') return 'You told us AI here is mostly general tools, with nothing shaping decisions about people. You don’t need a heavy framework yet. A one-page version of these controls is enough: the inventory, staff AI-use rules, data terms with vendors, and a named owner. Revisit this check before AI starts touching decisions about ' + (state.org === 'pub' ? 'residents' : 'customers or staff') + '.';
+    if (state.scale === 'heavy') return 'You told us AI shapes core services or decisions about people. At that level, every control below matters, and gaps in approval, human review, logging and switch-off are the ones regulators, auditors and courts will ask about first.' + (state.org === 'pub' ? ' Several of these uses may be high-risk under the EU AI Act if you operate in the EU.' : '');
+    return 'You told us several systems are in use and some affect people. Focus first on the systems that affect people: give them the full set of controls, and keep lighter rules for general productivity tools.';
+  }
+
+  function solutionReason(r) {
+    var weakest = r.areas.slice().sort(function (a, b) { return a.pct - b.pct; })[0];
+    if (r.score > 80) return 'An outside adviser can stress-test controls that look good on paper, for example by running an incident or switch-off exercise with your team.';
+    return 'Your weakest area is ' + weakest.title.toLowerCase() + ' (' + weakest.pct + '%). A governance adviser from the LLPA network can help you put those controls in place without building a bureaucracy around them.';
+  }
+
+  function contextualStep(r) {
+    var g = r.gaps[0];
+    if (!g) return { title: 'Rehearse the bad day', body: 'Your controls look solid. Next, test them: take one system and walk through a realistic failure with the owner, the reviewer and whoever holds the off-switch. Note what slowed you down.' };
+    return { title: 'This week: ' + g.q.ctl.toLowerCase(), body: tx(g.q.act) };
+  }
+
+  function renderResults() {
+    var r = compute();
+    var resultInfo = { label: r.level.label, score: r.score, lead_type: 'assessment' };
+    var host = $('[data-screen="results"]');
+    var ring = 2 * Math.PI * 52;
+    var html = '<div class="aic-fade">' +
+      '<span class="aic-eyebrow">Where you stand · ' + (state.org === 'pub' ? 'public body' : 'company') + ' edition</span>' +
+      '<h2 class="aic-h2" id="aic-gov-rh">' + esc(r.level.label) + '</h2>' +
+      '<div class="aic-card aic-gov-score">' +
+        '<div class="aic-gov-dial" role="img" aria-label="Governance controls score ' + r.score + ' out of 100">' +
+          '<svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" class="aic-gov-track"/><circle cx="60" cy="60" r="52" class="aic-gov-arc aic-tone-' + r.level.tone + '" style="stroke-dasharray:' + ring.toFixed(1) + ';stroke-dashoffset:' + (ring * (1 - r.score / 100)).toFixed(1) + '"/></svg>' +
+          '<div class="aic-gov-num"><b>' + r.score + '</b><span>of 100</span></div></div>' +
+        '<div><p>' + esc(r.level.desc) + '</p><p class="aic-small" style="margin-top:10px">' + esc(scaleAdvice(r)) + '</p>' +
+        (r.unknown ? '<p class="aic-note aic-warn" style="margin-top:12px"><strong>' + r.unknown + ' answer' + (r.unknown > 1 ? 's were' : ' was') + ' "Not sure".</strong> They score zero here. If nobody knows whether a control exists, it probably doesn’t work in practice, so finding out is the first action for each.</p>' : '') +
+        '</div></div>' +
+
+      '<div class="aic-card" style="margin-top:14px"><span class="aic-eyebrow">By area</span><div class="aic-bars" style="margin-top:8px">' +
+      r.areas.map(function (a) {
+        var cls = a.pct < 40 ? 'aic-low' : a.pct < 70 ? 'aic-mid' : '';
+        return '<div class="aic-bar-row"><span class="aic-bar-label">' + esc(a.title) + (a.unknown ? ' <span class="aic-small">(' + a.unknown + ' not sure)</span>' : '') + '</span>' +
+          '<span class="aic-bar" role="img" aria-label="' + esc(a.title) + ': ' + a.pct + ' percent"><i class="' + cls + '" data-w="' + a.pct + '"></i></span><span class="aic-bar-pct">' + a.pct + '%</span></div>';
+      }).join('') + '</div></div>';
+
+    html += '<div style="margin-top:28px"><span class="aic-eyebrow">Your top gaps</span><h3 class="aic-h2" style="font-size:26px">Close these first</h3>';
+    if (!r.gaps.length) html += '<p class="aic-soft">No control is missing or weak. Every gap left is about tightening what exists; see the action list below.</p>';
+    else html += '<ol class="aic-gaps">' + r.gaps.map(function (g, i) {
+      return '<li class="aic-card"><span class="aic-gap-n" aria-hidden="true">' + (i + 1) + '</span><div><div class="aic-qnum">' + esc(g.area) + (g.q.crit ? ' · core control' : '') + '</div><h4 class="aic-h3">' + esc(g.q.ctl) + ' <span class="aic-tag aic-t-' + g.st.tone + '">' + g.st.label + '</span></h4><p class="aic-soft">' + esc(tx(g.q.act)) + '</p></div></li>';
+    }).join('') + '</ol>';
+    html += '</div>';
+
+    var sorted = r.controls.slice().sort(function (x, y) { return x.pr - y.pr || x.ai - y.ai || x.qi - y.qi; });
+    html += '<div style="margin-top:28px"><span class="aic-eyebrow">Control-by-control action list</span><h3 class="aic-h2" style="font-size:26px">All ' + TOTAL_Q + ' controls, most urgent first</h3>' +
+      '<div class="aic-actions aic-noprint" style="margin:8px 0 12px"><div class="aic-seg" role="group" aria-label="Filter controls"><button type="button" data-filter="todo" aria-pressed="true">Needs action</button><button type="button" data-filter="all" aria-pressed="false">All controls</button></div></div>' +
+      '<div class="aic-card aic-ctllist">' + sorted.map(function (c) {
+        var done = c.st.id === 'in';
+        return '<div class="aic-ctl" data-status="' + c.st.id + '"' + (done ? ' hidden' : '') + '>' +
+          '<div class="aic-ctl-head"><span class="aic-tag aic-t-' + c.st.tone + '">' + c.st.label + '</span><b>' + esc(c.q.ctl) + '</b><span class="aic-small">' + esc(c.area) + '</span></div>' +
+          '<p class="aic-small"><b>Good looks like:</b> ' + esc(c.q.o[3]) + '.</p>' +
+          (done ? '<p class="aic-small"><b>Keep it working:</b> test it at least once a year and record the result.</p>' :
+            '<p><b>' + (c.st.id === 'unk' ? 'First find out, then: ' : 'Action: ') + '</b>' + esc(tx(c.q.act)) + '</p>') +
+          '</div>';
+      }).join('') + '<p class="aic-small aic-ctl-empty" ' + (sorted.some(function (c) { return c.st.id !== 'in'; }) ? 'hidden' : '') + '>Every control is in place. Switch to "All controls" to see them.</p></div></div>';
+
+    var step = contextualStep(r);
+    html += '<div style="margin-top:28px" class="aic-next">' +
+      '<div class="aic-card"><span class="aic-eyebrow">Your next step</span><h3 class="aic-h3">' + esc(step.title) + '</h3><p class="aic-soft">' + esc(step.body) + '</p>' +
+        '<button type="button" class="aic-btn aic-noprint" data-act="print">Print or save the action list</button></div>' +
+      '<div class="aic-card aic-solution"><span class="aic-eyebrow">Need more than an answer?</span><h3 class="aic-h3">Get matched to a governance adviser</h3><p class="aic-soft">' + esc(solutionReason(r)) + '</p>' +
+        '<a class="aic-btn aic-btn-primary aic-noprint" data-aic-cta="get_matched" data-aic-url="matchUrl" target="_blank" rel="noopener">Get matched to someone</a></div>' +
+      '</div>' +
+      '<div class="aic-handoff aic-noprint"><a data-aic-cta="email_results" data-aic-url="resultsFormUrl" target="_blank" rel="noopener">Email me my results</a>' +
+      '<a data-aic-cta="newsletter" data-aic-url="newsletterUrl" target="_blank" rel="noopener">Newsletter: keep up without keeping up with everything</a>' +
+      '<button type="button" class="aic-linkbtn" data-act="restart">Start again</button></div>';
+
+    html += '<div class="aic-card" style="margin-top:22px"><span class="aic-eyebrow">Worth doing whatever your score</span><ul class="aic-list" style="margin-top:8px">' +
+      '<li><b>Keep the inventory alive.</b> It is the control every other control depends on.</li>' +
+      '<li><b>Build AI literacy.</b> Staff who know when not to trust AI are the cheapest safeguard you have.</li>' +
+      '<li><b>Rehearse one bad day a year.</b> A short tabletop exercise tests ownership, escalation and switch-off together.</li>' +
+      '<li><b>Write it down in plain language.</b> ' + (state.org === 'pub' ? 'Public trust depends on residents being able to see what AI you use and why.' : 'Customers and staff trust what they can see and question.') + '</li></ul></div>';
+
+    html += '<div class="aic-sources" style="margin-top:18px"><p><b>About this check.</b> The questions draw on common public-sector and corporate AI governance practice, including the EU AI Act (Regulation (EU) 2024/1689) deployer duties in Articles 4, 26, 27 and 50, US OMB memoranda M-25-21 and M-25-22 on federal AI use and acquisition (April 2025), the UK Algorithmic Transparency Recording Standard, and the OECD\'s work on governing with AI. Legal references are as of November 2026. The EU amended some AI Act dates in July 2026 (Regulation (EU) 2026/1744 moved high-risk duties to December 2027 and August 2028), so check the official text. ' +
+      'This is a self-assessment, not an audit, legal advice or a certification. The scoring is a rough guide — use it to start a conversation, not to settle one.</p></div>';
+    html += '</div>';
+    host.innerHTML = html;
+    wireCtas(host, resultInfo);
+    var fills = $$('.aic-bar i', host);
+    function setW() { fills.forEach(function (f) { f.style.width = f.getAttribute('data-w') + '%'; }); }
+    if (reducedMotion) setW(); else requestAnimationFrame(function () { requestAnimationFrame(setW); });
+    emit('tool_completed', { assessment_result: r.level.label, score: r.score, org_type: state.org, ai_use: state.scale });
+    emit('result_viewed', { assessment_result: r.level.label, score: r.score });
+  }
+
+})();
+</script>
+<!-- ===== AIC:END ===== -->
+</body>
+</html>
+
+</body></html>

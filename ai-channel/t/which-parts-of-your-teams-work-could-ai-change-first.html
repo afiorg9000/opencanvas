@@ -1,0 +1,1173 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>which-parts-of-your-teams-work-could-ai-change-first</title><style>html,body{margin:0;background:#F7F8FA}@media (prefers-color-scheme:dark){html,body{background:#F7F8FA}}</style></head><body>
+<!--
+  Copy rewritten in house voice, 3 Nov 2026.
+  TOOL: Which Parts of Your Team's Work Could AI Change First?
+  Slug: which-parts-of-your-teams-work-could-ai-change-first
+  Audience: HR & Team Leads (primary tool). Also useful for Executives ("Which parts of our workforce could AI change first?").
+
+  WHAT IT DOES
+  A team-level edition of Check Your Job. The user lists the roles on their team (from 65 occupation
+  profiles, or a custom role) with headcount, optionally edits each role's tasks, and answers six short
+  questions about how the team works with AI today. The result shows: which tasks change first, the share
+  of team work time AI could do a lot of / help with / that still depends on people, where people still
+  add value, priority reskilling areas, a readiness level, and a short plan (AI policy, "when not to trust
+  AI", skills to build). Everything runs in the browser. Nothing is stored or sent unless the user clicks
+  a link.
+
+  MODEL AND DATA (frozen snapshot, no live data)
+  - Task model reused from Check Your Job: task types cr (routine computer), cj (judgment at a computer),
+    ip (people and trust), ph (physical). Type weights cr .90, cj .45, ip .12, ph .04.
+    Task factor = min(1, horizon(year) / task length) x type weight. Role exposure = time-share-weighted
+    mean of task factors. Team exposure = headcount-weighted mean of role exposures.
+  - Frontier: METR's 50%-reliability task-length horizon for the best model, ~16 hours as of April 2026
+    (metr.org/time-horizons; paper arXiv 2503.14499). Two paces: doubling every ~7 months (2019-2024
+    average) and ~4.3 months (pace since 2024). Everything past April 2026 is extrapolation.
+    METR measures software and reasoning tasks, not all work.
+  - Occupation task profiles: editorial approximations of typical task mixes (same set as Check Your Job),
+    standing in for O*NET task data. Not measurements.
+  - Context figures: WEF Future of Jobs 2025 (skills gap top barrier, 63% of employers); Pew Research
+    Center 2025 (64% of US public expect fewer jobs); Ipsos (about a third of workers expect AI to replace
+    their own job); EU AI Act Article 4 (AI literacy, applies from February 2025; reworded by Regulation (EU)
+    2026/1744 to "take measures to support" AI literacy, no set level required; updated 4 Nov 2026).
+  - Readiness level: unvalidated orientation scoring of six 0-3 answers. Not a diagnostic.
+  TO UPDATE: change FRONTIER_ASOF / ANCHOR_YEAR / ANCHOR_HOURS / PACES in the script.
+
+  EMBED IN WORDPRESS
+  Option A (Custom HTML block): paste everything between "AIC:BEGIN" and "AIC:END" below.
+  Option B (iframe): upload this file and embed it, e.g.
+    <iframe src="/tools/which-parts-of-your-teams-work-could-ai-change-first.html" style="width:100%;border:0;min-height:1400px" title="Which parts of your team's work could AI change first?"></iframe>
+  Set window.AICHANNEL_CONFIG before the tool (or edit the config block at the top of the script):
+    resultsFormUrl  "Email me my results" form page (receives lead_type, audience, source_page,
+                    source_content_or_tool, cta_clicked, assessment_name, assessment_result, score, utm_*)
+    coursesUrl      "Learn with a member" (team AI training / course schedule)
+    matchUrl        "Get matched to someone" (reskilling and change support)
+    newsletterUrl   separate newsletter opt-in (never auto-subscribed)
+    linkTarget      optional; "_top" when embedded in an iframe so links open the full page
+  EVENTS: window "aichannel:event" CustomEvent + parent.postMessage({type:"aichannel:event", ...}) for
+  tool_started, tool_completed, result_viewed, cta_clicked. No analytics calls are made by the tool.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Which parts of your team's work could AI change first? | AI Channel</title>
+<meta name="description" content="Help your team adapt to AI without guessing what comes next. Map tasks, exposure, human strengths and priority reskilling areas. About six minutes, no email required.">
+<!-- AI Channel design A: tool design system v2 (visual layer only; no behaviour changes) -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style id="aic-theme">
+/* ---------- tokens ---------- */
+:root,html{color-scheme:light!important;
+ --pine:#2859c7!important;--pine-deep:#1945ac!important;--accent:#2859c7!important;--accent-deep:#1945ac!important;--primary:#2859c7!important;--blue:#2859c7!important;--blue-d:#1945ac!important;
+ --paper:#ffffff!important;--bg:#ffffff!important;--white:#fff!important;--card:#fff!important;--ink:#14213d!important;--ink-soft:#3f4a5c!important;--ink-mute:#5b6577!important;--muted:#3f4a5c!important;
+ --line:#d9e2f0!important;--sage:#eef3fc!important;--amber-soft:#fbf3e4!important;--accent-wash:#eef3fc!important;--blue-wash:#eef3fc!important;--sky:#eef3fc!important;--pale:#f4f7fc!important;--warm:#f4f7fc!important;
+ --serif:"Newsreader",Georgia,serif!important;--sans:"Inter",system-ui,sans-serif!important;--mono:"IBM Plex Mono",ui-monospace,monospace!important}
+html body .aic-tool,html body .aic-article{
+ --aic-paper:#ffffff!important;--aic-white:#ffffff!important;--aic-ink:#14213d!important;--aic-soft:#46526a!important;--aic-line:#d9e2f0!important;--aic-sage:#eef3fc!important;
+ --aic-blue:#2859c7!important;--aic-blue-deep:#1945ac!important;--aic-blue-soft:#eef3fc!important;--aic-on-blue:#ffffff!important;--aic-focus:#9fbcff!important;
+ --aic-grey:#46526a!important;--aic-grey-soft:#f4f7fc!important;
+ --aic-radius:16px!important;--aic-radius-sm:12px!important;--aic-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important;
+ color-scheme:light!important;background:#fff!important;color:#14213d!important;
+ font-family:"Inter",system-ui,sans-serif!important;-webkit-font-smoothing:antialiased}
+html,body{background:#fff!important}
+html body .aic-tool{padding:56px 0 96px!important}
+html body .aic-article{padding:0 0 112px!important}
+html body .aic-tool .aic-col,html body .aic-article .aic-col{max-width:860px!important}
+@media(min-width:600px){html body .aic-tool .aic-col,html body .aic-article .aic-col{padding-inline:32px!important}}
+
+/* ---------- type ---------- */
+html body .aic-tool .aic-h1,html body .aic-article h1,body h1{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important;line-height:1.02!important;font-size:clamp(38px,5.4vw,62px)!important;color:#14213d}
+html body .aic-tool .aic-h2,html body .aic-article h2,body h2{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important;line-height:1.1!important}
+html body .aic-article h2{font-size:clamp(28px,3.6vw,38px)!important;margin-top:72px!important}
+html body .aic-tool .aic-h2{font-size:clamp(26px,3.4vw,36px)!important}
+html body .aic-tool .aic-h3,html body .aic-article h3,body h3{font-family:"Newsreader",Georgia,serif!important;font-weight:550!important;letter-spacing:-.01em!important;font-size:22px!important;line-height:1.2!important}
+body h4,body h5,body h6{font-family:"Inter",system-ui,sans-serif!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow,html body .aic-tool .aic-qnum,html body .aic-tool .aic-nav-hint,.aic-mono{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;letter-spacing:.06em!important;text-transform:uppercase;font-size:12px!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow{color:#2859c7!important;display:flex!important;align-items:center;gap:12px}
+html body .aic-tool .aic-eyebrow::before,html body .aic-article .aic-head .aic-eyebrow::before{content:"";width:28px;height:1px;background:#2859c7;flex:none}
+html body .aic-tool .aic-lede,html body .aic-article .aic-lede,html body .aic-article .aic-dek{font-size:20px!important;line-height:1.55!important;color:#3f4a5c!important;max-width:60ch}
+html body .aic-tool .aic-soft,html body .aic-tool .aic-small{color:#46526a!important}
+html body .aic-tool .aic-small{font-size:14px!important}
+html body .aic-article{font-size:18.5px!important;line-height:1.72!important}
+html body .aic-article p+p{margin-top:22px!important}
+html body .aic-article .aic-head{padding:72px 0 40px!important;border-bottom:1px solid #d9e2f0;margin-bottom:48px}
+html body .aic-article .aic-meta,html body .aic-article .aic-head p:not(.aic-lede):not(.aic-dek){font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px!important;letter-spacing:.03em;color:#5b6577!important}
+html body .aic-tool a,html body .aic-article a{color:#2859c7}
+
+/* ---------- panels ---------- */
+html body .aic-tool .aic-card,html body .aic-article .aic-card{background:#fff!important;border:1px solid #d9e2f0!important;border-radius:16px!important;box-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important}
+@media(min-width:600px){html body .aic-tool .aic-card{padding:36px 40px!important}html body .aic-article .aic-card{padding:32px 36px!important}}
+html body .aic-tool .aic-stack>*+*{margin-top:20px!important}
+html body .aic-tool .aic-grid2,html body .aic-article .aic-grid{gap:16px!important}
+/* the short answer: a framed figure, like the site's tool previews */
+html body .aic-article .aic-short{background:#fff!important;border:1px solid #d9e2f0!important;box-shadow:0 0 0 10px #eef3fc,0 0 0 11px #d9e2f0!important;margin:12px 11px 56px!important;border-radius:12px!important;border-left:1px solid #d9e2f0!important}
+html body .aic-article .aic-short .aic-eyebrow,html body .aic-article .aic-short>:first-child{color:#2859c7!important}
+/* notes and callouts */
+html body .aic-tool .aic-note,html body .aic-article .aic-note,html body .aic-article .aic-callout{background:#f4f7fc!important;border-left:3px solid #2859c7!important;border-radius:0 12px 12px 0!important;padding:18px 22px!important;font-size:15.5px!important;color:#14213d!important}
+html body .aic-tool .aic-note.aic-warn{background:#fdf7ec!important;border-left-color:#a46207!important}
+html body .aic-tool .aic-note.aic-bad{background:#fdf0ee!important;border-left-color:#b42318!important}
+html body .aic-tool .aic-note.aic-good{background:#eef8f1!important;border-left-color:#2f7a4e!important}
+/* calls to action become navy bands */
+html body .aic-tool .aic-cta,html body .aic-article .aic-cta,html body .aic-tool .aic-dark,html body .aic-article .aic-dark{--aic-ink:#ffffff!important;--aic-soft:#c9d6ee!important;--aic-white:#13264a!important;--aic-line:#2a3f6a!important;--aic-blue:#9fbcff!important;--aic-blue-soft:#1d3563!important;--aic-on-blue:#13264a!important;
+ background:#13264a!important;color:#fff!important;border-color:#13264a!important;box-shadow:none!important}
+html body .aic-tool .aic-cta *:not(.aic-btn):not(.aic-btn *),html body .aic-article .aic-cta *:not(.aic-btn):not(.aic-btn *){color:inherit}
+html body .aic-tool .aic-cta .aic-btn-primary,html body .aic-article .aic-cta .aic-btn-primary{background:#fff!important;color:#13264a!important;border-color:#fff!important}
+html body .aic-tool .aic-cta a:not(.aic-btn),html body .aic-article .aic-cta a:not(.aic-btn){color:#9fbcff!important}
+
+/* ---------- questions and answer options ---------- */
+html body .aic-tool .aic-q{margin-top:28px!important}
+html body .aic-tool .aic-qnum{color:#2859c7!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;font-size:clamp(22px,2.6vw,27px)!important;line-height:1.22!important;letter-spacing:-.01em!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qhint{font-size:15px!important;color:#46526a!important;margin-bottom:18px!important}
+html body .aic-tool .aic-opts{gap:10px!important;margin-top:18px!important}
+html body .aic-tool .aic-opt,html body .aic-tool .aic-pick,html body .aic-tool .aic-check{background:#fff!important;border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:16px 18px!important;font-size:16px!important;gap:14px!important;transition:border-color .15s,box-shadow .15s,background-color .15s,transform .15s!important}
+html body .aic-tool .aic-opt:hover,html body .aic-tool .aic-pick:hover,html body .aic-tool .aic-check:hover{border-color:#2859c7!important;box-shadow:0 6px 18px rgba(40,89,199,.10)!important;transform:translateY(-1px)}
+html body .aic-tool .aic-opt[aria-checked="true"],html body .aic-tool .aic-opt[aria-pressed="true"],html body .aic-tool .aic-pick:has(input:checked),html body .aic-tool .aic-check:has(input:checked),html body .aic-tool .aic-opt:has(input:checked){border-color:#2859c7!important;background:#f4f7fc!important;box-shadow:0 0 0 3px #dbe6fb!important}
+html body .aic-tool .aic-dot{width:22px!important;height:22px!important;border:2px solid #9aa8c0!important}
+html body .aic-tool .aic-dot::after{inset:4px!important;background:#2859c7!important}
+html body .aic-tool .aic-opt[aria-checked="true"] .aic-dot{border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-size:14px!important;color:#46526a!important;margin-top:4px!important}
+html body .aic-tool .aic-opt.aic-opt-unsure{background:transparent!important;border-style:dashed!important}
+html body .aic-tool input[type=text],html body .aic-tool input[type=search],html body .aic-tool input[type=email],html body .aic-tool textarea,html body .aic-tool select,html body .aic-tool .aic-input{border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:14px 16px!important;background:#fff!important;font-size:16px!important}
+html body .aic-tool input:focus,html body .aic-tool textarea:focus,html body .aic-tool select:focus{border-color:#2859c7!important;outline:none!important;box-shadow:0 0 0 3px #dbe6fb!important}
+
+/* ---------- controls ---------- */
+html body .aic-tool .aic-btn,html body .aic-article .aic-btn{min-height:50px!important;padding:14px 24px!important;font-weight:600!important;font-size:15px!important;border-radius:999px!important;border:1.5px solid #c9d6ee!important;box-shadow:none!important}
+html body .aic-tool .aic-btn:hover,html body .aic-article .aic-btn:hover{border-color:#2859c7!important}
+html body .aic-tool .aic-btn-primary,html body .aic-article .aic-btn-primary{background:#2859c7!important;border-color:#2859c7!important;color:#fff!important}
+html body .aic-tool .aic-btn-primary:hover,html body .aic-article .aic-btn-primary:hover{background:#1945ac!important;border-color:#1945ac!important}
+html body .aic-tool .aic-btn-ghost{border-color:transparent!important;text-decoration:underline;text-underline-offset:4px;color:#3f4a5c!important}
+html body .aic-tool .aic-btn[disabled]{opacity:.4!important}
+html body .aic-tool .aic-nav{margin-top:36px!important;padding-top:24px!important;border-top:1px solid #d9e2f0!important}
+html body .aic-tool .aic-actions{gap:12px!important}
+html body .aic-tool .aic-seg{border:1.5px solid #d9e2f0!important;padding:4px!important}
+html body .aic-tool .aic-seg button{font-weight:600!important;color:#3f4a5c!important}
+html body .aic-tool .aic-seg button[aria-pressed="true"],html body .aic-tool .aic-seg button[aria-checked="true"]{background:#13264a!important;color:#fff!important}
+html body .aic-tool .aic-progress{height:4px!important;background:#e3eaf6!important;margin:20px 0 8px!important}
+html body .aic-tool .aic-progress span,html body .aic-tool .aic-progress i{background:#2859c7!important}
+html body .aic-tool .aic-chip,html body .aic-tool .aic-pill{border:1.5px solid #d9e2f0!important;background:#fff!important;font-weight:600!important;border-radius:999px!important}
+html body .aic-tool .aic-chip[aria-pressed="true"],html body .aic-tool .aic-chip.aic-on,html body .aic-tool .aic-pill.aic-on{background:#eef3fc!important;border-color:#2859c7!important;color:#1945ac!important}
+html body .aic-tool .aic-tag,html body .aic-article .aic-tag{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;padding:5px 11px!important}
+html body .aic-tool .aic-privacy{font-size:14px!important;color:#46526a!important;margin-top:20px!important}
+
+/* ---------- results ---------- */
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-stat b,html body .aic-tool .aic-stat strong,html body .aic-tool .aic-display{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important}
+html body .aic-tool .aic-bar{height:8px!important;background:#e3eaf6!important}
+html body .aic-tool .aic-bar-row{padding:14px 0!important;border-bottom-color:#e3eaf6!important}
+html body .aic-tool .aic-bar-label{font-weight:600!important}
+html body .aic-tool table,html body .aic-article table{border-collapse:collapse}
+html body .aic-tool th,html body .aic-article th{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;text-transform:uppercase;color:#2859c7!important;background:#f4f7fc!important}
+html body .aic-tool td,html body .aic-article td{border-color:#e3eaf6!important}
+html body .aic-article .aic-sources,html body .aic-tool .aic-sources{font-size:14px!important;color:#46526a!important;border-top:1px solid #d9e2f0;padding-top:32px!important;margin-top:72px!important}
+html body .aic-article .aic-related,html body .aic-article .aic-deeper{margin-top:72px!important}
+
+/* ---------- pages outside the shared system ---------- */
+body:not(:has(.aic-tool)):not(:has(.aic-article)) h1,body:not(:has(.aic-tool)):not(:has(.aic-article)) h2,body:not(:has(.aic-tool)):not(:has(.aic-article)) h3{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important}
+html,body{font-family:"Inter",system-ui,sans-serif}
+input[type=range],input[type=checkbox],input[type=radio]{accent-color:#2859c7!important}
+:focus-visible{outline-color:#2859c7!important}
+[tabindex="-1"]:focus,h1:focus,h2:focus,h3:focus{outline:none!important;box-shadow:none!important}
+
+/* ================= v3: product-grade tool shell ================= */
+html,body{background:#f4f7fc!important}
+html body .aic-tool{background:#f4f7fc!important}
+html body .aic-tool .aic-col{max-width:980px!important}
+html body .aic-tool .aic-h1{font-size:clamp(40px,5vw,62px)!important;max-width:20ch}
+html body .aic-tool .aic-grid2>.aic-card{box-shadow:none!important;background:#fff!important;border-radius:14px!important}
+html body .aic-tool.aic-in-q .aic-h1{font-size:22px!important;line-height:1.2!important;max-width:none;margin:6px 0 20px!important;font-weight:500!important}
+html body .aic-tool.aic-in-q .aic-lede,html body .aic-tool.aic-in-q > .aic-col > .aic-privacy,html body .aic-tool.aic-in-q .aic-col > * > .aic-privacy{display:none!important}
+html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:56px 64px 44px!important;border:0!important;border-radius:24px!important;box-shadow:0 1px 0 rgba(19,38,74,.05),0 30px 70px rgba(19,38,74,.10)!important;min-height:460px}
+@media(max-width:700px){html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:32px 22px 28px!important;border-radius:18px!important;min-height:0}}
+html body .aic-tool .aic-progress{height:3px!important;background:#e3eaf6!important;border-radius:0!important;margin:14px 0 36px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-size:clamp(26px,3.2vw,38px)!important;line-height:1.12!important;letter-spacing:-.02em!important;margin-bottom:12px!important;max-width:28ch}
+html body .aic-tool .aic-qhint{font-size:16px!important;margin-bottom:24px!important}
+html body .aic-tool .aic-opts{counter-reset:aicopt;gap:12px!important}
+html body .aic-tool .aic-opt{counter-increment:aicopt;align-items:center!important;min-height:64px;padding:16px 20px!important;font-size:17px!important;font-weight:500;border-radius:14px!important}
+html body .aic-tool .aic-opt .aic-dot{display:none!important}
+html body .aic-tool .aic-opt::before{content:counter(aicopt,upper-alpha);flex:none;width:30px;height:30px;display:grid;place-items:center;border:1.5px solid #c9d6ee;border-radius:8px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;font-weight:500;color:#2859c7;background:#fff;transition:all .15s}
+html body .aic-tool .aic-opt:hover::before{border-color:#2859c7}
+html body .aic-tool .aic-opt[aria-checked="true"]::before{background:#2859c7;border-color:#2859c7;color:#fff;content:"\2713"}
+html body .aic-tool .aic-opt[aria-checked="true"]{background:#eef3fc!important;box-shadow:0 0 0 2px #2859c7!important;border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-weight:400}
+html body .aic-tool .aic-nav{border-top:0!important;margin-top:40px!important;padding-top:0!important}
+html body .aic-tool .aic-nav .aic-btn-primary{min-width:150px}
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-display{font-size:clamp(56px,8vw,96px)!important;line-height:.95!important;color:#14213d}
+
+/* ================= v4: legibility ================= */
+html body .aic-tool{font-size:17px!important;line-height:1.6!important}
+html body .aic-tool,html body .aic-article{--aic-soft:#334055!important}
+html body .aic-tool .aic-small,html body .aic-tool .aic-opt-sub,html body .aic-tool .aic-privacy,html body .aic-tool .aic-nav-hint{font-size:15px!important;color:#334055!important}
+html body .aic-tool p,html body .aic-tool li{color:#1d2a44}
+html body .aic-tool .aic-lede{font-size:20px!important;color:#2a364d!important}
+html body .aic-tool .aic-note{font-size:16.5px!important}
+html body .aic-tool .aic-opt{font-size:18px!important;color:#14213d!important}
+html body .aic-tool .aic-qhint{font-size:17px!important;color:#334055!important}
+html body .aic-tool .aic-eyebrow,html body .aic-tool .aic-qnum,.aic-mono{font-size:12.5px!important;color:#2859c7!important;letter-spacing:.05em!important}
+html body .aic-tool .aic-tag{font-size:12.5px!important}
+html body .aic-tool th,html body .aic-article th{font-size:12.5px!important}
+html body .aic-tool td{font-size:16px}
+html body .aic-article{color:#14213d!important}
+html body .aic-article p,html body .aic-article li{color:#1d2a44}
+</style>
+<script>
+(function(){
+  function hsl(c){var m=c&&c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/);if(!m)return null;var r=m[1]/255,g=m[2]/255,b=m[3]/255,a=m[4]===undefined?1:+m[4];
+    var mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn,s=d?d/(1-Math.abs(2*l-1)):0,h=0;
+    if(d){h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;if(h<0)h+=360}return {h:h,s:s,l:l,a:a}}
+  function blue(c){var x=hsl(c);return x&&x.a>0.05&&x.s>0.3&&x.l>0.28&&x.l<0.95&&x.h>=205&&x.h<=240?x:null}
+  function N(x,dark,light){return x.a<0.95?"rgba(40,89,199,"+Math.min(x.a,0.12).toFixed(3)+")":(x.l>0.82?light:dark)}
+  function fix(el){var c0=getComputedStyle(el),bg=hsl(c0.backgroundColor),fg=hsl(c0.color);if(bg&&fg&&bg.a>0.9&&bg.l<0.6&&bg.s>0.3&&bg.h>=205&&bg.h<=240&&fg.l<0.6)el.style.setProperty("color","#ffffff","important");
+    if(el.closest(".aic-cta,.aic-dark")||el.matches(".aic-opt,.aic-pick,.aic-check,.aic-btn,.aic-chip,.aic-pill,.aic-seg button,.aic-card,.aic-note"))return;var cs=getComputedStyle(el),x;
+    if((x=blue(cs.color)))el.style.setProperty("color",x.l>0.75?"#eef3fc":"#2859c7","important");
+    if((x=blue(cs.backgroundColor)))el.style.setProperty("background-color",N(x,"#2859c7",x.l>0.9?"#eef3fc":"#d6e2f8"),"important");
+    if(el instanceof SVGElement){if((x=blue(cs.fill)))el.style.setProperty("fill",N(x,"#2859c7","#eef3fc"),"important");if((x=blue(cs.stroke)))el.style.setProperty("stroke",N(x,"#2859c7","#d6e2f8"),"important")}
+    if(cs.textTransform==="uppercase"&&parseFloat(cs.fontSize)<=13.5&&!el.closest("button")&&!el.classList.contains("aic-mono"))el.classList.add("aic-mono");}
+  var t;function mode(){document.querySelectorAll(".aic-tool").forEach(function(r){var q=[].some.call(r.querySelectorAll(".aic-progress,.aic-qtext,.aic-q-text"),function(e){return e.offsetParent!==null});if(q!==r.classList.contains("aic-in-q"))r.classList.toggle("aic-in-q",q)})}
+  function run(){clearTimeout(t);t=setTimeout(function(){mode();document.querySelectorAll("body *").forEach(fix)},30)}
+  document.addEventListener("DOMContentLoaded",function(){run();new MutationObserver(run).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class","aria-pressed","aria-checked","data-state"]});
+    document.addEventListener("change",run,true);document.addEventListener("click",run,true);});
+})();
+</script>
+</head>
+<body>
+<!-- AIC:BEGIN (paste from here into a WordPress Custom HTML block) -->
+<style>
+.aic-tool{
+  --aic-paper:#F7F8FA; --aic-white:#FFFFFF; --aic-ink:#162033; --aic-soft:#667085; --aic-line:#DEE3EA; --aic-sage:#EEF1F6;
+  --aic-blue:#315EFB; --aic-blue-deep:#2448C9; --aic-blue-soft:#EEF3FF; --aic-focus:#B8C7FF;
+  --aic-amber:#A46207; --aic-amber-soft:#FFF6E8; --aic-green:#2F7A4E; --aic-green-soft:#EEF8F1;
+  --aic-hi:#A46207; --aic-hi-soft:#FFF6E8; --aic-md:#6D5BD0; --aic-md-soft:#F2EFFF; --aic-lo:#2F7A4E; --aic-lo-soft:#EEF8F1;
+  --aic-radius:18px; --aic-shadow:0 10px 28px rgba(21,32,51,.055);
+  background:var(--aic-paper); color:var(--aic-ink);
+  font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size:16px; line-height:1.55; -webkit-text-size-adjust:100%; text-align:left;
+  padding:0 0 56px; border-radius:0; overflow-wrap:break-word; overflow-x:clip;
+}
+@media (prefers-color-scheme:dark){
+  .aic-tool:not([data-theme="light"]){
+    --aic-paper:#101B2D; --aic-white:#162033; --aic-ink:#F2F4F8; --aic-soft:#A6B3C7; --aic-line:#2A3850; --aic-sage:#1E2A40;
+    --aic-blue:#7A97FF; --aic-blue-deep:#9BB2FF; --aic-blue-soft:#1F2B45; --aic-focus:#7A97FF;
+    --aic-amber:#E0A34A; --aic-amber-soft:#2E2412; --aic-green:#6FC592; --aic-green-soft:#13301F;
+    --aic-hi:#C08835; --aic-hi-soft:#2E2412; --aic-md:#8E80E0; --aic-md-soft:#251F3D; --aic-lo:#4FA675; --aic-lo-soft:#13301F;
+    --aic-shadow:none; color-scheme:dark;
+  }
+}
+.aic-tool *,.aic-tool *::before,.aic-tool *::after{box-sizing:border-box}
+.aic-tool h1,.aic-tool h2,.aic-tool h3,.aic-tool h4,.aic-tool p,.aic-tool ul,.aic-tool ol{margin:0;padding:0}
+.aic-tool h1,.aic-tool h2,.aic-tool h3,.aic-tool h4{font-family:inherit;font-weight:800;letter-spacing:-.035em;line-height:1.1;color:var(--aic-ink)}
+.aic-tool h1{font-size:clamp(32px,6vw,50px);text-wrap:balance}
+.aic-tool h2{font-size:clamp(25px,4.4vw,34px);text-wrap:balance}
+.aic-tool h3{font-size:19px;letter-spacing:-.025em;line-height:1.25}
+.aic-tool p{line-height:1.6}
+.aic-tool ul,.aic-tool ol{padding-left:1.2em}
+.aic-tool li{margin:0 0 6px}
+.aic-tool a{color:var(--aic-blue);font-weight:700;text-decoration:none}
+.aic-tool a:hover{text-decoration:underline}
+.aic-tool button,.aic-tool input,.aic-tool select{font-family:inherit;font-size:15px;color:var(--aic-ink)}
+.aic-tool :focus-visible{outline:3px solid var(--aic-focus);outline-offset:2px;border-radius:8px}
+.aic-tool [hidden]{display:none!important}
+.aic-sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;padding:0;margin:-1px}
+.aic-col{max-width:780px;margin:0 auto;padding-inline:16px}
+@media (min-width:700px){.aic-col{padding-inline:24px}}
+.aic-top{border-bottom:1px solid var(--aic-line);background:var(--aic-white)}
+.aic-top .aic-col{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px;flex-wrap:wrap}
+.aic-eyebrow{font-size:12px;font-weight:800;letter-spacing:.08em;color:var(--aic-blue);text-transform:uppercase;line-height:1.4}
+.aic-soft{color:var(--aic-soft)}
+.aic-small{font-size:14px}
+.aic-card{background:var(--aic-white);border:1px solid var(--aic-line);border-radius:var(--aic-radius);box-shadow:var(--aic-shadow);padding:20px}
+@media (min-width:700px){.aic-card{padding:24px 26px}}
+.aic-stack>*+*{margin-top:16px}
+.aic-section{margin-top:40px}
+.aic-section>.aic-eyebrow+h2,.aic-section>.aic-eyebrow+h3{margin-top:8px}
+.aic-lede{font-size:18px;color:var(--aic-soft);margin-top:16px;max-width:62ch}
+.aic-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;font-size:15px;font-weight:750;line-height:1.2;border-radius:999px;cursor:pointer;border:1px solid transparent;text-decoration:none!important;min-height:44px;text-align:center}
+.aic-btn-primary{color:#fff;background:var(--aic-blue);box-shadow:0 6px 16px rgba(49,94,251,.14)}
+.aic-btn-primary:hover{background:var(--aic-blue-deep)}
+.aic-tool .aic-btn-primary,.aic-tool a.aic-btn-primary{color:#fff}
+@media (prefers-color-scheme:dark){.aic-tool:not([data-theme="light"]) .aic-btn-primary{color:#0B1424}}
+.aic-btn-ghost{background:var(--aic-white);color:var(--aic-ink);border-color:var(--aic-line)}
+.aic-btn-ghost:hover{border-color:var(--aic-focus);color:var(--aic-blue)}
+.aic-btn[disabled]{opacity:.45;cursor:not-allowed;box-shadow:none}
+.aic-link{background:none;border:0;padding:4px 2px;color:var(--aic-soft);font-size:13.5px;font-weight:650;cursor:pointer;text-decoration:underline}
+.aic-link:hover{color:var(--aic-blue)}
+.aic-chip{padding:9px 13px;font-size:13.5px;font-weight:700;background:var(--aic-white);border:1px solid var(--aic-line);border-radius:999px;cursor:pointer;line-height:1.25;text-align:left}
+.aic-chip:hover{border-color:var(--aic-focus);color:var(--aic-blue)}
+.aic-chip[aria-pressed="true"],.aic-chip[aria-expanded="true"]{background:var(--aic-blue-soft);border-color:var(--aic-focus);color:var(--aic-blue)}
+.aic-chips{display:flex;flex-wrap:wrap;gap:8px}
+.aic-input{width:100%;padding:13px 16px;font-size:16px;border:1px solid var(--aic-line);border-radius:14px;background:var(--aic-white);color:var(--aic-ink)}
+.aic-input:focus{border-color:var(--aic-focus);outline:0;box-shadow:0 0 0 3px var(--aic-blue-soft)}
+.aic-select{padding:8px 10px;border:1px solid var(--aic-line);border-radius:10px;background:var(--aic-white);font-size:14px;font-weight:600;max-width:100%}
+.aic-range{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:999px;background:var(--aic-sage);margin:0}
+.aic-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;background:var(--aic-blue);border:3px solid var(--aic-white);box-shadow:0 2px 6px rgba(21,32,51,.25);cursor:pointer}
+.aic-range::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--aic-blue);border:3px solid var(--aic-white);box-shadow:0 2px 6px rgba(21,32,51,.25);cursor:pointer}
+.aic-seg{display:inline-flex;border:1px solid var(--aic-line);border-radius:999px;overflow:hidden;background:var(--aic-white);flex-wrap:wrap}
+.aic-seg button{font-size:13px;font-weight:750;padding:8px 13px;border:0;background:none;color:var(--aic-soft);cursor:pointer;min-height:36px}
+.aic-seg button[aria-pressed="true"]{background:var(--aic-blue);color:#fff}
+@media (prefers-color-scheme:dark){.aic-tool:not([data-theme="light"]) .aic-seg button[aria-pressed="true"]{color:#0B1424}}
+.aic-pill{display:inline-block;font-size:13px;font-weight:800;padding:7px 12px;border-radius:999px;white-space:nowrap;background:var(--aic-blue-soft);color:var(--aic-blue)}
+.aic-pill[data-l="hi"]{background:var(--aic-hi-soft);color:var(--aic-amber)}
+.aic-pill[data-l="md"]{background:var(--aic-md-soft);color:var(--aic-md)}
+.aic-pill[data-l="lo"]{background:var(--aic-lo-soft);color:var(--aic-green)}
+.aic-tag{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:5px 9px;border-radius:999px;background:var(--aic-blue-soft);color:var(--aic-blue);white-space:nowrap}
+.aic-tag.aic-tag-amber{background:var(--aic-amber-soft);color:var(--aic-amber)}
+.aic-tag.aic-tag-green{background:var(--aic-green-soft);color:var(--aic-green)}
+.aic-note{border-left:4px solid var(--aic-amber);background:var(--aic-amber-soft);padding:14px 16px;border-radius:0 12px 12px 0;font-size:14.5px}
+.aic-note.aic-note-blue{border-left-color:var(--aic-blue);background:var(--aic-blue-soft)}
+.aic-note.aic-note-green{border-left-color:var(--aic-green);background:var(--aic-green-soft)}
+.aic-note strong{display:block;margin-bottom:4px}
+/* progress */
+.aic-tool .aic-steps{display:flex;gap:6px;list-style:none;padding:0;margin:0;font-size:12.5px;font-weight:750;color:var(--aic-soft)}
+.aic-steps li{margin:0;display:flex;align-items:center;gap:6px}
+.aic-steps li+li::before{content:"";width:14px;height:1px;background:var(--aic-line);display:inline-block}
+.aic-steps li[aria-current="step"]{color:var(--aic-blue)}
+.aic-progress{height:4px;background:var(--aic-sage)}
+.aic-progress i{display:block;height:100%;width:0;background:var(--aic-blue);transition:width .3s ease}
+/* questions */
+.aic-q{margin-top:16px}
+.aic-q-num{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--aic-soft)}
+.aic-q-text{font-size:17.5px;font-weight:750;letter-spacing:-.015em;margin:6px 0 14px;line-height:1.4}
+.aic-q-text em{display:block;font-style:normal;font-weight:500;font-size:14.5px;color:var(--aic-soft);margin-top:6px;letter-spacing:0}
+.aic-opts{display:grid;gap:8px}
+.aic-opt{display:flex;align-items:flex-start;gap:12px;width:100%;padding:12px 14px;border:1px solid var(--aic-line);border-radius:14px;background:var(--aic-white);cursor:pointer;text-align:left;font-size:15px;line-height:1.4;min-height:44px}
+.aic-opt:hover{border-color:var(--aic-focus)}
+.aic-opt .aic-dot{flex:0 0 18px;height:18px;border-radius:50%;border:2px solid var(--aic-line);margin-top:1px;position:relative}
+.aic-opt[aria-checked="true"]{border-color:var(--aic-blue);background:var(--aic-blue-soft)}
+.aic-opt[aria-checked="true"] .aic-dot{border-color:var(--aic-blue)}
+.aic-opt[aria-checked="true"] .aic-dot::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--aic-blue)}
+.aic-nav{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:24px;flex-wrap:wrap}
+.aic-nav-hint{font-size:13px;color:var(--aic-soft);font-weight:650}
+/* bars */
+.aic-stackbar{display:flex;height:18px;border-radius:999px;overflow:hidden;background:var(--aic-sage);gap:2px}
+.aic-stackbar i{display:block;height:100%;transition:width .4s ease}
+.aic-stackbar i:first-child{border-radius:999px 0 0 999px}.aic-stackbar i:last-child{border-radius:0 999px 999px 0}
+.aic-hi-bg{background:var(--aic-hi)}.aic-md-bg{background:var(--aic-md)}.aic-lo-bg{background:var(--aic-lo)}
+.aic-tool .aic-legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13.5px;font-weight:700;margin-top:10px;font-variant-numeric:tabular-nums;list-style:none;padding:0}
+.aic-legend li{margin:0;display:flex;align-items:center;gap:7px}
+.aic-legend .aic-sw{width:11px;height:11px;border-radius:3px;display:inline-block;flex:0 0 11px}
+.aic-meter{height:10px;border-radius:999px;background:var(--aic-sage);overflow:hidden}
+.aic-meter i{display:block;height:100%;border-radius:999px;background:var(--aic-blue);transition:width .5s ease}
+.aic-meter i.aic-low{background:var(--aic-amber)}
+.aic-num{font-variant-numeric:tabular-nums;font-weight:800}
+.aic-big{font-size:clamp(44px,9vw,64px);font-weight:800;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
+.aic-grid2{display:grid;gap:14px}
+@media (min-width:700px){.aic-grid2{grid-template-columns:1fr 1fr}}
+.aic-action{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:start}
+.aic-action .aic-tag{grid-row:span 2;margin-top:2px}
+@media (max-width:480px){.aic-action{grid-template-columns:1fr}.aic-action .aic-tag{grid-row:auto;justify-self:start}}
+.aic-action p{font-size:15px;color:var(--aic-soft)}
+.aic-for{font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--aic-soft)}
+.aic-tool details{border-top:1px solid var(--aic-line)}
+.aic-tool details:last-of-type{border-bottom:1px solid var(--aic-line)}
+.aic-tool summary{cursor:pointer;padding:16px 0;font-weight:800;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px;letter-spacing:-.015em}
+.aic-tool summary::-webkit-details-marker{display:none}
+.aic-tool summary::after{content:"+";color:var(--aic-soft);font-weight:800;font-size:20px;line-height:1}
+.aic-tool details[open] summary::after{content:"\2013"}
+.aic-method{padding-bottom:16px}
+.aic-method p,.aic-method li{font-size:14.5px;color:var(--aic-soft);line-height:1.65}
+.aic-method p+p{margin-top:12px}
+.aic-method strong{color:var(--aic-ink)}
+.aic-cta{display:grid;gap:14px}
+@media (min-width:700px){.aic-cta{grid-template-columns:1fr 1fr}}
+.aic-cta .aic-card{display:flex;flex-direction:column;gap:10px}
+.aic-cta .aic-card .aic-btn{align-self:flex-start;margin-top:auto}
+.aic-cta-solution{border-color:var(--aic-focus)!important;background:var(--aic-blue-soft)!important}
+.aic-handoff{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-top:18px;font-size:14px}
+.aic-fade{animation:aicFade .35s ease both}
+@keyframes aicFade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.aic-table{width:100%;border-collapse:collapse;font-size:14px}
+.aic-table th,.aic-table td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--aic-line);vertical-align:top}
+.aic-table th{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--aic-soft)}
+.aic-table td.aic-r,.aic-table th.aic-r{text-align:right;font-variant-numeric:tabular-nums}
+.aic-tablewrap{overflow-x:auto}
+@media (prefers-reduced-motion:reduce){.aic-tool *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media print{
+  .aic-tool{background:#fff!important;color:#000;padding:0;font-size:12pt}
+  .aic-noprint,.aic-top button,.aic-handoff,.aic-cta .aic-btn,.aic-controls{display:none!important}
+  .aic-card{box-shadow:none;break-inside:avoid;border-color:#bbb}
+  .aic-tool details{border:0}
+  .aic-tool details>*:not(summary){display:block!important}
+  .aic-tool summary::after{content:""}
+  .aic-stackbar,.aic-meter,.aic-hi-bg,.aic-md-bg,.aic-lo-bg,.aic-sw{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .aic-tool a{color:#000;text-decoration:underline}
+}
+
+/* team tool */
+.aic-search{position:relative}
+.aic-tool .aic-suggest{list-style:none;padding:6px;margin:6px 0 0;border:1px solid var(--aic-line);border-radius:14px;background:var(--aic-white);box-shadow:var(--aic-shadow)}
+.aic-suggest li{margin:0}
+.aic-suggest button{display:flex;justify-content:space-between;gap:10px;width:100%;padding:11px 12px;border:0;background:none;border-radius:10px;cursor:pointer;text-align:left;font-weight:650}
+.aic-suggest button:hover,.aic-suggest button.aic-active{background:var(--aic-blue-soft);color:var(--aic-blue)}
+.aic-sector-list{margin-top:10px;padding:12px;border:1px dashed var(--aic-line);border-radius:14px}
+.aic-role{padding:0;overflow:hidden}
+.aic-role-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 14px;align-items:center;padding:14px 16px}
+.aic-role-name{font-weight:800;font-size:16.5px;letter-spacing:-.015em;min-width:0}
+.aic-role-sub{font-size:13px;color:var(--aic-soft);font-weight:600}
+.aic-count{display:inline-flex;align-items:center;border:1px solid var(--aic-line);border-radius:999px;overflow:hidden;background:var(--aic-white)}
+.aic-count button{width:38px;height:38px;border:0;background:none;font-size:18px;font-weight:700;cursor:pointer;color:var(--aic-ink)}
+.aic-count button:hover{background:var(--aic-blue-soft);color:var(--aic-blue)}
+.aic-count input{width:52px;height:38px;border:0;border-inline:1px solid var(--aic-line);text-align:center;font-weight:800;font-variant-numeric:tabular-nums;background:var(--aic-white);-moz-appearance:textfield}
+.aic-count input::-webkit-outer-spin-button,.aic-count input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.aic-role-tools{grid-column:1/-1;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.aic-tasks{border-top:1px solid var(--aic-line);background:var(--aic-paper);padding:6px 16px 14px}
+.aic-task{display:grid;grid-template-columns:minmax(0,1fr) 34px;gap:8px 10px;padding:12px 0;border-bottom:1px solid var(--aic-line)}
+.aic-task:last-of-type{border-bottom:0}
+.aic-task-name{font-weight:700;font-size:15px;padding:8px 10px;border:1px solid var(--aic-line);border-radius:10px;background:var(--aic-white);width:100%;min-width:0}
+.aic-task-ctl{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+.aic-task-share{display:flex;align-items:center;gap:8px;flex:1 1 180px;min-width:150px}
+.aic-task-share output{font-size:13px;font-weight:800;min-width:3.2em;text-align:right;font-variant-numeric:tabular-nums}
+.aic-lbl{font-size:12px;font-weight:700;color:var(--aic-soft)}
+.aic-x{width:34px;height:34px;border:0;background:none;border-radius:8px;color:var(--aic-soft);font-size:20px;cursor:pointer;line-height:1}
+.aic-x:hover{background:var(--aic-sage);color:var(--aic-ink)}
+.aic-sticky{position:sticky;bottom:0;z-index:5;background:linear-gradient(to top,var(--aic-paper) 70%,transparent);padding:18px 0 14px;margin-top:8px}
+.aic-controls{display:flex;flex-wrap:wrap;gap:14px 22px;align-items:center}
+.aic-year{display:flex;align-items:center;gap:12px;flex:1 1 240px}
+.aic-year output{font-weight:800;font-variant-numeric:tabular-nums;min-width:3em}
+.aic-map-row{padding:14px 0;border-top:1px solid var(--aic-line)}
+.aic-map-row:first-of-type{border-top:0}
+.aic-map-head{display:flex;justify-content:space-between;gap:12px;align-items:baseline;margin-bottom:8px;flex-wrap:wrap}
+.aic-map-bar{display:flex;gap:2px;height:30px}
+.aic-seg-task{position:relative;height:100%;border-radius:4px;cursor:default;min-width:3px;outline-offset:1px}
+.aic-seg-task:focus-visible{outline:3px solid var(--aic-focus)}
+.aic-tip{position:absolute;z-index:10;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--aic-ink);color:var(--aic-paper);font-size:12.5px;font-weight:600;line-height:1.4;padding:8px 10px;border-radius:8px;width:max-content;max-width:240px;pointer-events:none;display:none}
+.aic-seg-task:hover .aic-tip,.aic-seg-task:focus .aic-tip{display:block}
+.aic-map-labels{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:8px;font-size:12.5px;color:var(--aic-soft);font-weight:600}
+.aic-map-labels span::before{content:"";display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;background:var(--c)}
+.aic-tool .aic-rank{list-style:none;padding:0;counter-reset:r}
+.aic-rank li{counter-increment:r;display:grid;grid-template-columns:30px minmax(0,1fr);gap:4px 10px;padding:12px 0;border-top:1px solid var(--aic-line);margin:0}
+.aic-rank li:first-child{border-top:0}
+.aic-rank li::before{content:counter(r);font-weight:800;font-size:14px;width:26px;height:26px;border-radius:50%;background:var(--aic-sage);display:flex;align-items:center;justify-content:center;grid-row:span 2}
+.aic-rank .aic-t{font-weight:750}
+.aic-rank .aic-m{font-size:13.5px;color:var(--aic-soft)}
+.aic-skill h3{margin-bottom:6px}
+.aic-skill ul{margin-top:8px}
+.aic-skill li{font-size:14.5px}
+.aic-level{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.aic-lvl-steps{display:flex;gap:4px}
+.aic-lvl-steps i{width:28px;height:8px;border-radius:999px;background:var(--aic-sage)}
+.aic-lvl-steps i.on{background:var(--aic-blue)}
+</style>
+
+<div class="aic-tool" id="aic-which-parts-of-your-teams-work-could-ai-change-first" data-theme="auto">
+  <header class="aic-top">
+    <div class="aic-col">
+      <span class="aic-eyebrow">AI Channel · For HR &amp; Team Leads</span>
+      <ol class="aic-steps" aria-label="Progress">
+        <li data-step="team">1 Your team</li><li data-step="today">2 How you work today</li><li data-step="results">3 Your map</li>
+      </ol>
+    </div>
+    <div class="aic-progress" aria-hidden="true"><i data-ref="progress"></i></div>
+  </header>
+
+  <!-- INTRO -->
+  <section class="aic-screen aic-col" data-screen="intro" aria-labelledby="aic-t-intro">
+    <div style="padding-top:40px">
+      <div class="aic-eyebrow">3 steps · ~6 minutes · no email required</div>
+      <h1 id="aic-t-intro" tabindex="-1" style="margin-top:12px">Which parts of your team’s work could AI change first?</h1>
+      <p class="aic-lede">Help your team adapt to AI without guessing what comes next. Add the roles on your team and answer seven plain questions. In about six minutes you’ll see which tasks AI could change first, where your people still add the most value, and the skills to build first.</p>
+      <div class="aic-card" style="margin-top:28px">
+        <div class="aic-eyebrow">What the map shows</div>
+        <ul style="margin-top:12px;list-style:none;padding:0" class="aic-stack">
+          <li><strong>A task map of your team.</strong> <span class="aic-soft">Every role split into its main tasks, colored by how much AI could take on.</span></li>
+          <li><strong>What changes first, and what stays with people.</strong> <span class="aic-soft">Ranked by team time. Usually not whole jobs, but some of their tasks, starting with the repetitive ones.</span></li>
+          <li><strong>Priority reskilling areas and a short plan.</strong> <span class="aic-soft">Including what your AI policy should actually say, and when not to trust AI. Short enough to take to your next team meeting.</span></li>
+        </ul>
+      </div>
+      <div class="aic-note aic-note-blue" style="margin-top:20px">
+        <strong>Why map it now?</strong>
+        Today’s AI tools are like very capable assistants — great at some tasks, hopeless at others. Companies are explicitly trying to build the next step: AI that can do most tasks a person can do at a computer, as well as a skilled human. Experts disagree on when that arrives (serious estimates range from a few years to a few decades), but almost nobody serious says “never,” which is why it’s worth mapping your team’s work now.
+      </div>
+      <div class="aic-nav">
+        <button type="button" class="aic-btn aic-btn-primary" data-act="start">Start the map</button>
+        <span class="aic-nav-hint">Answers stay in your browser for this session only. Nothing is stored or sent.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEAM -->
+  <section class="aic-screen aic-col" data-screen="team" aria-labelledby="aic-t-team" hidden>
+    <div style="padding-top:32px">
+      <div class="aic-eyebrow">Step 1 of 3</div>
+      <h2 id="aic-t-team" tabindex="-1" style="margin-top:8px">Who’s on your team?</h2>
+      <p class="aic-soft" style="margin-top:10px">Add each role and how many people do it. Pick the closest job, then rename it or change its tasks until it looks like your team.</p>
+
+      <div class="aic-card" style="margin-top:20px">
+        <label for="aic-q-search" class="aic-for">Find a role</label>
+        <div class="aic-search" style="margin-top:8px">
+          <input id="aic-q-search" class="aic-input" type="text" autocomplete="off" placeholder="e.g. customer service, accountant, nurse" role="combobox" aria-expanded="false" aria-controls="aic-suggest" aria-autocomplete="list">
+          <ul id="aic-suggest" class="aic-suggest" role="listbox" aria-label="Matching roles" hidden></ul>
+        </div>
+        <p class="aic-small aic-soft" style="margin-top:14px">Or browse by area:</p>
+        <div class="aic-chips" data-ref="sectors" style="margin-top:8px"></div>
+        <div data-ref="sectorList"></div>
+        <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--aic-line)">
+          <label for="aic-custom" class="aic-for">Role not listed? Add your own</label>
+          <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+            <input id="aic-custom" class="aic-input" type="text" maxlength="60" placeholder="e.g. Claims handler" style="flex:1 1 200px">
+            <button type="button" class="aic-btn aic-btn-ghost" data-act="addCustom">Add role</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:28px;flex-wrap:wrap">
+        <h3>Your team <span class="aic-soft" data-ref="teamCount" style="font-weight:700"></span></h3>
+        <button type="button" class="aic-link" data-act="example">Try an example team</button>
+      </div>
+      <div data-ref="roles" class="aic-stack" style="margin-top:12px" aria-live="polite"></div>
+      <p data-ref="emptyTeam" class="aic-soft aic-small" style="margin-top:12px;padding:18px;border:1px dashed var(--aic-line);border-radius:14px;text-align:center">No roles yet. Search above, browse an area, or try the example team.</p>
+
+      <div class="aic-sticky">
+        <div class="aic-nav" style="margin-top:0">
+          <button type="button" class="aic-btn aic-btn-ghost" data-act="back" data-to="intro">← Back</button>
+          <span class="aic-nav-hint" data-ref="teamHint">Add at least one role</span>
+          <button type="button" class="aic-btn aic-btn-primary" data-act="toToday" disabled>Next →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TODAY -->
+  <section class="aic-screen aic-col" data-screen="today" aria-labelledby="aic-t-today" hidden>
+    <div style="padding-top:32px">
+      <div class="aic-eyebrow">Step 2 of 3</div>
+      <h2 id="aic-t-today" tabindex="-1" style="margin-top:8px">How does your team work with AI today?</h2>
+      <p class="aic-soft" style="margin-top:10px">Seven plain questions. They don’t change the map; they decide your plan and your readiness level. Answer for the team as it is today, not as you’d like it to be.</p>
+      <div data-ref="questions"></div>
+      <div class="aic-nav">
+        <button type="button" class="aic-btn aic-btn-ghost" data-act="back" data-to="team">← Back</button>
+        <span class="aic-nav-hint" data-ref="qHint"></span>
+        <button type="button" class="aic-btn aic-btn-primary" data-act="toResults" disabled>See my team’s map</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="aic-screen aic-col" data-screen="results" aria-labelledby="aic-t-results" hidden>
+    <div data-ref="results" style="padding-top:32px"></div>
+  </section>
+</div>
+
+<script>
+/* ---- AI Channel config: the WordPress editor can change these (or set window.AICHANNEL_CONFIG before this script) ---- */
+window.AICHANNEL_CONFIG = Object.assign({
+  resultsFormUrl: "#",      // "Email me my results" form (WordPress form page)
+  coursesUrl: "#",          // "Learn with a member" (Central AI course schedule)
+  matchUrl: "#",            // "Get matched to someone" (advisory/consulting form)
+  newsletterUrl: "#",       // separate newsletter opt-in
+  linkTarget: "_self"       // optional: "_top" when the tool sits in an iframe
+}, window.AICHANNEL_CONFIG || {});
+
+(function () {
+  "use strict";
+  var ROOT = document.getElementById("aic-which-parts-of-your-teams-work-could-ai-change-first");
+  if (!ROOT) return;
+  var CFG = window.AICHANNEL_CONFIG;
+  var SLUG = "which-parts-of-your-teams-work-could-ai-change-first";
+  var AUDIENCE = "hr-team-leads";
+  var TOOL_NAME = "Which Parts of Your Team's Work Could AI Change First?";
+
+  /* ---------------- Model (shared with Check Your Job) ---------------- */
+  var TYPE_WEIGHT = { cr: 0.9, cj: 0.45, ip: 0.12, ph: 0.04 };
+  var TYPE_LABEL = { cr: "Routine computer work", cj: "Judgment at a computer", ip: "People and trust", ph: "Physical, hands-on" };
+  /* FROZEN SNAPSHOT: METR's reported 50%-reliability horizon for the best model was roughly 16 hours in
+     April 2026 (metr.org/time-horizons). Update these three values to refresh the tool. */
+  var FRONTIER_ASOF = "April 2026";
+  var ANCHOR_YEAR = 2026.3;
+  var ANCHOR_HOURS = 16;
+  var PACES = {
+    slow: { label: "7-month doubling", months: 7, note: "the 2019–2024 average" },
+    fast: { label: "4.3-month doubling", months: 4.3, note: "the pace since 2024" }
+  };
+  function horizonAt(year, pace) { return ANCHOR_HOURS * Math.pow(2, ((year + 0.5 - ANCHOR_YEAR) * 12) / PACES[pace].months); }
+  function fmtHours(h) {
+    if (h < 1) return Math.round(h * 60) + " min";
+    if (h < 24) return Math.round(h) + " hours";
+    if (h < 168) return Math.round(h / 8) + " workdays";
+    if (h < 700) return Math.round(h / 40) + " workweeks";
+    if (h < 8000) return Math.round(h / 160) + " work-months";
+    return Math.round(h / 2000) + " work-years";
+  }
+  var LENGTHS = [[0.1, "A few minutes"], [0.25, "15 minutes"], [0.5, "30 minutes"], [1, "About an hour"], [2, "A couple of hours"], [4, "Half a day"], [8, "A full day"], [16, "Two days"], [40, "About a week"], [160, "About a month"]];
+  function nearestLen(len) { return LENGTHS.reduce(function (a, b) { return Math.abs(b[0] - len) < Math.abs(a[0] - len) ? b : a; })[0]; }
+  function taskFactor(t, year, pace) { return Math.min(1, horizonAt(year, pace) / t.len) * TYPE_WEIGHT[t.ty]; }
+  function levelOf(f) { return f >= 0.6 ? "hi" : f >= 0.25 ? "md" : "lo"; }
+  var LEVEL_TXT = { hi: "AI can already do a lot of this", md: "AI can help; a person still leads", lo: "Still depends on people" };
+  var LEVEL_SHORT = { hi: "AI can do a lot", md: "AI can help", lo: "Depends on people" };
+
+  /* Occupation task profiles: [name, [[task, % of time, typical length in hours, type]]] — editorial approximations (Check Your Job set). */
+  var OCC=[["Accountant",[["Reconcile transactions and ledgers",20,2,"cr"],["Prepare statements and reports",25,8,"cr"],["Prepare tax filings",20,8,"cj"],["Advise clients on decisions",20,2,"ip"],["Review and audit judgment calls",15,8,"cj"]]],
+["Customer service representative",[["Answer routine inquiries",45,0.25,"cr"],["Resolve complex complaints",25,0.5,"cj"],["Update customer records",15,0.1,"cr"],["De-escalate upset customers",15,0.5,"ip"]]],
+["Software developer",[["Write and modify code",35,4,"cj"],["Debug and fix issues",20,2,"cj"],["Review others' code",10,1,"cj"],["Design systems and architecture",15,16,"cj"],["Coordinate with team and stakeholders",20,2,"ip"]]],
+["Graphic designer",[["Produce assets to spec",30,2,"cr"],["Develop original concepts",25,8,"cj"],["Communicate with clients",20,1,"ip"],["Execute revision rounds",15,1,"cr"],["Shape brand strategy",10,16,"cj"]]],
+["Teacher (K-12)",[["Teach lessons in person",35,1,"ip"],["Plan lessons and materials",15,2,"cj"],["Grade and give written feedback",15,1,"cr"],["Mentor students, manage behavior",20,1,"ip"],["Handle admin and reporting",15,2,"cr"]]],
+["Nurse",[["Provide direct patient care",45,0.5,"ph"],["Chart and document",20,0.5,"cr"],["Administer medications",15,0.25,"ph"],["Communicate with patients and families",15,0.25,"ip"],["Coordinate care plans",5,1,"cj"]]],
+["Truck driver",[["Drive routes",70,8,"ph"],["Load, unload, inspect",10,1,"ph"],["Complete logs and paperwork",10,0.25,"cr"],["Interact with customers at stops",10,0.25,"ip"]]],
+["Lawyer",[["Research law and precedent",20,4,"cj"],["Draft contracts and filings",25,8,"cj"],["Counsel clients",20,1,"ip"],["Negotiate with other parties",15,2,"ip"],["Appear in court and hearings",20,8,"ip"]]],
+["Marketing manager",[["Create campaign content",20,4,"cj"],["Run analytics and reporting",20,4,"cr"],["Set strategy and positioning",20,16,"cj"],["Manage the team",20,2,"ip"],["Manage vendors and stakeholders",20,2,"ip"]]],
+["Journalist",[["Research and verify facts",25,4,"cj"],["Interview sources",20,1,"ip"],["Write articles",30,4,"cj"],["Edit and fact-check copy",10,1,"cr"],["Build and keep source relationships",15,2,"ip"]]],
+["Electrician",[["Install and repair systems",60,4,"ph"],["Diagnose faults",15,1,"cj"],["Talk through work with clients",10,0.5,"ip"],["Prepare quotes and paperwork",15,1,"cr"]]],
+["Retail salesperson",[["Assist customers on the floor",40,0.25,"ip"],["Process checkout",20,0.1,"cr"],["Stock shelves and displays",25,1,"ph"],["Handle returns and issues",15,0.25,"cj"]]],
+["HR specialist",[["Screen applications",20,1,"cr"],["Interview candidates",20,1,"ip"],["Administer policy and records",25,2,"cr"],["Handle employee relations",20,1,"ip"],["Answer benefits questions",15,0.5,"cr"]]],
+["Financial analyst",[["Build and maintain models",30,8,"cj"],["Gather and clean data",20,2,"cr"],["Write analysis and reports",25,4,"cr"],["Present findings to decision-makers",15,1,"ip"],["Monitor markets and news",10,1,"cr"]]],
+["Receptionist",[["Greet and direct visitors",25,0.1,"ip"],["Manage scheduling",25,0.25,"cr"],["Handle phones and messages",25,0.25,"cr"],["Process mail and admin",15,0.5,"cr"],["Coordinate office logistics",10,0.5,"cj"]]],
+["Paralegal",[["Review and summarize documents",30,4,"cr"],["Draft filings and correspondence",25,4,"cj"],["Organize case files",20,2,"cr"],["Handle client intake",15,0.5,"ip"],["Manage court filing procedures",10,1,"cr"]]],
+["Translator",[["Translate documents",55,4,"cr"],["Localize nuance, tone, and context",20,4,"cj"],["Liaise with clients",10,1,"ip"],["Research terminology",15,1,"cr"]]],
+["Project manager",[["Plan and schedule work",20,4,"cj"],["Produce status reporting",20,2,"cr"],["Communicate with stakeholders",25,1,"ip"],["Solve risks and blockers",20,2,"cj"],["Facilitate the team",15,1,"ip"]]],
+["Therapist / counselor",[["Hold sessions with clients",60,1,"ip"],["Plan treatment",15,1,"cj"],["Write notes and documentation",15,0.5,"cr"],["Coordinate referrals and care",10,0.5,"ip"]]],
+["Chef",[["Cook and prep",55,2,"ph"],["Develop menus",15,8,"cj"],["Run the kitchen and team",20,1,"ip"],["Order and manage inventory",10,1,"cr"]]],
+["Warehouse worker",[["Pick, pack, and move goods",60,0.5,"ph"],["Operate equipment",20,1,"ph"],["Scan and log inventory",15,0.25,"cr"],["Coordinate with the team",5,0.25,"ip"]]],
+["Pharmacist",[["Verify and dispense prescriptions",35,0.25,"cj"],["Counsel patients on medications",20,0.25,"ip"],["Check interactions and clinical issues",15,0.5,"cj"],["Manage inventory and admin",15,1,"cr"],["Supervise pharmacy technicians",15,1,"ip"]]],
+["Police officer",[["Patrol and respond to calls",40,1,"ph"],["Engage and de-escalate with the public",20,0.5,"ip"],["Write incident reports",20,1,"cr"],["Investigate cases",15,4,"cj"],["Testify in court",5,4,"ip"]]],
+["Dental hygienist",[["Clean teeth and perform preventive care",60,1,"ph"],["Educate patients on oral health",15,0.25,"ip"],["Chart and document",15,0.25,"cr"],["Assist the dentist",10,0.5,"ph"]]],
+["Insurance sales agent",[["Prospect and contact clients",25,0.5,"ip"],["Assess needs and recommend coverage",25,1,"ip"],["Prepare quotes and applications",25,1,"cr"],["Service existing policies",15,0.5,"cr"],["Handle compliance paperwork",10,1,"cr"]]],
+["Auto mechanic",[["Diagnose vehicle problems",20,1,"cj"],["Repair and maintain vehicles",55,2,"ph"],["Explain work to customers",10,0.25,"ip"],["Prepare estimates and paperwork",15,0.5,"cr"]]],
+["Social worker",[["Meet clients and make home visits",35,1,"ip"],["Document cases",20,1,"cr"],["Coordinate services and referrals",20,1,"cj"],["Respond to crises",15,2,"ip"],["Prepare court and agency reports",10,4,"cr"]]],
+["Architect",[["Design and draft buildings",35,16,"cj"],["Meet with clients",15,1,"ip"],["Produce code-compliant documents",25,8,"cr"],["Visit and inspect sites",10,2,"ph"],["Coordinate engineers and consultants",15,2,"ip"]]],
+["Bookkeeper",[["Record transactions",35,0.5,"cr"],["Reconcile accounts",25,2,"cr"],["Process invoices and payroll",25,1,"cr"],["Produce financial reports",10,2,"cr"],["Answer client questions",5,0.5,"ip"]]],
+["Real estate agent",[["Show properties to clients",30,1,"ip"],["Prospect and build a network",20,1,"ip"],["Negotiate deals",15,2,"ip"],["Create listings and marketing",20,1,"cr"],["Manage contracts and paperwork",15,2,"cr"]]],
+["Physician (doctor / GP)",[["Examine patients",25,0.25,"ph"],["Diagnose and decide treatment",20,0.5,"cj"],["Communicate with patients",20,0.25,"ip"],["Chart and document",20,0.5,"cr"],["Coordinate care and referrals",15,0.5,"cj"]]],
+["Cashier",[["Process transactions at the register",50,0.1,"cr"],["Interact with customers",25,0.1,"ip"],["Bag items and stock nearby shelves",15,0.25,"ph"],["Handle returns and issues",10,0.25,"cj"]]],
+["Janitor / cleaner",[["Clean and maintain facilities",80,2,"ph"],["Restock supplies",10,0.5,"ph"],["Report maintenance issues",10,0.25,"ip"]]],
+["Construction laborer",[["Perform site labor",70,2,"ph"],["Operate tools and equipment",20,1,"ph"],["Coordinate on safety and tasks",10,0.5,"ip"]]],
+["Carpenter",[["Build and install structures",60,4,"ph"],["Measure and plan work",15,1,"cj"],["Discuss jobs with clients",10,0.5,"ip"],["Handle materials and estimates",15,1,"cr"]]],
+["Plumber",[["Install and repair plumbing",60,2,"ph"],["Diagnose problems",15,1,"cj"],["Talk through work with customers",10,0.5,"ip"],["Prepare quotes and paperwork",15,1,"cr"]]],
+["Hairdresser / barber",[["Cut, color, and style hair",65,1,"ph"],["Consult and converse with clients",20,0.5,"ip"],["Manage bookings and payments",10,0.25,"cr"],["Maintain the salon",5,0.5,"ph"]]],
+["Waiter / server",[["Serve tables",35,0.25,"ph"],["Host and read guests",30,0.25,"ip"],["Enter orders and process payments",20,0.1,"cr"],["Set up and clean down",15,0.5,"ph"]]],
+["Bartender",[["Mix and serve drinks",45,0.1,"ph"],["Engage with guests",30,0.25,"ip"],["Stock and prep the bar",15,0.5,"ph"],["Handle payments",10,0.1,"cr"]]],
+["Hotel front desk agent",[["Process check-ins and check-outs",35,0.1,"cr"],["Solve guest requests and problems",30,0.25,"ip"],["Manage reservations and admin",20,0.25,"cr"],["Coordinate housekeeping and maintenance",15,0.25,"cj"]]],
+["Flight attendant",[["Run safety procedures",30,1,"ph"],["Serve and assist passengers",40,1,"ip"],["Complete pre- and post-flight checks",15,0.5,"ph"],["Handle onboard incidents",15,1,"cj"]]],
+["Airline pilot",[["Fly the aircraft",50,4,"ph"],["Plan flights and run pre-flight checks",20,1,"cj"],["Monitor systems and conditions",15,4,"cj"],["Communicate with crew and ATC",15,4,"ip"]]],
+["Data analyst",[["Clean and prepare data",25,2,"cr"],["Build analyses and queries",30,4,"cj"],["Produce dashboards and reports",25,4,"cr"],["Present insights to stakeholders",15,1,"ip"],["Gather requirements",5,1,"ip"]]],
+["Data entry clerk",[["Enter data from source documents",70,0.25,"cr"],["Verify accuracy",20,0.25,"cr"],["File and organize records",10,0.25,"cr"]]],
+["Executive assistant (admin assistant)",[["Manage calendars and scheduling",25,0.25,"cr"],["Handle email and correspondence",25,0.5,"cr"],["Arrange travel and logistics",15,1,"cr"],["Prepare meetings and take notes",15,1,"cj"],["Gatekeep and manage relationships",20,0.5,"ip"]]],
+["Recruiter",[["Source candidates",25,1,"cr"],["Screen and interview",30,0.5,"ip"],["Coordinate with hiring managers",20,0.5,"ip"],["Manage offers and admin",15,1,"cr"],["Build employer brand",10,2,"cj"]]],
+["Sales manager",[["Coach the sales team",25,1,"ip"],["Own key client relationships",25,2,"ip"],["Forecast and report",20,2,"cr"],["Set strategy and pricing",15,8,"cj"],["Run pipeline reviews",15,1,"cj"]]],
+["Copywriter (content writer)",[["Write copy and content",45,2,"cj"],["Revise to feedback",20,1,"cr"],["Research audience and brand",15,2,"cj"],["Communicate with clients and stakeholders",15,1,"ip"],["Proof and format",5,0.5,"cr"]]],
+["Video editor",[["Edit footage into cuts",50,8,"cj"],["Polish color and audio",20,2,"cr"],["Run review cycles with clients",15,1,"ip"],["Export and manage files",15,1,"cr"]]],
+["Photographer",[["Shoot on location or in studio",40,2,"ph"],["Edit and retouch",30,2,"cr"],["Communicate with clients",15,0.5,"ip"],["Market the business and handle admin",15,1,"cr"]]],
+["UX designer",[["Design flows and mockups",35,8,"cj"],["Run user research",20,2,"ip"],["Align stakeholders",20,1,"ip"],["Maintain design systems and handoff",15,2,"cr"],["Run usability tests",10,2,"cj"]]],
+["IT support specialist (help desk)",[["Resolve support tickets",45,0.5,"cj"],["Set up and configure devices",20,1,"ph"],["Walk users through fixes",20,0.25,"ip"],["Document solutions",15,0.5,"cr"]]],
+["Network administrator",[["Monitor and maintain systems",35,2,"cj"],["Configure infrastructure",25,4,"cj"],["Troubleshoot outages",20,2,"cj"],["Install hardware",10,2,"ph"],["Document the environment",10,1,"cr"]]],
+["Cybersecurity analyst",[["Monitor and triage alerts",30,0.5,"cj"],["Investigate incidents",25,4,"cj"],["Assess vulnerabilities",20,8,"cj"],["Produce reports and compliance docs",15,4,"cr"],["Deliver awareness training",10,1,"ip"]]],
+["University professor (lecturer)",[["Teach classes",25,1,"ip"],["Conduct research and write papers",30,40,"cj"],["Grade and give feedback",15,1,"cr"],["Mentor students",15,1,"ip"],["Serve on committees and admin",15,2,"cr"]]],
+["Childcare worker",[["Supervise and care for children",45,1,"ph"],["Engage and teach children",25,0.5,"ip"],["Communicate with parents",15,0.25,"ip"],["Handle meals and cleanup",15,0.5,"ph"]]],
+["Personal trainer",[["Coach live training sessions",55,1,"ip"],["Design programs",20,1,"cj"],["Check in with clients",15,0.25,"ip"],["Handle scheduling and admin",10,0.25,"cr"]]],
+["Farmer",[["Work fields and livestock",50,4,"ph"],["Operate machinery",20,4,"ph"],["Plan seasons and keep records",15,2,"cj"],["Deal with buyers and suppliers",15,1,"ip"]]],
+["Delivery driver (courier)",[["Drive routes",55,4,"ph"],["Pick up and drop off packages",25,0.25,"ph"],["Scan and log deliveries",10,0.1,"cr"],["Interact with customers",10,0.1,"ip"]]],
+["Security guard",[["Patrol and monitor premises",55,4,"ph"],["Watch surveillance feeds",20,4,"cr"],["Respond to incidents",15,1,"cj"],["Write reports and logs",10,0.5,"cr"]]],
+["Loan officer",[["Evaluate applications",30,2,"cj"],["Consult with clients",25,1,"ip"],["Collect and verify documents",25,1,"cr"],["Coordinate underwriting",10,1,"cj"],["Handle compliance paperwork",10,1,"cr"]]],
+["Bank teller",[["Process transactions",50,0.1,"cr"],["Serve customers",25,0.25,"ip"],["Balance drawer and reconcile",15,0.5,"cr"],["Refer products and services",10,0.25,"ip"]]],
+["Insurance claims adjuster",[["Review claims and documents",30,2,"cr"],["Investigate and assess damage",25,2,"cj"],["Interview claimants and witnesses",20,0.5,"ip"],["Decide settlements",15,1,"cj"],["Document decisions",10,1,"cr"]]],
+["Tax preparer",[["Prepare returns",50,2,"cr"],["Interview clients",20,0.5,"ip"],["Research tax questions",15,1,"cj"],["File and handle admin",15,0.5,"cr"]]],
+["Librarian",[["Help patrons find and evaluate information",30,0.25,"ip"],["Manage collections and cataloging",25,1,"cr"],["Run programs and community events",20,2,"ip"],["Maintain systems and digital resources",15,1,"cj"],["Handle circulation and admin",10,0.25,"cr"]]]];
+var SECTORS=[["Office & admin",["Accountant","Bookkeeper","Executive assistant (admin assistant)","Receptionist","Data entry clerk","HR specialist","Recruiter","Paralegal","Tax preparer","Project manager"]],["Tech & data",["Software developer","Data analyst","UX designer","IT support specialist (help desk)","Network administrator","Cybersecurity analyst"]],["Creative & media",["Graphic designer","Copywriter (content writer)","Video editor","Photographer","Journalist","Translator"]],["Health & care",["Nurse","Physician (doctor / GP)","Pharmacist","Dental hygienist","Therapist / counselor","Social worker","Childcare worker"]],["Education",["Teacher (K-12)","University professor (lecturer)","Librarian"]],["Sales & service",["Customer service representative","Retail salesperson","Cashier","Waiter / server","Bartender","Hotel front desk agent","Hairdresser / barber","Real estate agent","Insurance sales agent","Personal trainer","Flight attendant"]],["Finance & insurance",["Financial analyst","Loan officer","Bank teller","Insurance claims adjuster"]],["Trades, transport & physical",["Electrician","Plumber","Carpenter","Auto mechanic","Construction laborer","Chef","Farmer","Janitor / cleaner","Warehouse worker","Truck driver","Delivery driver (courier)","Security guard","Police officer","Airline pilot"]],["Business & professional",["Marketing manager","Sales manager","Lawyer","Architect"]]];
+
+
+  /* ---------------- State (memory only) ---------------- */
+  var S = { screen: "intro", roles: [], answers: {}, year: 2026, pace: "slow", started: false, completed: false, nextId: 1, openSector: null };
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function $(ref) { return ROOT.querySelector('[data-ref="' + ref + '"]'); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function pct(x) { return Math.round(x * 100); }
+  function findOcc(name) { for (var i = 0; i < OCC.length; i++) if (OCC[i][0] === name) return OCC[i]; return null; }
+
+  /* ---------------- Hand-off and events ---------------- */
+  function emit(name, extra) {
+    var detail = { event: name, tool: SLUG, audience: AUDIENCE, assessment_name: TOOL_NAME };
+    for (var k in (extra || {})) detail[k] = extra[k];
+    try { window.dispatchEvent(new CustomEvent("aichannel:event", { detail: detail })); } catch (e) {}
+    try { var msg = { type: "aichannel:event" }; for (var j in detail) msg[j] = detail[j]; if (window.parent) window.parent.postMessage(msg, "*"); } catch (e) {}
+  }
+  function utmParams() {
+    var out = {};
+    try { new URLSearchParams(window.location.search).forEach(function (v, k) { if (/^utm_/i.test(k)) out[k] = v; }); } catch (e) {}
+    return out;
+  }
+  function isSet(u) { return u && u !== "#"; }
+  function buildUrl(base, fields) {
+    if (!isSet(base)) return "#";
+    try {
+      var u = new URL(base, window.location.href);
+      var all = Object.assign({}, fields, utmParams());
+      Object.keys(all).forEach(function (k) { if (all[k] !== undefined && all[k] !== null && all[k] !== "") u.searchParams.set(k, all[k]); });
+      return u.toString();
+    } catch (e) { return base; }
+  }
+  function leadFields(cta, leadType) {
+    var r = S.lastResult || {};
+    return {
+      lead_type: leadType, audience: AUDIENCE, source_page: window.location.href, source_content_or_tool: SLUG,
+      cta_clicked: cta, assessment_name: TOOL_NAME, assessment_result: r.label || "", score: r.score != null ? r.score : ""
+    };
+  }
+
+  /* ---------------- Screens ---------------- */
+  var ORDER = ["intro", "team", "today", "results"];
+  function show(id, noFocus) {
+    S.screen = id;
+    ROOT.querySelectorAll(".aic-screen").forEach(function (s) { s.hidden = s.getAttribute("data-screen") !== id; });
+    ROOT.querySelectorAll(".aic-steps li").forEach(function (li) {
+      if (li.getAttribute("data-step") === id) li.setAttribute("aria-current", "step"); else li.removeAttribute("aria-current");
+    });
+    $("progress").style.width = [0, 25, 60, 100][ORDER.indexOf(id)] + "%";
+    if (id === "results") renderResults();
+    var top = ROOT.getBoundingClientRect().top + window.pageYOffset - 10;
+    if (window.pageYOffset > top) window.scrollTo({ top: top, behavior: reduced ? "auto" : "smooth" });
+    if (!noFocus) { var h = ROOT.querySelector('[data-screen="' + id + '"] h1, [data-screen="' + id + '"] h2'); if (h) { h.setAttribute("tabindex", "-1"); h.focus({ preventScroll: true }); } }
+  }
+
+  /* ---------------- Team builder ---------------- */
+  function addRole(occName, custom) {
+    if (S.roles.length >= 12) { $("teamHint").textContent = "Up to 12 roles. Group similar roles together."; return; }
+    var tasks;
+    if (custom) {
+      tasks = [["Writing routine emails, documents and updates", 30, 0.5, "cr"], ["Decisions and judgment calls the role is responsible for", 30, 1, "cj"], ["Working directly with people: customers, colleagues, partners", 40, 1, "ip"]];
+    } else { tasks = findOcc(occName)[1]; }
+    var role = { id: S.nextId++, name: occName, base: custom ? null : occName, n: 1, open: !!custom,
+      tasks: tasks.map(function (t) { return { t: t[0], sh: t[1], len: nearestLen(t[2]), ty: t[3] }; }) };
+    S.roles.push(role);
+    renderRoles();
+    var el = ROOT.querySelector('[data-role="' + role.id + '"] input[data-f="n"]');
+    if (el) el.focus();
+  }
+  function renderSectors() {
+    $("sectors").innerHTML = SECTORS.map(function (s, i) {
+      return '<button type="button" class="aic-chip" data-act="sector" data-i="' + i + '" aria-expanded="' + (S.openSector === i) + '">' + esc(s[0]) + "</button>";
+    }).join("");
+    var box = $("sectorList");
+    if (S.openSector === null) { box.innerHTML = ""; return; }
+    var s = SECTORS[S.openSector];
+    box.innerHTML = '<div class="aic-sector-list"><div class="aic-for" style="margin-bottom:8px">' + esc(s[0]) + ': tap to add</div><div class="aic-chips">' +
+      s[1].map(function (n) { return '<button type="button" class="aic-chip" data-act="addOcc" data-name="' + esc(n) + '">+ ' + esc(n) + "</button>"; }).join("") + "</div></div>";
+  }
+  function typeOptions(sel) { return Object.keys(TYPE_LABEL).map(function (k) { return '<option value="' + k + '"' + (k === sel ? " selected" : "") + ">" + TYPE_LABEL[k] + "</option>"; }).join(""); }
+  function lenOptions(sel) { return LENGTHS.map(function (l) { return '<option value="' + l[0] + '"' + (l[0] === sel ? " selected" : "") + ">" + l[1] + "</option>"; }).join(""); }
+  function roleTotal(r) { return r.tasks.reduce(function (s, t) { return s + t.sh; }, 0) || 1; }
+  function renderRoles() {
+    var box = $("roles");
+    var total = S.roles.reduce(function (s, r) { return s + r.n; }, 0);
+    $("emptyTeam").hidden = S.roles.length > 0;
+    $("teamCount").textContent = S.roles.length ? "· " + S.roles.length + (S.roles.length === 1 ? " role, " : " roles, ") + total + (total === 1 ? " person" : " people") : "";
+    var next = ROOT.querySelector('[data-act="toToday"]');
+    next.disabled = S.roles.length === 0;
+    $("teamHint").textContent = S.roles.length ? total + (total === 1 ? " person" : " people") + " on the map" : "Add at least one role";
+    box.innerHTML = S.roles.map(function (r) {
+      var tot = roleTotal(r);
+      var h = '<div class="aic-card aic-role" data-role="' + r.id + '">' +
+        '<div class="aic-role-head"><div style="min-width:0"><label class="aic-sr" for="aic-rn-' + r.id + '">Role name</label>' +
+        '<input id="aic-rn-' + r.id + '" class="aic-task-name aic-role-name" style="border-color:transparent;padding:4px 6px;margin-left:-6px;background:transparent" data-f="name" value="' + esc(r.name) + '" maxlength="60">' +
+        '<div class="aic-role-sub">' + (r.base ? "Based on: " + esc(r.base) : "Custom role") + " · " + r.tasks.length + " tasks</div></div>" +
+        '<div class="aic-count" role="group" aria-label="Number of people in ' + esc(r.name) + '"><button type="button" data-act="dec" aria-label="One fewer person">−</button>' +
+        '<input type="number" inputmode="numeric" min="1" max="999" data-f="n" value="' + r.n + '" aria-label="People in this role"><button type="button" data-act="inc" aria-label="One more person">+</button></div>' +
+        '<div class="aic-role-tools"><button type="button" class="aic-link" data-act="toggleTasks" aria-expanded="' + r.open + '">' + (r.open ? "Hide tasks" : "Adjust tasks") + '</button><button type="button" class="aic-link" data-act="removeRole">Remove role</button></div></div>';
+      if (r.open) {
+        h += '<div class="aic-tasks"><p class="aic-small aic-soft" style="padding:10px 0 4px">Rename tasks, set what kind of work each one is, how long one go at it usually takes, and roughly how much of the week it fills.</p>' +
+          r.tasks.map(function (t, i) {
+            var id = "aic-t-" + r.id + "-" + i;
+            return '<div class="aic-task" data-i="' + i + '"><label class="aic-sr" for="' + id + '">Task name</label><input id="' + id + '" class="aic-task-name" data-f="t" value="' + esc(t.t) + '" maxlength="80">' +
+              '<button type="button" class="aic-x" data-act="rmTask" aria-label="Remove task: ' + esc(t.t) + '">×</button>' +
+              '<div class="aic-task-ctl"><label class="aic-sr" for="' + id + '-ty">Type of work</label><select id="' + id + '-ty" class="aic-select" data-f="ty">' + typeOptions(t.ty) + "</select>" +
+              '<label class="aic-sr" for="' + id + '-len">Typical length</label><select id="' + id + '-len" class="aic-select" data-f="len">' + lenOptions(t.len) + "</select>" +
+              '<span class="aic-task-share"><label class="aic-lbl" for="' + id + '-sh">Share</label><input id="' + id + '-sh" class="aic-range" type="range" min="1" max="100" step="1" value="' + t.sh + '" data-f="sh"><output for="' + id + '-sh">' + Math.round(t.sh / tot * 100) + "%</output></span></div></div>";
+          }).join("") +
+          (r.tasks.length < 8 ? '<button type="button" class="aic-link" data-act="addTask" style="margin-top:8px">+ Add a task</button>' : "") + "</div>";
+      }
+      return h + "</div>";
+    }).join("");
+  }
+  function roleById(el) { var c = el.closest("[data-role]"); if (!c) return null; var id = +c.getAttribute("data-role"); for (var i = 0; i < S.roles.length; i++) if (S.roles[i].id === id) return S.roles[i]; return null; }
+  function refreshShares(card, r) {
+    var tot = roleTotal(r);
+    card.querySelectorAll(".aic-task").forEach(function (row) { var t = r.tasks[+row.getAttribute("data-i")]; row.querySelector("output").textContent = Math.round(t.sh / tot * 100) + "%"; });
+  }
+
+  /* search combobox */
+  var search = ROOT.querySelector("#aic-q-search"), sug = ROOT.querySelector("#aic-suggest"), sugIdx = -1, sugItems = [];
+  function renderSuggest() {
+    var q = search.value.trim().toLowerCase();
+    sugItems = q ? OCC.filter(function (o) { return o[0].toLowerCase().indexOf(q) > -1; }).slice(0, 7).map(function (o) { return o[0]; }) : [];
+    if (q && !sugItems.length) sugItems = ["__custom__"];
+    sug.hidden = !sugItems.length; search.setAttribute("aria-expanded", String(!!sugItems.length)); sugIdx = -1;
+    sug.innerHTML = sugItems.map(function (n, i) {
+      var label = n === "__custom__" ? 'No match. Add “' + esc(search.value.trim()) + '” as a custom role' : esc(n);
+      return '<li role="presentation"><button type="button" role="option" id="aic-sg-' + i + '" tabindex="-1" data-act="pickSuggest" data-i="' + i + '"><span>' + label + '</span><span class="aic-soft" aria-hidden="true">+ Add</span></button></li>';
+    }).join("");
+  }
+  function pickSuggest(i) {
+    var n = sugItems[i]; if (!n) return;
+    if (n === "__custom__") addRole(search.value.trim().slice(0, 60), true); else addRole(n, false);
+    search.value = ""; renderSuggest();
+  }
+  search.addEventListener("input", renderSuggest);
+  search.addEventListener("keydown", function (e) {
+    if (!sugItems.length) return;
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault(); sugIdx = (sugIdx + (e.key === "ArrowDown" ? 1 : -1) + sugItems.length) % sugItems.length;
+      sug.querySelectorAll("button").forEach(function (b, i) { b.classList.toggle("aic-active", i === sugIdx); });
+      search.setAttribute("aria-activedescendant", "aic-sg-" + sugIdx);
+    } else if (e.key === "Enter") { e.preventDefault(); pickSuggest(sugIdx < 0 ? 0 : sugIdx); }
+    else if (e.key === "Escape") { search.value = ""; renderSuggest(); }
+  });
+
+  /* ---------------- Questions ---------------- */
+  var QUESTIONS = [
+    { id: "policy", t: "If someone on your team asked “Can I use an AI tool for this?”, is there a written answer?",
+      o: [["We’ve never discussed it", 0], ["It’s been mentioned, nothing written", 1], ["A written rule: approved tools and what never goes in", 2], ["Written, walked through with real examples, and people actually use it", 3]] },
+    { id: "trust", t: "Does your team know when not to trust AI?<em>That it can be confidently wrong, make up sources or figures, and miss context it can’t see.</em>",
+      o: [["I doubt most do", 0], ["The tech-comfortable ones do", 1], ["We’ve told everyone what to check", 2], ["We’ve shown real examples from our own work and agreed what always gets a human check", 3]] },
+    { id: "use", t: "How much is your team using AI tools on real work today?",
+      o: [["Nobody, or I’m not tracking this — I genuinely don’t know", 0], ["One or two people, on their own initiative", 1], ["Several people, fairly regularly", 2], ["Most people, as part of how work gets done", 3]] },
+    { id: "training", t: "What training on AI tools has your team had?",
+      o: [["None", 0], ["They’re figuring it out on their own", 1], ["One organized session", 2], ["Ongoing — sessions plus practice time on real work", 3]] },
+    { id: "talk", t: "Have you talked with your team, as a group, about what AI might change in their work?",
+      o: [["Not yet", 0], ["In passing", 1], ["Once, properly", 2], ["Regularly, including what we don’t know yet", 3]] },
+    { id: "path", t: "For the people whose work changes most, is there a plan — new skills, a changed role, or at least a straight conversation?",
+      o: [["No", 0], ["We’ll deal with it when it happens", 1], ["For some roles", 2], ["Yes, with time and budget set aside", 3]] },
+    { id: "eu", unscored: true, t: "Does your organization operate in the EU, or have staff using AI there?<em>We only use this to tell you whether the EU AI Act’s staff AI-literacy duty probably applies.</em>",
+      o: [["Yes", 2], ["No", 0], ["Not sure", 1]] }
+  ];
+  var SCORED = QUESTIONS.filter(function (q) { return !q.unscored; });
+  function renderQuestions() {
+    $("questions").innerHTML = QUESTIONS.map(function (q, qi) {
+      return '<div class="aic-card aic-q"><div class="aic-q-num">Question ' + (qi + 1) + " of " + QUESTIONS.length + '</div><div class="aic-q-text" id="aic-ql-' + q.id + '">' + q.t + '</div><div class="aic-opts" role="radiogroup" aria-labelledby="aic-ql-' + q.id + '">' +
+        q.o.map(function (o, oi) { var on = S.answers[q.id] === oi; return '<button type="button" class="aic-opt" role="radio" aria-checked="' + on + '" tabindex="' + (on || (S.answers[q.id] == null && oi === 0) ? 0 : -1) + '" data-q="' + q.id + '" data-o="' + oi + '"><span class="aic-dot" aria-hidden="true"></span><span>' + o[0] + "</span></button>"; }).join("") + "</div></div>";
+    }).join("");
+    refreshQHint();
+  }
+  function refreshQHint() {
+    var n = QUESTIONS.filter(function (q) { return S.answers[q.id] != null; }).length;
+    $("qHint").textContent = n === QUESTIONS.length ? "All answered" : n + " of " + QUESTIONS.length + " answered";
+    ROOT.querySelector('[data-act="toResults"]').disabled = n < QUESTIONS.length;
+  }
+  function selectOpt(btn) {
+    var q = btn.getAttribute("data-q");
+    btn.parentElement.querySelectorAll(".aic-opt").forEach(function (b) { b.setAttribute("aria-checked", "false"); b.tabIndex = -1; });
+    btn.setAttribute("aria-checked", "true"); btn.tabIndex = 0;
+    S.answers[q] = +btn.getAttribute("data-o");
+    refreshQHint();
+  }
+  function ans(id) { var q = QUESTIONS.filter(function (x) { return x.id === id; })[0]; return q.o[S.answers[id]][1]; }
+
+  /* ---------------- Compute ---------------- */
+  function compute() {
+    var year = S.year, pace = S.pace, N = 0, by = { hi: 0, md: 0, lo: 0 }, type = { cr: 0, cj: 0, ip: 0, ph: 0 }, idx = 0, tasks = [], roles = [];
+    S.roles.forEach(function (r) { N += r.n; });
+    S.roles.forEach(function (r) {
+      var tot = roleTotal(r), rIdx = 0, rBy = { hi: 0, md: 0, lo: 0 }, rType = { cr: 0, cj: 0, ip: 0, ph: 0 }, top = null;
+      r.tasks.forEach(function (t) {
+        var share = t.sh / tot, f = taskFactor(t, year, pace), lv = levelOf(f), w = r.n * share / N;
+        rIdx += share * f; rBy[lv] += share; rType[t.ty] += share;
+        by[lv] += w; type[t.ty] += w; idx += w * f;
+        tasks.push({ role: r.name, n: r.n, t: t.t, ty: t.ty, len: t.len, share: share, f: f, lv: lv, w: w, impact: w * f, people: r.n });
+        if (!top || share > top.share) top = { t: t.t, ty: t.ty, share: share };
+      });
+      roles.push({ r: r, idx: rIdx, by: rBy, type: rType, top: top, concentrated: top && top.share >= 0.5 && (top.ty === "cr" || top.ty === "cj") });
+    });
+    var score = Math.round(idx * 100);
+    var verdict = score >= 55 ? "hi" : score >= 30 ? "md" : "lo";
+    var pts = SCORED.reduce(function (s, q) { return s + ans(q.id); }, 0);
+    var ready = Math.round(pts / (SCORED.length * 3) * 100);
+    var level = READY_LEVELS.filter(function (l) { return ready <= l.max; })[0];
+    return { N: N, by: by, type: type, score: score, verdict: verdict, tasks: tasks, roles: roles, ready: ready, level: level, h: horizonAt(year, pace) };
+  }
+  var VERDICT = { hi: "Highly exposed", md: "Partly exposed", lo: "Lower exposure" };
+  var READY_LEVELS = [
+    { max: 25, step: 1, name: "Not yet started", desc: "AI is probably already in your team’s work, with no shared rules, skills or conversation around it. That’s common, and the first steps are cheap — a one-page policy, one practical session, one straight conversation with the team." },
+    { max: 50, step: 2, name: "Aware, informal", desc: "Some people use AI and you’ve talked about it, but the rules and skills live in a few heads. That works until someone is in a hurry or your most fluent person leaves. Your plan targets the gaps that would hurt first." },
+    { max: 75, step: 3, name: "Building momentum", desc: "You have rules, some training and real use. The remaining gaps are specific rather than general — usually knowing when not to trust AI, and a plan for the people whose work changes most." },
+    { max: 100, step: 4, name: "Ahead of the pack", desc: "Your team uses AI on purpose, with rules people follow, skills that are spreading, and open conversations about what changes. Your job now is keeping the map current as the tools change." }
+  ];
+
+  /* first year (from 2026) a task's length falls inside the frontier at the chosen pace */
+  function firstYearInReach(len, pace) { for (var y = 2026; y <= 2040; y++) if (horizonAt(y, pace) >= len) return y; return null; }
+
+  /* ---------------- Reskilling areas ---------------- */
+  var SKILL_AREAS = {
+    verify: { title: "Knowing when not to trust AI", type: null,
+      why: "Every role needs this one first. AI tools are confident when they’re wrong, and the cost of an unchecked error lands on your team, not the tool.",
+      skills: ["Spotting invented facts, figures, quotes and sources, and checking them against the original", "Knowing what the tool can’t see: your customer’s history, last week’s decision, the unwritten rule", "Agreeing, per task, what always gets a human check before it goes out"] },
+    cr: { title: "Running AI on routine work", type: "cr",
+      why: "Routine computer work changes first. The person who runs the tools and checks what they produce is in a far better spot than the one racing them by hand.",
+      skills: ["Writing clear instructions and examples for AI tools; breaking a task into steps", "Checking AI output quickly against a standard, and logging what goes wrong", "Redesigning the workflow: what AI drafts, what a person approves, what’s automated"] },
+    cj: { title: "Moving from producing to judging", type: "cj",
+      why: "As AI drafts more of the judgment work, value shifts to whoever frames the problem, sets the standard and catches what’s wrong.",
+      skills: ["Framing problems and briefs so the first draft is useful", "Reviewing and editing AI-assisted analysis, plans and documents", "Owning the decision: explaining it, standing behind it, escalating when unsure"] },
+    ip: { title: "Deepening the trust work", type: "ip",
+      why: "Work built on relationships, presence and reading people is furthest from what this trend measures. It’s what customers and colleagues will keep wanting from people longest.",
+      skills: ["Advising and explaining: turning AI-assisted analysis into a conversation", "Handling difficult conversations, complaints and negotiations", "Coaching and supporting colleagues through change"] },
+    ph: { title: "Using AI around the hands-on work", type: "ph",
+      why: "Physical work is a long way from what this trend measures. The near-term change is AI taking over the paperwork, scheduling and reporting around it, which frees up time if people know how to use it.",
+      skills: ["Using AI for reports, logs, quotes and scheduling, with a check before anything is sent", "Voice and phone-based tools for capturing notes on the job", "Knowing what must never be decided by a tool: safety, sign-off, anything irreversible"] },
+    widen: { title: "Widening single-task roles", type: null,
+      why: "Some roles on your team are built around one core computer task. Firms have the strongest incentive to automate a role’s core, so these roles need neighboring skills before the change arrives.",
+      skills: ["Adding review, quality and exception-handling work to the role", "Building customer-facing or coordination responsibilities", "A 90-day learning plan toward a neighboring role on the team"] }
+  };
+  function pickSkillAreas(c) {
+    var areas = [];
+    var conc = c.roles.filter(function (x) { return x.concentrated; });
+    var cand = [
+      { k: "cr", p: c.type.cr }, { k: "cj", p: c.type.cj }, { k: "ip", p: c.type.ip * 0.8 }, { k: "ph", p: c.type.ph * 0.6 }
+    ];
+    if (conc.length) cand.push({ k: "widen", p: 0.3 + conc.reduce(function (s, x) { return s + x.r.n; }, 0) / c.N * 0.5 });
+    cand = cand.filter(function (x) { return x.p >= 0.08; }).sort(function (a, b) { return b.p - a.p; });
+    var top2 = cand.slice(0, 2).map(function (x) { return x.k; });
+    /* "when not to trust AI" is always one of the three; it leads when the team doesn't know it yet */
+    areas = ans("trust") < 2 ? ["verify"].concat(top2) : top2.concat(["verify"]);
+    return areas.map(function (k) {
+      var a = SKILL_AREAS[k], who;
+      if (k === "widen") who = conc.map(function (x) { return x.r.name; });
+      else if (a.type) who = c.roles.slice().sort(function (x, y) { return y.type[a.type] * y.r.n - x.type[a.type] * x.r.n; }).filter(function (x) { return x.type[a.type] > 0.1; }).slice(0, 3).map(function (x) { return x.r.name; });
+      else who = c.roles.slice().sort(function (x, y) { return (y.type.cr + y.type.cj) * y.r.n - (x.type.cr + x.type.cj) * x.r.n; }).slice(0, 3).map(function (x) { return x.r.name; });
+      return { k: k, a: a, who: who };
+    });
+  }
+
+  /* ---------------- Plan ---------------- */
+  function buildPlan(c, areas) {
+    var items = [];
+    var eu = S.answers.eu !== 1; // yes or not sure
+    if (ans("policy") < 2) items.push({ tag: "This week", title: "Write the one-page AI policy.", detail: "Approved tools, what never goes in, what always gets a human check, who to ask, and a no-blame line for mistakes. The outline below is enough for a first version; share it in your next team meeting." });
+    else items.push({ tag: "This month", title: "Check your policy against this map.", detail: "Walk through the tasks marked “AI can do a lot” and confirm the policy says which tools are allowed for each and what gets checked. Policies written before the tasks were mapped usually miss a few." });
+    if (ans("trust") < 2) items.push({ tag: "This month", title: "Run a 45-minute “when not to trust AI” session.", detail: "Take one real task from the top of your “changes first” list, have AI do it, and find the errors together. Then agree, task by task, what always gets a human check. Nothing teaches verification faster than a confident wrong answer in your own work." });
+    if (ans("use") < 2 || ans("training") < 2) items.push({ tag: "This month", title: "Get people using the tools on real work.", detail: "Start with " + esc(areas[0] ? areas[0].a.title.toLowerCase() : "the basics") + ". Run a lunch-hour show-and-tell: whoever uses AI most shows the team their three best tricks on real work. Start a shared “what worked” doc the same day. Training on the tasks that change first beats a general course." });
+    if (ans("talk") < 2) items.push({ tag: "This quarter", title: "Tell the team what you found, and what you don’t know.", detail: "Share this map. Say plainly what you know, what you don’t, and when you’ll say more, then ask what people are worried about. Don’t promise that no one’s job will change. No manager can keep that promise, and people know it." });
+    if (ans("path") < 2) items.push({ tag: "This quarter", title: "Agree a plan for the most-changed roles.", detail: "For each role near the top of your map, write down which skills to build, which neighboring work they could take on, and the time and budget for it. Decide this before the change arrives. A plan made in a hurry is usually a worse one." });
+    if (items.length < 4) items.push({ tag: "This quarter", title: "Turn freed-up time into better work, on purpose.", detail: "When AI saves time on a task, decide together where that time goes: the people work, quality, the backlog. Teams that don’t decide tend to lose the gain to more of the same." });
+    if (eu) items.push({ tag: "Check", title: "Confirm your AI-literacy duty.", detail: "Since February 2025, Article 4 of the EU AI Act has required organizations that provide or use AI systems to take measures to support the AI literacy of staff dealing with them. Since July 2026 it no longer sets a level each person must reach. Ask whoever handles compliance what that means for your team, and keep a record of who was trained." });
+    items = items.slice(0, eu ? 5 : 4);
+    items.push({ tag: "Ongoing", title: "Re-map twice a year.", detail: "The length of task AI can finish on its own has been doubling every four to seven months, so this map goes stale fast. Re-test the tools on your real work and retake the map in six months. The questions won’t change; your answers should." });
+    return items;
+  }
+
+  /* ---------------- Results ---------------- */
+  function renderResults(partial) {
+    var c = compute(), cfg = CFG;
+    var label = VERDICT[c.verdict] + " · " + c.level.name;
+    S.lastResult = { label: label, score: c.score };
+    var areas = pickSkillAreas(c), plan = buildPlan(c, areas);
+    var sortedRoles = c.roles.slice().sort(function (a, b) { return b.idx - a.idx; });
+    var first = c.tasks.filter(function (t) { return t.lv !== "lo"; }).sort(function (a, b) { return b.impact - a.impact; }).slice(0, 5);
+    var human = c.tasks.filter(function (t) { return t.lv === "lo"; }).sort(function (a, b) { return b.w - a.w; }).slice(0, 5);
+    var conc = c.roles.filter(function (x) { return x.concentrated; });
+    var mostRole = sortedRoles[0];
+    var hiPct = pct(c.by.hi), mdPct = pct(c.by.md), loPct = Math.max(0, 100 - hiPct - mdPct);
+    var html = "";
+
+    /* headline */
+    html += '<div class="aic-eyebrow">Your team’s AI change map · ' + c.N + (c.N === 1 ? " person" : " people") + " · " + S.roles.length + (S.roles.length === 1 ? " role" : " roles") + "</div>" +
+      '<h2 id="aic-t-results" tabindex="-1" style="margin-top:10px">About <span class="aic-num">' + c.score + '%</span> of your team’s work time is in tasks AI could substantially handle by ' + S.year + ".</h2>" +
+      '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;align-items:center"><span class="aic-pill" data-l="' + c.verdict + '">' + VERDICT[c.verdict] + '</span><span class="aic-soft aic-small">Most exposed role: <strong style="color:var(--aic-ink)">' + esc(mostRole.r.name) + "</strong> (" + pct(mostRole.idx) + "%)</span></div>" +
+      '<p class="aic-soft" style="margin-top:14px">This shows which tasks are in reach if today’s trend holds. It doesn’t forecast job losses. Exposed tasks usually change shape first — AI drafts, people check and decide. What happens after that depends on what you do next, and that’s what the plan below is for.</p>';
+
+    var headHtml = html; html = "";
+    /* controls + stacked bar */
+    var ctlHtml = '<div class="aic-card" style="margin-top:22px"><div class="aic-controls">' +
+      '<div class="aic-year"><label for="aic-year" class="aic-lbl">Year</label><input id="aic-year" class="aic-range" type="range" min="2026" max="2030" step="1" value="' + S.year + '" aria-describedby="aic-year-note"><output for="aic-year">' + S.year + "</output></div>" +
+      '<div class="aic-seg" role="group" aria-label="Doubling pace"><button type="button" data-act="pace" data-p="slow" aria-pressed="' + (S.pace === "slow") + '">7-month pace</button><button type="button" data-act="pace" data-p="fast" aria-pressed="' + (S.pace === "fast") + '">4.3-month pace</button></div></div><div data-ref="rBar">';
+    var barHtml = '<p id="aic-year-note" class="aic-small aic-soft" style="margin-top:12px">As of ' + FRONTIER_ASOF + ", the best AI could finish computer tasks of about 16 hours, succeeding about half the time. At a " + PACES[S.pace].label + " (" + PACES[S.pace].note + ") that becomes about <strong>" + fmtHours(c.h) + "</strong> by " + S.year + ". Anything after " + FRONTIER_ASOF + " is extrapolation.</p>" +
+      '<div style="margin-top:18px" class="aic-for">Share of your team’s combined work time</div>' +
+      '<div class="aic-stackbar" style="margin-top:10px" role="img" aria-label="' + hiPct + "% AI can already do a lot of, " + mdPct + "% AI can help with, " + loPct + '% still depends on people"><i class="aic-hi-bg" style="width:' + hiPct + '%"></i><i class="aic-md-bg" style="width:' + mdPct + '%"></i><i class="aic-lo-bg" style="width:' + loPct + '%"></i></div>' +
+      '<ul class="aic-legend"><li><span class="aic-sw aic-hi-bg"></span>' + hiPct + "% AI can already do a lot of</li><li><span class=\"aic-sw aic-md-bg\"></span>" + mdPct + "% AI can help with</li><li><span class=\"aic-sw aic-lo-bg\"></span>" + loPct + "% still depends on people</li></ul>";
+
+    /* team map */
+    html += '<div class="aic-section"><div class="aic-eyebrow">The team map</div><h3 style="margin-top:8px">Every role, task by task</h3><p class="aic-soft aic-small" style="margin-top:6px">Each bar is one role’s week. The wider the segment, the more of the week it takes; the color shows how much AI could take on by ' + S.year + ". Hover over or tab to a segment for details.</p>" +
+      '<div class="aic-card" style="margin-top:14px">' + sortedRoles.map(function (x) {
+        var tot = roleTotal(x.r);
+        var segs = x.r.tasks.map(function (t) {
+          var f = taskFactor(t, S.year, S.pace), lv = levelOf(f), sh = Math.round(t.sh / tot * 100);
+          return '<span class="aic-seg-task aic-' + lv + '-bg" tabindex="0" style="flex:' + t.sh + ' 1 0" aria-label="' + esc(t.t) + ": " + sh + "% of time, " + LEVEL_TXT[lv] + '"><span class="aic-tip" aria-hidden="true"><strong>' + esc(t.t) + "</strong><br>" + sh + "% of the week · " + LEVEL_TXT[lv] + "</span></span>";
+        }).join("");
+        return '<div class="aic-map-row"><div class="aic-map-head"><span><strong>' + esc(x.r.name) + '</strong> <span class="aic-soft aic-small">× ' + x.r.n + '</span></span><span class="aic-small"><span class="aic-num">' + pct(x.idx) + "%</span> exposure</span></div>" +
+          '<div class="aic-map-bar">' + segs + '</div><div class="aic-map-labels" aria-hidden="true">' + x.r.tasks.slice().sort(function (a, b) { return b.sh - a.sh; }).slice(0, 3).map(function (t) { return '<span style="--c:var(--aic-' + levelOf(taskFactor(t, S.year, S.pace)) + ')">' + esc(t.t) + "</span>"; }).join("") + "</div></div>";
+      }).join("") +
+      '<ul class="aic-legend" style="margin-top:14px;padding-top:12px;border-top:1px solid var(--aic-line)"><li><span class="aic-sw aic-hi-bg"></span>AI can do a lot</li><li><span class="aic-sw aic-md-bg"></span>AI can help</li><li><span class="aic-sw aic-lo-bg"></span>Depends on people</li></ul>' +
+      '<details class="aic-noprint" style="margin-top:12px"><summary>Show the map as a table</summary><div class="aic-tablewrap"><table class="aic-table"><thead><tr><th>Role</th><th>Task</th><th class="aic-r">Share</th><th>By ' + S.year + "</th></tr></thead><tbody>" +
+      sortedRoles.map(function (x) { var tot = roleTotal(x.r); return x.r.tasks.map(function (t, i) { return "<tr><td>" + (i ? "" : esc(x.r.name) + " ×" + x.r.n) + "</td><td>" + esc(t.t) + '</td><td class="aic-r">' + Math.round(t.sh / tot * 100) + "%</td><td>" + LEVEL_SHORT[levelOf(taskFactor(t, S.year, S.pace))] + "</td></tr>"; }).join(""); }).join("") +
+      "</tbody></table></div></details></div></div>";
+
+    /* changes first / still people */
+    html += '<div class="aic-section aic-grid2">' +
+      '<div class="aic-card"><div class="aic-eyebrow" style="color:var(--aic-amber)">What changes first</div><p class="aic-small aic-soft" style="margin-top:6px">Ranked by how much team time is in reach.</p><ol class="aic-rank" style="margin-top:8px">' +
+      (first.length ? first.map(function (t) {
+        var y = firstYearInReach(t.len, S.pace);
+        var when = t.lv === "hi" ? (y && y > 2026 ? "In reach from about " + y : "Already in reach") : "AI can help now; a person stays accountable";
+        return '<li><span class="aic-t">' + esc(t.t) + '</span><span class="aic-m">' + esc(t.role) + " · " + t.people + (t.people === 1 ? " person" : " people") + " · ~" + pct(t.share) + "% of their time · " + when + "</span></li>";
+      }).join("") : '<li><span class="aic-t">Nothing on this map is strongly exposed yet.</span><span class="aic-m">Try a later year or the faster pace to see what moves first.</span></li>') + "</ol></div>" +
+      '<div class="aic-card"><div class="aic-eyebrow" style="color:var(--aic-green)">Where your people still add value</div><p class="aic-small aic-soft" style="margin-top:6px">' + pct(c.type.ip) + "% of team time is people and trust work, " + pct(c.type.ph) + "% hands-on, " + pct(c.type.cj) + "% judgment.</p><ol class=\"aic-rank\" style=\"margin-top:8px\">" +
+      (human.length ? human.map(function (t) {
+        var why = t.ty === "ip" ? "Trust, relationships, reading people" : t.ty === "ph" ? "Physical presence and hands-on skill" : t.ty === "cj" ? "Judgment on long, open-ended work" : "Longer than what AI can do reliably today";
+        return '<li><span class="aic-t">' + esc(t.t) + '</span><span class="aic-m">' + esc(t.role) + " · ~" + pct(t.share) + "% of their time · " + why + "</span></li>";
+      }).join("") : '<li><span class="aic-t">Very little of this team’s mapped work is people or hands-on work.</span><span class="aic-m">So the judgment and review skills below matter more. That’s where the human value moves.</span></li>') +
+      '</ol><p class="aic-small aic-soft" style="margin-top:10px">Even in exposed tasks, people still own the standard, the decision and the accountability. That doesn’t show up as a color, but it’s often the most valuable part.</p></div></div>';
+
+    /* concentration */
+    if (conc.length) {
+      html += '<div class="aic-note" style="margin-top:20px"><strong>When one task is most of the job</strong>' +
+        conc.map(function (x) { return esc(x.r.name) + " is built around “" + esc(x.top.t.toLowerCase()) + "” (about " + pct(x.top.share) + "% of the role)"; }).join("; ") +
+        ". Two economists who study automation, Gans and Goldfarb, find that firms have the most reason to automate a job’s core task, because that can remove the whole position. Jobs made of many different parts tend to fare better. That’s why widening these roles is on the list below.</div>";
+    }
+
+    /* readiness */
+    html += '<div class="aic-section"><div class="aic-eyebrow">How ready the team is to manage it</div><div class="aic-card" style="margin-top:10px"><div class="aic-level"><div><div class="aic-for">Readiness level</div><h3 style="font-size:24px;margin-top:4px">' + c.level.name + '</h3></div><div class="aic-lvl-steps" role="img" aria-label="Level ' + c.level.step + ' of 4">' + [1, 2, 3, 4].map(function (i) { return '<i class="' + (i <= c.level.step ? "on" : "") + '"></i>'; }).join("") + '</div><span class="aic-soft aic-small">' + c.ready + "/100 from your answers</span></div><p class=\"aic-soft\" style=\"margin-top:12px\">" + c.level.desc + "</p>" +
+      '<div class="aic-grid2" style="margin-top:16px">' + SCORED.map(function (q) {
+        var v = ans(q.id), names = { policy: "AI policy", trust: "Knowing when not to trust AI", use: "Use on real work", training: "Training", talk: "Talking about it", path: "Path for changed roles" };
+        return '<div><div style="display:flex;justify-content:space-between;font-size:13.5px;font-weight:700"><span>' + names[q.id] + '</span><span class="aic-soft">' + ["Not started", "Informal", "In place", "Strong"][v] + '</span></div><div class="aic-meter" style="margin-top:6px" role="img" aria-label="' + names[q.id] + ": " + v + ' of 3"><i class="' + (v < 2 ? "aic-low" : "") + '" style="width:' + Math.max(6, v / 3 * 100) + '%"></i></div></div>';
+      }).join("") + "</div></div></div>";
+
+    /* reskilling */
+    html += '<div class="aic-section"><div class="aic-eyebrow">Priority reskilling areas</div><h3 style="margin-top:8px">The skills to build first</h3><p class="aic-soft aic-small" style="margin-top:6px">Picked from your team’s task mix and your answers. In the World Economic Forum’s Future of Jobs Report 2025, 63% of employers named the skills gap as their top barrier.</p><div class="aic-stack" style="margin-top:14px">' +
+      areas.map(function (x, i) {
+        return '<div class="aic-card aic-skill"><div class="aic-for">Priority ' + (i + 1) + (x.who.length ? " · Most relevant for: " + x.who.map(esc).join(", ") : "") + "</div><h3 style=\"margin-top:6px\">" + x.a.title + '</h3><p class="aic-soft">' + x.a.why + "</p><ul>" + x.a.skills.map(function (s) { return "<li>" + s + "</li>"; }).join("") + "</ul></div>";
+      }).join("") + "</div></div>";
+
+    /* plan */
+    html += '<div class="aic-section"><div class="aic-eyebrow">Your plan</div><h3 style="margin-top:8px">Where to begin</h3><p class="aic-soft aic-small" style="margin-top:6px">Matched to your answers. Each one is a no-regrets move: worth doing even if AI progress stalls tomorrow, because it’s also just good management.</p><div class="aic-stack" style="margin-top:14px">' +
+      plan.map(function (p) { return '<div class="aic-card aic-action"><span class="aic-tag ' + (p.tag === "Ongoing" ? "aic-tag-green" : p.tag === "Check" ? "aic-tag-amber" : "") + '">' + p.tag + "</span><h3>" + p.title + "</h3><p>" + p.detail + "</p></div>"; }).join("") + "</div>" +
+      '<div style="margin-top:18px"><details><summary>What your team’s AI policy should actually say (one page)</summary><div class="aic-method"><ol>' +
+      "<li><strong>Approved tools.</strong> Which AI tools are allowed for work, on which accounts. Business accounts whose data terms someone has read, not personal free ones.</li>" +
+      "<li><strong>The never-list.</strong> What must never go into an AI tool: customer and personal data, health and HR information, financials, passwords, anything under NDA.</li>" +
+      "<li><strong>The checking rule.</strong> Nothing AI-written reaches a customer, a decision about a person, or a public channel without a person reading it.</li>" +
+      "<li><strong>Human-decides tasks.</strong> What AI may never decide alone: hiring and performance decisions, payments, anything irreversible.</li>" +
+      "<li><strong>Disclosure.</strong> When to tell customers or colleagues that AI was used.</li>" +
+      "<li><strong>Who to ask, and no blame.</strong> One named person for questions, and a promise: if something goes wrong, say so early and you won’t be in trouble.</li>" +
+      (S.answers.eu !== 1 ? "<li><strong>Training record.</strong> Who has been trained on which tools, to show the AI-literacy measures Article 4 of the EU AI Act expects.</li>" : "") +
+      "</ol></div></details>" +
+      '<details><summary>When not to trust AI: the team checklist</summary><div class="aic-method"><p>Use AI to draft, summarize and suggest. A person checks, or decides, when:</p><ul>' +
+      "<li><strong>It states a fact, figure, quote or source.</strong> These can be made up and still look perfect. Check against the original.</li>" +
+      "<li><strong>It’s about a specific person.</strong> Hiring, performance, health, money: a person decides and can explain why.</li>" +
+      "<li><strong>It can’t be undone.</strong> Payments, deletions, offers, anything sent to a regulator or the public.</li>" +
+      "<li><strong>It depends on context the tool can’t see.</strong> The customer’s history, last week’s decision, the unwritten rule.</li>" +
+      "<li><strong>It sounds most confident.</strong> Confidence is not accuracy. The smoother the answer on a hard question, the more it needs checking.</li>" +
+      "<li><strong>The request is urgent and unusual.</strong> A voice or message asking for money or access gets verified on a channel you already trust.</li>" +
+      "</ul></div></details></div></div>";
+
+    /* caveats */
+    html += '<div class="aic-section"><div class="aic-eyebrow">Read this before you share it</div><div class="aic-card aic-method" style="margin-top:10px;padding-bottom:20px"><ul>' +
+      "<li><strong>Exposure is not job loss.</strong> Jobs are bundles of tasks. Automating some tasks can change a role or even grow it, depending on what you do with the time.</li>" +
+      "<li><strong>Capability is not adoption.</strong> The map shows what AI could take on, not what it will in your organization. Cost, trust, rules and habits move more slowly than capability.</li>" +
+      "<li><strong>The trend is real but narrow, and may not continue.</strong> METR measures software and reasoning tasks. Computer work with messy context, and anything physical, lag behind. The trend could hold, speed up or stall, and serious people disagree about which.</li>" +
+      "<li><strong>The profiles are generic.</strong> Each role starts from an approximate task mix. Adjust tasks to match your team, and test the top tasks on real work before acting on them.</li>" +
+      "<li><strong>People will read this personally.</strong> In a 2025 Pew Research Center survey, 64% of the US public expected AI to mean fewer jobs, and Ipsos found about a third of workers expect AI to replace their own. Share the map with context and a plan, never as a list of roles at risk. If someone is struggling, point them to your employee assistance program or a professional.</li>" +
+      "</ul></div></div>";
+
+    /* next steps */
+    var heavy = c.score >= 30 || conc.length > 0, noPath = ans("path") < 2;
+    var solution = (heavy && noPath) ? {
+      cta: "get_matched", lead: "advisory", url: cfg.matchUrl, label: "Get matched to someone",
+      title: "Get help planning the reskilling",
+      reason: "About " + c.score + "% of your team’s time is in exposed tasks" + (conc.length ? ", some roles are built around one core task," : "") + " and there’s no plan yet for the people whose work changes most. An LLPA member can help you plan the reskilling and the conversation with your team.",
+      alt: { cta: "learn_with_member", lead: "training", url: cfg.coursesUrl, label: "Or find team AI training" }
+    } : {
+      cta: "learn_with_member", lead: "training", url: cfg.coursesUrl, label: "Learn with a member",
+      title: "Train the team on the tasks that change first",
+      reason: "Your first priority is " + areas[0].a.title.toLowerCase() + ". A practical course from an LLPA member, built on your team’s real tasks, closes that gap faster than everyone figuring it out alone.",
+      alt: { cta: "get_matched", lead: "advisory", url: cfg.matchUrl, label: "Or get matched to someone for reskilling support" }
+    };
+    html += '<div class="aic-section"><div class="aic-eyebrow">What to do next</div><div class="aic-cta" style="margin-top:12px">' +
+      '<div class="aic-card"><div class="aic-for">Your next step</div><h3>Take the map to your next team meeting</h3><p class="aic-soft aic-small">Print it or save it as a PDF, then walk through the “changes first” list with the team. Ask them which tasks the profile got wrong. They’ll know.</p><button type="button" class="aic-btn aic-btn-ghost" data-act="print">Print or save as PDF</button></div>' +
+      '<div class="aic-card aic-cta-solution"><div class="aic-for">Need more than an answer?</div><h3>' + solution.title + '</h3><p class="aic-small" style="color:var(--aic-ink)">' + solution.reason + "</p>" +
+      '<a class="aic-btn aic-btn-primary" data-cta="' + solution.cta + '" data-lead="' + solution.lead + '" data-base="' + esc(solution.url) + '" href="#">' + solution.label + "</a>" +
+      '<a class="aic-small" style="margin-top:4px" data-cta="' + solution.alt.cta + '" data-lead="' + solution.alt.lead + '" data-base="' + esc(solution.alt.url) + '" href="#">' + solution.alt.label + "</a></div></div>" +
+      '<div class="aic-handoff"><a class="aic-btn aic-btn-ghost" data-cta="email_results" data-lead="results_email" data-base="' + esc(cfg.resultsFormUrl) + '" href="#">Email me my results</a>' +
+      '<span class="aic-soft">We’ll only email your results. The newsletter is separate: <a data-cta="newsletter" data-lead="newsletter" data-base="' + esc(cfg.newsletterUrl) + '" href="#">sign up here</a> if you want to keep up without keeping up with everything.</span></div></div>';
+
+    /* method + sources */
+    html += '<div class="aic-section"><details><summary>How the map works, and sources</summary><div class="aic-method">' +
+      "<p><strong>The frontier.</strong> Researchers at METR measure the length of task (in human working time) that AI agents can complete with 50% reliability. That length has been doubling roughly every seven months over six years (arXiv 2503.14499), and faster, about every 4.3 months, since 2024. This tool freezes a snapshot: about 16 hours for the best model as of " + FRONTIER_ASOF + " (metr.org/time-horizons). Everything after that date is extrapolation at the pace you choose. METR measures software and reasoning tasks, not all work, and its measurements are less certain at the longest lengths.</p>" +
+      "<p><strong>Each task.</strong> A task counts toward exposure by its share of the role’s time × how fully its typical length fits inside the frontier for the chosen year (min of 1 and frontier ÷ task length) × a weight for its type: routine computer work 0.90, judgment at a computer 0.45, people and trust 0.12, physical 0.04. The weights discount non-computer work because the measured frontier is about computer tasks. A task is shown as “AI can do a lot” at 0.6 or above, “AI can help” from 0.25, and “depends on people” below that.</p>" +
+      "<p><strong>The team.</strong> Role exposure is the time-weighted average of its tasks. Team exposure weights each role by headcount, assuming similar hours per person. “What changes first” ranks tasks by people × share of time × task factor.</p>" +
+      "<p><strong>Readiness.</strong> Your six scored answers (0–3 each) give a 0–100 score and one of four levels. It’s a rough guide, not a measured diagnostic — use it to start a conversation, not to settle one. The EU question only changes the plan.</p>" +
+      "<p><strong>Sources.</strong> METR, “Measuring AI Ability to Complete Long Tasks” (arXiv 2503.14499) and metr.org/time-horizons (snapshot April 2026). Task profiles: editorial approximations of typical task mixes, in the spirit of O*NET task data, shared with AI Channel’s Check Your Job. Gans &amp; Goldfarb, “O-Ring Automation” (NBER w34639). WEF Future of Jobs Report 2025. Pew Research Center (2025). Ipsos AI monitor. EU AI Act Article 4 (applies from 2 February 2025). Figures as of the dates shown; tool content current as of November 2026. This map is general guidance, not legal or HR advice.</p>" +
+      "</div></details></div>";
+
+    html += '<div class="aic-nav aic-noprint"><button type="button" class="aic-btn aic-btn-ghost" data-act="back" data-to="team">← Edit the team</button><button type="button" class="aic-link" data-act="restart">Start over</button></div>';
+
+    if (partial && $("rHead")) {
+      $("rHead").innerHTML = headHtml; $("rBar").innerHTML = barHtml; $("rBody").innerHTML = html;
+      ROOT.querySelectorAll('[data-act="pace"]').forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-p") === S.pace)); });
+      ROOT.querySelector("#aic-year + output").textContent = S.year;
+      return;
+    }
+    $("results").innerHTML = '<div data-ref="rHead">' + headHtml + "</div>" + ctlHtml + barHtml + '</div></div><div data-ref="rBody">' + html + "</div>";
+    if (!S.completed) { S.completed = true; emit("tool_completed", { assessment_result: label, score: c.score }); }
+    emit("result_viewed", { assessment_result: label, score: c.score, year: S.year, pace: S.pace });
+  }
+  /* update results on year/pace change, keeping the controls (and focus) in place */
+  function rerender() { renderResults(true); }
+
+  /* ---------------- Events ---------------- */
+  ROOT.addEventListener("click", function (e) {
+    var opt = e.target.closest(".aic-opt"); if (opt) { selectOpt(opt); return; }
+    var cta = e.target.closest("[data-cta]");
+    if (cta) {
+      var base = cta.getAttribute("data-base"), name = cta.getAttribute("data-cta"), lead = cta.getAttribute("data-lead");
+      var fields = name === "newsletter" ? { source_page: window.location.href, source_content_or_tool: SLUG, cta_clicked: name } : leadFields(name, lead);
+      emit("cta_clicked", { cta: name, lead_type: lead, assessment_result: (S.lastResult || {}).label, score: (S.lastResult || {}).score });
+      if (!isSet(base)) { e.preventDefault(); return; }
+      cta.href = buildUrl(base, fields);
+      cta.target = CFG.linkTarget || "_self";
+      return;
+    }
+    var b = e.target.closest("[data-act]"); if (!b) return;
+    var act = b.getAttribute("data-act"), r;
+    switch (act) {
+      case "start": if (!S.started) { S.started = true; emit("tool_started"); } show("team"); break;
+      case "back": show(b.getAttribute("data-to")); break;
+      case "toToday": if (S.roles.length) { renderQuestions(); show("today"); } break;
+      case "toResults": show("results"); break;
+      case "sector": var i = +b.getAttribute("data-i"); S.openSector = S.openSector === i ? null : i; renderSectors(); var nb = ROOT.querySelector('[data-act="sector"][data-i="' + i + '"]'); if (nb) nb.focus(); break;
+      case "addOcc": addRole(b.getAttribute("data-name"), false); break;
+      case "pickSuggest": pickSuggest(+b.getAttribute("data-i")); break;
+      case "addCustom": var inp = ROOT.querySelector("#aic-custom"), v = inp.value.trim(); if (!v) { inp.focus(); return; } addRole(v.slice(0, 60), true); inp.value = ""; break;
+      case "example":
+        S.roles = []; [["Customer service representative", 8], ["HR specialist", 2], ["Data analyst", 2], ["Project manager", 1]].forEach(function (x) { addRole(x[0], false); S.roles[S.roles.length - 1].n = x[1]; });
+        renderRoles(); break;
+      case "inc": case "dec": r = roleById(b); if (!r) return; r.n = Math.max(1, Math.min(999, r.n + (act === "inc" ? 1 : -1))); b.parentElement.querySelector("input").value = r.n; renderRoles(); var cb = ROOT.querySelector('[data-role="' + r.id + '"] [data-act="' + act + '"]'); if (cb) cb.focus(); break;
+      case "toggleTasks": r = roleById(b); r.open = !r.open; renderRoles(); ROOT.querySelector('[data-role="' + r.id + '"] [data-act="toggleTasks"]').focus(); break;
+      case "removeRole": r = roleById(b); S.roles = S.roles.filter(function (x) { return x !== r; }); renderRoles(); search.focus(); break;
+      case "rmTask": r = roleById(b); if (r.tasks.length <= 1) return; r.tasks.splice(+b.closest(".aic-task").getAttribute("data-i"), 1); renderRoles(); break;
+      case "addTask": r = roleById(b); r.tasks.push({ t: "New task", sh: 10, len: 1, ty: "cj" }); renderRoles(); var ins = ROOT.querySelectorAll('[data-role="' + r.id + '"] .aic-task-name[data-f="t"]'); if (ins.length) { ins[ins.length - 1].focus(); ins[ins.length - 1].select(); } break;
+      case "pace": S.pace = b.getAttribute("data-p"); rerender(); break;
+      case "print": window.print(); break;
+      case "restart": S.roles = []; S.answers = {}; S.year = 2026; S.pace = "slow"; S.completed = false; S.started = false; renderRoles(); show("intro"); break;
+    }
+  });
+  ROOT.addEventListener("input", function (e) {
+    var el = e.target, f = el.getAttribute("data-f");
+    if (el.id === "aic-year") { S.year = +el.value; rerender(); return; }
+    if (!f) return;
+    var r = roleById(el); if (!r) return;
+    if (f === "name") { r.name = el.value || "Unnamed role"; return; }
+    if (f === "n") { var n = parseInt(el.value, 10); if (n >= 1) { r.n = Math.min(999, n); var total = S.roles.reduce(function (s, x) { return s + x.n; }, 0); $("teamHint").textContent = total + " people on the map"; } return; }
+    var t = r.tasks[+el.closest(".aic-task").getAttribute("data-i")];
+    if (f === "t") t.t = el.value || "Unnamed task";
+    if (f === "sh") { t.sh = +el.value; refreshShares(el.closest("[data-role]"), r); }
+  });
+  ROOT.addEventListener("change", function (e) {
+    var el = e.target, f = el.getAttribute("data-f"); if (!f) return;
+    var r = roleById(el); if (!r) return;
+    if (f === "n") { r.n = Math.max(1, Math.min(999, parseInt(el.value, 10) || 1)); renderRoles(); return; }
+    if (f === "name") { renderRoles(); return; }
+    if (f === "ty" || f === "len") { var t = r.tasks[+el.closest(".aic-task").getAttribute("data-i")]; if (f === "ty") t.ty = el.value; else t.len = +el.value; }
+  });
+  ROOT.addEventListener("keydown", function (e) {
+    var opt = e.target.closest && e.target.closest(".aic-opt"); if (!opt) return;
+    var opts = Array.prototype.slice.call(opt.parentElement.querySelectorAll(".aic-opt")), i = opts.indexOf(opt), n = null;
+    if (e.key === "ArrowDown" || e.key === "ArrowRight") n = opts[(i + 1) % opts.length];
+    if (e.key === "ArrowUp" || e.key === "ArrowLeft") n = opts[(i - 1 + opts.length) % opts.length];
+    if (e.key === " " || e.key === "Enter") { e.preventDefault(); selectOpt(opt); return; }
+    if (n) { e.preventDefault(); n.focus(); selectOpt(n); }
+  });
+  /* open collapsed sections when printing */
+  window.addEventListener("beforeprint", function () { ROOT.querySelectorAll("details:not(.aic-noprint)").forEach(function (d) { if (!d.open) { d.setAttribute("data-was-closed", ""); d.open = true; } }); });
+  window.addEventListener("afterprint", function () { ROOT.querySelectorAll("details[data-was-closed]").forEach(function (d) { d.open = false; d.removeAttribute("data-was-closed"); }); });
+
+  renderSectors(); renderRoles(); show("intro", true);
+})();
+</script>
+<!-- AIC:END -->
+</body>
+</html>
+
+</body></html>

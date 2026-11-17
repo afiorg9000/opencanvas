@@ -1,0 +1,901 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>digital-resilience-checklist</title><style>html,body{margin:0;background:#F7F8FA}@media (prefers-color-scheme:dark){html,body{background:#F7F8FA}}</style></head><body>
+<!--
+TOOL: Digital Resilience Checklist
+FILE: digital-resilience-checklist.html   (slug: digital-resilience-checklist)   TYPE: tool (interactive, printable)
+TITLE (H1): business "Could your business get through an outage, a hacked account or a lost laptop?";
+  household "Could your household get through an outage, a hacked account or a lost phone?"
+AUDIENCE: Small businesses (default edition) and households (switch at the top). Copy differs per edition for
+  every one of the 20 checks.
+
+WHAT IT DOES: 20 checks in four areas: Who can get into your accounts? (passkeys/2SV, unique passwords + manager,
+  offline recovery codes, second admin / trusted contact, leavers / device wiping, auto-updates); Could you get your
+  data back? (separate backup, one copy disconnected, restore tested, someone else can restore / phone backup);
+  What happens when the internet or power goes? (numbers on paper, payments/hotspot, outage plan / medicines plan,
+  status pages, AI-tool fallbacks / documents offline); Could someone talk their way in? (call-back rule,
+  two-person approval / family code word, no-blame reporting, tabletop / family talk, who to call incl. GDPR 72h).
+  Each check has a priority (Do first / Important / Good practice), a one-line why-and-how, and Done / Partly /
+  Not yet / N/A. Sticky tally. Result: priority-weighted % with named level, area bars, "Do these next" (top three
+  open checks by priority), a fork closing, Print (checklist with answers + an offline card with blank lines;
+  never passwords), or "Print a blank checklist" without answering. Next step: AI & Digital Dependency Score.
+  Member route: business with % < 70 or any open "Do first" -> matchUrl; otherwise coursesUrl. Email me my
+  results + separate newsletter link.
+
+SOURCES (checked 4 Nov 2026): NCSC Small organisations guide to cyber security (pub. 9 Apr 2026, reviewed 21 Jul
+  2026); CISA Secure Our World; DSIT Cyber security breaches survey 2025/2026 (30 Apr 2026: 43% breach/attack,
+  phishing 38%, incident response plans 25%); FBI IC3 2025 report (BEC $3.05bn); FTC family emergency scams;
+  International AI Safety Report 2026 summary (cloned-voice family scams); Ready.gov power outages; GDPR Art. 33.
+
+WHAT CHANGED vs aidoomsdayguide.com/tools/digital-resilience-checklist/: the original was 10 bare checkboxes
+  ("Secure primary email") with a count and three generic tips, and printed the page as-is. This version has
+  separate business and household editions, explains why and how for every check, prioritises, gives partial
+  credit, names what to do next, and prints a clean checklist plus an offline card. Facts verified and dated;
+  AI-era risks (voice clones, AI-tool dependency) included without hype; AI Channel next steps; no ads or
+  "doomsday" branding.
+
+PRIVACY: in-browser only; answers in sessionStorage for this tab (try/catch). No network requests, cookies or
+  localStorage.
+
+HOW TO EMBED IN WORDPRESS: (a) Custom HTML block: paste everything between "BEGIN AI CHANNEL TOOL" and "END AI
+  CHANNEL TOOL". Printing from a theme page may include the theme header/footer; the iframe prints cleanly.
+  (b) iframe: <iframe src="/tools/digital-resilience-checklist.html" title="Digital resilience checklist"
+  style="width:100%;min-height:2200px;border:0" loading="lazy"></iframe>
+
+CONFIG URLS (window.AICHANNEL_CONFIG): resultsFormUrl, coursesUrl, matchUrl, newsletterUrl, contentBaseUrl (prefix
+  for ai-dependency-score.html). CTA query fields: lead_type, audience (business | individual), source_page,
+  source_content_or_tool, cta_clicked, assessment_name, assessment_result (level), score (%), utm_*. Events:
+  tool_started, tool_completed, result_viewed, cta_clicked (also print_blank, print_checklist).
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Digital Resilience Checklist: outages, hacked accounts, backups and offline plans</title>
+<meta name="description" content="A printable checklist for small businesses and households: accounts, backups, outages and scams, with what to do next and an offline card.">
+<!-- AI Channel design A: tool design system v2 (visual layer only; no behaviour changes) -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style id="aic-theme">
+/* ---------- tokens ---------- */
+:root,html{color-scheme:light!important;
+ --pine:#2859c7!important;--pine-deep:#1945ac!important;--accent:#2859c7!important;--accent-deep:#1945ac!important;--primary:#2859c7!important;--blue:#2859c7!important;--blue-d:#1945ac!important;
+ --paper:#ffffff!important;--bg:#ffffff!important;--white:#fff!important;--card:#fff!important;--ink:#14213d!important;--ink-soft:#3f4a5c!important;--ink-mute:#5b6577!important;--muted:#3f4a5c!important;
+ --line:#d9e2f0!important;--sage:#eef3fc!important;--amber-soft:#fbf3e4!important;--accent-wash:#eef3fc!important;--blue-wash:#eef3fc!important;--sky:#eef3fc!important;--pale:#f4f7fc!important;--warm:#f4f7fc!important;
+ --serif:"Newsreader",Georgia,serif!important;--sans:"Inter",system-ui,sans-serif!important;--mono:"IBM Plex Mono",ui-monospace,monospace!important}
+html body .aic-tool,html body .aic-article{
+ --aic-paper:#ffffff!important;--aic-white:#ffffff!important;--aic-ink:#14213d!important;--aic-soft:#46526a!important;--aic-line:#d9e2f0!important;--aic-sage:#eef3fc!important;
+ --aic-blue:#2859c7!important;--aic-blue-deep:#1945ac!important;--aic-blue-soft:#eef3fc!important;--aic-on-blue:#ffffff!important;--aic-focus:#9fbcff!important;
+ --aic-grey:#46526a!important;--aic-grey-soft:#f4f7fc!important;
+ --aic-radius:16px!important;--aic-radius-sm:12px!important;--aic-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important;
+ color-scheme:light!important;background:#fff!important;color:#14213d!important;
+ font-family:"Inter",system-ui,sans-serif!important;-webkit-font-smoothing:antialiased}
+html,body{background:#fff!important}
+html body .aic-tool{padding:56px 0 96px!important}
+html body .aic-article{padding:0 0 112px!important}
+html body .aic-tool .aic-col,html body .aic-article .aic-col{max-width:860px!important}
+@media(min-width:600px){html body .aic-tool .aic-col,html body .aic-article .aic-col{padding-inline:32px!important}}
+
+/* ---------- type ---------- */
+html body .aic-tool .aic-h1,html body .aic-article h1,body h1{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important;line-height:1.02!important;font-size:clamp(38px,5.4vw,62px)!important;color:#14213d}
+html body .aic-tool .aic-h2,html body .aic-article h2,body h2{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important;line-height:1.1!important}
+html body .aic-article h2{font-size:clamp(28px,3.6vw,38px)!important;margin-top:72px!important}
+html body .aic-tool .aic-h2{font-size:clamp(26px,3.4vw,36px)!important}
+html body .aic-tool .aic-h3,html body .aic-article h3,body h3{font-family:"Newsreader",Georgia,serif!important;font-weight:550!important;letter-spacing:-.01em!important;font-size:22px!important;line-height:1.2!important}
+body h4,body h5,body h6{font-family:"Inter",system-ui,sans-serif!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow,html body .aic-tool .aic-qnum,html body .aic-tool .aic-nav-hint,.aic-mono{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;letter-spacing:.06em!important;text-transform:uppercase;font-size:12px!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow{color:#2859c7!important;display:flex!important;align-items:center;gap:12px}
+html body .aic-tool .aic-eyebrow::before,html body .aic-article .aic-head .aic-eyebrow::before{content:"";width:28px;height:1px;background:#2859c7;flex:none}
+html body .aic-tool .aic-lede,html body .aic-article .aic-lede,html body .aic-article .aic-dek{font-size:20px!important;line-height:1.55!important;color:#3f4a5c!important;max-width:60ch}
+html body .aic-tool .aic-soft,html body .aic-tool .aic-small{color:#46526a!important}
+html body .aic-tool .aic-small{font-size:14px!important}
+html body .aic-article{font-size:18.5px!important;line-height:1.72!important}
+html body .aic-article p+p{margin-top:22px!important}
+html body .aic-article .aic-head{padding:72px 0 40px!important;border-bottom:1px solid #d9e2f0;margin-bottom:48px}
+html body .aic-article .aic-meta,html body .aic-article .aic-head p:not(.aic-lede):not(.aic-dek){font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px!important;letter-spacing:.03em;color:#5b6577!important}
+html body .aic-tool a,html body .aic-article a{color:#2859c7}
+
+/* ---------- panels ---------- */
+html body .aic-tool .aic-card,html body .aic-article .aic-card{background:#fff!important;border:1px solid #d9e2f0!important;border-radius:16px!important;box-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important}
+@media(min-width:600px){html body .aic-tool .aic-card{padding:36px 40px!important}html body .aic-article .aic-card{padding:32px 36px!important}}
+html body .aic-tool .aic-stack>*+*{margin-top:20px!important}
+html body .aic-tool .aic-grid2,html body .aic-article .aic-grid{gap:16px!important}
+/* the short answer: a framed figure, like the site's tool previews */
+html body .aic-article .aic-short{background:#fff!important;border:1px solid #d9e2f0!important;box-shadow:0 0 0 10px #eef3fc,0 0 0 11px #d9e2f0!important;margin:12px 11px 56px!important;border-radius:12px!important;border-left:1px solid #d9e2f0!important}
+html body .aic-article .aic-short .aic-eyebrow,html body .aic-article .aic-short>:first-child{color:#2859c7!important}
+/* notes and callouts */
+html body .aic-tool .aic-note,html body .aic-article .aic-note,html body .aic-article .aic-callout{background:#f4f7fc!important;border-left:3px solid #2859c7!important;border-radius:0 12px 12px 0!important;padding:18px 22px!important;font-size:15.5px!important;color:#14213d!important}
+html body .aic-tool .aic-note.aic-warn{background:#fdf7ec!important;border-left-color:#a46207!important}
+html body .aic-tool .aic-note.aic-bad{background:#fdf0ee!important;border-left-color:#b42318!important}
+html body .aic-tool .aic-note.aic-good{background:#eef8f1!important;border-left-color:#2f7a4e!important}
+/* calls to action become navy bands */
+html body .aic-tool .aic-cta,html body .aic-article .aic-cta,html body .aic-tool .aic-dark,html body .aic-article .aic-dark{--aic-ink:#ffffff!important;--aic-soft:#c9d6ee!important;--aic-white:#13264a!important;--aic-line:#2a3f6a!important;--aic-blue:#9fbcff!important;--aic-blue-soft:#1d3563!important;--aic-on-blue:#13264a!important;
+ background:#13264a!important;color:#fff!important;border-color:#13264a!important;box-shadow:none!important}
+html body .aic-tool .aic-cta *:not(.aic-btn):not(.aic-btn *),html body .aic-article .aic-cta *:not(.aic-btn):not(.aic-btn *){color:inherit}
+html body .aic-tool .aic-cta .aic-btn-primary,html body .aic-article .aic-cta .aic-btn-primary{background:#fff!important;color:#13264a!important;border-color:#fff!important}
+html body .aic-tool .aic-cta a:not(.aic-btn),html body .aic-article .aic-cta a:not(.aic-btn){color:#9fbcff!important}
+
+/* ---------- questions and answer options ---------- */
+html body .aic-tool .aic-q{margin-top:28px!important}
+html body .aic-tool .aic-qnum{color:#2859c7!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;font-size:clamp(22px,2.6vw,27px)!important;line-height:1.22!important;letter-spacing:-.01em!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qhint{font-size:15px!important;color:#46526a!important;margin-bottom:18px!important}
+html body .aic-tool .aic-opts{gap:10px!important;margin-top:18px!important}
+html body .aic-tool .aic-opt,html body .aic-tool .aic-pick,html body .aic-tool .aic-check{background:#fff!important;border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:16px 18px!important;font-size:16px!important;gap:14px!important;transition:border-color .15s,box-shadow .15s,background-color .15s,transform .15s!important}
+html body .aic-tool .aic-opt:hover,html body .aic-tool .aic-pick:hover,html body .aic-tool .aic-check:hover{border-color:#2859c7!important;box-shadow:0 6px 18px rgba(40,89,199,.10)!important;transform:translateY(-1px)}
+html body .aic-tool .aic-opt[aria-checked="true"],html body .aic-tool .aic-opt[aria-pressed="true"],html body .aic-tool .aic-pick:has(input:checked),html body .aic-tool .aic-check:has(input:checked),html body .aic-tool .aic-opt:has(input:checked){border-color:#2859c7!important;background:#f4f7fc!important;box-shadow:0 0 0 3px #dbe6fb!important}
+html body .aic-tool .aic-dot{width:22px!important;height:22px!important;border:2px solid #9aa8c0!important}
+html body .aic-tool .aic-dot::after{inset:4px!important;background:#2859c7!important}
+html body .aic-tool .aic-opt[aria-checked="true"] .aic-dot{border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-size:14px!important;color:#46526a!important;margin-top:4px!important}
+html body .aic-tool .aic-opt.aic-opt-unsure{background:transparent!important;border-style:dashed!important}
+html body .aic-tool input[type=text],html body .aic-tool input[type=search],html body .aic-tool input[type=email],html body .aic-tool textarea,html body .aic-tool select,html body .aic-tool .aic-input{border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:14px 16px!important;background:#fff!important;font-size:16px!important}
+html body .aic-tool input:focus,html body .aic-tool textarea:focus,html body .aic-tool select:focus{border-color:#2859c7!important;outline:none!important;box-shadow:0 0 0 3px #dbe6fb!important}
+
+/* ---------- controls ---------- */
+html body .aic-tool .aic-btn,html body .aic-article .aic-btn{min-height:50px!important;padding:14px 24px!important;font-weight:600!important;font-size:15px!important;border-radius:999px!important;border:1.5px solid #c9d6ee!important;box-shadow:none!important}
+html body .aic-tool .aic-btn:hover,html body .aic-article .aic-btn:hover{border-color:#2859c7!important}
+html body .aic-tool .aic-btn-primary,html body .aic-article .aic-btn-primary{background:#2859c7!important;border-color:#2859c7!important;color:#fff!important}
+html body .aic-tool .aic-btn-primary:hover,html body .aic-article .aic-btn-primary:hover{background:#1945ac!important;border-color:#1945ac!important}
+html body .aic-tool .aic-btn-ghost{border-color:transparent!important;text-decoration:underline;text-underline-offset:4px;color:#3f4a5c!important}
+html body .aic-tool .aic-btn[disabled]{opacity:.4!important}
+html body .aic-tool .aic-nav{margin-top:36px!important;padding-top:24px!important;border-top:1px solid #d9e2f0!important}
+html body .aic-tool .aic-actions{gap:12px!important}
+html body .aic-tool .aic-seg{border:1.5px solid #d9e2f0!important;padding:4px!important}
+html body .aic-tool .aic-seg button{font-weight:600!important;color:#3f4a5c!important}
+html body .aic-tool .aic-seg button[aria-pressed="true"],html body .aic-tool .aic-seg button[aria-checked="true"]{background:#13264a!important;color:#fff!important}
+html body .aic-tool .aic-progress{height:4px!important;background:#e3eaf6!important;margin:20px 0 8px!important}
+html body .aic-tool .aic-progress span,html body .aic-tool .aic-progress i{background:#2859c7!important}
+html body .aic-tool .aic-chip,html body .aic-tool .aic-pill{border:1.5px solid #d9e2f0!important;background:#fff!important;font-weight:600!important;border-radius:999px!important}
+html body .aic-tool .aic-chip[aria-pressed="true"],html body .aic-tool .aic-chip.aic-on,html body .aic-tool .aic-pill.aic-on{background:#eef3fc!important;border-color:#2859c7!important;color:#1945ac!important}
+html body .aic-tool .aic-tag,html body .aic-article .aic-tag{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;padding:5px 11px!important}
+html body .aic-tool .aic-privacy{font-size:14px!important;color:#46526a!important;margin-top:20px!important}
+
+/* ---------- results ---------- */
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-stat b,html body .aic-tool .aic-stat strong,html body .aic-tool .aic-display{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important}
+html body .aic-tool .aic-bar{height:8px!important;background:#e3eaf6!important}
+html body .aic-tool .aic-bar-row{padding:14px 0!important;border-bottom-color:#e3eaf6!important}
+html body .aic-tool .aic-bar-label{font-weight:600!important}
+html body .aic-tool table,html body .aic-article table{border-collapse:collapse}
+html body .aic-tool th,html body .aic-article th{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;text-transform:uppercase;color:#2859c7!important;background:#f4f7fc!important}
+html body .aic-tool td,html body .aic-article td{border-color:#e3eaf6!important}
+html body .aic-article .aic-sources,html body .aic-tool .aic-sources{font-size:14px!important;color:#46526a!important;border-top:1px solid #d9e2f0;padding-top:32px!important;margin-top:72px!important}
+html body .aic-article .aic-related,html body .aic-article .aic-deeper{margin-top:72px!important}
+
+/* ---------- pages outside the shared system ---------- */
+body:not(:has(.aic-tool)):not(:has(.aic-article)) h1,body:not(:has(.aic-tool)):not(:has(.aic-article)) h2,body:not(:has(.aic-tool)):not(:has(.aic-article)) h3{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important}
+html,body{font-family:"Inter",system-ui,sans-serif}
+input[type=range],input[type=checkbox],input[type=radio]{accent-color:#2859c7!important}
+:focus-visible{outline-color:#2859c7!important}
+[tabindex="-1"]:focus,h1:focus,h2:focus,h3:focus{outline:none!important;box-shadow:none!important}
+
+/* ================= v3: product-grade tool shell ================= */
+html,body{background:#f4f7fc!important}
+html body .aic-tool{background:#f4f7fc!important}
+html body .aic-tool .aic-col{max-width:980px!important}
+html body .aic-tool .aic-h1{font-size:clamp(40px,5vw,62px)!important;max-width:20ch}
+html body .aic-tool .aic-grid2>.aic-card{box-shadow:none!important;background:#fff!important;border-radius:14px!important}
+html body .aic-tool.aic-in-q .aic-h1{font-size:22px!important;line-height:1.2!important;max-width:none;margin:6px 0 20px!important;font-weight:500!important}
+html body .aic-tool.aic-in-q .aic-lede,html body .aic-tool.aic-in-q > .aic-col > .aic-privacy,html body .aic-tool.aic-in-q .aic-col > * > .aic-privacy{display:none!important}
+html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:56px 64px 44px!important;border:0!important;border-radius:24px!important;box-shadow:0 1px 0 rgba(19,38,74,.05),0 30px 70px rgba(19,38,74,.10)!important;min-height:460px}
+@media(max-width:700px){html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:32px 22px 28px!important;border-radius:18px!important;min-height:0}}
+html body .aic-tool .aic-progress{height:3px!important;background:#e3eaf6!important;border-radius:0!important;margin:14px 0 36px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-size:clamp(26px,3.2vw,38px)!important;line-height:1.12!important;letter-spacing:-.02em!important;margin-bottom:12px!important;max-width:28ch}
+html body .aic-tool .aic-qhint{font-size:16px!important;margin-bottom:24px!important}
+html body .aic-tool .aic-opts{counter-reset:aicopt;gap:12px!important}
+html body .aic-tool .aic-opt{counter-increment:aicopt;align-items:center!important;min-height:64px;padding:16px 20px!important;font-size:17px!important;font-weight:500;border-radius:14px!important}
+html body .aic-tool .aic-opt .aic-dot{display:none!important}
+html body .aic-tool .aic-opt::before{content:counter(aicopt,upper-alpha);flex:none;width:30px;height:30px;display:grid;place-items:center;border:1.5px solid #c9d6ee;border-radius:8px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;font-weight:500;color:#2859c7;background:#fff;transition:all .15s}
+html body .aic-tool .aic-opt:hover::before{border-color:#2859c7}
+html body .aic-tool .aic-opt[aria-checked="true"]::before{background:#2859c7;border-color:#2859c7;color:#fff;content:"\2713"}
+html body .aic-tool .aic-opt[aria-checked="true"]{background:#eef3fc!important;box-shadow:0 0 0 2px #2859c7!important;border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-weight:400}
+html body .aic-tool .aic-nav{border-top:0!important;margin-top:40px!important;padding-top:0!important}
+html body .aic-tool .aic-nav .aic-btn-primary{min-width:150px}
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-display{font-size:clamp(56px,8vw,96px)!important;line-height:.95!important;color:#14213d}
+
+/* ================= v4: legibility ================= */
+html body .aic-tool{font-size:17px!important;line-height:1.6!important}
+html body .aic-tool,html body .aic-article{--aic-soft:#334055!important}
+html body .aic-tool .aic-small,html body .aic-tool .aic-opt-sub,html body .aic-tool .aic-privacy,html body .aic-tool .aic-nav-hint{font-size:15px!important;color:#334055!important}
+html body .aic-tool p,html body .aic-tool li{color:#1d2a44}
+html body .aic-tool .aic-lede{font-size:20px!important;color:#2a364d!important}
+html body .aic-tool .aic-note{font-size:16.5px!important}
+html body .aic-tool .aic-opt{font-size:18px!important;color:#14213d!important}
+html body .aic-tool .aic-qhint{font-size:17px!important;color:#334055!important}
+html body .aic-tool .aic-eyebrow,html body .aic-tool .aic-qnum,.aic-mono{font-size:12.5px!important;color:#2859c7!important;letter-spacing:.05em!important}
+html body .aic-tool .aic-tag{font-size:12.5px!important}
+html body .aic-tool th,html body .aic-article th{font-size:12.5px!important}
+html body .aic-tool td{font-size:16px}
+html body .aic-article{color:#14213d!important}
+html body .aic-article p,html body .aic-article li{color:#1d2a44}
+</style>
+<script>
+(function(){
+  function hsl(c){var m=c&&c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/);if(!m)return null;var r=m[1]/255,g=m[2]/255,b=m[3]/255,a=m[4]===undefined?1:+m[4];
+    var mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn,s=d?d/(1-Math.abs(2*l-1)):0,h=0;
+    if(d){h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;if(h<0)h+=360}return {h:h,s:s,l:l,a:a}}
+  function blue(c){var x=hsl(c);return x&&x.a>0.05&&x.s>0.3&&x.l>0.28&&x.l<0.95&&x.h>=205&&x.h<=240?x:null}
+  function N(x,dark,light){return x.a<0.95?"rgba(40,89,199,"+Math.min(x.a,0.12).toFixed(3)+")":(x.l>0.82?light:dark)}
+  function fix(el){var c0=getComputedStyle(el),bg=hsl(c0.backgroundColor),fg=hsl(c0.color);if(bg&&fg&&bg.a>0.9&&bg.l<0.6&&bg.s>0.3&&bg.h>=205&&bg.h<=240&&fg.l<0.6)el.style.setProperty("color","#ffffff","important");
+    if(el.closest(".aic-cta,.aic-dark")||el.matches(".aic-opt,.aic-pick,.aic-check,.aic-btn,.aic-chip,.aic-pill,.aic-seg button,.aic-card,.aic-note"))return;var cs=getComputedStyle(el),x;
+    if((x=blue(cs.color)))el.style.setProperty("color",x.l>0.75?"#eef3fc":"#2859c7","important");
+    if((x=blue(cs.backgroundColor)))el.style.setProperty("background-color",N(x,"#2859c7",x.l>0.9?"#eef3fc":"#d6e2f8"),"important");
+    if(el instanceof SVGElement){if((x=blue(cs.fill)))el.style.setProperty("fill",N(x,"#2859c7","#eef3fc"),"important");if((x=blue(cs.stroke)))el.style.setProperty("stroke",N(x,"#2859c7","#d6e2f8"),"important")}
+    if(cs.textTransform==="uppercase"&&parseFloat(cs.fontSize)<=13.5&&!el.closest("button")&&!el.classList.contains("aic-mono"))el.classList.add("aic-mono");}
+  var t;function mode(){document.querySelectorAll(".aic-tool").forEach(function(r){var q=[].some.call(r.querySelectorAll(".aic-progress,.aic-qtext,.aic-q-text"),function(e){return e.offsetParent!==null});if(q!==r.classList.contains("aic-in-q"))r.classList.toggle("aic-in-q",q)})}
+  function run(){clearTimeout(t);t=setTimeout(function(){mode();document.querySelectorAll("body *").forEach(fix)},30)}
+  document.addEventListener("DOMContentLoaded",function(){run();new MutationObserver(run).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class","aria-pressed","aria-checked","data-state"]});
+    document.addEventListener("change",run,true);document.addEventListener("click",run,true);});
+})();
+</script>
+</head>
+<body style="margin:0;background:#F7F8FA">
+<!-- ===== BEGIN AI CHANNEL TOOL: copy from here to END into a WordPress Custom HTML block ===== -->
+<div class="aic-tool" id="aic-digital-resilience-checklist" data-theme="light">
+<style>
+.aic-tool{--aic-paper:#F7F8FA;--aic-card:#FFFFFF;--aic-ink:#162033;--aic-soft:#667085;--aic-line:#DEE3EA;--aic-sage:#EEF1F6;--aic-blue:#315EFB;--aic-blue-deep:#2448C9;--aic-blue-wash:#EEF3FF;--aic-amber:#A46207;--aic-amber-wash:#FBF4E8;--aic-green:#2F7A4E;--aic-green-wash:#EAF5EE;--aic-violet:#6D5BD0;--aic-radius:18px;--aic-radius-sm:12px;--aic-shadow:0 10px 28px rgba(21,32,51,.055);--aic-focus:#B8C7FF;
+  display:block;background:var(--aic-paper);color:var(--aic-ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.55;padding:28px 0 56px;-webkit-text-size-adjust:100%;text-align:left}
+@media (prefers-color-scheme:dark){.aic-tool:not([data-theme="light"]){--aic-paper:#101B2D;--aic-card:#162033;--aic-ink:#F2F4F8;--aic-soft:#A6B3C7;--aic-line:#2A3850;--aic-sage:#1E2A40;--aic-blue:#7A97FF;--aic-blue-deep:#9BB2FF;--aic-blue-wash:#1F2B45;--aic-amber:#E0A34A;--aic-amber-wash:#2B2618;--aic-green:#6FC592;--aic-green-wash:#16301F;--aic-violet:#A99CF0;--aic-shadow:none;--aic-focus:#4A63B8;color-scheme:dark}}
+.aic-tool[data-theme="dark"]{--aic-paper:#101B2D;--aic-card:#162033;--aic-ink:#F2F4F8;--aic-soft:#A6B3C7;--aic-line:#2A3850;--aic-sage:#1E2A40;--aic-blue:#7A97FF;--aic-blue-deep:#9BB2FF;--aic-blue-wash:#1F2B45;--aic-amber:#E0A34A;--aic-amber-wash:#2B2618;--aic-green:#6FC592;--aic-green-wash:#16301F;--aic-violet:#A99CF0;--aic-shadow:none;--aic-focus:#4A63B8;color-scheme:dark}
+.aic-tool *,.aic-tool *::before,.aic-tool *::after{box-sizing:border-box}
+.aic-tool h1,.aic-tool h2,.aic-tool h3,.aic-tool h4,.aic-tool p,.aic-tool ul,.aic-tool ol,.aic-tool figure,.aic-tool fieldset,.aic-tool legend{margin:0;padding:0}
+.aic-tool fieldset{border:0;min-width:0}
+.aic-tool ul,.aic-tool ol{padding-left:1.2em}
+.aic-tool button{font-family:inherit}
+.aic-tool a{color:var(--aic-blue);font-weight:700;text-decoration:none}
+.aic-tool a:hover{text-decoration:underline}
+.aic-tool a:focus-visible,.aic-tool button:focus-visible,.aic-tool input:focus-visible+.aic-opt-box,.aic-tool [tabindex]:focus-visible,.aic-tool summary:focus-visible{outline:3px solid var(--aic-focus);outline-offset:2px;border-radius:10px}
+.aic-tool [tabindex="-1"]:focus{outline:none}
+.aic-col{max-width:760px;margin:0 auto;padding-inline:clamp(16px,4vw,24px)}
+.aic-sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0;padding:0;margin:-1px}
+.aic-eyebrow{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--aic-blue);margin-bottom:10px}
+.aic-display{font-weight:800;letter-spacing:-.035em;line-height:1.06}
+.aic-h1{font-size:clamp(32px,6.4vw,50px);margin-bottom:16px}
+.aic-h2{font-size:clamp(24px,4.2vw,32px);font-weight:800;letter-spacing:-.03em;line-height:1.12;margin-bottom:10px}
+.aic-h3{font-size:18px;font-weight:800;letter-spacing:-.02em;line-height:1.25;margin-bottom:6px}
+.aic-lede{font-size:clamp(17px,2.3vw,19px);color:var(--aic-soft);max-width:640px}
+.aic-soft{color:var(--aic-soft)}
+.aic-small{font-size:13.5px}
+.aic-num{font-variant-numeric:tabular-nums}
+.aic-card{background:var(--aic-card);border:1px solid var(--aic-line);border-radius:var(--aic-radius);box-shadow:var(--aic-shadow);padding:clamp(18px,4vw,28px)}
+.aic-stack>*+*{margin-top:16px}
+.aic-gap{margin-top:28px}
+.aic-grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:620px){.aic-grid2{grid-template-columns:1fr}}
+.aic-meta{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 22px}
+.aic-pill{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--aic-soft);background:var(--aic-card);border:1px solid var(--aic-line);border-radius:999px;padding:6px 11px}
+.aic-tag{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:5px 9px;background:var(--aic-blue-wash);color:var(--aic-blue)}
+.aic-tag.is-amber{background:var(--aic-amber-wash);color:var(--aic-amber)}
+.aic-tag.is-green{background:var(--aic-green-wash);color:var(--aic-green)}
+.aic-tag.is-grey{background:var(--aic-sage);color:var(--aic-soft)}
+.aic-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:12px 20px;font-size:15.5px;font-weight:750;border-radius:999px;border:1px solid transparent;cursor:pointer;text-decoration:none!important;line-height:1.2;text-align:center}
+.aic-btn-primary{background:var(--aic-blue);color:#fff!important;box-shadow:0 6px 16px rgba(49,94,251,.16)}
+.aic-btn-primary:hover{background:var(--aic-blue-deep)}
+.aic-tool[data-theme="dark"] .aic-btn-primary{color:#0B1424!important}
+@media (prefers-color-scheme:dark){.aic-tool:not([data-theme="light"]) .aic-btn-primary{color:#0B1424!important}}
+.aic-btn-secondary{background:var(--aic-card);color:var(--aic-ink)!important;border-color:var(--aic-line)}
+.aic-btn-secondary:hover{border-color:var(--aic-blue);color:var(--aic-blue)!important}
+.aic-btn-link{background:none;border:0;color:var(--aic-soft);font-weight:700;font-size:14px;text-decoration:underline!important;padding:8px 4px;min-height:0;cursor:pointer}
+.aic-btn[disabled],.aic-btn[aria-disabled="true"]{opacity:.45;cursor:not-allowed;box-shadow:none}
+.aic-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.aic-row.is-between{justify-content:space-between}
+.aic-progress{height:6px;background:var(--aic-sage);border-radius:999px;overflow:hidden;margin:6px 0 22px}
+.aic-progress>span{display:block;height:100%;width:0;background:var(--aic-blue);border-radius:999px;transition:width .35s ease}
+.aic-qhead{display:flex;justify-content:space-between;gap:10px;align-items:baseline;font-size:13px;font-weight:700;color:var(--aic-soft)}
+.aic-qtext{font-size:clamp(19px,2.8vw,22px);font-weight:800;letter-spacing:-.02em;line-height:1.3;margin:4px 0 18px}
+.aic-opts{display:grid;gap:10px}
+.aic-opt{position:relative;display:block;cursor:pointer}
+.aic-opt input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.aic-opt-box{display:flex;gap:12px;align-items:flex-start;padding:13px 15px;border:1px solid var(--aic-line);border-radius:var(--aic-radius-sm);background:var(--aic-card);font-size:15.5px;line-height:1.45;transition:border-color .15s,background .15s,box-shadow .15s}
+.aic-opt:hover .aic-opt-box{border-color:#AFC0FF}
+.aic-opt-dot{flex:none;width:18px;height:18px;margin-top:2px;border-radius:50%;border:2px solid #B4BDCC;position:relative}
+.aic-opt-dot::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--aic-blue);transform:scale(0);transition:transform .15s}
+.aic-opt input:checked+.aic-opt-box{border-color:var(--aic-blue);box-shadow:0 0 0 3px var(--aic-blue-wash)}
+.aic-opt input:checked+.aic-opt-box .aic-opt-dot{border-color:var(--aic-blue)}
+.aic-opt input:checked+.aic-opt-box .aic-opt-dot::after{transform:scale(1)}
+.aic-opt input:disabled+.aic-opt-box{cursor:default}
+.aic-opt.is-correct input+.aic-opt-box{border-color:var(--aic-green);background:var(--aic-green-wash);box-shadow:none}
+.aic-opt.is-wrong input+.aic-opt-box{border-color:var(--aic-amber);background:var(--aic-amber-wash);box-shadow:none}
+.aic-opt-mark{display:block;font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-top:4px}
+.aic-opt-mark:empty{display:none}
+.aic-opt.is-correct input+.aic-opt-box .aic-opt-dot{border-color:var(--aic-green)}
+.aic-opt.is-wrong input+.aic-opt-box .aic-opt-dot{border-color:var(--aic-amber)}
+.aic-opt.is-wrong input+.aic-opt-box .aic-opt-dot::after{background:var(--aic-amber)}
+.aic-opt.is-correct .aic-opt-mark{color:var(--aic-green)}
+.aic-opt.is-wrong .aic-opt-mark{color:var(--aic-amber)}
+.aic-note{background:var(--aic-blue-wash);border-left:3px solid var(--aic-blue);border-radius:0 var(--aic-radius-sm) var(--aic-radius-sm) 0;padding:14px 16px;font-size:15px}
+.aic-note.is-amber{background:var(--aic-amber-wash);border-left-color:var(--aic-amber)}
+.aic-note.is-green{background:var(--aic-green-wash);border-left-color:var(--aic-green)}
+.aic-reveal{margin-top:18px;padding-top:18px;border-top:1px solid var(--aic-line)}
+.aic-verdict{font-weight:800;font-size:17px;letter-spacing:-.01em;margin-bottom:8px}
+.aic-verdict.is-right{color:var(--aic-green)}
+.aic-verdict.is-wrong{color:var(--aic-amber)}
+.aic-reveal p+p{margin-top:10px}
+.aic-src{margin-top:14px;font-size:14px;color:var(--aic-soft)}
+.aic-src a{overflow-wrap:anywhere}
+.aic-src li{margin-top:4px}
+.aic-nav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:22px;flex-wrap:wrap}
+.aic-bar-row{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr) 56px;gap:12px;align-items:center;padding:11px 0;border-top:1px solid var(--aic-line)}
+.aic-bar-row:first-child{border-top:0}
+@media (max-width:560px){.aic-bar-row{grid-template-columns:minmax(0,1fr) 56px}.aic-bar-row .aic-bar-label{grid-column:1/-1}}
+.aic-bar-label{font-weight:700;font-size:14.5px}
+.aic-bar{display:block;height:10px;background:var(--aic-sage);border-radius:999px;overflow:hidden}
+.aic-bar>span{display:block;height:100%;border-radius:999px;background:var(--aic-blue);transition:width .8s ease}
+.aic-bar>span.is-low{background:var(--aic-amber)}
+.aic-bar>span.is-high{background:var(--aic-green)}
+.aic-bar-pct{font-weight:800;font-size:14px;text-align:right;font-variant-numeric:tabular-nums}
+.aic-score{display:grid;grid-template-columns:auto minmax(0,1fr);gap:24px;align-items:center}
+@media (max-width:560px){.aic-score{grid-template-columns:1fr;gap:14px}}
+.aic-score-num{font-size:clamp(52px,11vw,76px);font-weight:800;letter-spacing:-.05em;line-height:1;font-variant-numeric:tabular-nums}
+.aic-score-num small{font-size:.32em;letter-spacing:0;color:var(--aic-soft);font-weight:700;margin-left:4px}
+.aic-list{display:grid;gap:12px;padding:0!important;list-style:none}
+.aic-item{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:start}
+.aic-item-n{width:30px;height:30px;border-radius:50%;background:var(--aic-blue-wash);color:var(--aic-blue);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center}
+.aic-item p{font-size:15px;color:var(--aic-soft)}
+.aic-dark{background:#162033;color:#E7ECF5;border-radius:var(--aic-radius);padding:clamp(20px,4.5vw,32px)}
+.aic-dark .aic-eyebrow{color:#9BB2FF}
+.aic-dark a{color:#B8C7FF}
+.aic-dark .aic-soft,.aic-dark p{color:#C9D2E1}
+.aic-dark .aic-h2,.aic-dark .aic-h3{color:#fff}
+.aic-dark .aic-btn-primary{background:#fff;color:#162033!important;box-shadow:none}
+.aic-dark .aic-btn-primary:hover{background:#E3E9FF}
+.aic-dark .aic-btn-secondary{background:transparent;color:#fff!important;border-color:#3A4A66}
+.aic-dark .aic-btn-secondary:hover{border-color:#B8C7FF;color:#B8C7FF!important}
+.aic-step{display:grid;gap:6px;padding:16px 0;border-top:1px solid #2E3C57}
+.aic-step:first-of-type{border-top:0;padding-top:4px}
+.aic-step .aic-row{margin-top:8px}
+.aic-keep{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;margin-top:16px;font-size:14px}
+.aic-keep a,.aic-keep button{font-size:14px}
+.aic-noregret li{margin-top:6px;font-size:15px}
+.aic-tool details{border-top:1px solid var(--aic-line)}
+.aic-tool details:last-child{border-bottom:1px solid var(--aic-line)}
+.aic-tool summary{cursor:pointer;list-style:none;padding:14px 0;font-weight:800;display:flex;justify-content:space-between;gap:12px;align-items:center}
+.aic-tool summary::-webkit-details-marker{display:none}
+.aic-tool summary::after{content:"+";color:var(--aic-soft);font-weight:800;font-size:18px}
+.aic-tool details[open] summary::after{content:"\2013"}
+.aic-details-body{padding:0 0 16px;font-size:15px;color:var(--aic-soft)}
+.aic-details-body p+p{margin-top:8px}
+.aic-foot{margin-top:28px;font-size:13px;color:var(--aic-soft);line-height:1.6}
+.aic-foot p+p{margin-top:6px}
+.aic-screen[hidden]{display:none!important}
+.aic-fade{animation:aicFade .3s ease both}
+@keyframes aicFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.aic-tool *,.aic-tool *::before,.aic-tool *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media print{
+  .aic-tool{background:#fff!important;color:#000;padding:0;font-size:11pt}
+  .aic-tool .aic-noprint{display:none!important}
+  .aic-tool .aic-card{box-shadow:none;border:1px solid #bbb;break-inside:avoid}
+  .aic-tool .aic-dark{background:#fff!important;color:#000!important;border:1px solid #bbb}
+  .aic-tool .aic-dark *{color:#000!important}
+  .aic-tool details{display:block}
+  .aic-tool details>*{display:block}
+  .aic-tool a{color:#000;text-decoration:underline}
+  .aic-tool .aic-bar>span,.aic-tool .aic-tag,.aic-tool svg{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+/* ---- extras shared by the four resilience / risk tools ---- */
+.aic-tool{--aic-red:#B42318;--aic-red-wash:#FDEDEB}
+.aic-tool[data-theme="dark"]{--aic-red:#F97066;--aic-red-wash:#3A1E22}
+@media (prefers-color-scheme:dark){.aic-tool:not([data-theme="light"]){--aic-red:#F97066;--aic-red-wash:#3A1E22}}
+.aic-tag.is-red{background:var(--aic-red-wash);color:var(--aic-red)}
+.aic-note.is-red{background:var(--aic-red-wash);border-left-color:var(--aic-red)}
+.aic-seg{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.aic-seg label{position:relative;cursor:pointer;display:inline-flex}
+.aic-seg input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.aic-seg span{display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:7px 13px;border:1px solid var(--aic-line);border-radius:999px;background:var(--aic-card);font-size:14px;font-weight:700;color:var(--aic-soft);line-height:1.25;transition:background .15s,border-color .15s,color .15s}
+.aic-seg label:hover span{border-color:#AFC0FF;color:var(--aic-ink)}
+.aic-seg input:checked+span{background:var(--aic-blue);border-color:var(--aic-blue);color:#fff}
+.aic-tool[data-theme="dark"] .aic-seg input:checked+span{color:#0B1424}
+.aic-seg input:focus-visible+span{outline:3px solid var(--aic-focus);outline-offset:2px}
+.aic-seg.is-chips input[type=checkbox]+span::before{content:"";width:14px;height:14px;border-radius:4px;border:2px solid #B4BDCC;flex:none}
+.aic-seg.is-chips input[type=checkbox]:checked+span::before{border-color:#fff;background:#fff;box-shadow:inset 0 0 0 2px var(--aic-blue)}
+.aic-seg-legend{font-size:13px;font-weight:800;color:var(--aic-soft);letter-spacing:.01em}
+.aic-edition{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:18px}
+.aic-edition .aic-seg{margin-top:0}
+.aic-chipgrid{display:grid;gap:8px;grid-template-columns:1fr}
+@media (min-width:620px){.aic-chipgrid{grid-template-columns:1fr 1fr}}
+.aic-pick{position:relative;display:block;cursor:pointer}
+.aic-pick input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.aic-pick-box{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1px solid var(--aic-line);border-radius:var(--aic-radius-sm);background:var(--aic-card);height:100%}
+.aic-pick:hover .aic-pick-box{border-color:#AFC0FF}
+.aic-pick-check{flex:none;width:20px;height:20px;border-radius:6px;border:2px solid #B4BDCC;margin-top:1px;display:flex;align-items:center;justify-content:center}
+.aic-pick input:checked+.aic-pick-box{border-color:var(--aic-blue);box-shadow:0 0 0 3px var(--aic-blue-wash)}
+.aic-pick input:checked+.aic-pick-box .aic-pick-check{background:var(--aic-blue);border-color:var(--aic-blue)}
+.aic-pick input:checked+.aic-pick-box .aic-pick-check::after{content:"";width:9px;height:5px;border-left:2.5px solid #fff;border-bottom:2.5px solid #fff;transform:rotate(-45deg) translate(1px,-1px)}
+.aic-pick input:focus-visible+.aic-pick-box{outline:3px solid var(--aic-focus);outline-offset:2px}
+.aic-pick-t{font-weight:800;font-size:15.5px;line-height:1.3;display:block}
+.aic-pick-h{font-size:13.5px;color:var(--aic-soft);display:block;margin-top:2px}
+.aic-rows>*+*{border-top:1px solid var(--aic-line)}
+.aic-rowq{padding:16px 0}
+.aic-rowq:first-child{padding-top:4px}
+.aic-rowq-t{font-weight:800;font-size:16.5px;letter-spacing:-.01em}
+.aic-rowq-h{font-size:13.5px;color:var(--aic-soft)}
+.aic-rowq fieldset{margin-top:10px}
+.aic-table{width:100%;border-collapse:collapse;font-size:14.5px}
+.aic-table th{text-align:left;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--aic-soft);font-weight:800;padding:8px 8px 8px 0;border-bottom:1px solid var(--aic-line);vertical-align:bottom}
+.aic-table td{padding:10px 8px 10px 0;border-bottom:1px solid var(--aic-line);vertical-align:top}
+.aic-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.aic-fix{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:start;padding:16px 0;border-top:1px solid var(--aic-line)}
+.aic-fix:first-child{border-top:0;padding-top:4px}
+.aic-fix p{font-size:15px;color:var(--aic-soft);margin-top:4px}
+.aic-fix .aic-tag{margin-bottom:6px}
+.aic-line{display:inline-block;min-width:9em;border-bottom:1px solid var(--aic-soft);height:1.1em;vertical-align:baseline}
+.aic-input{width:100%;padding:10px 12px;border:1px solid var(--aic-line);border-radius:10px;background:var(--aic-card);color:var(--aic-ink);font:inherit;font-size:15px}
+.aic-input:focus{outline:3px solid var(--aic-focus);outline-offset:0;border-color:var(--aic-blue)}
+.aic-field{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:800;color:var(--aic-soft)}
+.aic-fields{display:grid;gap:10px;grid-template-columns:1fr}
+@media (min-width:620px){.aic-fields{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.aic-printonly{display:none}
+@media print{
+  .aic-tool .aic-printonly{display:block!important}
+  .aic-tool .aic-screen[hidden]{display:none!important}
+  .aic-tool .aic-seg span,.aic-tool .aic-note,.aic-tool .aic-tag{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .aic-tool .aic-input{border:0;border-bottom:1px solid #999;border-radius:0;padding:2px 0}
+  .aic-tool .aic-pagebreak{break-before:page}
+  .aic-tool .aic-table tr{break-inside:avoid}
+}
+
+.aic-rc-n{font-size:12px;font-weight:800;letter-spacing:.04em;color:var(--aic-soft);text-transform:uppercase;margin-bottom:2px}
+.aic-rc-pri{border-radius:999px;padding:2px 7px}
+.aic-rc-p3{background:var(--aic-red-wash);color:var(--aic-red)}
+.aic-rc-p2{background:var(--aic-amber-wash);color:var(--aic-amber)}
+.aic-rc-p1{background:var(--aic-sage);color:var(--aic-soft)}
+.aic-tool details.aic-rc-how{border:0;margin:2px 0 4px}
+.aic-tool details.aic-rc-how summary{padding:4px 0;font-size:13.5px;font-weight:750;color:var(--aic-blue);justify-content:flex-start}
+.aic-tool details.aic-rc-how summary::after{font-size:15px;margin-left:4px}
+.aic-rc-how p{font-size:14.5px;color:var(--aic-soft);padding-bottom:6px;max-width:62ch}
+.aic-rc-item{transition:box-shadow .15s}
+.aic-rc-item[data-state="done"]{box-shadow:inset 3px 0 0 var(--aic-green);padding-left:12px}
+.aic-rc-item[data-state="part"]{box-shadow:inset 3px 0 0 var(--aic-amber);padding-left:12px}
+.aic-rc-item[data-state="not"]{box-shadow:inset 3px 0 0 var(--aic-red);padding-left:12px}
+.aic-rc-tally{position:sticky;bottom:10px;z-index:5;margin-top:18px;display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;background:var(--aic-card);border:1px solid var(--aic-line);border-radius:999px;padding:8px 8px 8px 18px;box-shadow:0 10px 30px rgba(21,32,51,.12);font-size:14px}
+@media (max-width:440px){.aic-rc-tally{border-radius:18px;padding:10px 12px}.aic-rc-tally .aic-btn{width:100%}}
+#aic-rc-res{margin-top:32px}
+.aic-rc-card{margin-top:22px;padding-top:14px;border-top:2px dashed #999}
+@media print{
+  #aic-digital-resilience-checklist.aic-rc-blankprint #aic-rc-res{display:none!important}
+  #aic-digital-resilience-checklist .aic-rc-card{break-before:page;border-top:0}
+  #aic-digital-resilience-checklist .aic-rc-print .aic-table{font-size:10.5pt}
+}
+
+</style>
+<div class="aic-col">
+  <noscript><p>This checklist needs JavaScript. It runs in your browser and nothing is sent.</p></noscript>
+  <div class="aic-rc-form aic-noprint" id="aic-rc-form">
+    <div class="aic-edition">
+      <span class="aic-seg-legend" id="aic-rc-edl">This checklist is for</span>
+      <div class="aic-seg" role="radiogroup" aria-labelledby="aic-rc-edl">
+        <label><input type="radio" name="aic-rc-ed" value="business" checked><span>A small business</span></label>
+        <label><input type="radio" name="aic-rc-ed" value="household"><span>A household</span></label>
+      </div>
+    </div>
+    <p class="aic-eyebrow">Digital resilience checklist</p>
+    <h1 class="aic-display aic-h1" id="aic-rc-h1"></h1>
+    <p class="aic-lede" id="aic-rc-lede"></p>
+    <div class="aic-meta"><span class="aic-pill">20 checks · about 10 minutes</span><span class="aic-pill">Printable</span><span class="aic-pill">No email, nothing stored</span></div>
+    <div class="aic-note" id="aic-rc-why" style="margin-bottom:8px"></div>
+    <p class="aic-small aic-soft" style="display:flex;gap:8px;margin:14px 0 6px" id="aic-rc-privacy"></p>
+    <div class="aic-row" style="margin-bottom:8px"><button type="button" class="aic-btn-link" id="aic-rc-blank">Print a blank checklist instead</button></div>
+    <div id="aic-rc-areas"></div>
+    <div class="aic-rc-tally" id="aic-rc-tally" role="status" aria-live="polite"></div>
+  </div>
+
+  <section id="aic-rc-res" aria-labelledby="aic-rc-resh" hidden>
+    <p class="aic-eyebrow aic-noprint">Where you stand</p>
+    <div class="aic-card aic-noprint">
+      <div class="aic-score">
+        <div class="aic-score-num aic-num" id="aic-rc-score" aria-hidden="true"></div>
+        <div><h2 class="aic-h2" id="aic-rc-resh" tabindex="-1"></h2><p class="aic-soft" id="aic-rc-resp"></p></div>
+      </div>
+      <p class="aic-sr" id="aic-rc-scoresr"></p>
+      <div style="margin-top:18px" id="aic-rc-bars"></div>
+    </div>
+    <div class="aic-card aic-gap">
+      <p class="aic-eyebrow">Do these next</p>
+      <h2 class="aic-h2">Three things, in this order</h2>
+      <div id="aic-rc-next"></div>
+    </div>
+    <div class="aic-dark aic-gap aic-noprint"><p class="aic-eyebrow">The fork</p><h2 class="aic-h2" id="aic-rc-forkh"></h2><p id="aic-rc-forkp"></p></div>
+    <div class="aic-gap" id="aic-rc-handoff"></div>
+    <div class="aic-row aic-noprint" style="margin-top:14px"><button type="button" class="aic-btn aic-btn-secondary" id="aic-rc-print">Print my checklist and offline card</button><button type="button" class="aic-btn-link" id="aic-rc-back">Back to the checklist</button><button type="button" class="aic-btn-link" id="aic-rc-restart">Start again</button></div>
+  </section>
+
+  <div class="aic-printonly" id="aic-rc-printable"></div>
+
+  <div class="aic-foot aic-noprint">
+    <details><summary>How the score works, and where the advice comes from</summary><div class="aic-details-body" id="aic-rc-method"></div></details>
+  </div>
+</div>
+
+<script>
+window.AICHANNEL_CONFIG = Object.assign({
+  resultsFormUrl: "#",      // "Email me my results" form (WordPress form page)
+  coursesUrl: "#",          // "Learn with a member" (Central AI course schedule)
+  matchUrl: "#",            // "Get matched to someone" (advisory/consulting form)
+  newsletterUrl: "#",       // separate newsletter opt-in
+  contentBaseUrl: ""        // prefix for links to sibling AI Channel pieces by slug, e.g. "/tools/" ("" = same folder)
+}, window.AICHANNEL_CONFIG || {});
+(function () {
+  'use strict';
+  var TOOL = { slug: 'digital-resilience-checklist', rootId: 'aic-digital-resilience-checklist', audience: 'business', name: 'Digital Resilience Checklist' };
+  /* ---------- Shared helpers (same in every AI Channel tool) ---------- */
+  var CFG = window.AICHANNEL_CONFIG;
+  var root = document.getElementById(TOOL.rootId);
+  if (!root) return;
+  var REDUCE = false;
+  try { REDUCE = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  var IN_FRAME = false;
+  try { IN_FRAME = window.self !== window.top; } catch (e) { IN_FRAME = true; }
+
+  function $(sel, el) { return (el || root).querySelector(sel); }
+  function $all(sel, el) { return Array.prototype.slice.call((el || root).querySelectorAll(sel)); }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function utmParams() {
+    var out = {};
+    try {
+      var p = new URLSearchParams(window.location.search);
+      p.forEach(function (v, k) { if (/^utm_/i.test(k)) out[k] = v; });
+    } catch (e) {}
+    return out;
+  }
+  function emit(name, extra) {
+    var detail = Object.assign({
+      event: name,
+      audience: TOOL.audience,
+      source_content_or_tool: TOOL.slug,
+      assessment_name: TOOL.name
+    }, extra || {});
+    try { window.dispatchEvent(new CustomEvent('aichannel:event', { detail: detail })); } catch (e) {}
+    try { if (window.parent) window.parent.postMessage(Object.assign({ type: 'aichannel:event' }, detail), '*'); } catch (e) {}
+  }
+  var LEAD_TYPES = { email_results: 'results_email', learn_with_member: 'training', get_matched: 'advisory', newsletter: 'newsletter' };
+  function handoffUrl(base, cta, result) {
+    if (!base || base === '#') return '#';
+    var f = Object.assign({
+      lead_type: LEAD_TYPES[cta] || 'other',
+      audience: TOOL.audience,
+      source_page: window.location.href,
+      source_content_or_tool: TOOL.slug,
+      cta_clicked: cta,
+      assessment_name: TOOL.name,
+      assessment_result: result && result.label,
+      score: result && result.score
+    }, utmParams());
+    var q = Object.keys(f).filter(function (k) { return f[k] !== undefined && f[k] !== null && f[k] !== ''; })
+      .map(function (k) { return encodeURIComponent(k) + '=' + encodeURIComponent(f[k]); }).join('&');
+    var hash = '', i = base.indexOf('#');
+    if (i > -1) { hash = base.slice(i); base = base.slice(0, i); }
+    return base + (base.indexOf('?') > -1 ? '&' : '?') + q + hash;
+  }
+  /* Wire a CTA link. getResult() returns {label, score} at click time. */
+  function wireCta(a, cta, cfgKey, getResult) {
+    if (!a) return;
+    function refresh() { a.href = handoffUrl(CFG[cfgKey], cta, getResult ? getResult() : null); }
+    refresh();
+    if (IN_FRAME) { a.target = '_blank'; a.rel = 'noopener'; }
+    a.addEventListener('click', function (ev) {
+      refresh();
+      var r = getResult ? getResult() : {};
+      emit('cta_clicked', { cta_clicked: cta, assessment_result: r && r.label, score: r && r.score });
+      if (a.getAttribute('href') === '#') ev.preventDefault();
+    });
+  }
+  function scrollToRoot() {
+    try {
+      var top = root.getBoundingClientRect().top;
+      if (top < 0 || top > window.innerHeight * 0.5) {
+        window.scrollTo({ top: window.pageYOffset + top - 12, behavior: REDUCE ? 'auto' : 'smooth' });
+      }
+    } catch (e) {}
+  }
+  function focusHeading(el) {
+    if (!el) return;
+    el.setAttribute('tabindex', '-1');
+    try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
+  }
+  function show(screen) {
+    $all('.aic-screen').forEach(function (s) { s.hidden = s !== screen; });
+    screen.classList.remove('aic-fade'); void screen.offsetWidth; screen.classList.add('aic-fade');
+    scrollToRoot();
+    focusHeading(screen.querySelector('[data-focus]') || screen.querySelector('h1,h2'));
+  }
+  function store(key, val) { try { sessionStorage.setItem(TOOL.slug + ':' + key, JSON.stringify(val)); } catch (e) {} }
+  function load(key) { try { var v = sessionStorage.getItem(TOOL.slug + ':' + key); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
+  function clearStore() { try { Object.keys(sessionStorage).forEach(function (k) { if (k.indexOf(TOOL.slug + ':') === 0) sessionStorage.removeItem(k); }); } catch (e) {} }
+  function contentUrl(slug) { return (CFG.contentBaseUrl || '') + slug + '.html'; }
+  var started = false;
+  function startOnce(extra) { if (started) return; started = true; emit('tool_started', extra || {}); }
+
+  /* Result hand-off: one next step, one member route, then email + newsletter. o = {
+     next:{title, body, href, label, newTab}, sol:{kind:'courses'|'match', title, body}, getResult } */
+  function renderHandoff(host, o) {
+    var solCta = o.sol.kind === 'match' ? 'get_matched' : 'learn_with_member';
+    var solKey = o.sol.kind === 'match' ? 'matchUrl' : 'coursesUrl';
+    var solLabel = o.sol.kind === 'match' ? 'Get matched to someone' : 'Learn with a member';
+    host.innerHTML =
+      '<div class="aic-grid2 aic-noprint">' +
+        '<div class="aic-card"><p class="aic-eyebrow">What to do next</p><h3 class="aic-h3">' + esc(o.next.title) + '</h3>' +
+          '<p class="aic-soft" style="font-size:15px">' + esc(o.next.body) + '</p>' +
+          '<div class="aic-row" style="margin-top:14px"><a class="aic-btn aic-btn-secondary" data-aic-next href="' + esc(o.next.href) + '">' + esc(o.next.label) + '</a></div></div>' +
+        '<div class="aic-card" style="border-color:#C7D3FF"><p class="aic-eyebrow">Need more than an answer?</p><h3 class="aic-h3">' + esc(o.sol.title) + '</h3>' +
+          '<p class="aic-soft" style="font-size:15px">' + esc(o.sol.body) + '</p>' +
+          '<div class="aic-row" style="margin-top:14px"><a class="aic-btn aic-btn-primary" data-aic-sol href="#">' + solLabel + '</a></div></div>' +
+      '</div>' +
+      '<div class="aic-keep aic-noprint">' +
+        '<a href="#" data-aic-email>Email me my results</a>' +
+        '<span class="aic-soft">Optional. It opens a short form and doesn’t sign you up to anything.</span>' +
+      '</div>' +
+      '<p class="aic-keep aic-noprint aic-soft" style="margin-top:8px">Keep up without keeping up with everything. <a href="#" data-aic-news>Get the newsletter</a></p>';
+    wireCta($('[data-aic-sol]', host), solCta, solKey, o.getResult);
+    wireCta($('[data-aic-email]', host), 'email_results', 'resultsFormUrl', o.getResult);
+    var news = $('[data-aic-news]', host);
+    news.href = CFG.newsletterUrl || '#';
+    if (IN_FRAME) { news.target = '_blank'; news.rel = 'noopener'; }
+    news.addEventListener('click', function (ev) { var r = o.getResult(); emit('cta_clicked', { cta_clicked: 'newsletter', assessment_result: r.label, score: r.score }); if (news.getAttribute('href') === '#') ev.preventDefault(); });
+    var nx = $('[data-aic-next]', host);
+    if (IN_FRAME) { nx.target = '_top'; }
+    nx.addEventListener('click', function () { var r = o.getResult(); emit('cta_clicked', { cta_clicked: 'next_step', next_step: o.next.label, assessment_result: r.label, score: r.score }); });
+  }
+  function radioQ(name, text, opts, sel, hint) {
+    return '<fieldset class="aic-q" style="margin-top:22px"><legend class="aic-qtext" style="font-size:18px;margin-bottom:12px">' + text + '</legend>' +
+      (hint ? '<p class="aic-small aic-soft" style="margin:-6px 0 12px">' + hint + '</p>' : '') +
+      '<div class="aic-opts">' + opts.map(function (o, i) {
+        return '<label class="aic-opt"><input type="radio" name="' + name + '" value="' + i + '"' + (String(sel) === String(i) ? ' checked' : '') + '><span class="aic-opt-box"><span class="aic-opt-dot" aria-hidden="true"></span><span>' + esc(o[0]) + '</span></span></label>';
+      }).join('') + '</div></fieldset>';
+  }
+  function segQ(name, legend, opts, sel) {
+    return '<fieldset><legend class="aic-seg-legend">' + esc(legend) + '</legend><div class="aic-seg">' + opts.map(function (o, i) {
+      return '<label><input type="radio" name="' + name + '" value="' + i + '"' + (String(sel) === String(i) ? ' checked' : '') + '><span>' + esc(o) + '</span></label>';
+    }).join('') + '</div></fieldset>';
+  }
+  var LOCK_SVG = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true" style="flex:none;margin-top:3px"><rect x="2" y="6" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M4.5 6V4.5a2.5 2.5 0 015 0V6" stroke="currentColor" stroke-width="1.5"/></svg>';
+
+  /* ================= Digital Resilience Checklist ================= */
+  var COPY = {
+    business: {
+      audience: 'business',
+      h1: 'Could your business get through an outage, a hacked account or a lost laptop?',
+      lede: 'Twenty plain checks in four areas: who can get into your accounts, whether you could get your data back, what happens when the internet goes, and whether someone could talk their way in. Mark what’s done, see what to do next, and print the checklist with an offline card for the drawer.',
+      why: '<strong>43% of UK businesses reported a cyber breach or attack in the past year, and only a quarter have a formal incident response plan</strong>, according to the UK government’s 2026 survey. Most of what protects a small business is cheap and dull: passkeys, a backup you’ve tested, numbers on paper, and a call-back rule.',
+      forkh: 'Two businesses, one bad Monday',
+      fork: 'The finance inbox is taken over on Friday night. By Monday, a supplier has been sent “new bank details”. In one business the payment stops at the call-back rule and the inbox is recovered with codes from the safe. In the other, the money’s gone and nobody can get into the admin account. Same attack, same week. One of them did this checklist while nothing was wrong. Do it again in six months; the questions won’t change, your answers should.'
+    },
+    household: {
+      audience: 'individual',
+      h1: 'Could your household get through an outage, a hacked account or a lost phone?',
+      lede: 'Twenty plain checks in four areas: who can get into your accounts, whether you could get your photos and documents back, what happens when the power goes, and whether a scammer could talk their way in. Mark what’s done, see what to do next, and print it with an offline card for the kitchen drawer.',
+      why: '<strong>Scammers now use cloned voices to pose as family members</strong>, and most households have one phone or one email account that everything hangs off. None of the fixes below are technical. They’re settings you turn on once, a second copy of what you can’t replace, and a few things written down.',
+      forkh: 'Two households, one lost phone',
+      fork: 'Same day, same problem: a phone left in a taxi, and that evening a call from a panicked “daughter” asking for money. In one household it’s an afternoon of admin and a code word nobody on the phone knows. In the other it’s locked accounts, lost photos and a transfer that can’t be undone. The difference is an hour spent while nothing was wrong.'
+    }
+  };
+  var AREAS = [
+    { id: 'acc', t: 'Who can get into your accounts?', b: 'Most account takeovers start with one inbox.', items: [
+      { id: 'a1', p: 3,
+        b: ['Every mailbox has a passkey or 2-step verification, admins first.', 'Email resets every other account. The NCSC says to use passkeys where your provider supports them; otherwise a strong, unique password plus 2-step verification. An authenticator app beats text messages, and any kind beats none.'],
+        h: ['Your main email has a passkey or 2-step verification.', 'Email resets every other account. Use a passkey if your provider offers one; otherwise a strong, unique password plus 2-step verification. An authenticator app beats text messages, and any kind beats none.'] },
+      { id: 'a2', p: 3,
+        b: ['Important accounts have unique passwords, kept in a password manager.', 'Banking, payroll, social media, online storage, the website and domain, point of sale. A reused password means one leak opens everything. A password manager (or your browser’s) makes unique ones painless.'],
+        h: ['Important accounts have unique passwords, kept in a password manager.', 'Bank, email, shopping and social media. A reused password means one leak opens everything. A password manager (or your browser’s) makes unique ones painless.'] },
+      { id: 'a3', p: 3,
+        b: ['Backup codes and recovery details are stored offline.', 'For email, the domain, banking and the password manager: printed and locked away, not sitting in the inbox they’d recover.'],
+        h: ['Backup codes and recovery details are stored offline.', 'For your email and password manager: printed or written down and kept somewhere safe at home, not only on your phone.'] },
+      { id: 'a4', p: 2,
+        b: ['Two people can reach the admin side of email, domain, website and banking.', 'Each with their own login, not a shared password. If the only admin leaves, falls ill or forgets, you shouldn’t have to beg a provider for your own business back.'],
+        h: ['Someone you trust could step in if you couldn’t manage your accounts.', 'Most big providers let you name a trusted or legacy contact. Set it up for email and photos, and write down where the important things are.'] },
+      { id: 'a5', p: 2,
+        b: ['Leavers lose access the same day, and shared logins are gone.', 'Keep a list of who has access to what and run it on someone’s last day. Shared logins make that impossible, so replace them with named accounts.'],
+        h: ['Old phones and laptops are wiped before they’re sold or passed on.', 'Sign out, remove the device from your accounts, and do a factory reset.'] },
+      { id: 'a6', p: 2,
+        b: ['Phones, computers and apps update automatically.', 'Most attacks use holes that already have a fix. Turn on automatic updates and replace devices that no longer get them.'],
+        h: ['Phones, computers and apps update automatically.', 'Most attacks use holes that already have a fix. Turn on automatic updates and replace devices that no longer get them.'] }
+    ] },
+    { id: 'bak', t: 'Could you get your data back?', b: 'A sync isn’t a backup.', items: [
+      { id: 'b1', p: 3,
+        b: ['Business data has a separate backup, not just a cloud sync.', 'If files are deleted or locked by ransomware, a sync copies the damage. Back up files, email, accounts and customer data; exports from the software you rent count.'],
+        h: ['Photos and important documents are in two places.', 'The cloud plus an external drive is enough. The NCSC suggests using both, in case one is lost, stolen or fails.'] },
+      { id: 'b2', p: 2,
+        b: ['At least one copy isn’t permanently connected.', 'Unplug the backup drive after use and protect online backups with 2-step verification. Some ransomware goes after anything it can reach.'],
+        h: ['The backup drive isn’t left plugged in.', 'Unplug it after use and protect online backups with 2-step verification. Some viruses go after anything connected.'] },
+      { id: 'b3', p: 3,
+        b: ['You’ve restored something from a backup in the last 12 months.', 'Pick one folder, restore it, open the files. A backup you’ve never restored is a hope, not a backup.'],
+        h: ['You’ve checked you can open files from your backup.', 'Pick a few photos and a document and open them from the copy. A backup you’ve never opened is a hope, not a backup.'] },
+      { id: 'b4', p: 2,
+        b: ['Someone other than you could find and run the backup.', 'Write down where the backups are and how to restore them, and keep it with your outage card.'],
+        h: ['Your phone is backed up, including contacts and 2-step codes.', 'Check your authenticator app can move to a new phone, or that you have backup codes for the accounts it protects.'] }
+    ] },
+    { id: 'out', t: 'What happens when the internet or power goes?', b: 'The outage plan is the one you wrote before the outage.', items: [
+      { id: 'c1', p: 2,
+        b: ['Key phone numbers are written on paper.', 'Staff, top customers, key suppliers, the bank’s fraud line, your IT or web supplier.'],
+        h: ['Key phone numbers are written on paper.', 'Family, doctor and pharmacy, a neighbor, the bank’s fraud line. Most people know two or three numbers by heart, at best.'] },
+      { id: 'c2', p: 2,
+        b: ['You can take payments and reach customers with no office internet.', 'A phone hotspot for the card reader, payment links by text, the main number diverted to a mobile. Try it once on a quiet day.'],
+        h: ['A charged power bank, and a way to get online without home internet.', 'Know how to turn your phone into a hotspot, and keep the power bank charged.'] },
+      { id: 'c3', p: 3, hp: 2,
+        b: ['There’s a one-page outage plan: who decides, what you tell customers, the manual workarounds.', 'Our AI & Digital Dependency Score builds an outage card for each system you rely on. A single page puts you ahead of most businesses.'],
+        h: ['There’s a plan for medicines and anything that needs power.', 'A paper list of medicines and doctors, and a plan for refrigerated medicines or powered medical devices. Ready.gov suggests talking it through with your medical provider.'] },
+      { id: 'c4', p: 1,
+        b: ['You know where to check whether a provider is down, and how to reach their support.', 'Bookmark the status pages for email, payments and your key software, and keep the support numbers on paper.'],
+        h: ['You know how to check whether it’s you or them.', 'Your internet provider’s status page or service number, written down, saves an hour of restarting the router.'] },
+      { id: 'c5', p: 1,
+        b: ['You know which work depends on which AI tool, and what you’d do without it.', 'Prices, terms and availability change with little notice. For each task where AI is now part of the process, name the fallback.'],
+        h: ['Important documents are available offline, securely.', 'ID, insurance and prescriptions: copies kept safely at home, or in an encrypted folder you can open without internet.'] }
+    ] },
+    { id: 'sca', t: 'Could someone talk their way in?', b: 'Voice clones, urgent transfers, and the call-back rule.', items: [
+      { id: 'd1', p: 3,
+        b: ['Bank-detail changes and urgent payment requests get a call-back on a number you already had.', 'Never the number in the email. Business email compromise cost US victims about $3 billion in 2025, by the FBI’s count, and a cloned voice makes the call sound right.'],
+        h: ['If someone asks for money urgently, you call them back on a number you already have.', 'That’s the FTC’s advice for family emergency scams: hang up and call the person on a number you know is theirs.'] },
+      { id: 'd2', p: 3,
+        b: ['Unusual payments need a second person to approve.', 'Two people, two channels. It slows down the fraud, not the business.'],
+        h: ['Your family has a code word for emergencies.', 'Something only you’d know, agreed in person. A voice that sounds right is no longer proof.'] },
+      { id: 'd3', p: 2,
+        b: ['Everyone knows how to report a suspicious message, and won’t be blamed for it.', 'One named person or channel. Phishing was the most common attack in the UK’s 2026 survey, reported by 38% of businesses.'],
+        h: ['Everyone at home knows what to do with a suspicious message.', 'Don’t click, don’t reply, check with someone. Forward scam texts and emails to your country’s reporting service.'] },
+      { id: 'd4', p: 1,
+        b: ['You’ve practiced the first hour of a bad day at least once.', 'A 45-minute tabletop: “the finance inbox has been taken over; go.” Fix whatever it exposes. Businesses that have practiced once look calm on the real day.'],
+        h: ['You’ve talked through scams with older relatives and the kids.', 'Show them one real example of a voice clone or a fake delivery text. Five minutes now saves a lot later.'] },
+      { id: 'd5', p: 2,
+        b: ['You know who to call: bank fraud line, IT help, insurer, and when the regulator must be told.', 'Under the GDPR, some personal-data breaches must be reported to the regulator within 72 hours. Put the contacts on your outage card.'],
+        h: ['You know who to call if money goes.', 'Your bank’s fraud line first, as fast as you can, then the police or your national reporting service. Keep the number on paper.'] }
+    ] }
+  ];
+  var STATES = [['done', 'Done'], ['part', 'Partly'], ['not', 'Not yet'], ['na', 'N/A']];
+  var VAL = { done: 1, part: 0.5, not: 0 };
+  var S = load('state') || { ed: 'business', a: {} };
+  if (!COPY[S.ed]) S.ed = 'business';
+  function save() { store('state', S); }
+  function C() { return COPY[S.ed]; }
+  function iv(it) { return S.ed === 'business' ? it.b : it.h; }
+  function ip(it) { return S.ed === 'household' && it.hp ? it.hp : it.p; }
+  var PRI = { 3: 'Do first', 2: 'Important', 1: 'Good practice' };
+  $('#aic-rc-privacy').innerHTML = LOCK_SVG + '<span>Answers stay in your browser for this session only. Nothing is stored or sent.</span>';
+
+  function render() {
+    var c = C();
+    TOOL.audience = c.audience;
+    $all('input[name="aic-rc-ed"]').forEach(function (r) { r.checked = r.value === S.ed; });
+    $('#aic-rc-h1').textContent = c.h1;
+    $('#aic-rc-lede').textContent = c.lede;
+    $('#aic-rc-why').innerHTML = c.why;
+    var n = 0;
+    $('#aic-rc-areas').innerHTML = AREAS.map(function (a, ai) {
+      return '<section class="aic-card aic-gap" aria-labelledby="aic-rc-a' + ai + '"><p class="aic-eyebrow">Area ' + (ai + 1) + ' of 4</p><h2 class="aic-h2" id="aic-rc-a' + ai + '">' + esc(a.t) + '</h2><p class="aic-soft">' + esc(a.b) + '</p><div class="aic-rows" style="margin-top:8px">' +
+        a.items.map(function (it) {
+          n++; var v = iv(it), st = S.a[it.id], p = ip(it);
+          return '<div class="aic-rowq aic-rc-item" data-state="' + (st || '') + '"><p class="aic-rc-n">' + n + ' · <span class="aic-rc-pri aic-rc-p' + p + '">' + PRI[p] + '</span></p><p class="aic-rowq-t" id="aic-rc-t-' + it.id + '">' + esc(v[0]) + '</p>' +
+            '<details class="aic-rc-how"><summary>Why and how</summary><p>' + esc(v[1]) + '</p></details>' +
+            '<div class="aic-seg" role="radiogroup" aria-labelledby="aic-rc-t-' + it.id + '">' + STATES.map(function (s) {
+              return '<label><input type="radio" name="aic-rc-' + it.id + '" value="' + s[0] + '"' + (st === s[0] ? ' checked' : '') + '><span>' + s[1] + '</span></label>';
+            }).join('') + '</div></div>';
+        }).join('') + '</div></section>';
+    }).join('');
+    $all('#aic-rc-areas input').forEach(function (inp) {
+      inp.addEventListener('change', function () {
+        startOnce({ edition: S.ed });
+        S.a[inp.name.slice(7)] = inp.value; save();
+        inp.closest('.aic-rc-item').setAttribute('data-state', inp.value);
+        tally();
+      });
+    });
+    tally();
+  }
+  function allItems() { var o = []; AREAS.forEach(function (a) { a.items.forEach(function (it) { o.push({ a: a, it: it }); }); }); return o; }
+  function tally() {
+    var items = allItems(), answered = items.filter(function (x) { return S.a[x.it.id]; }).length;
+    var done = items.filter(function (x) { return S.a[x.it.id] === 'done'; }).length;
+    $('#aic-rc-tally').innerHTML = '<span><b>' + done + '</b> done · ' + answered + ' of ' + items.length + ' answered</span><button type="button" class="aic-btn aic-btn-primary" id="aic-rc-go"' + (answered < 5 ? ' disabled' : '') + '>' + (answered < items.length ? 'See what to do next' : 'See where you stand') + '</button>';
+    $('#aic-rc-go').addEventListener('click', function () { results(true); });
+  }
+  $all('input[name="aic-rc-ed"]').forEach(function (r) {
+    r.addEventListener('change', function () { if (r.value !== S.ed) { S.ed = r.value; save(); render(); $('#aic-rc-res').hidden = true; } });
+  });
+
+  function compute() {
+    var tw = 0, got = 0, unanswered = 0, areas = AREAS.map(function (a) { return { a: a, tw: 0, got: 0 }; });
+    allItems().forEach(function (x, i) {
+      var st = S.a[x.it.id]; if (!st) unanswered++;
+      if (st === 'na') return;
+      var w = ip(x.it), v = VAL[st] || 0;
+      tw += w; got += w * v;
+      var ar = areas.filter(function (y) { return y.a === x.a; })[0]; ar.tw += w; ar.got += w * v;
+    });
+    var pct = tw ? Math.round(100 * got / tw) : 0;
+    var todo = allItems().filter(function (x) { var st = S.a[x.it.id]; return st !== 'done' && st !== 'na'; })
+      .sort(function (p, q) { return ip(q.it) - ip(p.it) || (S.a[p.it.id] === 'part' ? 1 : 0) - (S.a[q.it.id] === 'part' ? 1 : 0); });
+    var lvl = pct >= 90 ? 'Ready for a bad day' : pct >= 70 ? 'Solid, with a few gaps' : pct >= 40 ? 'Getting there' : 'Exposed on the basics';
+    return { pct: pct, areas: areas, todo: todo, unanswered: unanswered, level: lvl, p3open: todo.filter(function (x) { return ip(x.it) === 3; }).length };
+  }
+  var R = null;
+  function getResult() { return R ? { label: R.level, score: R.pct } : {}; }
+  var DESC = {
+    'Exposed on the basics': 'The checks that stop most real incidents aren’t in place yet. That’s common, and the top three below are an afternoon’s work between them.',
+    'Getting there': 'Some of the basics are in place and some aren’t. The gaps are specific, so start with the ones marked Do first.',
+    'Solid, with a few gaps': 'Most of what matters is done. What’s left tends to be the habits: testing restores, practicing the first hour, keeping the card current.',
+    'Ready for a bad day': 'You’d meet an outage, a takeover attempt or a scam call with a plan. Keep it that way: re-run this when people, phones or systems change.'
+  };
+
+  function results(fresh) {
+    R = compute();
+    $('#aic-rc-score').innerHTML = R.pct + '<small>%</small>';
+    $('#aic-rc-scoresr').textContent = R.pct + ' percent: ' + R.level + '.';
+    $('#aic-rc-resh').textContent = R.level;
+    $('#aic-rc-resp').textContent = DESC[R.level] + (R.unanswered ? ' (' + R.unanswered + ' check' + (R.unanswered > 1 ? 's' : '') + ' not answered yet count as not done.)' : '');
+    $('#aic-rc-bars').innerHTML = R.areas.map(function (x) {
+      var p = x.tw ? Math.round(100 * x.got / x.tw) : 100;
+      return '<div class="aic-bar-row"><span class="aic-bar-label">' + esc(x.a.t) + '</span><span class="aic-bar" aria-hidden="true"><span class="' + (p < 40 ? 'is-low' : p >= 75 ? 'is-high' : '') + '" style="width:' + p + '%"></span></span><span class="aic-bar-pct">' + p + '%</span></div>';
+    }).join('');
+    var top = R.todo.slice(0, 3);
+    $('#aic-rc-next').innerHTML = top.length ? top.map(function (x, i) {
+      var v = iv(x.it);
+      return '<div class="aic-fix"><span class="aic-item-n">' + (i + 1) + '</span><div><span class="aic-tag ' + (ip(x.it) === 3 ? 'is-red' : 'is-amber') + '">' + PRI[ip(x.it)] + (S.a[x.it.id] === 'part' ? ' · partly done' : '') + '</span><h3 class="aic-h3">' + esc(v[0]) + '</h3><p>' + esc(v[1]) + '</p></div></div>';
+    }).join('') : '<p class="aic-note is-green">Everything that applies is done. Print the checklist, put a review date in the calendar, and redo it in six months.</p>';
+    $('#aic-rc-forkh').textContent = C().forkh;
+    $('#aic-rc-forkp').textContent = C().fork;
+    var biz = S.ed === 'business';
+    var sol = biz && (R.pct < 70 || R.p3open > 0)
+      ? { kind: 'match', title: 'Get the basics set up properly', body: 'You have ' + (R.p3open || 'several') + ' “Do first” check' + (R.p3open === 1 ? '' : 's') + ' still open. A member who advises small businesses on IT and AI adoption can set up passkeys, backups, admin access and the outage plan with you, and leave you with a checklist that stays current.' }
+      : biz ? { kind: 'courses', title: 'Make it the whole team’s habit', body: 'The setup is in good shape. What fails next is usually people: a rushed payment, a pasted password. A short course with a member covers AI, scams and safe everyday use for the team.' }
+        : { kind: 'courses', title: 'Get confident with the everyday tech', body: R.pct < 70 ? 'Most of your next steps are settings and habits: passkeys, backups, spotting scams. A short course with a member walks you through them on your own devices.' : 'You’re in good shape. If you want to use AI tools more without adding new weak points, a short course with a member is a good next step.' };
+    renderHandoff($('#aic-rc-handoff'), {
+      next: { title: 'Find the system you’d miss first', body: 'The checklist covers the basics. The AI & Digital Dependency Score goes system by system and ranks your single points of failure, with an outage card to print.', href: contentUrl('ai-dependency-score'), label: 'Open the Dependency Score' },
+      sol: sol, getResult: getResult
+    });
+    buildPrintable(false);
+    var res = $('#aic-rc-res'); res.hidden = false;
+    try { res.scrollIntoView({ behavior: REDUCE ? 'auto' : 'smooth', block: 'start' }); } catch (e) {}
+    focusHeading($('#aic-rc-resh'));
+    if (fresh) {
+      emit('tool_completed', { assessment_result: R.level, score: R.pct, edition: S.ed, unanswered: R.unanswered });
+      emit('result_viewed', { assessment_result: R.level, score: R.pct, edition: S.ed });
+    }
+  }
+
+  function buildPrintable(blank) {
+    var biz = S.ed === 'business', n = 0;
+    var mark = function (st) { return blank || !st ? '☐' : st === 'done' ? '☑ Done' : st === 'part' ? '◐ Partly' : st === 'na' ? 'N/A' : '☐ Not yet'; };
+    var h = '<div class="aic-rc-print"><h2 class="aic-h2">' + (biz ? 'Our digital resilience checklist' : 'Our household digital resilience checklist') + '</h2><p class="aic-small">Checked on: ____________ · Next review: ____________ · AI Channel Digital Resilience Checklist</p>';
+    AREAS.forEach(function (a) {
+      h += '<h3 class="aic-h3" style="margin-top:14px">' + esc(a.t) + '</h3><table class="aic-table"><tbody>' + a.items.map(function (it) {
+        n++; return '<tr><td style="width:30px">' + n + '</td><td>' + esc(iv(it)[0]) + '</td><td style="white-space:nowrap;width:1%">' + mark(S.a[it.id]) + '</td></tr>';
+      }).join('') + '</tbody></table>';
+    });
+    h += '<div class="aic-rc-card"><h2 class="aic-h2">' + (biz ? 'Offline card: keep it by the till or in the office drawer' : 'Offline card: keep it in the kitchen drawer') + '</h2>' +
+      '<p class="aic-small">Never write passwords on this card.</p><table class="aic-table"><tbody>' +
+      (biz ? [['Who decides we’re in outage mode', ''], ['Bank fraud line', ''], ['IT or web supplier', ''], ['Insurer', ''], ['Data-protection regulator', ''], ['Where the backup codes are kept', ''], ['Where the backups are, and who can restore them', ''], ['Status pages to check (email, payments, key software)', ''], ['Staff group text or messaging list', ''], ['Top customers and suppliers to tell', '']]
+        : [['Family numbers', ''], ['Doctor and pharmacy', ''], ['A neighbor', ''], ['Bank fraud line', ''], ['Internet provider fault line', ''], ['Where the backup codes are kept', ''], ['Where the external backup drive is', ''], ['Medicines and anything that needs power', ''], ['Our family code word', 'Agreed in person, not written here']]).map(function (r) {
+        return '<tr><td style="width:42%"><strong>' + esc(r[0]) + '</strong></td><td>' + (r[1] ? '<em>' + esc(r[1]) + '</em>' : '<span class="aic-line" style="min-width:100%"></span>') + '</td></tr>';
+      }).join('') + '</tbody></table></div></div>';
+    $('#aic-rc-printable').innerHTML = h;
+    root.classList.toggle('aic-rc-blankprint', !!blank);
+  }
+  $('#aic-rc-blank').addEventListener('click', function () { buildPrintable(true); emit('cta_clicked', { cta_clicked: 'print_blank' }); window.print(); });
+  $('#aic-rc-print').addEventListener('click', function () { buildPrintable(false); emit('cta_clicked', { cta_clicked: 'print_checklist', assessment_result: getResult().label, score: getResult().score }); window.print(); });
+  $('#aic-rc-back').addEventListener('click', function () { $('#aic-rc-res').hidden = true; scrollToRoot(); focusHeading($('#aic-rc-h1')); });
+  $('#aic-rc-restart').addEventListener('click', function () { S = { ed: S.ed, a: {} }; clearStore(); save(); $('#aic-rc-res').hidden = true; render(); scrollToRoot(); focusHeading($('#aic-rc-h1')); });
+
+  $('#aic-rc-method').innerHTML = '<p>Each check is weighted by priority (Do first counts three times, Important twice, Good practice once). Done counts fully, Partly half, Not yet and unanswered zero; N/A is left out. It’s a rule of thumb for deciding what to do next, not an audit or a certification.</p>' +
+    '<p>Sources, checked November 2026:</p><ol class="aic-src">' +
+    '<li>UK National Cyber Security Centre, Small organisations guide to cyber security (published 9 April 2026, reviewed 21 July 2026): secure your email, secure important accounts, passkeys, backing up your data. <a href="https://www.ncsc.gov.uk/collection/small-organisations-guide-to-cyber-security" target="_blank" rel="noopener">ncsc.gov.uk</a></li>' +
+    '<li>CISA, Secure Our World: phishing, strong passwords, multifactor authentication and a password manager, updates. <a href="https://www.cisa.gov/secure-our-world" target="_blank" rel="noopener">cisa.gov/secure-our-world</a></li>' +
+    '<li>UK Department for Science, Innovation and Technology, Cyber security breaches survey 2025/2026 (30 April 2026): 43% of businesses reported a breach or attack in the last 12 months; phishing 38%; formal incident response plans 25%. <a href="https://www.gov.uk/government/statistics/cyber-security-breaches-survey-20252026/cyber-security-breaches-survey-20252026" target="_blank" rel="noopener">gov.uk</a></li>' +
+    '<li>FBI Internet Crime Complaint Center, 2025 Internet Crime Report: business email compromise losses $3,046,598,558. <a href="https://www.ic3.gov/AnnualReport/Reports/2025_IC3Report.pdf" target="_blank" rel="noopener">ic3.gov</a></li>' +
+    '<li>US Federal Trade Commission, Family emergency scams. <a href="https://consumer.ftc.gov/scams/family-emergency-scams" target="_blank" rel="noopener">consumer.ftc.gov</a></li>' +
+    '<li>International AI Safety Report 2026, Extended Summary for Policymakers (3 February 2026): scammers have used cloned voices to pose as family members. <a href="https://internationalaisafetyreport.org/publication/2026-report-extended-summary-policymakers" target="_blank" rel="noopener">internationalaisafetyreport.org</a></li>' +
+    '<li>Ready.gov, Power outages. <a href="https://www.ready.gov/power-outages" target="_blank" rel="noopener">ready.gov/power-outages</a></li>' +
+    '<li>GDPR Article 33: notification of a personal data breach within 72 hours where required. <a href="https://gdpr-info.eu/art-33-gdpr/" target="_blank" rel="noopener">gdpr-info.eu</a></li></ol>' +
+    '<p>General guidance, not security, legal or insurance advice.</p>';
+
+  render();
+
+})();
+</script>
+</div>
+<!-- ===== END AI CHANNEL TOOL ===== -->
+</body>
+</html>
+
+</body></html>

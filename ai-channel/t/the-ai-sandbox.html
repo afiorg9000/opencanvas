@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>the-ai-sandbox</title><style>html,body{margin:0;background:#F7F8FA}@media (prefers-color-scheme:dark){html,body{background:#F7F8FA}}</style><!-- AI Channel design A: tool design system v2 (visual layer only; no behaviour changes) -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style id="aic-theme">
+/* ---------- tokens ---------- */
+:root,html{color-scheme:light!important;
+ --pine:#2859c7!important;--pine-deep:#1945ac!important;--accent:#2859c7!important;--accent-deep:#1945ac!important;--primary:#2859c7!important;--blue:#2859c7!important;--blue-d:#1945ac!important;
+ --paper:#ffffff!important;--bg:#ffffff!important;--white:#fff!important;--card:#fff!important;--ink:#14213d!important;--ink-soft:#3f4a5c!important;--ink-mute:#5b6577!important;--muted:#3f4a5c!important;
+ --line:#d9e2f0!important;--sage:#eef3fc!important;--amber-soft:#fbf3e4!important;--accent-wash:#eef3fc!important;--blue-wash:#eef3fc!important;--sky:#eef3fc!important;--pale:#f4f7fc!important;--warm:#f4f7fc!important;
+ --serif:"Newsreader",Georgia,serif!important;--sans:"Inter",system-ui,sans-serif!important;--mono:"IBM Plex Mono",ui-monospace,monospace!important}
+html body .aic-tool,html body .aic-article{
+ --aic-paper:#ffffff!important;--aic-white:#ffffff!important;--aic-ink:#14213d!important;--aic-soft:#46526a!important;--aic-line:#d9e2f0!important;--aic-sage:#eef3fc!important;
+ --aic-blue:#2859c7!important;--aic-blue-deep:#1945ac!important;--aic-blue-soft:#eef3fc!important;--aic-on-blue:#ffffff!important;--aic-focus:#9fbcff!important;
+ --aic-grey:#46526a!important;--aic-grey-soft:#f4f7fc!important;
+ --aic-radius:16px!important;--aic-radius-sm:12px!important;--aic-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important;
+ color-scheme:light!important;background:#fff!important;color:#14213d!important;
+ font-family:"Inter",system-ui,sans-serif!important;-webkit-font-smoothing:antialiased}
+html,body{background:#fff!important}
+html body .aic-tool{padding:56px 0 96px!important}
+html body .aic-article{padding:0 0 112px!important}
+html body .aic-tool .aic-col,html body .aic-article .aic-col{max-width:860px!important}
+@media(min-width:600px){html body .aic-tool .aic-col,html body .aic-article .aic-col{padding-inline:32px!important}}
+
+/* ---------- type ---------- */
+html body .aic-tool .aic-h1,html body .aic-article h1,body h1{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important;line-height:1.02!important;font-size:clamp(38px,5.4vw,62px)!important;color:#14213d}
+html body .aic-tool .aic-h2,html body .aic-article h2,body h2{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important;line-height:1.1!important}
+html body .aic-article h2{font-size:clamp(28px,3.6vw,38px)!important;margin-top:72px!important}
+html body .aic-tool .aic-h2{font-size:clamp(26px,3.4vw,36px)!important}
+html body .aic-tool .aic-h3,html body .aic-article h3,body h3{font-family:"Newsreader",Georgia,serif!important;font-weight:550!important;letter-spacing:-.01em!important;font-size:22px!important;line-height:1.2!important}
+body h4,body h5,body h6{font-family:"Inter",system-ui,sans-serif!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow,html body .aic-tool .aic-qnum,html body .aic-tool .aic-nav-hint,.aic-mono{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;letter-spacing:.06em!important;text-transform:uppercase;font-size:12px!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow{color:#2859c7!important;display:flex!important;align-items:center;gap:12px}
+html body .aic-tool .aic-eyebrow::before,html body .aic-article .aic-head .aic-eyebrow::before{content:"";width:28px;height:1px;background:#2859c7;flex:none}
+html body .aic-tool .aic-lede,html body .aic-article .aic-lede,html body .aic-article .aic-dek{font-size:20px!important;line-height:1.55!important;color:#3f4a5c!important;max-width:60ch}
+html body .aic-tool .aic-soft,html body .aic-tool .aic-small{color:#46526a!important}
+html body .aic-tool .aic-small{font-size:14px!important}
+html body .aic-article{font-size:18.5px!important;line-height:1.72!important}
+html body .aic-article p+p{margin-top:22px!important}
+html body .aic-article .aic-head{padding:72px 0 40px!important;border-bottom:1px solid #d9e2f0;margin-bottom:48px}
+html body .aic-article .aic-meta,html body .aic-article .aic-head p:not(.aic-lede):not(.aic-dek){font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px!important;letter-spacing:.03em;color:#5b6577!important}
+html body .aic-tool a,html body .aic-article a{color:#2859c7}
+
+/* ---------- panels ---------- */
+html body .aic-tool .aic-card,html body .aic-article .aic-card{background:#fff!important;border:1px solid #d9e2f0!important;border-radius:16px!important;box-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important}
+@media(min-width:600px){html body .aic-tool .aic-card{padding:36px 40px!important}html body .aic-article .aic-card{padding:32px 36px!important}}
+html body .aic-tool .aic-stack>*+*{margin-top:20px!important}
+html body .aic-tool .aic-grid2,html body .aic-article .aic-grid{gap:16px!important}
+/* the short answer: a framed figure, like the site's tool previews */
+html body .aic-article .aic-short{background:#fff!important;border:1px solid #d9e2f0!important;box-shadow:0 0 0 10px #eef3fc,0 0 0 11px #d9e2f0!important;margin:12px 11px 56px!important;border-radius:12px!important;border-left:1px solid #d9e2f0!important}
+html body .aic-article .aic-short .aic-eyebrow,html body .aic-article .aic-short>:first-child{color:#2859c7!important}
+/* notes and callouts */
+html body .aic-tool .aic-note,html body .aic-article .aic-note,html body .aic-article .aic-callout{background:#f4f7fc!important;border-left:3px solid #2859c7!important;border-radius:0 12px 12px 0!important;padding:18px 22px!important;font-size:15.5px!important;color:#14213d!important}
+html body .aic-tool .aic-note.aic-warn{background:#fdf7ec!important;border-left-color:#a46207!important}
+html body .aic-tool .aic-note.aic-bad{background:#fdf0ee!important;border-left-color:#b42318!important}
+html body .aic-tool .aic-note.aic-good{background:#eef8f1!important;border-left-color:#2f7a4e!important}
+/* calls to action become navy bands */
+html body .aic-tool .aic-cta,html body .aic-article .aic-cta,html body .aic-tool .aic-dark,html body .aic-article .aic-dark{--aic-ink:#ffffff!important;--aic-soft:#c9d6ee!important;--aic-white:#13264a!important;--aic-line:#2a3f6a!important;--aic-blue:#9fbcff!important;--aic-blue-soft:#1d3563!important;--aic-on-blue:#13264a!important;
+ background:#13264a!important;color:#fff!important;border-color:#13264a!important;box-shadow:none!important}
+html body .aic-tool .aic-cta *:not(.aic-btn):not(.aic-btn *),html body .aic-article .aic-cta *:not(.aic-btn):not(.aic-btn *){color:inherit}
+html body .aic-tool .aic-cta .aic-btn-primary,html body .aic-article .aic-cta .aic-btn-primary{background:#fff!important;color:#13264a!important;border-color:#fff!important}
+html body .aic-tool .aic-cta a:not(.aic-btn),html body .aic-article .aic-cta a:not(.aic-btn){color:#9fbcff!important}
+
+/* ---------- questions and answer options ---------- */
+html body .aic-tool .aic-q{margin-top:28px!important}
+html body .aic-tool .aic-qnum{color:#2859c7!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;font-size:clamp(22px,2.6vw,27px)!important;line-height:1.22!important;letter-spacing:-.01em!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qhint{font-size:15px!important;color:#46526a!important;margin-bottom:18px!important}
+html body .aic-tool .aic-opts{gap:10px!important;margin-top:18px!important}
+html body .aic-tool .aic-opt,html body .aic-tool .aic-pick,html body .aic-tool .aic-check{background:#fff!important;border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:16px 18px!important;font-size:16px!important;gap:14px!important;transition:border-color .15s,box-shadow .15s,background-color .15s,transform .15s!important}
+html body .aic-tool .aic-opt:hover,html body .aic-tool .aic-pick:hover,html body .aic-tool .aic-check:hover{border-color:#2859c7!important;box-shadow:0 6px 18px rgba(40,89,199,.10)!important;transform:translateY(-1px)}
+html body .aic-tool .aic-opt[aria-checked="true"],html body .aic-tool .aic-opt[aria-pressed="true"],html body .aic-tool .aic-pick:has(input:checked),html body .aic-tool .aic-check:has(input:checked),html body .aic-tool .aic-opt:has(input:checked){border-color:#2859c7!important;background:#f4f7fc!important;box-shadow:0 0 0 3px #dbe6fb!important}
+html body .aic-tool .aic-dot{width:22px!important;height:22px!important;border:2px solid #9aa8c0!important}
+html body .aic-tool .aic-dot::after{inset:4px!important;background:#2859c7!important}
+html body .aic-tool .aic-opt[aria-checked="true"] .aic-dot{border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-size:14px!important;color:#46526a!important;margin-top:4px!important}
+html body .aic-tool .aic-opt.aic-opt-unsure{background:transparent!important;border-style:dashed!important}
+html body .aic-tool input[type=text],html body .aic-tool input[type=search],html body .aic-tool input[type=email],html body .aic-tool textarea,html body .aic-tool select,html body .aic-tool .aic-input{border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:14px 16px!important;background:#fff!important;font-size:16px!important}
+html body .aic-tool input:focus,html body .aic-tool textarea:focus,html body .aic-tool select:focus{border-color:#2859c7!important;outline:none!important;box-shadow:0 0 0 3px #dbe6fb!important}
+
+/* ---------- controls ---------- */
+html body .aic-tool .aic-btn,html body .aic-article .aic-btn{min-height:50px!important;padding:14px 24px!important;font-weight:600!important;font-size:15px!important;border-radius:999px!important;border:1.5px solid #c9d6ee!important;box-shadow:none!important}
+html body .aic-tool .aic-btn:hover,html body .aic-article .aic-btn:hover{border-color:#2859c7!important}
+html body .aic-tool .aic-btn-primary,html body .aic-article .aic-btn-primary{background:#2859c7!important;border-color:#2859c7!important;color:#fff!important}
+html body .aic-tool .aic-btn-primary:hover,html body .aic-article .aic-btn-primary:hover{background:#1945ac!important;border-color:#1945ac!important}
+html body .aic-tool .aic-btn-ghost{border-color:transparent!important;text-decoration:underline;text-underline-offset:4px;color:#3f4a5c!important}
+html body .aic-tool .aic-btn[disabled]{opacity:.4!important}
+html body .aic-tool .aic-nav{margin-top:36px!important;padding-top:24px!important;border-top:1px solid #d9e2f0!important}
+html body .aic-tool .aic-actions{gap:12px!important}
+html body .aic-tool .aic-seg{border:1.5px solid #d9e2f0!important;padding:4px!important}
+html body .aic-tool .aic-seg button{font-weight:600!important;color:#3f4a5c!important}
+html body .aic-tool .aic-seg button[aria-pressed="true"],html body .aic-tool .aic-seg button[aria-checked="true"]{background:#13264a!important;color:#fff!important}
+html body .aic-tool .aic-progress{height:4px!important;background:#e3eaf6!important;margin:20px 0 8px!important}
+html body .aic-tool .aic-progress span,html body .aic-tool .aic-progress i{background:#2859c7!important}
+html body .aic-tool .aic-chip,html body .aic-tool .aic-pill{border:1.5px solid #d9e2f0!important;background:#fff!important;font-weight:600!important;border-radius:999px!important}
+html body .aic-tool .aic-chip[aria-pressed="true"],html body .aic-tool .aic-chip.aic-on,html body .aic-tool .aic-pill.aic-on{background:#eef3fc!important;border-color:#2859c7!important;color:#1945ac!important}
+html body .aic-tool .aic-tag,html body .aic-article .aic-tag{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;padding:5px 11px!important}
+html body .aic-tool .aic-privacy{font-size:14px!important;color:#46526a!important;margin-top:20px!important}
+
+/* ---------- results ---------- */
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-stat b,html body .aic-tool .aic-stat strong,html body .aic-tool .aic-display{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important}
+html body .aic-tool .aic-bar{height:8px!important;background:#e3eaf6!important}
+html body .aic-tool .aic-bar-row{padding:14px 0!important;border-bottom-color:#e3eaf6!important}
+html body .aic-tool .aic-bar-label{font-weight:600!important}
+html body .aic-tool table,html body .aic-article table{border-collapse:collapse}
+html body .aic-tool th,html body .aic-article th{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;text-transform:uppercase;color:#2859c7!important;background:#f4f7fc!important}
+html body .aic-tool td,html body .aic-article td{border-color:#e3eaf6!important}
+html body .aic-article .aic-sources,html body .aic-tool .aic-sources{font-size:14px!important;color:#46526a!important;border-top:1px solid #d9e2f0;padding-top:32px!important;margin-top:72px!important}
+html body .aic-article .aic-related,html body .aic-article .aic-deeper{margin-top:72px!important}
+
+/* ---------- pages outside the shared system ---------- */
+body:not(:has(.aic-tool)):not(:has(.aic-article)) h1,body:not(:has(.aic-tool)):not(:has(.aic-article)) h2,body:not(:has(.aic-tool)):not(:has(.aic-article)) h3{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important}
+html,body{font-family:"Inter",system-ui,sans-serif}
+input[type=range],input[type=checkbox],input[type=radio]{accent-color:#2859c7!important}
+:focus-visible{outline-color:#2859c7!important}
+[tabindex="-1"]:focus,h1:focus,h2:focus,h3:focus{outline:none!important;box-shadow:none!important}
+
+/* ================= v3: product-grade tool shell ================= */
+html,body{background:#f4f7fc!important}
+html body .aic-tool{background:#f4f7fc!important}
+html body .aic-tool .aic-col{max-width:980px!important}
+html body .aic-tool .aic-h1{font-size:clamp(40px,5vw,62px)!important;max-width:20ch}
+html body .aic-tool .aic-grid2>.aic-card{box-shadow:none!important;background:#fff!important;border-radius:14px!important}
+html body .aic-tool.aic-in-q .aic-h1{font-size:22px!important;line-height:1.2!important;max-width:none;margin:6px 0 20px!important;font-weight:500!important}
+html body .aic-tool.aic-in-q .aic-lede,html body .aic-tool.aic-in-q > .aic-col > .aic-privacy,html body .aic-tool.aic-in-q .aic-col > * > .aic-privacy{display:none!important}
+html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:56px 64px 44px!important;border:0!important;border-radius:24px!important;box-shadow:0 1px 0 rgba(19,38,74,.05),0 30px 70px rgba(19,38,74,.10)!important;min-height:460px}
+@media(max-width:700px){html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:32px 22px 28px!important;border-radius:18px!important;min-height:0}}
+html body .aic-tool .aic-progress{height:3px!important;background:#e3eaf6!important;border-radius:0!important;margin:14px 0 36px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-size:clamp(26px,3.2vw,38px)!important;line-height:1.12!important;letter-spacing:-.02em!important;margin-bottom:12px!important;max-width:28ch}
+html body .aic-tool .aic-qhint{font-size:16px!important;margin-bottom:24px!important}
+html body .aic-tool .aic-opts{counter-reset:aicopt;gap:12px!important}
+html body .aic-tool .aic-opt{counter-increment:aicopt;align-items:center!important;min-height:64px;padding:16px 20px!important;font-size:17px!important;font-weight:500;border-radius:14px!important}
+html body .aic-tool .aic-opt .aic-dot{display:none!important}
+html body .aic-tool .aic-opt::before{content:counter(aicopt,upper-alpha);flex:none;width:30px;height:30px;display:grid;place-items:center;border:1.5px solid #c9d6ee;border-radius:8px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;font-weight:500;color:#2859c7;background:#fff;transition:all .15s}
+html body .aic-tool .aic-opt:hover::before{border-color:#2859c7}
+html body .aic-tool .aic-opt[aria-checked="true"]::before{background:#2859c7;border-color:#2859c7;color:#fff;content:"\2713"}
+html body .aic-tool .aic-opt[aria-checked="true"]{background:#eef3fc!important;box-shadow:0 0 0 2px #2859c7!important;border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-weight:400}
+html body .aic-tool .aic-nav{border-top:0!important;margin-top:40px!important;padding-top:0!important}
+html body .aic-tool .aic-nav .aic-btn-primary{min-width:150px}
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-display{font-size:clamp(56px,8vw,96px)!important;line-height:.95!important;color:#14213d}
+
+/* ================= v4: legibility ================= */
+html body .aic-tool{font-size:17px!important;line-height:1.6!important}
+html body .aic-tool,html body .aic-article{--aic-soft:#334055!important}
+html body .aic-tool .aic-small,html body .aic-tool .aic-opt-sub,html body .aic-tool .aic-privacy,html body .aic-tool .aic-nav-hint{font-size:15px!important;color:#334055!important}
+html body .aic-tool p,html body .aic-tool li{color:#1d2a44}
+html body .aic-tool .aic-lede{font-size:20px!important;color:#2a364d!important}
+html body .aic-tool .aic-note{font-size:16.5px!important}
+html body .aic-tool .aic-opt{font-size:18px!important;color:#14213d!important}
+html body .aic-tool .aic-qhint{font-size:17px!important;color:#334055!important}
+html body .aic-tool .aic-eyebrow,html body .aic-tool .aic-qnum,.aic-mono{font-size:12.5px!important;color:#2859c7!important;letter-spacing:.05em!important}
+html body .aic-tool .aic-tag{font-size:12.5px!important}
+html body .aic-tool th,html body .aic-article th{font-size:12.5px!important}
+html body .aic-tool td{font-size:16px}
+html body .aic-article{color:#14213d!important}
+html body .aic-article p,html body .aic-article li{color:#1d2a44}
+</style>
+<script>
+(function(){
+  function hsl(c){var m=c&&c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/);if(!m)return null;var r=m[1]/255,g=m[2]/255,b=m[3]/255,a=m[4]===undefined?1:+m[4];
+    var mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn,s=d?d/(1-Math.abs(2*l-1)):0,h=0;
+    if(d){h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;if(h<0)h+=360}return {h:h,s:s,l:l,a:a}}
+  function blue(c){var x=hsl(c);return x&&x.a>0.05&&x.s>0.3&&x.l>0.28&&x.l<0.95&&x.h>=205&&x.h<=240?x:null}
+  function N(x,dark,light){return x.a<0.95?"rgba(40,89,199,"+Math.min(x.a,0.12).toFixed(3)+")":(x.l>0.82?light:dark)}
+  function fix(el){var c0=getComputedStyle(el),bg=hsl(c0.backgroundColor),fg=hsl(c0.color);if(bg&&fg&&bg.a>0.9&&bg.l<0.6&&bg.s>0.3&&bg.h>=205&&bg.h<=240&&fg.l<0.6)el.style.setProperty("color","#ffffff","important");
+    if(el.closest(".aic-cta,.aic-dark")||el.matches(".aic-opt,.aic-pick,.aic-check,.aic-btn,.aic-chip,.aic-pill,.aic-seg button,.aic-card,.aic-note"))return;var cs=getComputedStyle(el),x;
+    if((x=blue(cs.color)))el.style.setProperty("color",x.l>0.75?"#eef3fc":"#2859c7","important");
+    if((x=blue(cs.backgroundColor)))el.style.setProperty("background-color",N(x,"#2859c7",x.l>0.9?"#eef3fc":"#d6e2f8"),"important");
+    if(el instanceof SVGElement){if((x=blue(cs.fill)))el.style.setProperty("fill",N(x,"#2859c7","#eef3fc"),"important");if((x=blue(cs.stroke)))el.style.setProperty("stroke",N(x,"#2859c7","#d6e2f8"),"important")}
+    if(cs.textTransform==="uppercase"&&parseFloat(cs.fontSize)<=13.5&&!el.closest("button")&&!el.classList.contains("aic-mono"))el.classList.add("aic-mono");}
+  var t;function mode(){document.querySelectorAll(".aic-tool").forEach(function(r){var q=[].some.call(r.querySelectorAll(".aic-progress,.aic-qtext,.aic-q-text"),function(e){return e.offsetParent!==null});if(q!==r.classList.contains("aic-in-q"))r.classList.toggle("aic-in-q",q)})}
+  function run(){clearTimeout(t);t=setTimeout(function(){mode();document.querySelectorAll("body *").forEach(fix)},30)}
+  document.addEventListener("DOMContentLoaded",function(){run();new MutationObserver(run).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class","aria-pressed","aria-checked","data-state"]});
+    document.addEventListener("change",run,true);document.addEventListener("click",run,true);});
+})();
+</script>
+</head><body>
+<!--
+TITLE: How do we use AI tools without exposing our data? (The AI Sandbox)
+TYPE: Guide (backlog item "The AI Sandbox"), with a small three-question "Find your starting point" picker.
+FILE: the-ai-sandbox.html   SLUG: the-ai-sandbox
+AUDIENCE: Business owners and mid-market companies (primary); executives, IT leads, public-sector teams.
+Copy in house voice (US spelling), November 2026.
+
+WHAT IT COVERS: The honest version of the backlog promise. A "sandbox" is a controlled zone built from approved
+  tools, data rules and a record. Five vendor-neutral approaches, each with what it protects against, what it
+  doesn't, effort and best use: (1) business agreements with no-training terms, (2) data minimization/redaction,
+  (3) pseudonymization/anonymization, (4) private or on-prem models, (5) gateway with DLP. Side-by-side table,
+  a decision picker (most sensitive data x current use x tech capacity -> recommended mix + first three moves +
+  matchUrl line), what a sandbox doesn't fix (outputs, prompt injection, connectors), actions for the org and
+  the individual. The backlog line "so your real data never leaves your network" is corrected: only option 4
+  keeps data on your own systems; the page says so.
+
+SOURCES CHECKED (all on 4 Nov 2026): Microsoft/LinkedIn Work Trend Index release (8 May 2024: 78% of AI users
+  bring their own tools); IBM Cost of a Data Breach 2025 release (30 Jul 2025: one in five orgs breach via shadow
+  AI; +US$670,000); NBC News/Bloomberg on Samsung (2 May 2023); OpenAI API data controls (no training by default;
+  abuse-monitoring logs up to 30 days; zero retention by approval); Microsoft Learn enterprise data protection
+  (prompts not used to train foundation models); Google Workspace privacy hub (no training without permission);
+  ICO anonymisation/pseudonymisation guidance (28 Mar 2025, under review after the DUA Act); EDPB Guidelines
+  01/2025 (16 Jan 2025); CJEU C-413/23 P EDPS v SRB (4 Sep 2025); UK AISI blog (17 Jul 2026: open-weight models
+  can be hosted privately; trail closed models by 4-7 months on cyber evals); ICO AI guidance (security and data
+  minimisation); NCSC prompt-injection blog (8 Dec 2025); OWASP Top 10 for LLM Apps 2025. Vendor documents are
+  cited for facts about their own products, three providers side by side; no endorsement.
+
+WHAT CHANGED VS aidoomsdayguide.com (related pages /work/can-i-put-confidential-information-into-chatgpt/,
+  /evidence/prompt-injection-explained/): the old pages said "use approved tools" and "classify data" in general
+  terms, repeated their own short answer and carried a generic four-question box. This version answers up front,
+  compares the five concrete ways to control data with their real limits (retention, pseudonymized data is still
+  personal data, open-model capability gap), adds verified figures with dates, an interactive starting point, and
+  AI Channel next steps. No doomsday branding.
+
+HOW TO EMBED IN WORDPRESS:
+  Option A, Custom HTML block: paste everything between AIC:START and AIC:END (style + article + script).
+    CSS is scoped to .aic-article (variables on the wrapper, no global element styles), every class is
+    prefixed aic-, JS runs in an IIFE; the only global is window.AICHANNEL_CONFIG. No network requests,
+    no cookies, no storage. System font stack (Inter used if the theme already loads it).
+  Option B, iframe: <iframe src="/path/the-ai-sandbox.html" title="The AI Sandbox" style="width:100%;min-height:2400px;border:0" loading="lazy"></iframe>
+    (Upload the file to the media library or theme folder first; it renders as-is in a browser.)
+
+CONFIG (window.AICHANNEL_CONFIG, set before this block or edit the defaults at the top of the script):
+  matchUrl       - "Get matched to someone" (advisory form). Member route used on this page.
+  newsletterUrl  - "Keep up without keeping up with everything." link
+  coursesUrl     - not used on this page (kept for consistency)
+  resultsFormUrl - not used on this page
+  contentBaseUrl - prefix for sibling pieces; links are contentBaseUrl + slug + ".html" (default "").
+    For WordPress permalinks you may prefer to edit the data-aic-slug links or set contentBaseUrl to
+    "/guides/" and serve .html files there.
+TRACKING: dispatches window CustomEvent "aichannel:event" and parent.postMessage({type:"aichannel:event",...})
+  for content_viewed and cta_clicked (plus tool_started / tool_completed / result_viewed where noted).
+  Member links carry lead_type, audience, source_page, source_content_or_tool, cta_clicked and utm_* params.
+  Picker events: tool_started, tool_completed, result_viewed (assessment_result = mix label).
+-->
+<!-- AIC:START -->
+<style>
+/* ===== AI Channel article base (scoped to .aic-article) ===== */
+.aic-article{
+  --aic-paper:#F7F8FA; --aic-white:#FFFFFF; --aic-ink:#162033; --aic-soft:#667085; --aic-line:#DEE3EA; --aic-sage:#EEF1F6;
+  --aic-blue:#315EFB; --aic-blue-deep:#2448C9; --aic-blue-soft:#EEF3FF; --aic-on-blue:#FFFFFF;
+  --aic-amber:#A46207; --aic-amber-soft:#FBF3E4; --aic-green:#2F7A4E; --aic-green-soft:#E9F5EE;
+  --aic-red:#B42318; --aic-red-soft:#FDEDEB;
+  --aic-radius:18px; --aic-radius-sm:12px; --aic-shadow:0 10px 28px rgba(21,32,51,.055);
+  --aic-measure:68ch;
+  display:block; background:var(--aic-paper); color:var(--aic-ink);
+  font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size:18px; line-height:1.68; padding:36px 0 64px; -webkit-text-size-adjust:100%; text-align:left; overflow-wrap:break-word;
+}
+@media (prefers-color-scheme:dark){
+  .aic-article{
+    --aic-paper:#101B2D; --aic-white:#162033; --aic-ink:#F2F4F8; --aic-soft:#A6B3C7; --aic-line:#2A3850; --aic-sage:#1E2A40;
+    --aic-blue:#7A97FF; --aic-blue-deep:#9BB2FF; --aic-blue-soft:#1F2B45; --aic-on-blue:#0B1426;
+    --aic-amber:#E0A34A; --aic-amber-soft:#2D2617; --aic-green:#6FC592; --aic-green-soft:#15302A;
+    --aic-red:#F97066; --aic-red-soft:#3A1E22; --aic-shadow:none; color-scheme:dark;
+  }
+}
+.aic-article *,.aic-article *::before,.aic-article *::after{box-sizing:border-box}
+.aic-article h1,.aic-article h2,.aic-article h3,.aic-article h4,.aic-article p,.aic-article ul,.aic-article ol,.aic-article li,.aic-article figure,.aic-article table,.aic-article fieldset,.aic-article legend{margin:0;padding:0}
+.aic-article fieldset{border:0;min-width:0}
+.aic-article button,.aic-article input,.aic-article select{font:inherit;color:inherit}
+.aic-article a{color:var(--aic-blue);font-weight:650;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+.aic-article a:hover{color:var(--aic-blue-deep);text-decoration-thickness:2px}
+.aic-article :focus-visible{outline:3px solid #9DB2FF;outline-offset:2px;border-radius:6px}
+.aic-article [hidden]{display:none!important}
+.aic-article .aic-sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;margin:-1px;padding:0;border:0}
+
+.aic-article .aic-wrap{max-width:860px;margin:0 auto;padding-inline:16px}
+@media (min-width:600px){.aic-article .aic-wrap{padding-inline:28px}}
+.aic-article .aic-prose{max-width:var(--aic-measure)}
+.aic-article .aic-prose>*+*{margin-top:1em}
+.aic-article .aic-prose ul,.aic-article .aic-prose ol{padding-left:1.25em}
+.aic-article .aic-prose li+li{margin-top:.45em}
+.aic-article .aic-prose strong{font-weight:750}
+
+.aic-article .aic-eyebrow{display:block;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--aic-blue);line-height:1.4}
+.aic-article .aic-h1{font-size:clamp(32px,6.6vw,52px);line-height:1.04;font-weight:800;letter-spacing:-.035em;margin:12px 0 14px;max-width:20ch}
+.aic-article .aic-kicker{font-size:clamp(19px,2.6vw,22px);line-height:1.45;color:var(--aic-soft);max-width:var(--aic-measure);font-weight:500}
+.aic-article .aic-meta{margin-top:14px;font-size:14px;color:var(--aic-soft);display:flex;flex-wrap:wrap;gap:6px 16px}
+.aic-article .aic-h2{font-size:clamp(25px,4.2vw,33px);line-height:1.12;font-weight:800;letter-spacing:-.03em;margin:56px 0 14px;max-width:26ch;scroll-margin-top:20px}
+.aic-article .aic-h3{font-size:20px;line-height:1.3;font-weight:800;letter-spacing:-.015em;margin:28px 0 8px}
+.aic-article .aic-soft{color:var(--aic-soft)}
+.aic-article .aic-small{font-size:15px;line-height:1.6;color:var(--aic-soft)}
+
+/* Short answer */
+.aic-article .aic-answer{margin-top:28px;background:var(--aic-white);border:1px solid var(--aic-line);border-left:5px solid var(--aic-blue);border-radius:var(--aic-radius);box-shadow:var(--aic-shadow);padding:22px 22px 24px;max-width:var(--aic-measure)}
+@media (min-width:600px){.aic-article .aic-answer{padding:26px 30px 28px}}
+.aic-article .aic-answer p{margin-top:10px;font-size:19px;line-height:1.6}
+
+/* Cards */
+.aic-article .aic-card{background:var(--aic-white);border:1px solid var(--aic-line);border-radius:var(--aic-radius);box-shadow:var(--aic-shadow);padding:20px 20px 22px}
+@media (min-width:600px){.aic-article .aic-card{padding:24px 26px}}
+.aic-article .aic-cards{display:grid;gap:14px;margin-top:18px}
+.aic-article .aic-card .aic-h3{margin-top:4px}
+.aic-article .aic-card p{font-size:17px;line-height:1.6}
+.aic-article .aic-card p+p,.aic-article .aic-card p+dl,.aic-article .aic-card dl+p{margin-top:10px}
+.aic-article .aic-dl{display:grid;gap:10px;margin-top:12px}
+.aic-article .aic-dl div{border-top:1px solid var(--aic-line);padding-top:10px}
+.aic-article .aic-dl dt{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--aic-soft)}
+.aic-article .aic-dl dd{margin:2px 0 0;font-size:16.5px;line-height:1.55}
+@media (min-width:720px){.aic-article .aic-dl{grid-template-columns:1fr 1fr}}
+.aic-article .aic-tag{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.04em;padding:3px 10px;border-radius:999px;background:var(--aic-blue-soft);color:var(--aic-blue-deep);line-height:1.6}
+.aic-article .aic-tag-amber{background:var(--aic-amber-soft);color:var(--aic-amber)}
+.aic-article .aic-tag-green{background:var(--aic-green-soft);color:var(--aic-green)}
+
+/* Callouts */
+.aic-article .aic-note{margin-top:20px;max-width:var(--aic-measure);background:var(--aic-amber-soft);border-radius:var(--aic-radius-sm);padding:16px 18px;font-size:16.5px;line-height:1.6}
+.aic-article .aic-note strong{color:var(--aic-amber)}
+.aic-article .aic-stat{margin-top:20px;max-width:var(--aic-measure);display:grid;gap:12px}
+@media (min-width:640px){.aic-article .aic-stat{grid-template-columns:1fr 1fr}}
+.aic-article .aic-stat div{background:var(--aic-white);border:1px solid var(--aic-line);border-radius:var(--aic-radius-sm);padding:16px 18px}
+.aic-article .aic-stat b{display:block;font-size:30px;line-height:1.1;font-weight:800;letter-spacing:-.03em;color:var(--aic-blue)}
+.aic-article .aic-stat span{display:block;margin-top:6px;font-size:15.5px;line-height:1.5}
+.aic-article .aic-stat small{display:block;margin-top:6px;font-size:13px;color:var(--aic-soft);line-height:1.45}
+
+/* Tables */
+.aic-article .aic-tablewrap{margin-top:18px;overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--aic-line);border-radius:var(--aic-radius-sm);background:var(--aic-white)}
+.aic-article table{border-collapse:collapse;width:100%;font-size:15.5px;line-height:1.5}
+.aic-article th,.aic-article td{text-align:left;vertical-align:top;padding:11px 13px;border-bottom:1px solid var(--aic-line)}
+.aic-article thead th{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--aic-soft);background:var(--aic-sage)}
+.aic-article tbody tr:last-child td,.aic-article tbody tr:last-child th{border-bottom:0}
+.aic-article tbody th{font-weight:750}
+.aic-article .aic-table-wide{min-width:640px}
+
+/* TOC */
+.aic-article .aic-toc{margin-top:26px;max-width:var(--aic-measure);border:1px solid var(--aic-line);border-radius:var(--aic-radius-sm);padding:16px 18px;background:var(--aic-white)}
+.aic-article .aic-toc ol{margin-top:8px;padding-left:1.3em;columns:1;font-size:16px;line-height:1.55}
+@media (min-width:720px){.aic-article .aic-toc ol{columns:2;column-gap:32px}}
+.aic-article .aic-toc li{break-inside:avoid;margin-bottom:4px}
+.aic-article .aic-toc a{font-weight:600;text-decoration:none}
+.aic-article .aic-toc a:hover{text-decoration:underline}
+
+/* Actions */
+.aic-article .aic-actions-list{margin-top:18px;display:grid;gap:12px;max-width:var(--aic-measure);list-style:none;padding:0;counter-reset:aicact}
+.aic-article .aic-actions-list li{counter-increment:aicact;position:relative;background:var(--aic-white);border:1px solid var(--aic-line);border-radius:var(--aic-radius-sm);padding:14px 16px 14px 54px;font-size:17px;line-height:1.55}
+.aic-article .aic-actions-list li::before{content:counter(aicact);position:absolute;left:14px;top:14px;width:28px;height:28px;border-radius:50%;background:var(--aic-blue-soft);color:var(--aic-blue-deep);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center}
+.aic-article .aic-actions-list b{display:block;font-weight:800;letter-spacing:-.01em}
+.aic-article .aic-who{margin-top:26px;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--aic-soft)}
+
+/* Buttons + CTA */
+.aic-article .aic-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;min-height:46px;border-radius:999px;border:1px solid var(--aic-line);background:var(--aic-white);color:var(--aic-ink);font-weight:750;font-size:15.5px;line-height:1.2;text-decoration:none;cursor:pointer}
+.aic-article .aic-btn:hover{border-color:#B8C7FF;text-decoration:none;color:var(--aic-ink)}
+.aic-article .aic-btn-primary{background:var(--aic-blue);border-color:var(--aic-blue);color:var(--aic-on-blue);box-shadow:0 6px 16px rgba(49,94,251,.14)}
+.aic-article .aic-btn-primary:hover{background:var(--aic-blue-deep);border-color:var(--aic-blue-deep);color:var(--aic-on-blue)}
+.aic-article .aic-cta{margin-top:56px;max-width:var(--aic-measure);background:var(--aic-white);border:1px solid var(--aic-line);border-radius:var(--aic-radius);box-shadow:var(--aic-shadow);padding:24px}
+@media (min-width:600px){.aic-article .aic-cta{padding:28px 32px}}
+.aic-article .aic-cta .aic-h2{margin:6px 0 8px}
+.aic-article .aic-cta p{font-size:17px}
+.aic-article .aic-cta-row{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-top:16px}
+.aic-article .aic-cta-row .aic-small a{font-weight:700}
+
+/* Related + sources */
+.aic-article .aic-related{margin-top:16px;display:grid;gap:10px;max-width:var(--aic-measure);list-style:none;padding:0}
+@media (min-width:640px){.aic-article .aic-related{grid-template-columns:1fr 1fr}}
+.aic-article .aic-related a{display:block;height:100%;background:var(--aic-white);border:1px solid var(--aic-line);border-radius:var(--aic-radius-sm);padding:14px 16px;text-decoration:none;color:var(--aic-ink);font-weight:750;font-size:16.5px;line-height:1.4}
+.aic-article .aic-related a:hover{border-color:#B8C7FF}
+.aic-article .aic-related small{display:block;margin-top:4px;font-weight:500;color:var(--aic-soft);font-size:14.5px}
+.aic-article .aic-sources{margin-top:14px;padding-left:1.6em;font-size:15px;line-height:1.55;color:var(--aic-soft);max-width:var(--aic-measure)}
+.aic-article .aic-sources li+li{margin-top:9px}
+.aic-article .aic-sources a{font-weight:600;word-break:break-word}
+.aic-article .aic-sources cite{font-style:normal;color:var(--aic-ink);font-weight:650}
+.aic-article .aic-sup{font-size:.68em;vertical-align:super;line-height:0;font-weight:700;text-decoration:none;margin-left:1px}
+.aic-article .aic-footnote{margin-top:28px;font-size:14px;color:var(--aic-soft);max-width:var(--aic-measure);border-top:1px solid var(--aic-line);padding-top:14px}
+.aic-article hr{border:0;border-top:1px solid var(--aic-line);margin:40px 0 0}
+
+@media (prefers-reduced-motion:reduce){.aic-article *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media print{
+  .aic-article{background:#fff;color:#000;font-size:11.5pt;padding:0}
+  .aic-article .aic-card,.aic-article .aic-answer,.aic-article .aic-cta,.aic-article .aic-toc,.aic-article .aic-related a{box-shadow:none;break-inside:avoid}
+  .aic-article .aic-noprint,.aic-article .aic-cta,.aic-article .aic-toc{display:none!important}
+  .aic-article a{color:#000}
+  .aic-article .aic-tablewrap{overflow:visible}
+  .aic-article .aic-table-wide{min-width:0}
+}
+.aic-article .aic-sup+.aic-sup::before{content:",";margin-right:1px}
+.aic-article .aic-q+.aic-q{margin-top:22px}
+.aic-article .aic-qtext{font-size:18px;font-weight:750;line-height:1.35;letter-spacing:-.01em;margin-bottom:10px;padding:0}
+.aic-article .aic-opts{display:grid;gap:8px}
+.aic-article .aic-opt{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:1px solid var(--aic-line);border-radius:var(--aic-radius-sm);background:var(--aic-paper);cursor:pointer;font-size:16px;line-height:1.45}
+.aic-article .aic-opt:hover{border-color:#B8C7FF;background:var(--aic-white)}
+.aic-article .aic-opt input{margin:3px 0 0;flex:none;width:18px;height:18px;accent-color:var(--aic-blue)}
+.aic-article .aic-opt:has(input:checked){border-color:var(--aic-blue);background:var(--aic-white);box-shadow:0 0 0 3px var(--aic-blue-soft)}
+.aic-article .aic-opt:focus-within{outline:3px solid #9DB2FF;outline-offset:2px}
+.aic-article .aic-result-mix{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 4px}
+.aic-article #aic-sbx-result ol{margin-top:10px;padding-left:1.3em;font-size:17px}
+.aic-article #aic-sbx-result li+li{margin-top:6px}
+.aic-article #aic-sbx-result p{font-size:17px;margin-top:10px}
+</style>
+<article class="aic-article" id="aic-the-ai-sandbox" aria-labelledby="aic-sbx-title">
+<div class="aic-wrap">
+
+<header>
+  <span class="aic-eyebrow">The AI Sandbox · Guide for business</span>
+  <h1 class="aic-h1" id="aic-sbx-title">How do we use AI tools without exposing our data?</h1>
+  <p class="aic-kicker">Your people need outside AI tools. Every prompt is a small decision about where your data goes. Here are the five ways to control that, what each one really protects, and how to pick.</p>
+  <p class="aic-meta"><span>About 12 minutes</span><span>Last checked November 2026</span><span>Vendor-neutral</span></p>
+</header>
+
+<section class="aic-answer" aria-labelledby="aic-sbx-short">
+  <span class="aic-eyebrow" id="aic-sbx-short">The short answer</span>
+  <p>Don't choose between banning AI and hoping for the best. Sort your data into what can go out, what can go out only under contract, and what must stay in. Then give people an approved route for each.</p>
+  <p>For most businesses that means a business-tier AI agreement that rules out training on your data, plus a short list of things that never go in. Private or on-premises models are for the small slice of data that can't leave at all. Only that last option keeps data on your own systems; the others control what leaves and on what terms.</p>
+</section>
+
+<nav class="aic-toc aic-noprint" aria-label="On this page">
+  <span class="aic-eyebrow">On this page</span>
+  <ol>
+    <li><a href="#aic-sbx-why">Why this can't wait</a></li>
+    <li><a href="#aic-sbx-what">What a "sandbox" actually is</a></li>
+    <li><a href="#aic-sbx-five">The five approaches</a></li>
+    <li><a href="#aic-sbx-compare">Side by side</a></li>
+    <li><a href="#aic-sbx-path">Find your starting point</a></li>
+    <li><a href="#aic-sbx-gaps">What a sandbox doesn't fix</a></li>
+    <li><a href="#aic-sbx-do">What you can do</a></li>
+    <li><a href="#aic-sbx-sources">Sources</a></li>
+  </ol>
+</nav>
+
+<h2 class="aic-h2" id="aic-sbx-why">Why this can't wait</h2>
+<div class="aic-prose">
+  <p>If you haven't given people an approved AI tool, many are already using their own. In Microsoft and LinkedIn's 2024 survey of knowledge workers, 78% of people who use AI at work said they bring their own tools.<a class="aic-sup" href="#aic-sbx-s1">1</a> Their own tools means their own accounts, under consumer terms you never agreed to.</p>
+  <p>That has a cost. In IBM's 2025 breach study, one in five organizations reported a breach linked to "shadow AI" (tools staff use without approval), and organizations with a lot of it paid about $670,000 more per breach on average.<a class="aic-sup" href="#aic-sbx-s2">2</a> The best-known early case is Samsung, which restricted generative AI on company devices in 2023 after engineers pasted internal source code into ChatGPT.<a class="aic-sup" href="#aic-sbx-s3">3</a></p>
+  <p>A ban on its own rarely fixes this. People route around rules that make their job harder. The fix is a better route than their own account.</p>
+</div>
+
+<h2 class="aic-h2" id="aic-sbx-what">What a "sandbox" actually is</h2>
+<div class="aic-prose">
+  <p>There's no single product called an AI sandbox. It's a controlled zone you build out of three things:</p>
+  <ul>
+    <li><strong>Approved tools and accounts</strong>, on terms you have read.</li>
+    <li><strong>Data rules</strong> that say which kinds of information can go into which tool.</li>
+    <li><strong>A record</strong> of what was used, so you can check and learn.</li>
+  </ul>
+  <p>The five approaches below are the building blocks. Most organizations end up combining two or three of them.</p>
+</div>
+
+<h2 class="aic-h2" id="aic-sbx-five">The five approaches</h2>
+<div class="aic-cards">
+
+  <section class="aic-card" aria-labelledby="aic-sbx-a1">
+    <span class="aic-tag">1 · Contract</span>
+    <h3 class="aic-h3" id="aic-sbx-a1">Business agreements with no-training terms</h3>
+    <p>Move people from personal accounts to a business or API plan whose terms say your prompts and files aren't used to train the provider's models. The major providers say this for their business products: OpenAI for its API, Microsoft for Copilot under its enterprise data protection terms, and Google for Workspace unless you give permission.<a class="aic-sup" href="#aic-sbx-s4">4</a><a class="aic-sup" href="#aic-sbx-s5">5</a><a class="aic-sup" href="#aic-sbx-s6">6</a></p>
+    <dl class="aic-dl">
+      <div><dt>Protects against</dt><dd>Your data turning up in someone else's answers via training; unclear consumer terms.</dd></div>
+      <div><dt>Doesn't protect against</dt><dd>Your data still leaves your network. "No training" isn't "no storage": OpenAI, for example, keeps API logs for up to 30 days for abuse monitoring unless you're approved for zero retention.<a class="aic-sup" href="#aic-sbx-s4">4</a></dd></div>
+      <div><dt>Effort and cost</dt><dd>Low. Licences plus an afternoon reading the data terms.</dd></div>
+      <div><dt>Good for</dt><dd>Everyday drafting, summarizing and analysis of internal material.</dd></div>
+    </dl>
+    <p class="aic-small">Read for: retention period, where data is processed, sub-processors, who at the vendor can see it, and what changes when someone turns on web search or a third-party plugin.</p>
+  </section>
+
+  <section class="aic-card" aria-labelledby="aic-sbx-a2">
+    <span class="aic-tag">2 · Habit</span>
+    <h3 class="aic-h3" id="aic-sbx-a2">Data minimization and redaction</h3>
+    <p>Send only what the task needs. A tool can rewrite a complaint letter without the customer's name, account number or address. Redaction can be manual (a rule people follow) or automated (a tool that strips names, numbers and IDs before the prompt is sent). The UK data protection regulator expects this kind of minimization when AI touches personal data.<a class="aic-sup" href="#aic-sbx-s11">11</a></p>
+    <dl class="aic-dl">
+      <div><dt>Protects against</dt><dd>Oversharing. It works with any tool and costs almost nothing.</dd></div>
+      <div><dt>Doesn't protect against</dt><dd>Context. Automated redaction catches patterns (card numbers, emails) and misses meaning ("our biggest client in Lyon is about to leave"). People also forget.</dd></div>
+      <div><dt>Effort and cost</dt><dd>Low for the rule; moderate for automated tools.</dd></div>
+      <div><dt>Good for</dt><dd>Every organization, as a baseline on top of whatever else you choose.</dd></div>
+    </dl>
+  </section>
+
+  <section class="aic-card" aria-labelledby="aic-sbx-a3">
+    <span class="aic-tag">3 · Transformation</span>
+    <h3 class="aic-h3" id="aic-sbx-a3">Pseudonymization and anonymization</h3>
+    <p>Pseudonymization swaps identifiers for tokens ("Customer 4471") and keeps the key on your side, so you can put names back into the answer afterwards. Anonymization removes the link for good. Both sound like they take the data out of privacy law. Usually they don't.</p>
+    <p>The UK and EU regulators say pseudonymized data is still personal data for whoever holds or can use the key.<a class="aic-sup" href="#aic-sbx-s7">7</a><a class="aic-sup" href="#aic-sbx-s8">8</a> In 2025 the EU's top court added that whether it's personal data for a recipient depends on whether that recipient can realistically re-identify people.<a class="aic-sup" href="#aic-sbx-s9">9</a> That helps the vendor's position, not yours: you hold the key, so for you it stays personal data. True anonymization is hard to achieve with rich text, where details like job titles and dates can identify someone.</p>
+    <dl class="aic-dl">
+      <div><dt>Protects against</dt><dd>Direct exposure of names and IDs; lowers the impact if a vendor is breached.</dd></div>
+      <div><dt>Doesn't protect against</dt><dd>Re-identification from context; your obligations under privacy law.</dd></div>
+      <div><dt>Effort and cost</dt><dd>Moderate. Needs tooling, a secure key store and testing.</dd></div>
+      <div><dt>Good for</dt><dd>Bulk analysis of customer feedback, case notes or tickets.</dd></div>
+    </dl>
+  </section>
+
+  <section class="aic-card" aria-labelledby="aic-sbx-a4">
+    <span class="aic-tag aic-tag-green">4 · Location</span>
+    <h3 class="aic-h3" id="aic-sbx-a4">Private or on-premises models</h3>
+    <p>Run an open-weight model (one whose files anyone can download) on your own servers or in your own cloud account. This is the only approach where prompts don't go to a model provider at all. As the UK AI Security Institute puts it, open-weight models "can be hosted privately, with no data returning to the model provider."<a class="aic-sup" href="#aic-sbx-s10">10</a></p>
+    <dl class="aic-dl">
+      <div><dt>Protects against</dt><dd>Data leaving your environment; changes to a vendor's terms.</dd></div>
+      <div><dt>Doesn't protect against</dt><dd>Your own security gaps. You now own patching, access control, logging and testing. Open models also trail the best closed ones: on the Institute's cyber tests, the leading open models matched closed models released 4 to 7 months earlier (July 2026).<a class="aic-sup" href="#aic-sbx-s10">10</a></dd></div>
+      <div><dt>Effort and cost</dt><dd>High. Hardware or cloud compute, engineers, and ongoing upkeep.</dd></div>
+      <div><dt>Good for</dt><dd>The data that truly can't leave: regulated records, source code, legal privilege, trade secrets.</dd></div>
+    </dl>
+    <p class="aic-small">Going this route? Read <a data-aic-slug="in-house-llm-governance" href="in-house-llm-governance.html">In-house LLM governance</a> first.</p>
+  </section>
+
+  <section class="aic-card" aria-labelledby="aic-sbx-a5">
+    <span class="aic-tag aic-tag-amber">5 · Control point</span>
+    <h3 class="aic-h3" id="aic-sbx-a5">An AI gateway with data loss prevention</h3>
+    <p>Put one route between your people and every AI tool. A gateway (or the data loss prevention features in your existing security tools) can block unapproved services, warn or strip sensitive patterns before a prompt leaves, and log use. It turns your data rules into something the system enforces.</p>
+    <dl class="aic-dl">
+      <div><dt>Protects against</dt><dd>Accidental pastes of obvious secrets; use of unapproved tools on managed devices.</dd></div>
+      <div><dt>Doesn't protect against</dt><dd>Personal phones and home laptops; sensitive meaning that doesn't match a pattern. The logs are now sensitive data too.</dd></div>
+      <div><dt>Effort and cost</dt><dd>Moderate to high. Worth it once many people use AI daily.</dd></div>
+      <div><dt>Good for</dt><dd>Mid-size and larger organizations, regulated sectors, and anyone who has to show an auditor what happened.</dd></div>
+    </dl>
+  </section>
+</div>
+
+<h2 class="aic-h2" id="aic-sbx-compare">Side by side</h2>
+<div class="aic-tablewrap" role="region" aria-label="Comparison of the five approaches" tabindex="0">
+<table class="aic-table-wide">
+  <thead><tr><th scope="col">Approach</th><th scope="col">Data leaves your network?</th><th scope="col">Main weakness</th><th scope="col">Effort</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Business agreement</th><td>Yes, under contract</td><td>Retention, sub-processors, terms change</td><td>Low</td></tr>
+    <tr><th scope="row">Minimization and redaction</th><td>Less of it</td><td>Misses meaning; relies on habit</td><td>Low</td></tr>
+    <tr><th scope="row">Pseudonymization</th><td>Yes, without direct identifiers</td><td>Re-identification; still personal data for you</td><td>Moderate</td></tr>
+    <tr><th scope="row">Private or on-prem model</th><td>No</td><td>You own all the security; lower capability</td><td>High</td></tr>
+    <tr><th scope="row">Gateway with DLP</th><td>Yes, filtered and logged</td><td>Unmanaged devices; pattern-only checks</td><td>Moderate to high</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 class="aic-h2" id="aic-sbx-path">Find your starting point</h2>
+<div class="aic-prose"><p>Three questions. Your answers stay on this page; nothing is stored or sent.</p></div>
+<form class="aic-card aic-picker aic-noprint" id="aic-sbx-form" style="margin-top:16px" novalidate>
+  <fieldset class="aic-q">
+    <legend class="aic-qtext">What's the most sensitive thing people want to use AI with?</legend>
+    <div class="aic-opts">
+      <label class="aic-opt"><input type="radio" name="data" value="1"> <span>Public material: marketing copy, published reports, job ads</span></label>
+      <label class="aic-opt"><input type="radio" name="data" value="2"> <span>Internal working documents: plans, drafts, meeting notes</span></label>
+      <label class="aic-opt"><input type="radio" name="data" value="3"> <span>Personal data about customers or staff</span></label>
+      <label class="aic-opt"><input type="radio" name="data" value="4"> <span>Crown jewels: health or financial records, source code, legal advice, trade secrets</span></label>
+    </div>
+  </fieldset>
+  <fieldset class="aic-q">
+    <legend class="aic-qtext">Where does AI use happen today?</legend>
+    <div class="aic-opts">
+      <label class="aic-opt"><input type="radio" name="now" value="none"> <span>Hardly at all, as far as I know</span></label>
+      <label class="aic-opt"><input type="radio" name="now" value="shadow"> <span>People use their own accounts and nobody's said much</span></label>
+      <label class="aic-opt"><input type="radio" name="now" value="approved"> <span>We have an approved business tool</span></label>
+    </div>
+  </fieldset>
+  <fieldset class="aic-q">
+    <legend class="aic-qtext">Who looks after your technology?</legend>
+    <div class="aic-opts">
+      <label class="aic-opt"><input type="radio" name="cap" value="1"> <span>An outside IT provider, or one person who does it on the side</span></label>
+      <label class="aic-opt"><input type="radio" name="cap" value="2"> <span>A small in-house IT team</span></label>
+      <label class="aic-opt"><input type="radio" name="cap" value="3"> <span>IT, security and engineers who could run their own systems</span></label>
+    </div>
+  </fieldset>
+  <div class="aic-cta-row">
+    <button type="submit" class="aic-btn aic-btn-primary">Show my starting point</button>
+    <span class="aic-small" id="aic-sbx-hint" aria-live="polite"></span>
+  </div>
+</form>
+<section class="aic-card" id="aic-sbx-result" hidden tabindex="-1" aria-live="polite" style="margin-top:14px"></section>
+
+<h2 class="aic-h2" id="aic-sbx-gaps">What a sandbox doesn't fix</h2>
+<div class="aic-prose">
+  <p>Controlling what goes in is half the job. Three risks sit outside it.</p>
+  <ul>
+    <li><strong>What comes out.</strong> A tool that's private can still be wrong. Someone still has to check the answer before it reaches a customer. See <a data-aic-slug="when-ai-gets-it-wrong" href="when-ai-gets-it-wrong.html">When AI gets it wrong</a>.</li>
+    <li><strong>What the AI reads.</strong> Once an assistant can read email, web pages or shared drives, hidden instructions inside that content can steer it, and leak what it can see. The UK National Cyber Security Centre warns this "prompt injection" may never be fully solved, so limit what such a tool can reach and do.<a class="aic-sup" href="#aic-sbx-s12">12</a> It's top of the OWASP list of risks for AI applications, with sensitive information disclosure second.<a class="aic-sup" href="#aic-sbx-s13">13</a></li>
+    <li><strong>What gets connected.</strong> Each plugin, connector or agent that links an AI tool to your systems widens what it can see. Approve connections the way you approve tools.</li>
+  </ul>
+</div>
+
+<h2 class="aic-h2" id="aic-sbx-do">What you can do</h2>
+<p class="aic-who">For your organization</p>
+<ol class="aic-actions-list">
+  <li><b>Write the three-column list.</b> Can go into an approved tool · Can go in only with names stripped · Never goes into an outside tool. One page. Use examples from your own work, not categories.</li>
+  <li><b>Give people a better route than their own account.</b> Pick one approved business tool, read its data terms, and switch it on before you announce any rule.</li>
+  <li><b>Read the data terms, not the brochure.</b> Find the retention period, the processing location and the sub-processor list. Write them down where your team can see them.</li>
+  <li><b>Keep the crown jewels out until you're ready.</b> If something truly can't leave, it stays out of outside tools until you have a private setup or a contract your lawyers have signed off.</li>
+  <li><b>Review every quarter.</b> Terms, tools and features change. Put a 30-minute check in the calendar.</li>
+</ol>
+<p class="aic-who">For you, at your desk</p>
+<ol class="aic-actions-list">
+  <li><b>Run the name test.</b> Before you paste, ask: would I be comfortable if this showed up with my name on it in a vendor's logs? If not, strip it or don't send it.</li>
+  <li><b>Use the work account.</b> Never move work data into a personal AI account, even "just this once."</li>
+</ol>
+
+<aside class="aic-cta" aria-labelledby="aic-sbx-cta">
+  <span class="aic-eyebrow">Need more than an answer?</span>
+  <h2 class="aic-h2" id="aic-sbx-cta">Get help setting up your sandbox</h2>
+  <p>Choosing tools, reading the contracts and wiring in a gateway is a few days of expert work. A member can do it with you, for your data and your sector.</p>
+  <div class="aic-cta-row">
+    <a class="aic-btn aic-btn-primary" data-aic-cta="matchUrl" data-aic-label="get_matched_sandbox" href="#">Get matched to someone</a>
+    <span class="aic-small">Or <a data-aic-cta="newsletterUrl" data-aic-label="newsletter" href="#">keep up without keeping up with everything.</a></span>
+  </div>
+</aside>
+
+<h2 class="aic-h2" id="aic-sbx-related">Related</h2>
+<ul class="aic-related">
+  <li><a data-aic-slug="ai-data-sharing-risk-checker" href="ai-data-sharing-risk-checker.html">AI data sharing risk checker<small>Check one prompt before you send it.</small></a></li>
+  <li><a data-aic-slug="ai-due-diligence-checklist" href="ai-due-diligence-checklist.html">AI due diligence checklist<small>Before your business adopts any AI tool.</small></a></li>
+  <li><a data-aic-slug="in-house-llm-governance" href="in-house-llm-governance.html">In-house LLM governance<small>If you run the model yourself.</small></a></li>
+  <li><a data-aic-slug="small-business-ai-safety" href="small-business-ai-safety.html">Small business AI safety<small>The basics, in an afternoon.</small></a></li>
+</ul>
+
+<h2 class="aic-h2" id="aic-sbx-sources">Sources</h2>
+<p class="aic-small">Last checked November 2026. Vendor documents are cited for what each says about its own products, not as recommendations.</p>
+<ol class="aic-sources">
+  <li id="aic-sbx-s1"><cite>Microsoft and LinkedIn release the 2024 Work Trend Index on the state of AI at work</cite>. Microsoft and LinkedIn, 8 May 2024. <a href="https://news.microsoft.com/source/2024/05/08/microsoft-and-linkedin-release-the-2024-work-trend-index-on-the-state-of-ai-at-work/" rel="noopener" target="_blank">news.microsoft.com</a></li>
+  <li id="aic-sbx-s2"><cite>IBM Report: 13% of organizations reported breaches of AI models or applications, 97% of which reported lacking proper AI access controls</cite> (Cost of a Data Breach 2025; 600 organizations, breaches March 2024 to February 2025). IBM, 30 July 2025. <a href="https://newsroom.ibm.com/2025-07-30-ibm-report-13-of-organizations-reported-breaches-of-ai-models-or-applications,-97-of-which-reported-lacking-proper-ai-access-controls" rel="noopener" target="_blank">newsroom.ibm.com</a></li>
+  <li id="aic-sbx-s3"><cite>Samsung bans use of AI like ChatGPT for employees after misuse of the chatbot</cite>. NBC News (reporting Bloomberg), 2 May 2023. <a href="https://www.nbcnews.com/tech/tech-news/samsung-bans-use-chatgpt-employees-misuse-chatbot-rcna82407" rel="noopener" target="_blank">nbcnews.com</a></li>
+  <li id="aic-sbx-s4"><cite>Data controls in the OpenAI platform</cite>. OpenAI API documentation, as of November 2026. <a href="https://developers.openai.com/api/docs/guides/your-data" rel="noopener" target="_blank">developers.openai.com</a></li>
+  <li id="aic-sbx-s5"><cite>Enterprise data protection in Microsoft Copilot and Microsoft Copilot Chat</cite>. Microsoft Learn, as of November 2026. <a href="https://learn.microsoft.com/en-us/copilot/plan/enterprise-data-protection" rel="noopener" target="_blank">learn.microsoft.com</a></li>
+  <li id="aic-sbx-s6"><cite>Generative AI in Google Workspace Privacy Hub</cite>. Google, as of November 2026. <a href="https://knowledge.workspace.google.com/admin/gemini/generative-ai-in-google-workspace-privacy-hub" rel="noopener" target="_blank">knowledge.workspace.google.com</a></li>
+  <li id="aic-sbx-s7"><cite>Anonymisation and pseudonymisation guidance</cite>. Information Commissioner's Office (UK), published 28 March 2025; under review after the Data (Use and Access) Act 2025. <a href="https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/data-sharing/anonymisation/pseudonymisation/" rel="noopener" target="_blank">ico.org.uk</a></li>
+  <li id="aic-sbx-s8"><cite>Guidelines 01/2025 on Pseudonymisation</cite> (version for public consultation). European Data Protection Board, adopted 16 January 2025. <a href="https://www.edpb.europa.eu/system/files/2025-01/edpb_guidelines_202501_pseudonymisation_en.pdf" rel="noopener" target="_blank">edpb.europa.eu</a></li>
+  <li id="aic-sbx-s9"><cite>EDPS v SRB, Case C-413/23 P</cite>. Court of Justice of the European Union, judgment of 4 September 2025. <a href="https://curia.europa.eu/juris/liste.jsf?num=C-413/23" rel="noopener" target="_blank">curia.europa.eu</a></li>
+  <li id="aic-sbx-s10"><cite>How far behind the frontier are leading open weight models on cyber?</cite> UK AI Security Institute, 17 July 2026. <a href="https://www.aisi.gov.uk/blog/how-far-behind-the-frontier-are-leading-open-weight-models-on-cyber" rel="noopener" target="_blank">aisi.gov.uk</a></li>
+  <li id="aic-sbx-s11"><cite>How should we assess security and data minimisation in AI?</cite> (Guidance on AI and data protection). Information Commissioner's Office (UK). <a href="https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/artificial-intelligence/guidance-on-ai-and-data-protection/how-should-we-assess-security-and-data-minimisation-in-ai/" rel="noopener" target="_blank">ico.org.uk</a></li>
+  <li id="aic-sbx-s12"><cite>Prompt injection is not SQL injection (it may be worse)</cite>. National Cyber Security Centre (UK), 8 December 2025. <a href="https://www.ncsc.gov.uk/blog-post/prompt-injection-is-not-sql-injection" rel="noopener" target="_blank">ncsc.gov.uk</a></li>
+  <li id="aic-sbx-s13"><cite>OWASP Top 10 for LLM Applications 2025</cite>. OWASP GenAI Security Project. <a href="https://genai.owasp.org/llm-top-10/" rel="noopener" target="_blank">genai.owasp.org</a></li>
+</ol>
+<p class="aic-footnote">This guide explains options; it isn't legal advice. Whether a particular use of personal data is lawful depends on your contracts, your sector and the law where you operate.</p>
+
+</div>
+</article>
+<script>
+window.AICHANNEL_CONFIG = Object.assign({
+  resultsFormUrl: "#",      // "Email me my results" form (not used on this page)
+  coursesUrl: "#",          // "Learn with a member" (Central AI course schedule)
+  matchUrl: "#",            // "Get matched to someone" (advisory/consulting form)
+  newsletterUrl: "#",       // separate newsletter opt-in
+  contentBaseUrl: ""        // prefix for sibling pieces: contentBaseUrl + slug + ".html"
+}, window.AICHANNEL_CONFIG || {});
+
+(function(){
+  "use strict";
+  var CFG = window.AICHANNEL_CONFIG;
+  var ROOT = document.getElementById("aic-the-ai-sandbox");
+  if(!ROOT) return;
+  var SLUG = "the-ai-sandbox", AUDIENCE = "business", NAME = "The AI Sandbox";
+
+  function utm(){
+    var out = {};
+    try{ new URLSearchParams(location.search).forEach(function(v,k){ if(/^utm_/i.test(k)) out[k]=v; }); }catch(e){}
+    return out;
+  }
+  function emit(type, extra){
+    var detail = Object.assign({event:type, lead_type:"content", audience:AUDIENCE, source_page:location.href, source_content_or_tool:SLUG, assessment_name:NAME}, utm(), extra||{});
+    try{ window.dispatchEvent(new CustomEvent("aichannel:event",{detail:detail})); }catch(e){}
+    try{ if(window.parent && window.parent!==window) window.parent.postMessage(Object.assign({type:"aichannel:event"},detail),"*"); }catch(e){}
+  }
+  function withParams(base, params){
+    if(!base || base==="#") return "#";
+    try{
+      var u = new URL(base, location.href);
+      Object.keys(params).forEach(function(k){ if(params[k]!=null && params[k]!=="") u.searchParams.set(k, params[k]); });
+      return u.toString();
+    }catch(e){ return base; }
+  }
+
+  // Sibling links by slug
+  ROOT.querySelectorAll("[data-aic-slug]").forEach(function(a){
+    a.setAttribute("href", (CFG.contentBaseUrl||"") + a.getAttribute("data-aic-slug") + ".html");
+  });
+  // Member and newsletter links
+  ROOT.querySelectorAll("[data-aic-cta]").forEach(function(a){
+    var key = a.getAttribute("data-aic-cta");
+    var label = a.getAttribute("data-aic-label") || key;
+    var params = Object.assign({lead_type: key==="newsletterUrl" ? "newsletter" : (key==="matchUrl" ? "advisory" : (key==="coursesUrl" ? "training" : "content")), audience:AUDIENCE, source_page:location.href, source_content_or_tool:SLUG, cta_clicked:label}, utm());
+    a.setAttribute("href", key==="newsletterUrl" ? (CFG[key]||"#") : withParams(CFG[key], params));
+    a.addEventListener("click", function(){ emit("cta_clicked", {cta_clicked:label}); });
+  });
+  emit("content_viewed");
+
+  // ---- Starting-point picker ----
+  var form = ROOT.querySelector("#aic-sbx-form");
+  var out = ROOT.querySelector("#aic-sbx-result");
+  var hint = ROOT.querySelector("#aic-sbx-hint");
+  var started = false;
+  function val(n){ var el = form.querySelector('input[name="'+n+'"]:checked'); return el ? el.value : null; }
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+  form.addEventListener("change", function(){ if(!started){ started = true; emit("tool_started"); } hint.textContent = ""; });
+  form.addEventListener("submit", function(ev){
+    ev.preventDefault();
+    var d = +val("data"), now = val("now"), cap = +val("cap");
+    if(!d || !now || !cap){ hint.textContent = "Answer all three to see your starting point."; return; }
+    var mix = [], steps = [], label, why;
+
+    if(now === "shadow") steps.push("Switch on one approved business tool this month, and tell people it's there before you tell them what's banned. A better route beats a ban.");
+    if(now === "none") steps.push("Ask your team, without blame, which AI tools they've tried for work. \"Hardly at all\" is often \"nobody's mentioned it.\"");
+    steps.push("Write the three-column list: can go in · only with names stripped · never goes into an outside tool.");
+
+    if(d <= 2){
+      label = "Contract plus habit";
+      mix = ["Business agreement", "Minimization"];
+      why = "Your most sensitive use is internal material. A business-tier tool with no-training terms and a clear rule on what to leave out covers most of the risk at low cost.";
+      steps.push("Read your chosen tool's data terms: retention, processing location, sub-processors. Write them on one page.");
+      if(cap >= 2){ mix.push("Gateway (later)"); steps.push("Once use is daily and widespread, look at the data loss prevention features you may already own."); }
+    } else if(d === 3){
+      label = "Contract, habit and a filter";
+      mix = ["Business agreement", "Minimization", "Pseudonymization"];
+      why = "Personal data brings privacy law with it. Use a business tool under a data processing agreement, strip names by default, and pseudonymize when you analyze records in bulk.";
+      steps.push("Check whether you need a data protection impact assessment before customer or staff data goes into any AI tool.");
+      if(cap >= 2){ mix.push("Gateway"); steps.push("Add a gateway or DLP rule that flags names, ID numbers and account details before a prompt leaves."); }
+      else steps.push("Make \"strip names first\" the written default, and show people how with two real examples.");
+    } else {
+      label = cap === 3 ? "Keep it in-house" : "Keep it out for now";
+      why = cap === 3
+        ? "Your most sensitive data shouldn't go to an outside model at all. You have the people to run a private model for that slice, and use a business tool for everything else."
+        : "Your most sensitive data shouldn't go to an outside model, and running a private one is a big job for a small team. Keep that data out of AI tools until you have a private setup someone else manages for you, or a contract your lawyers have signed off.";
+      mix = cap === 3 ? ["Private model", "Gateway", "Business agreement for the rest"] : ["Business agreement for the rest", "Minimization", "Expert help for the crown jewels"];
+      steps.push(cap === 3 ? "Read In-house LLM governance before you build: you'll own security, logging and testing." : "Name the crown-jewel data explicitly in your \"never\" column, with examples.");
+    }
+
+    var matchLine = (d === 4 || (d === 3 && cap === 1))
+      ? "Your answers point to work that needs a specialist: data terms, privacy checks or a private setup."
+      : "If you'd rather not read contracts and configure tools yourself, a member can set this up with you.";
+    out.innerHTML =
+      '<span class="aic-eyebrow">Where to begin</span>' +
+      '<h3 class="aic-h3" style="font-size:24px;margin-top:6px">' + esc(label) + '</h3>' +
+      '<div class="aic-result-mix">' + mix.map(function(m){ return '<span class="aic-tag">' + esc(m) + '</span>'; }).join("") + '</div>' +
+      '<p>' + esc(why) + '</p>' +
+      '<p><strong>Your first three moves</strong></p>' +
+      '<ol>' + steps.slice(0,3).map(function(s){ return '<li>' + esc(s) + '</li>'; }).join("") + '</ol>' +
+      '<p class="aic-small" style="margin-top:14px">' + esc(matchLine) + ' <a href="#" data-aic-res-cta>Get matched to someone</a></p>';
+    out.hidden = false;
+    var a = out.querySelector("[data-aic-res-cta]");
+    a.setAttribute("href", withParams(CFG.matchUrl, Object.assign({lead_type:"advisory", audience:AUDIENCE, source_page:location.href, source_content_or_tool:SLUG, cta_clicked:"get_matched_sandbox_result", assessment_name:NAME, assessment_result:label}, utm())));
+    a.addEventListener("click", function(){ emit("cta_clicked", {cta_clicked:"get_matched_sandbox_result", assessment_result:label}); });
+    emit("tool_completed", {assessment_result:label});
+    emit("result_viewed", {assessment_result:label});
+    try{ out.focus({preventScroll:false}); }catch(e){ out.focus(); }
+  });
+})();
+</script>
+<!-- AIC:END -->
+
+</body></html>

@@ -1,0 +1,751 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ai-and-jobs-explained</title><style>html,body{margin:0;background:#F7F8FA}@media (prefers-color-scheme:dark){html,body{background:#F7F8FA}}</style></head><body>
+<!--
+  ARTICLE (interactive explainer): AI and jobs: what's actually going to happen?
+  Slug: ai-and-jobs-explained   Type: interactive explainer / article (jobs cluster overview)
+  Audience: business owners, executives, HR / L&D / team leads (priority 1); individuals thinking about their own job (priority 2).
+  Covers: the short answer; why serious people disagree (four positions side by side, each with who holds it, its strongest evidence and what it may miss: tasks-not-jobs, fast displacement from the bottom up, slower diffusion, new work); a step-through of one forecast (the "pyramid replacement" model from The Intelligence Curse) with today's evidence marked against each stage (early signs / not yet clear / not seen / speculation); four rules for thinking about it; actions by role (business, HR/L&D, own job); member routes; related pieces; sources.
+  This is the overview of the jobs cluster. It links to which-jobs-will-ai-replace (exposure lists, brakes on automation, labor data) and jobs-hardest-for-ai-to-replace (friction) rather than repeating them.
+
+  SOURCES CHECKED (all on the web, 9 November 2026)
+  - Eloundou, Manning, Mishkin, Rock, "GPTs are GPTs", arXiv 2303.10130 (v1 17 Mar 2023, v5 21 Aug 2023); Science 2024. 80% / 10% and 19% / 50% read in the arXiv abstract.
+  - ILO Working Paper 140 (Gmyrek, Berg et al.), 20 May 2025: one in four workers with some exposure; 3.3% in highest gradient; "transformation of jobs is the most likely impact".
+  - Tomlinson et al., Microsoft Research, arXiv 2507.07935 (Jul 2025, v7 23 Oct 2026): 200k Copilot conversations; "This would be a mistake" / ATM passage read in the PDF.
+  - Anthropic Economic Index, January 2026 report, 15 Jan 2026: Claude.ai sample 13-20 Nov 2025, augmentation 52%, automation 45%.
+  - Drago and Laine, The Intelligence Curse, chapter 2 "Pyramid Replacement" (intelligence-curse.ai/pyramid; series dated April 2025, LessWrong crosspost 24 Apr 2025). Six stages and caveats read on the chapter page. The chapter page itself carries no author or date; both come from the series home page/PDF.
+  - Dario Amodei to Axios, 28 May 2025 (half of entry-level white-collar jobs; 10-20% unemployment; within five years). Axios blocked automated reading; wording checked in Fortune's report of 28 May 2025.
+  - Svanberg et al., MIT FutureTech, "Beyond AI Exposure", 2024 (publication page dated 8 Feb 2024): 23% of wages for vision tasks attractive to automate.
+  - Acemoglu, "The Simple Macroeconomics of AI", Economic Policy 40(121), 2025 (NBER WP 32487): "no more than a 0.66% increase in TFP over 10 years".
+  - Autor, Chin, Salomons, Seegmiller, "New Frontiers: The Origins and Content of New Work, 1940-2018", NBER WP 30389 (2022), QJE 2024: "the majority of current employment is in new job specialties introduced after 1940".
+  - Brynjolfsson, Chandar, Chen, "Canaries in the Coal Mine?", Stanford Digital Economy Lab, revised 12 Aug 2026: 22-25 year olds in exposed jobs 19% below trend; mainly via reduced hiring; "early, descriptive indicators".
+  - Massenkoff and McCrory, Anthropic, 5 Mar 2026: 33% vs 94% in Computer & Math; no systematic unemployment rise; job-finding for 22-25 into highly exposed jobs down about 14% vs 2022, "barely" significant.
+  - The Budget Lab at Yale, AI labor-market tracker, updated 14 Oct 2026 (key takeaways quoted from the live page).
+  - Pew Research Center, 3 Apr 2025: 64% of US adults vs 39% of AI experts expect fewer jobs over 20 years; 19% of experts expect more.
+  - Global Automation Atlas (Garg, Crosta, Baier), automationatlas.org: 18,797 tasks, 124 countries (home page, Nov 2026). Linked as a resource only.
+
+  NOT USED (could not verify, or not needed): a precise share of current jobs that did not exist in 1940 (the paper's abstract says only "the majority"); any figure for graduate or entry-level hiring outside the US; later Anthropic Economic Index splits reported only by secondary sources; Acemoglu's lower 0.53% variant (kept the headline ceiling only).
+
+  EMBED IN WORDPRESS
+  Option A (Custom HTML block): paste everything between "AIC:BEGIN" and "AIC:END".
+  Option B (iframe): upload this file and embed it, e.g.
+    <iframe src="/articles/ai-and-jobs-explained.html" style="width:100%;border:0;min-height:3600px" title="AI and jobs: what's actually going to happen?"></iframe>
+  Without JavaScript every view, stage and role is shown in full; the toggles only appear when the script runs.
+  CONFIG (set window.AICHANNEL_CONFIG before the article, or edit the block at the top of the script):
+    coursesUrl      "Learn with a member" (Central AI course schedule)
+    matchUrl        "Get matched to someone" (advisory/consulting form)
+    newsletterUrl   separate newsletter opt-in
+    contentBaseUrl  prefix for sibling links, built as contentBaseUrl + slug + ".html" (default "")
+    linkTarget      optional; "_top" when embedded in an iframe
+  EVENTS: window "aichannel:event" CustomEvent + parent.postMessage({type:"aichannel:event", ...}) for
+    tool_started (first use of any toggle), tool_completed (reached the last forecast stage),
+    result_viewed (a role picked; assessment_result = business | hr | individual), cta_clicked.
+    Fields: event, lead_type "content", audience, source_page, source_content_or_tool, assessment_name, plus assessment_result / cta_clicked where relevant.
+  No analytics calls, no network requests, no storage.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI and jobs: what's actually going to happen? | AI Channel</title>
+<meta name="description" content="Why serious people disagree about AI and jobs, what replacement could look like step by step, what the data shows as of November 2026, and what to do about it if you run a business, lead HR or are thinking about your own job.">
+<!-- AI Channel design A: tool design system v2 (visual layer only; no behaviour changes) -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style id="aic-theme">
+/* ---------- tokens ---------- */
+:root,html{color-scheme:light!important;
+ --pine:#2859c7!important;--pine-deep:#1945ac!important;--accent:#2859c7!important;--accent-deep:#1945ac!important;--primary:#2859c7!important;--blue:#2859c7!important;--blue-d:#1945ac!important;
+ --paper:#ffffff!important;--bg:#ffffff!important;--white:#fff!important;--card:#fff!important;--ink:#14213d!important;--ink-soft:#3f4a5c!important;--ink-mute:#5b6577!important;--muted:#3f4a5c!important;
+ --line:#d9e2f0!important;--sage:#eef3fc!important;--amber-soft:#fbf3e4!important;--accent-wash:#eef3fc!important;--blue-wash:#eef3fc!important;--sky:#eef3fc!important;--pale:#f4f7fc!important;--warm:#f4f7fc!important;
+ --serif:"Newsreader",Georgia,serif!important;--sans:"Inter",system-ui,sans-serif!important;--mono:"IBM Plex Mono",ui-monospace,monospace!important}
+html body .aic-tool,html body .aic-article{
+ --aic-paper:#ffffff!important;--aic-white:#ffffff!important;--aic-ink:#14213d!important;--aic-soft:#46526a!important;--aic-line:#d9e2f0!important;--aic-sage:#eef3fc!important;
+ --aic-blue:#2859c7!important;--aic-blue-deep:#1945ac!important;--aic-blue-soft:#eef3fc!important;--aic-on-blue:#ffffff!important;--aic-focus:#9fbcff!important;
+ --aic-grey:#46526a!important;--aic-grey-soft:#f4f7fc!important;
+ --aic-radius:16px!important;--aic-radius-sm:12px!important;--aic-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important;
+ color-scheme:light!important;background:#fff!important;color:#14213d!important;
+ font-family:"Inter",system-ui,sans-serif!important;-webkit-font-smoothing:antialiased}
+html,body{background:#fff!important}
+html body .aic-tool{padding:56px 0 96px!important}
+html body .aic-article{padding:0 0 112px!important}
+html body .aic-tool .aic-col,html body .aic-article .aic-col{max-width:860px!important}
+@media(min-width:600px){html body .aic-tool .aic-col,html body .aic-article .aic-col{padding-inline:32px!important}}
+
+/* ---------- type ---------- */
+html body .aic-tool .aic-h1,html body .aic-article h1,body h1{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important;line-height:1.02!important;font-size:clamp(38px,5.4vw,62px)!important;color:#14213d}
+html body .aic-tool .aic-h2,html body .aic-article h2,body h2{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important;line-height:1.1!important}
+html body .aic-article h2{font-size:clamp(28px,3.6vw,38px)!important;margin-top:72px!important}
+html body .aic-tool .aic-h2{font-size:clamp(26px,3.4vw,36px)!important}
+html body .aic-tool .aic-h3,html body .aic-article h3,body h3{font-family:"Newsreader",Georgia,serif!important;font-weight:550!important;letter-spacing:-.01em!important;font-size:22px!important;line-height:1.2!important}
+body h4,body h5,body h6{font-family:"Inter",system-ui,sans-serif!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow,html body .aic-tool .aic-qnum,html body .aic-tool .aic-nav-hint,.aic-mono{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;letter-spacing:.06em!important;text-transform:uppercase;font-size:12px!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow{color:#2859c7!important;display:flex!important;align-items:center;gap:12px}
+html body .aic-tool .aic-eyebrow::before,html body .aic-article .aic-head .aic-eyebrow::before{content:"";width:28px;height:1px;background:#2859c7;flex:none}
+html body .aic-tool .aic-lede,html body .aic-article .aic-lede,html body .aic-article .aic-dek{font-size:20px!important;line-height:1.55!important;color:#3f4a5c!important;max-width:60ch}
+html body .aic-tool .aic-soft,html body .aic-tool .aic-small{color:#46526a!important}
+html body .aic-tool .aic-small{font-size:14px!important}
+html body .aic-article{font-size:18.5px!important;line-height:1.72!important}
+html body .aic-article p+p{margin-top:22px!important}
+html body .aic-article .aic-head{padding:72px 0 40px!important;border-bottom:1px solid #d9e2f0;margin-bottom:48px}
+html body .aic-article .aic-meta,html body .aic-article .aic-head p:not(.aic-lede):not(.aic-dek){font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px!important;letter-spacing:.03em;color:#5b6577!important}
+html body .aic-tool a,html body .aic-article a{color:#2859c7}
+
+/* ---------- panels ---------- */
+html body .aic-tool .aic-card,html body .aic-article .aic-card{background:#fff!important;border:1px solid #d9e2f0!important;border-radius:16px!important;box-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important}
+@media(min-width:600px){html body .aic-tool .aic-card{padding:36px 40px!important}html body .aic-article .aic-card{padding:32px 36px!important}}
+html body .aic-tool .aic-stack>*+*{margin-top:20px!important}
+html body .aic-tool .aic-grid2,html body .aic-article .aic-grid{gap:16px!important}
+/* the short answer: a framed figure, like the site's tool previews */
+html body .aic-article .aic-short{background:#fff!important;border:1px solid #d9e2f0!important;box-shadow:0 0 0 10px #eef3fc,0 0 0 11px #d9e2f0!important;margin:12px 11px 56px!important;border-radius:12px!important;border-left:1px solid #d9e2f0!important}
+html body .aic-article .aic-short .aic-eyebrow,html body .aic-article .aic-short>:first-child{color:#2859c7!important}
+/* notes and callouts */
+html body .aic-tool .aic-note,html body .aic-article .aic-note,html body .aic-article .aic-callout{background:#f4f7fc!important;border-left:3px solid #2859c7!important;border-radius:0 12px 12px 0!important;padding:18px 22px!important;font-size:15.5px!important;color:#14213d!important}
+html body .aic-tool .aic-note.aic-warn{background:#fdf7ec!important;border-left-color:#a46207!important}
+html body .aic-tool .aic-note.aic-bad{background:#fdf0ee!important;border-left-color:#b42318!important}
+html body .aic-tool .aic-note.aic-good{background:#eef8f1!important;border-left-color:#2f7a4e!important}
+/* calls to action become navy bands */
+html body .aic-tool .aic-cta,html body .aic-article .aic-cta,html body .aic-tool .aic-dark,html body .aic-article .aic-dark{--aic-ink:#ffffff!important;--aic-soft:#c9d6ee!important;--aic-white:#13264a!important;--aic-line:#2a3f6a!important;--aic-blue:#9fbcff!important;--aic-blue-soft:#1d3563!important;--aic-on-blue:#13264a!important;
+ background:#13264a!important;color:#fff!important;border-color:#13264a!important;box-shadow:none!important}
+html body .aic-tool .aic-cta *:not(.aic-btn):not(.aic-btn *),html body .aic-article .aic-cta *:not(.aic-btn):not(.aic-btn *){color:inherit}
+html body .aic-tool .aic-cta .aic-btn-primary,html body .aic-article .aic-cta .aic-btn-primary{background:#fff!important;color:#13264a!important;border-color:#fff!important}
+html body .aic-tool .aic-cta a:not(.aic-btn),html body .aic-article .aic-cta a:not(.aic-btn){color:#9fbcff!important}
+
+/* ---------- questions and answer options ---------- */
+html body .aic-tool .aic-q{margin-top:28px!important}
+html body .aic-tool .aic-qnum{color:#2859c7!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;font-size:clamp(22px,2.6vw,27px)!important;line-height:1.22!important;letter-spacing:-.01em!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qhint{font-size:15px!important;color:#46526a!important;margin-bottom:18px!important}
+html body .aic-tool .aic-opts{gap:10px!important;margin-top:18px!important}
+html body .aic-tool .aic-opt,html body .aic-tool .aic-pick,html body .aic-tool .aic-check{background:#fff!important;border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:16px 18px!important;font-size:16px!important;gap:14px!important;transition:border-color .15s,box-shadow .15s,background-color .15s,transform .15s!important}
+html body .aic-tool .aic-opt:hover,html body .aic-tool .aic-pick:hover,html body .aic-tool .aic-check:hover{border-color:#2859c7!important;box-shadow:0 6px 18px rgba(40,89,199,.10)!important;transform:translateY(-1px)}
+html body .aic-tool .aic-opt[aria-checked="true"],html body .aic-tool .aic-opt[aria-pressed="true"],html body .aic-tool .aic-pick:has(input:checked),html body .aic-tool .aic-check:has(input:checked),html body .aic-tool .aic-opt:has(input:checked){border-color:#2859c7!important;background:#f4f7fc!important;box-shadow:0 0 0 3px #dbe6fb!important}
+html body .aic-tool .aic-dot{width:22px!important;height:22px!important;border:2px solid #9aa8c0!important}
+html body .aic-tool .aic-dot::after{inset:4px!important;background:#2859c7!important}
+html body .aic-tool .aic-opt[aria-checked="true"] .aic-dot{border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-size:14px!important;color:#46526a!important;margin-top:4px!important}
+html body .aic-tool .aic-opt.aic-opt-unsure{background:transparent!important;border-style:dashed!important}
+html body .aic-tool input[type=text],html body .aic-tool input[type=search],html body .aic-tool input[type=email],html body .aic-tool textarea,html body .aic-tool select,html body .aic-tool .aic-input{border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:14px 16px!important;background:#fff!important;font-size:16px!important}
+html body .aic-tool input:focus,html body .aic-tool textarea:focus,html body .aic-tool select:focus{border-color:#2859c7!important;outline:none!important;box-shadow:0 0 0 3px #dbe6fb!important}
+
+/* ---------- controls ---------- */
+html body .aic-tool .aic-btn,html body .aic-article .aic-btn{min-height:50px!important;padding:14px 24px!important;font-weight:600!important;font-size:15px!important;border-radius:999px!important;border:1.5px solid #c9d6ee!important;box-shadow:none!important}
+html body .aic-tool .aic-btn:hover,html body .aic-article .aic-btn:hover{border-color:#2859c7!important}
+html body .aic-tool .aic-btn-primary,html body .aic-article .aic-btn-primary{background:#2859c7!important;border-color:#2859c7!important;color:#fff!important}
+html body .aic-tool .aic-btn-primary:hover,html body .aic-article .aic-btn-primary:hover{background:#1945ac!important;border-color:#1945ac!important}
+html body .aic-tool .aic-btn-ghost{border-color:transparent!important;text-decoration:underline;text-underline-offset:4px;color:#3f4a5c!important}
+html body .aic-tool .aic-btn[disabled]{opacity:.4!important}
+html body .aic-tool .aic-nav{margin-top:36px!important;padding-top:24px!important;border-top:1px solid #d9e2f0!important}
+html body .aic-tool .aic-actions{gap:12px!important}
+html body .aic-tool .aic-seg{border:1.5px solid #d9e2f0!important;padding:4px!important}
+html body .aic-tool .aic-seg button{font-weight:600!important;color:#3f4a5c!important}
+html body .aic-tool .aic-seg button[aria-pressed="true"],html body .aic-tool .aic-seg button[aria-checked="true"]{background:#13264a!important;color:#fff!important}
+html body .aic-tool .aic-progress{height:4px!important;background:#e3eaf6!important;margin:20px 0 8px!important}
+html body .aic-tool .aic-progress span,html body .aic-tool .aic-progress i{background:#2859c7!important}
+html body .aic-tool .aic-chip,html body .aic-tool .aic-pill{border:1.5px solid #d9e2f0!important;background:#fff!important;font-weight:600!important;border-radius:999px!important}
+html body .aic-tool .aic-chip[aria-pressed="true"],html body .aic-tool .aic-chip.aic-on,html body .aic-tool .aic-pill.aic-on{background:#eef3fc!important;border-color:#2859c7!important;color:#1945ac!important}
+html body .aic-tool .aic-tag,html body .aic-article .aic-tag{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;padding:5px 11px!important}
+html body .aic-tool .aic-privacy{font-size:14px!important;color:#46526a!important;margin-top:20px!important}
+
+/* ---------- results ---------- */
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-stat b,html body .aic-tool .aic-stat strong,html body .aic-tool .aic-display{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important}
+html body .aic-tool .aic-bar{height:8px!important;background:#e3eaf6!important}
+html body .aic-tool .aic-bar-row{padding:14px 0!important;border-bottom-color:#e3eaf6!important}
+html body .aic-tool .aic-bar-label{font-weight:600!important}
+html body .aic-tool table,html body .aic-article table{border-collapse:collapse}
+html body .aic-tool th,html body .aic-article th{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;text-transform:uppercase;color:#2859c7!important;background:#f4f7fc!important}
+html body .aic-tool td,html body .aic-article td{border-color:#e3eaf6!important}
+html body .aic-article .aic-sources,html body .aic-tool .aic-sources{font-size:14px!important;color:#46526a!important;border-top:1px solid #d9e2f0;padding-top:32px!important;margin-top:72px!important}
+html body .aic-article .aic-related,html body .aic-article .aic-deeper{margin-top:72px!important}
+
+/* ---------- pages outside the shared system ---------- */
+body:not(:has(.aic-tool)):not(:has(.aic-article)) h1,body:not(:has(.aic-tool)):not(:has(.aic-article)) h2,body:not(:has(.aic-tool)):not(:has(.aic-article)) h3{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important}
+html,body{font-family:"Inter",system-ui,sans-serif}
+input[type=range],input[type=checkbox],input[type=radio]{accent-color:#2859c7!important}
+:focus-visible{outline-color:#2859c7!important}
+[tabindex="-1"]:focus,h1:focus,h2:focus,h3:focus{outline:none!important;box-shadow:none!important}
+
+/* ================= v3: product-grade tool shell ================= */
+html,body{background:#f4f7fc!important}
+html body .aic-tool{background:#f4f7fc!important}
+html body .aic-tool .aic-col{max-width:980px!important}
+html body .aic-tool .aic-h1{font-size:clamp(40px,5vw,62px)!important;max-width:20ch}
+html body .aic-tool .aic-grid2>.aic-card{box-shadow:none!important;background:#fff!important;border-radius:14px!important}
+html body .aic-tool.aic-in-q .aic-h1{font-size:22px!important;line-height:1.2!important;max-width:none;margin:6px 0 20px!important;font-weight:500!important}
+html body .aic-tool.aic-in-q .aic-lede,html body .aic-tool.aic-in-q > .aic-col > .aic-privacy,html body .aic-tool.aic-in-q .aic-col > * > .aic-privacy{display:none!important}
+html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:56px 64px 44px!important;border:0!important;border-radius:24px!important;box-shadow:0 1px 0 rgba(19,38,74,.05),0 30px 70px rgba(19,38,74,.10)!important;min-height:460px}
+@media(max-width:700px){html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:32px 22px 28px!important;border-radius:18px!important;min-height:0}}
+html body .aic-tool .aic-progress{height:3px!important;background:#e3eaf6!important;border-radius:0!important;margin:14px 0 36px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-size:clamp(26px,3.2vw,38px)!important;line-height:1.12!important;letter-spacing:-.02em!important;margin-bottom:12px!important;max-width:28ch}
+html body .aic-tool .aic-qhint{font-size:16px!important;margin-bottom:24px!important}
+html body .aic-tool .aic-opts{counter-reset:aicopt;gap:12px!important}
+html body .aic-tool .aic-opt{counter-increment:aicopt;align-items:center!important;min-height:64px;padding:16px 20px!important;font-size:17px!important;font-weight:500;border-radius:14px!important}
+html body .aic-tool .aic-opt .aic-dot{display:none!important}
+html body .aic-tool .aic-opt::before{content:counter(aicopt,upper-alpha);flex:none;width:30px;height:30px;display:grid;place-items:center;border:1.5px solid #c9d6ee;border-radius:8px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;font-weight:500;color:#2859c7;background:#fff;transition:all .15s}
+html body .aic-tool .aic-opt:hover::before{border-color:#2859c7}
+html body .aic-tool .aic-opt[aria-checked="true"]::before{background:#2859c7;border-color:#2859c7;color:#fff;content:"\2713"}
+html body .aic-tool .aic-opt[aria-checked="true"]{background:#eef3fc!important;box-shadow:0 0 0 2px #2859c7!important;border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-weight:400}
+html body .aic-tool .aic-nav{border-top:0!important;margin-top:40px!important;padding-top:0!important}
+html body .aic-tool .aic-nav .aic-btn-primary{min-width:150px}
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-display{font-size:clamp(56px,8vw,96px)!important;line-height:.95!important;color:#14213d}
+
+/* ================= v4: legibility ================= */
+html body .aic-tool{font-size:17px!important;line-height:1.6!important}
+html body .aic-tool,html body .aic-article{--aic-soft:#334055!important}
+html body .aic-tool .aic-small,html body .aic-tool .aic-opt-sub,html body .aic-tool .aic-privacy,html body .aic-tool .aic-nav-hint{font-size:15px!important;color:#334055!important}
+html body .aic-tool p,html body .aic-tool li{color:#1d2a44}
+html body .aic-tool .aic-lede{font-size:20px!important;color:#2a364d!important}
+html body .aic-tool .aic-note{font-size:16.5px!important}
+html body .aic-tool .aic-opt{font-size:18px!important;color:#14213d!important}
+html body .aic-tool .aic-qhint{font-size:17px!important;color:#334055!important}
+html body .aic-tool .aic-eyebrow,html body .aic-tool .aic-qnum,.aic-mono{font-size:12.5px!important;color:#2859c7!important;letter-spacing:.05em!important}
+html body .aic-tool .aic-tag{font-size:12.5px!important}
+html body .aic-tool th,html body .aic-article th{font-size:12.5px!important}
+html body .aic-tool td{font-size:16px}
+html body .aic-article{color:#14213d!important}
+html body .aic-article p,html body .aic-article li{color:#1d2a44}
+</style>
+<script>
+(function(){
+  function hsl(c){var m=c&&c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/);if(!m)return null;var r=m[1]/255,g=m[2]/255,b=m[3]/255,a=m[4]===undefined?1:+m[4];
+    var mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn,s=d?d/(1-Math.abs(2*l-1)):0,h=0;
+    if(d){h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;if(h<0)h+=360}return {h:h,s:s,l:l,a:a}}
+  function blue(c){var x=hsl(c);return x&&x.a>0.05&&x.s>0.3&&x.l>0.28&&x.l<0.95&&x.h>=205&&x.h<=240?x:null}
+  function N(x,dark,light){return x.a<0.95?"rgba(40,89,199,"+Math.min(x.a,0.12).toFixed(3)+")":(x.l>0.82?light:dark)}
+  function fix(el){var c0=getComputedStyle(el),bg=hsl(c0.backgroundColor),fg=hsl(c0.color);if(bg&&fg&&bg.a>0.9&&bg.l<0.6&&bg.s>0.3&&bg.h>=205&&bg.h<=240&&fg.l<0.6)el.style.setProperty("color","#ffffff","important");
+    if(el.closest(".aic-cta,.aic-dark")||el.matches(".aic-opt,.aic-pick,.aic-check,.aic-btn,.aic-chip,.aic-pill,.aic-seg button,.aic-card,.aic-note"))return;var cs=getComputedStyle(el),x;
+    if((x=blue(cs.color)))el.style.setProperty("color",x.l>0.75?"#eef3fc":"#2859c7","important");
+    if((x=blue(cs.backgroundColor)))el.style.setProperty("background-color",N(x,"#2859c7",x.l>0.9?"#eef3fc":"#d6e2f8"),"important");
+    if(el instanceof SVGElement){if((x=blue(cs.fill)))el.style.setProperty("fill",N(x,"#2859c7","#eef3fc"),"important");if((x=blue(cs.stroke)))el.style.setProperty("stroke",N(x,"#2859c7","#d6e2f8"),"important")}
+    if(cs.textTransform==="uppercase"&&parseFloat(cs.fontSize)<=13.5&&!el.closest("button")&&!el.classList.contains("aic-mono"))el.classList.add("aic-mono");}
+  var t;function mode(){document.querySelectorAll(".aic-tool").forEach(function(r){var q=[].some.call(r.querySelectorAll(".aic-progress,.aic-qtext,.aic-q-text"),function(e){return e.offsetParent!==null});if(q!==r.classList.contains("aic-in-q"))r.classList.toggle("aic-in-q",q)})}
+  function run(){clearTimeout(t);t=setTimeout(function(){mode();document.querySelectorAll("body *").forEach(fix)},30)}
+  document.addEventListener("DOMContentLoaded",function(){run();new MutationObserver(run).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class","aria-pressed","aria-checked","data-state"]});
+    document.addEventListener("change",run,true);document.addEventListener("click",run,true);});
+})();
+</script>
+</head>
+<body style="margin:0">
+<!-- AIC:BEGIN (paste from here into a WordPress Custom HTML block) -->
+<style>
+.aic-article{
+  --aic-paper:#F7F8FA; --aic-white:#FFFFFF; --aic-ink:#162033; --aic-soft:#667085; --aic-line:#DEE3EA; --aic-sage:#EEF1F6;
+  --aic-blue:#315EFB; --aic-blue-deep:#2448C9; --aic-blue-soft:#EEF3FF; --aic-focus:#B8C7FF;
+  --aic-amber:#A46207; --aic-amber-soft:#FFF6E8; --aic-green:#2F7A4E; --aic-green-soft:#EEF8F1;
+  --aic-violet:#6D5BD0; --aic-violet-soft:#F2EFFF; --aic-grey:#5B6576; --aic-grey-soft:#F0F2F5;
+  --aic-radius:18px; --aic-shadow:0 10px 28px rgba(21,32,51,.055); --aic-measure:68ch;
+  display:block; background:var(--aic-paper); color:var(--aic-ink);
+  font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size:18px; line-height:1.68; -webkit-text-size-adjust:100%; text-align:left;
+  padding:0 0 64px; overflow-wrap:break-word; overflow-x:clip;
+}
+@media (prefers-color-scheme:dark){
+  .aic-article:not([data-theme="light"]){
+    --aic-paper:#101B2D; --aic-white:#162033; --aic-ink:#F2F4F8; --aic-soft:#A6B3C7; --aic-line:#2A3850; --aic-sage:#1E2A40;
+    --aic-blue:#7A97FF; --aic-blue-deep:#9BB2FF; --aic-blue-soft:#1F2B45; --aic-focus:#7A97FF;
+    --aic-amber:#E0A34A; --aic-amber-soft:#2E2412; --aic-green:#6FC592; --aic-green-soft:#13301F;
+    --aic-violet:#A79BEF; --aic-violet-soft:#251F3D; --aic-grey:#B5BFCE; --aic-grey-soft:#1C2638;
+    --aic-shadow:none; color-scheme:dark;
+  }
+}
+.aic-article *,.aic-article *::before,.aic-article *::after{box-sizing:border-box}
+.aic-article h1,.aic-article h2,.aic-article h3,.aic-article p,.aic-article ul,.aic-article ol,.aic-article dl,.aic-article dd,.aic-article dt{margin:0;padding:0}
+.aic-article h1,.aic-article h2,.aic-article h3{font-family:inherit;font-weight:800;letter-spacing:-.035em;line-height:1.1;color:var(--aic-ink)}
+.aic-article h1{font-size:clamp(34px,6.4vw,54px);text-wrap:balance;max-width:20ch}
+.aic-article h2{font-size:clamp(25px,4.2vw,32px);text-wrap:balance;margin-top:52px}
+.aic-article h3{font-size:19px;letter-spacing:-.02em;line-height:1.3}
+.aic-article p{max-width:var(--aic-measure)}
+.aic-article p+p{margin-top:18px}
+.aic-article h2+p{margin-top:16px}
+.aic-article ul,.aic-article ol{padding-left:1.25em;max-width:var(--aic-measure)}
+.aic-article li{margin:0 0 8px}
+.aic-article a{color:var(--aic-blue);font-weight:650;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+.aic-article a:hover{color:var(--aic-blue-deep)}
+.aic-article :focus-visible{outline:3px solid var(--aic-focus);outline-offset:2px;border-radius:6px}
+.aic-article strong{font-weight:750}
+.aic-article [hidden]{display:none!important}
+.aic-col{max-width:760px;margin:0 auto;padding-inline:16px}
+@media (min-width:700px){.aic-col{padding-inline:24px}}
+.aic-eyebrow{display:block;font-size:12px;font-weight:800;letter-spacing:.08em;color:var(--aic-blue);text-transform:uppercase;line-height:1.4}
+.aic-head{padding:40px 0 8px}
+.aic-head .aic-eyebrow{margin-bottom:14px}
+.aic-meta{margin-top:16px;font-size:14px;color:var(--aic-soft)}
+.aic-card{background:var(--aic-white);border:1px solid var(--aic-line);border-radius:var(--aic-radius);box-shadow:var(--aic-shadow);padding:20px}
+@media (min-width:700px){.aic-card{padding:24px 28px}}
+.aic-short{margin-top:28px;border-left:5px solid var(--aic-blue)}
+.aic-short .aic-eyebrow{margin-bottom:10px}
+.aic-short p{font-size:19.5px;line-height:1.6;max-width:none}
+.aic-short p+p{margin-top:12px}
+.aic-ref{font-size:.68em;font-weight:750;vertical-align:super;line-height:0;text-decoration:none!important;padding:0 1px;margin-left:1px}
+/* toggle bars (tabs and pressed buttons) */
+.aic-bar{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.aic-chip{appearance:none;font:inherit;font-size:15px;font-weight:750;line-height:1.25;min-height:44px;padding:10px 16px;border-radius:999px;border:1px solid var(--aic-line);background:var(--aic-white);color:var(--aic-ink);cursor:pointer;text-align:left}
+.aic-chip:hover{border-color:var(--aic-focus);color:var(--aic-blue)}
+.aic-chip[aria-selected="true"],.aic-chip[aria-pressed="true"]{background:var(--aic-blue);border-color:var(--aic-blue);color:#fff}
+@media (prefers-color-scheme:dark){.aic-article:not([data-theme="light"]) .aic-chip[aria-selected="true"],.aic-article:not([data-theme="light"]) .aic-chip[aria-pressed="true"]{color:#0B1424}}
+.aic-chip:focus-visible{outline:3px solid var(--aic-focus);outline-offset:2px}
+/* views */
+.aic-views{display:grid;gap:14px;margin-top:16px}
+.aic-view{border-top:5px solid var(--aic-blue)}
+.aic-view[data-tone="fast"]{border-top-color:var(--aic-amber)}
+.aic-view[data-tone="slow"]{border-top-color:var(--aic-violet)}
+.aic-view[data-tone="new"]{border-top-color:var(--aic-green)}
+.aic-view h3{font-size:clamp(20px,3vw,23px);margin-top:6px}
+.aic-view .aic-lede{margin-top:8px;font-size:17px}
+.aic-view dl{margin-top:14px;display:grid;gap:12px}
+.aic-view dt{font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--aic-soft)}
+.aic-view dd{font-size:16px;line-height:1.6;margin-top:2px}
+.aic-view dd ul{margin-top:4px}
+.aic-view dd li{margin-bottom:6px}
+.aic-agree{margin-top:16px;background:var(--aic-blue-soft);border-radius:14px;padding:16px 18px;font-size:16.5px;line-height:1.6}
+.aic-agree p{max-width:none}
+/* stepper */
+.aic-stepper{margin-top:18px}
+.aic-stepnav{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.aic-stepnav .aic-chip{min-width:44px;padding:10px 0;text-align:center;justify-content:center;font-variant-numeric:tabular-nums}
+.aic-stages{list-style:none;padding:0!important;display:grid;gap:12px;max-width:none!important}
+.aic-stage{margin:0!important}
+.aic-stage .aic-num{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--aic-soft)}
+.aic-stage h3{font-size:clamp(20px,3vw,24px);margin-top:4px}
+.aic-stage>p{margin-top:8px;font-size:16.5px}
+.aic-status{display:inline-block;margin-top:14px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border-radius:8px;padding:4px 10px;line-height:1.35}
+.aic-st-early{background:var(--aic-amber-soft);color:var(--aic-amber)}
+.aic-st-unclear{background:var(--aic-violet-soft);color:var(--aic-violet)}
+.aic-st-none{background:var(--aic-green-soft);color:var(--aic-green)}
+.aic-st-spec{background:var(--aic-grey-soft);color:var(--aic-grey)}
+.aic-evid{margin-top:8px;font-size:15.5px;line-height:1.6}
+.aic-other{margin-top:10px;font-size:15px;line-height:1.55;color:var(--aic-soft)}
+.aic-other b{color:var(--aic-ink);font-weight:750}
+.aic-stepctl{display:flex;gap:10px;justify-content:space-between;align-items:center;margin-top:14px;flex-wrap:wrap}
+.aic-stepctl .aic-count{font-size:14px;color:var(--aic-soft)}
+.aic-legend{margin-top:16px;font-size:14px;color:var(--aic-soft);line-height:1.6}
+.aic-legend .aic-status{margin:0 4px 0 0;font-size:11px;padding:2px 7px}
+/* rules + actions */
+.aic-rules{list-style:none;padding:0!important;display:grid;gap:12px;margin-top:16px;max-width:none!important;counter-reset:aicrule}
+@media (min-width:700px){.aic-rules{grid-template-columns:1fr 1fr}}
+.aic-rules li{margin:0;background:var(--aic-white);border:1px solid var(--aic-line);border-radius:14px;padding:16px 18px;counter-increment:aicrule}
+.aic-rules li::before{content:counter(aicrule);display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--aic-blue-soft);color:var(--aic-blue);font-weight:800;font-size:13px;margin-bottom:8px}
+.aic-rules h3{font-size:17.5px;margin-bottom:4px}
+.aic-rules p{font-size:16px;line-height:1.6}
+.aic-roles{display:grid;gap:20px;margin-top:16px}
+.aic-role h3.aic-rolehead{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--aic-soft);margin-bottom:10px}
+.aic-actions{display:grid;gap:12px}
+.aic-act{background:var(--aic-white);border:1px solid var(--aic-line);border-radius:14px;padding:16px 18px}
+.aic-act h4{margin:0 0 4px;font-size:17.5px;font-weight:800;letter-spacing:-.02em;line-height:1.3}
+.aic-act p{font-size:16px;line-height:1.6;max-width:none}
+.aic-newsline{margin-top:14px;font-size:15px;color:var(--aic-soft)}
+/* cta, related, sources */
+.aic-cta{margin-top:40px;border-top:4px solid var(--aic-blue)}
+.aic-cta h2{margin-top:0;font-size:clamp(22px,3.6vw,27px)}
+.aic-cta p{margin-top:10px;font-size:16.5px}
+.aic-btnrow{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.aic-btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 20px;font:inherit;font-size:15px;font-weight:750;line-height:1.2;border-radius:999px;min-height:44px;text-decoration:none!important;border:1px solid transparent;cursor:pointer}
+.aic-btn-primary{background:var(--aic-blue);color:#fff!important;box-shadow:0 6px 16px rgba(49,94,251,.14)}
+.aic-btn-primary:hover{background:var(--aic-blue-deep)}
+@media (prefers-color-scheme:dark){.aic-article:not([data-theme="light"]) .aic-btn-primary{color:#0B1424!important}}
+.aic-btn-ghost{background:var(--aic-white);color:var(--aic-ink)!important;border-color:var(--aic-line)}
+.aic-btn-ghost:hover{border-color:var(--aic-focus);color:var(--aic-blue)!important}
+.aic-btn[disabled]{opacity:.45;cursor:default}
+.aic-related{list-style:none;padding:0!important;display:grid;gap:8px;margin-top:14px;max-width:none!important}
+@media (min-width:700px){.aic-related{grid-template-columns:1fr 1fr}}
+.aic-related li{margin:0}
+.aic-related a{display:block;height:100%;background:var(--aic-white);border:1px solid var(--aic-line);border-radius:14px;padding:14px 16px;text-decoration:none;color:var(--aic-ink);font-weight:750;font-size:16px;line-height:1.35}
+.aic-related a span{display:block;margin-top:4px;font-weight:500;font-size:14px;color:var(--aic-soft)}
+.aic-related a:hover{border-color:var(--aic-focus);color:var(--aic-blue)}
+.aic-sources{margin-top:52px;padding-top:24px;border-top:1px solid var(--aic-line)}
+.aic-sources h2{margin-top:0;font-size:22px}
+.aic-sources ol{margin-top:14px;font-size:14.5px;line-height:1.55;color:var(--aic-soft);padding-left:1.6em;max-width:none}
+.aic-sources li{margin-bottom:9px;scroll-margin-top:80px}
+.aic-sources li:target{background:var(--aic-blue-soft);border-radius:6px}
+.aic-sources a{font-weight:600;word-break:break-word}
+.aic-sources p{font-size:14.5px;color:var(--aic-soft);margin-top:12px;max-width:none}
+@media (prefers-reduced-motion:no-preference){.aic-article .aic-chip,.aic-article .aic-btn{transition:background-color .15s,border-color .15s,color .15s}}
+@media print{
+  .aic-article{background:#fff;color:#000;font-size:12pt;padding:0}
+  .aic-article .aic-cta,.aic-article .aic-related,.aic-article .aic-btnrow,.aic-article .aic-bar,.aic-article .aic-stepnav,.aic-article .aic-stepctl,.aic-article .aic-legend{display:none!important}
+  .aic-article [hidden]{display:block!important}
+  .aic-card,.aic-act,.aic-rules li{box-shadow:none;break-inside:avoid}
+}
+</style>
+<article class="aic-article" id="aic-ai-and-jobs-explained" lang="en">
+<div class="aic-col">
+<header class="aic-head">
+  <span class="aic-eyebrow">AI and work</span>
+  <h1>AI and jobs: what's actually going to happen?</h1>
+  <p class="aic-meta">Last checked November 2026 · About 9 minutes · For business owners, leaders, HR teams and anyone thinking about their own job</p>
+</header>
+
+<section class="aic-card aic-short" aria-labelledby="aic-aj-short">
+  <span class="aic-eyebrow" id="aic-aj-short">The short answer</span>
+  <p>Nobody knows how far or how fast this goes, and anyone who sounds certain is guessing. What we can see so far is AI taking over tasks inside jobs, and fewer young people being hired into the most exposed roles. There is no broad wave of AI layoffs in the data yet.</p>
+  <p>The first changes show up in hiring, not firing, and at the bottom of the ladder. Plan for that now, and keep watching, because the people who expect much faster change have serious arguments too.</p>
+</section>
+
+<h2 id="aic-aj-why">Why people disagree</h2>
+<p>Serious people read the same evidence differently. In a 2025 Pew survey, 39% of AI experts expected AI to mean fewer US jobs over the next 20 years, and 19% expected more.<a class="aic-ref" href="#aic-aj-s13" aria-label="Source 13">13</a> Here are the four main positions, each at its strongest.</p>
+
+<div class="aic-bar" role="tablist" aria-label="Four views on AI and jobs" data-aic-tabs hidden>
+  <button type="button" class="aic-chip" role="tab" id="aic-aj-tab-tasks" aria-controls="aic-aj-view-tasks" aria-selected="true">Tasks change, jobs adapt</button>
+  <button type="button" class="aic-chip" role="tab" id="aic-aj-tab-fast" aria-controls="aic-aj-view-fast" aria-selected="false" tabindex="-1">Fast, from the bottom up</button>
+  <button type="button" class="aic-chip" role="tab" id="aic-aj-tab-slow" aria-controls="aic-aj-view-slow" aria-selected="false" tabindex="-1">Slower than the demos</button>
+  <button type="button" class="aic-chip" role="tab" id="aic-aj-tab-new" aria-controls="aic-aj-view-new" aria-selected="false" tabindex="-1">New work appears</button>
+</div>
+
+<div class="aic-views">
+  <section class="aic-card aic-view" data-tone="tasks" id="aic-aj-view-tasks" aria-labelledby="aic-aj-vh-tasks">
+    <span class="aic-eyebrow">View 1</span>
+    <h3 id="aic-aj-vh-tasks">AI changes tasks, and most jobs adapt</h3>
+    <p class="aic-lede">AI takes over pieces of most office jobs and helps with others. Jobs get redesigned far more often than they disappear.</p>
+    <dl>
+      <div><dt>Who holds it</dt><dd>Researchers at the International Labour Organization, OpenAI, the University of Pennsylvania and Microsoft.</dd></div>
+      <div><dt>Strongest evidence</dt><dd><ul>
+        <li>About 80% of US workers could have at least 10% of their tasks affected by AI tools like ChatGPT, but only about 19% could see half or more of their tasks affected.<a class="aic-ref" href="#aic-aj-s1" aria-label="Source 1">1</a></li>
+        <li>The ILO finds one in four workers worldwide in a job with some exposure, and 3.3% in the highest category. Its conclusion: "transformation of jobs is the most likely impact."<a class="aic-ref" href="#aic-aj-s2" aria-label="Source 2">2</a></li>
+        <li>In a sample of conversations from November 2025, 52% of conversations with Anthropic's Claude chatbot had people working with the AI, and 45% had them handing the task over.<a class="aic-ref" href="#aic-aj-s4" aria-label="Source 4">4</a></li>
+        <li>Microsoft researchers, after studying 200,000 conversations with Copilot, warned that reading high scores as job loss "would be a mistake": ATMs automated a core task of bank tellers, and teller jobs still grew.<a class="aic-ref" href="#aic-aj-s3" aria-label="Source 3">3</a></li>
+      </ul></dd></div>
+      <div><dt>What it may miss</dt><dd>These are snapshots of today's tools. If AI keeps improving, the share of each job it can do rises with it.</dd></div>
+    </dl>
+  </section>
+
+  <section class="aic-card aic-view" data-tone="fast" id="aic-aj-view-fast" aria-labelledby="aic-aj-vh-fast">
+    <span class="aic-eyebrow">View 2</span>
+    <h3 id="aic-aj-vh-fast">Fast displacement, starting at the bottom</h3>
+    <p class="aic-lede">As AI gets more capable, companies stop hiring juniors, then cut upward through the hierarchy, faster than past technologies because AI can take on whole bundles of computer work.</p>
+    <dl>
+      <div><dt>Who holds it</dt><dd>Luke Drago and Rudolf Laine, whose essay series <em>The Intelligence Curse</em> (April 2025) calls it "pyramid replacement".<a class="aic-ref" href="#aic-aj-s5" aria-label="Source 5">5</a> Anthropic's chief executive, Dario Amodei, told Axios in May 2025 that AI could eliminate half of entry-level white-collar jobs and push US unemployment to 10–20% within five years.<a class="aic-ref" href="#aic-aj-s6" aria-label="Source 6">6</a></dd></div>
+      <div><dt>Strongest evidence</dt><dd><ul>
+        <li>The first thing it predicts has started to show. Stanford researchers find employment of 22 to 25 year olds in AI-exposed jobs is 19% below trend, mostly through fewer hires rather than layoffs.<a class="aic-ref" href="#aic-aj-s10" aria-label="Source 10">10</a></li>
+        <li>Anthropic's economists find job-finding rates for 22 to 25 year olds into highly exposed jobs down about 14% since 2022, a result they call only barely statistically significant.<a class="aic-ref" href="#aic-aj-s11" aria-label="Source 11">11</a></li>
+      </ul></dd></div>
+      <div><dt>What it may miss</dt><dd>The early data shows a pattern, not proof that AI caused it. And economy-wide data still shows no clear AI footprint.<a class="aic-ref" href="#aic-aj-s12" aria-label="Source 12">12</a></dd></div>
+    </dl>
+  </section>
+
+  <section class="aic-card aic-view" data-tone="slow" id="aic-aj-view-slow" aria-labelledby="aic-aj-vh-slow">
+    <span class="aic-eyebrow">View 3</span>
+    <h3 id="aic-aj-vh-slow">Slower than the demos suggest</h3>
+    <p class="aic-lede">Even when AI can do a task, using it at work costs money and time, and runs into quality problems, rules and liability. The change is real, and slow.</p>
+    <dl>
+      <div><dt>Who holds it</dt><dd>Researchers at MIT FutureTech, and MIT economist Daron Acemoglu.</dd></div>
+      <div><dt>Strongest evidence</dt><dd><ul>
+        <li>When MIT researchers priced out computer-vision systems, only about 23% of the wages paid for vision tasks were attractive to automate at then-current costs.<a class="aic-ref" href="#aic-aj-s7" aria-label="Source 7">7</a></li>
+        <li>Acemoglu estimates AI will add no more than 0.66% to total productivity over ten years.<a class="aic-ref" href="#aic-aj-s8" aria-label="Source 8">8</a></li>
+        <li>In computer and math jobs, Anthropic found its AI used for 33% of tasks against 94% judged possible.<a class="aic-ref" href="#aic-aj-s11" aria-label="Source 11">11</a></li>
+      </ul></dd></div>
+      <div><dt>What it may miss</dt><dd>Costs fall fast, and the MIT study covered image recognition only.</dd></div>
+    </dl>
+  </section>
+
+  <section class="aic-card aic-view" data-tone="new" id="aic-aj-view-new" aria-labelledby="aic-aj-vh-new">
+    <span class="aic-eyebrow">View 4</span>
+    <h3 id="aic-aj-vh-new">New work appears, as it always has</h3>
+    <p class="aic-lede">Technology removes some work and creates kinds we can't name yet. Most of today's jobs are in specialties that didn't exist in 1940.</p>
+    <dl>
+      <div><dt>Who holds it</dt><dd>Labor economists including MIT's David Autor, and the 19% of AI experts in Pew's survey who expected more jobs, not fewer.</dd></div>
+      <div><dt>Strongest evidence</dt><dd><ul>
+        <li>Autor and colleagues find that "the majority of current employment is in new job specialties introduced after 1940."<a class="aic-ref" href="#aic-aj-s9" aria-label="Source 9">9</a></li>
+              </ul></dd></div>
+      <div><dt>What it may miss</dt><dd>History doesn't say how long the gap lasts or who gets the new jobs. And if AI can learn the new work too, the old pattern may not hold.</dd></div>
+    </dl>
+  </section>
+</div>
+
+<div class="aic-agree"><p><strong>Where they agree:</strong> routine computer work and entry-level roles change first. The argument is about speed, and how far up the ladder it goes.</p></div>
+
+<h2 id="aic-aj-steps">What replacement could look like</h2>
+<p>One detailed forecast of how this unfolds is the "pyramid replacement" model in <em>The Intelligence Curse</em>.<a class="aic-ref" href="#aic-aj-s5" aria-label="Source 5">5</a> It is one view, not a consensus. Step through it and see what today's evidence says at each stage.</p>
+
+<div class="aic-stepper">
+  <div class="aic-stepnav" data-aic-stepnav role="group" aria-label="Jump to a stage" hidden>
+    <button type="button" class="aic-chip" aria-pressed="true" aria-label="Stage 1: Hiring slows" data-aic-go="0">1</button>
+    <button type="button" class="aic-chip" aria-pressed="false" aria-label="Stage 2: Entry-level hiring stops" data-aic-go="1">2</button>
+    <button type="button" class="aic-chip" aria-pressed="false" aria-label="Stage 3: Cuts reach management" data-aic-go="2">3</button>
+    <button type="button" class="aic-chip" aria-pressed="false" aria-label="Stage 4: AI does almost every role" data-aic-go="3">4</button>
+    <button type="button" class="aic-chip" aria-pressed="false" aria-label="Stage 5: Only the top team remains" data-aic-go="4">5</button>
+    <button type="button" class="aic-chip" aria-pressed="false" aria-label="Stage 6: No humans in daily operations" data-aic-go="5">6</button>
+  </div>
+  <ol class="aic-stages">
+    <li class="aic-card aic-stage" data-aic-stage>
+      <span class="aic-num">Stage 1 of 6</span>
+      <h3>Hiring slows</h3>
+      <p>AI handles basic tasks, so firms hire fewer entry-level staff instead of laying people off.</p>
+      <span class="aic-status aic-st-early">Evidence today: early signs</span>
+      <p class="aic-evid">Fewer 22 to 25 year olds in AI-exposed jobs (Stanford, data to June 2026), mainly through reduced hiring.<a class="aic-ref" href="#aic-aj-s10" aria-label="Source 10">10</a> Anthropic sees the same pattern, weakly.<a class="aic-ref" href="#aic-aj-s11" aria-label="Source 11">11</a></p>
+      <p class="aic-other"><b>Another reading:</b> the Stanford authors call their findings "early, descriptive indicators," not proof of cause. Anthropic lists other explanations, such as young people returning to school.</p>
+    </li>
+    <li class="aic-card aic-stage" data-aic-stage>
+      <span class="aic-num">Stage 2 of 6</span>
+      <h3>Entry-level hiring stops</h3>
+      <p>Junior hiring shrinks fast as AI takes on more complex work.</p>
+      <span class="aic-status aic-st-unclear">Evidence today: not yet clear</span>
+      <p class="aic-evid">We found no reliable data showing entry-level hiring has stopped in any broad field as of November 2026.</p>
+      <p class="aic-other"><b>Another reading:</b> employers redesign junior roles around checking and customer work, and keep hiring.</p>
+    </li>
+    <li class="aic-card aic-stage" data-aic-stage>
+      <span class="aic-num">Stage 3 of 6</span>
+      <h3>Cuts reach management</h3>
+      <p>With no juniors coming up, layoffs move to the middle layers, often when a downturn gives companies the reason.</p>
+      <span class="aic-status aic-st-none">Evidence today: not seen</span>
+      <p class="aic-evid">Yale's Budget Lab (14 October 2026): measures of AI usage "show no connection to changes in employment or unemployment."<a class="aic-ref" href="#aic-aj-s12" aria-label="Source 12">12</a></p>
+      <p class="aic-other"><b>Another reading:</b> the brakes in View 3 hold this stage off for years, or for good.</p>
+    </li>
+    <li class="aic-card aic-stage" data-aic-stage>
+      <span class="aic-num">Stage 4 of 6</span>
+      <h3>AI does almost every role</h3>
+      <p>Most of the work below the top team is done by AI.</p>
+      <span class="aic-status aic-st-spec">Evidence today: speculation</span>
+      <p class="aic-evid">Needs AI far more capable and reliable than today's tools. Experts disagree on whether and when that arrives.</p>
+    </li>
+    <li class="aic-card aic-stage" data-aic-stage>
+      <span class="aic-num">Stage 5 of 6</span>
+      <h3>Only the top team remains</h3>
+      <p>A small leadership group directs AI systems that do the work.</p>
+      <span class="aic-status aic-st-spec">Evidence today: speculation</span>
+      <p class="aic-evid">Depends on the same leap in AI capability as stage 4.</p>
+    </li>
+    <li class="aic-card aic-stage" data-aic-stage>
+      <span class="aic-num">Stage 6 of 6</span>
+      <h3>No humans in daily operations</h3>
+      <p>In some firms, nobody manages the day-to-day.</p>
+      <span class="aic-status aic-st-spec">Evidence today: speculation</span>
+      <p class="aic-evid">The authors themselves say regulation, investor caution, unions and cost could slow all this, and that some work, such as long-range planning, taste and local knowledge, may last longer.<a class="aic-ref" href="#aic-aj-s5" aria-label="Source 5">5</a></p>
+    </li>
+  </ol>
+  <div class="aic-stepctl" data-aic-stepctl hidden>
+    <button type="button" class="aic-btn aic-btn-ghost" data-aic-prev>Previous stage</button>
+    <span class="aic-count" data-aic-count aria-live="polite">Stage 1 of 6</span>
+    <button type="button" class="aic-btn aic-btn-primary" data-aic-next>Next stage</button>
+  </div>
+  <p class="aic-legend"><span class="aic-status aic-st-early">Early signs</span> some data points this way · <span class="aic-status aic-st-unclear">Not yet clear</span> no good data · <span class="aic-status aic-st-none">Not seen</span> data points the other way · <span class="aic-status aic-st-spec">Speculation</span> depends on future AI</p>
+</div>
+
+<h2 id="aic-aj-think">How to think about it</h2>
+<p>Four rules that hold whichever view turns out right.</p>
+<ol class="aic-rules">
+  <li><h3>Think in tasks, not titles.</h3><p>Two people with the same title can have very different weeks. Ask which parts of the week are repetitive and easy to check.</p></li>
+  <li><h3>Watch hiring, not firing.</h3><p>The first signal is roles quietly not backfilled and junior intakes that shrink. Layoff headlines come later, if at all.</p></li>
+  <li><h3>Exposure isn't loss.</h3><p>Cost, quality, rules and who answers for mistakes all sit in between.</p></li>
+  <li><h3>Plan on the trend, not the snapshot.</h3><p>What AI can't do this year says little about next year. Recheck your plan every six months against what the tools can actually do.</p></li>
+</ol>
+
+<h2 id="aic-aj-do">What to do about it</h2>
+<p>Each list works whether change turns out fast or slow.</p>
+
+<div class="aic-bar" role="group" aria-label="Show actions for" data-aic-roles hidden>
+  <button type="button" class="aic-chip" aria-pressed="false" aria-controls="aic-aj-role-business" data-aic-role="business">I run a business</button>
+  <button type="button" class="aic-chip" aria-pressed="false" aria-controls="aic-aj-role-hr" data-aic-role="hr">I lead HR or L&amp;D</button>
+  <button type="button" class="aic-chip" aria-pressed="false" aria-controls="aic-aj-role-individual" data-aic-role="individual">I'm thinking about my own job</button>
+</div>
+
+<div class="aic-roles">
+  <section class="aic-role" id="aic-aj-role-business" data-aic-rolepanel="business" aria-labelledby="aic-aj-rh-business">
+    <h3 class="aic-rolehead" id="aic-aj-rh-business">If you run a business</h3>
+    <div class="aic-actions">
+      <div class="aic-act"><h4>Run the one-task test.</h4><p>Take your most repetitive task (quotes, replies, summaries). Do it your usual way with a clock running, then with a good AI tool. The minutes tell you more than any forecast.</p></div>
+      <div class="aic-act"><h4>Price the whole job, not the demo.</h4><p>Count the checking, the fixing and the customers who want a person, not just the subscription.</p></div>
+      <div class="aic-act"><h4>Decide what the saved time is for.</h4><p>More customers, better service or fewer hires. Choose on purpose and tell your staff before rumors do.</p></div>
+      <div class="aic-act"><h4>Hold the 3-year conversation.</h4><p>One hour with your team: if AI could do our core service cheaply in three years, what do we sell then? Write down two trigger points: "if we see X, we do Y."</p></div>
+    </div>
+  </section>
+  <section class="aic-role" id="aic-aj-role-hr" data-aic-rolepanel="hr" aria-labelledby="aic-aj-rh-hr">
+    <h3 class="aic-rolehead" id="aic-aj-rh-hr">If you lead HR or L&amp;D</h3>
+    <div class="aic-actions">
+      <div class="aic-act"><h4>Protect the entry-level pipeline.</h4><p>Stop hiring juniors and in five years you'll have nobody ready to promote. Keep a junior intake, and build those roles around checking AI work, judgment and customer contact.</p></div>
+      <div class="aic-act"><h4>Track hiring by level.</h4><p>Report entry-level roles not backfilled each quarter, next to headcount. It's the number that moves first.</p></div>
+      <div class="aic-act"><h4>Map tasks before you touch roles.</h4><p>Use <a data-aic-slug="which-parts-of-your-teams-work-could-ai-change-first" href="which-parts-of-your-teams-work-could-ai-change-first.html">Which Parts of Your Team's Work Could AI Change First?</a> to see where the change lands and what people should learn next.</p></div>
+      <div class="aic-act"><h4>Train people to check, not just to prompt.</h4><p>Knowing when not to trust AI, and how to catch its mistakes, can be taught.</p></div>
+    </div>
+  </section>
+  <section class="aic-role" id="aic-aj-role-individual" data-aic-rolepanel="individual" aria-labelledby="aic-aj-rh-individual">
+    <h3 class="aic-rolehead" id="aic-aj-rh-individual">If you're thinking about your own job</h3>
+    <div class="aic-actions">
+      <div class="aic-act"><h4>Run the one-task test.</h4><p>List your ten most common tasks. Mark the repetitive, checkable ones. Try a good AI tool on one with a clock running. That's your real exposure.</p></div>
+      <div class="aic-act"><h4>Check your job, task by task.</h4><p><a data-aic-slug="check-your-job" href="check-your-job.html">Check Your Job</a> shows which of your tasks are within AI's reach, and when, if current trends hold.</p></div>
+      <div class="aic-act"><h4>Grow the part that needs you.</h4><p>Ask for more of the sign-off, the client contact, the judgment.</p></div>
+      <div class="aic-act"><h4>Keep a cushion.</h4><p>A few months of savings and an up-to-date CV, more so early in your career.</p></div>
+    </div>
+  </section>
+</div>
+<p class="aic-newsline">A no-regrets move: AI fluency, a financial cushion and skills that travel between roles are worth building even if AI progress stalls tomorrow.</p>
+
+<section class="aic-card aic-cta" aria-labelledby="aic-aj-more">
+  <h2 id="aic-aj-more">Need more than an answer?</h2>
+  <p data-aic-ctaline>Planning roles, hiring or reskilling around AI? A member can help you get the sequence right, or train your people to use and check AI on their own tasks.</p>
+  <div class="aic-btnrow">
+    <a class="aic-btn aic-btn-primary" data-aic-cfg="matchUrl" data-aic-cta="get_matched" href="#">Get matched to someone</a>
+    <a class="aic-btn aic-btn-ghost" data-aic-cfg="coursesUrl" data-aic-cta="learn_with_member" href="#">Learn with a member</a>
+  </div>
+  <p class="aic-newsline">Or <a data-aic-cfg="newsletterUrl" data-aic-cta="newsletter" href="#">keep up without keeping up with everything.</a></p>
+</section>
+
+<section aria-labelledby="aic-aj-rel">
+  <h2 id="aic-aj-rel" style="font-size:22px">Related</h2>
+  <ul class="aic-related">
+    <li><a data-aic-slug="check-your-job" href="check-your-job.html">How exposed is your job to AI, task by task?<span>Check Your Job: your role against the trend.</span></a></li>
+    <li><a data-aic-slug="which-parts-of-your-teams-work-could-ai-change-first" href="which-parts-of-your-teams-work-could-ai-change-first.html">Which parts of your team's work could AI change first?<span>The team-level map for managers and HR.</span></a></li>
+    <li><a href="https://automationatlas.org/">Global Automation Atlas<span>Researchers' task-by-task ratings for 124 countries.</span></a></li>
+  </ul>
+</section>
+
+<section class="aic-sources" aria-labelledby="aic-aj-src">
+  <h2 id="aic-aj-src">Sources</h2>
+  <ol>
+    <li id="aic-aj-s1">Tyna Eloundou, Sam Manning, Pamela Mishkin and Daniel Rock, "GPTs are GPTs: An early look at the labor market impact potential of large language models", arXiv 2303.10130, March 2023 (revised August 2023); published in <em>Science</em>, 2024. <a href="https://arxiv.org/abs/2303.10130">arxiv.org/abs/2303.10130</a></li>
+    <li id="aic-aj-s2">Pawel Gmyrek, Janine Berg and others, "Generative AI and Jobs: A Refined Global Index of Occupational Exposure", ILO Working Paper 140, 20 May 2025. <a href="https://www.ilo.org/publications/generative-ai-and-jobs-refined-global-index-occupational-exposure">ilo.org</a></li>
+    <li id="aic-aj-s3">Kiran Tomlinson, Sonia Jaffe, Will Wang, Scott Counts and Siddharth Suri (Microsoft Research), "Working with AI: Measuring the Applicability of Generative AI to Occupations", arXiv 2507.07935, July 2025 (latest revision October 2026). <a href="https://arxiv.org/abs/2507.07935">arxiv.org/abs/2507.07935</a></li>
+    <li id="aic-aj-s4">Anthropic, "Anthropic Economic Index: January 2026 report", 15 January 2026 (Claude.ai conversations sampled 13–20 November 2025). <a href="https://www.anthropic.com/research/anthropic-economic-index-january-2026-report">anthropic.com</a></li>
+    <li id="aic-aj-s5">Luke Drago and Rudolf Laine, <em>The Intelligence Curse</em>, essay series, April 2025; chapter "Pyramid Replacement". <a href="https://intelligence-curse.ai/pyramid">intelligence-curse.ai/pyramid</a></li>
+    <li id="aic-aj-s6">Dario Amodei, interview with Axios, "Behind the Curtain: A white-collar bloodbath", 28 May 2025 (<a href="https://www.axios.com/2025/05/28/ai-jobs-white-collar-unemployment-anthropic">axios.com</a>); as reported by Fortune, 28 May 2025 (<a href="https://fortune.com/2025/05/28/anthropic-ceo-warning-ai-job-loss/">fortune.com</a>).</li>
+    <li id="aic-aj-s7">Maja S. Svanberg, Wensu Li, Martin Fleming, Brian C. Goehring and Neil C. Thompson (MIT FutureTech), "Beyond AI Exposure: Which Tasks are Cost-Effective to Automate with Computer Vision?", 2024. <a href="https://futuretech.mit.edu/publication/beyond-ai-exposure-which-tasks-are-cost-effective-to-automate-with-computer-vision">futuretech.mit.edu</a></li>
+    <li id="aic-aj-s8">Daron Acemoglu, "The Simple Macroeconomics of AI", <em>Economic Policy</em> 40(121), 2025, pp. 13–58 (NBER Working Paper 32487, 2024). <a href="https://econpapers.repec.org/RePEc:oup:ecpoli:v:40:y:2025:i:121:p:13-58.">econpapers.repec.org</a></li>
+    <li id="aic-aj-s9">David Autor, Caroline Chin, Anna Salomons and Bryan Seegmiller, "New Frontiers: The Origins and Content of New Work, 1940–2018", NBER Working Paper 30389, 2022; <em>Quarterly Journal of Economics</em>, 2024. <a href="https://www.nber.org/papers/w30389">nber.org</a></li>
+    <li id="aic-aj-s10">Erik Brynjolfsson, Bharat Chandar and Ruyu Chen (Stanford Digital Economy Lab), "Canaries in the Coal Mine? Six Facts about the Recent Employment Effects of Artificial Intelligence", first published August 2025, revised 12 August 2026 (payroll data through June 2026). <a href="https://digitaleconomy.stanford.edu/publications/canaries-in-the-coal-mine/">digitaleconomy.stanford.edu</a></li>
+    <li id="aic-aj-s11">Maxim Massenkoff and Peter McCrory (Anthropic), "Labor market impacts of AI: A new measure and early evidence", 5 March 2026. <a href="https://www.anthropic.com/research/labor-market-impacts">anthropic.com</a></li>
+    <li id="aic-aj-s12">The Budget Lab at Yale, "Tracking the Impact of AI on the Labor Market", updated 14 October 2026 (live tracker; as of that date). <a href="https://budgetlab.yale.edu/research/tracking-impact-ai-labor-market">budgetlab.yale.edu</a></li>
+    <li id="aic-aj-s13">Pew Research Center, "Public and expert predictions for AI's next 20 years", 3 April 2025. <a href="https://www.pewresearch.org/internet/2025/04/03/public-and-expert-predictions-for-ais-next-20-years/">pewresearch.org</a></li>
+    <li id="aic-aj-s14">Prashant Garg, Tommaso Crosta and Jasmin Baier, "Global Automation Atlas", automationatlas.org, 2026 (18,797 tasks, 124 countries; model-produced ratings, not employment forecasts). <a href="https://automationatlas.org/">automationatlas.org</a></li>
+  </ol>
+  <p>All sources checked November 2026. Labor-market trackers update often; figures are as of the dates shown. Not career or legal advice.</p>
+</section>
+</div>
+</article>
+<script>
+(function(){
+  'use strict';
+  /* ---- AI Channel config: the WordPress editor can change these (or set window.AICHANNEL_CONFIG before this script) ---- */
+  window.AICHANNEL_CONFIG = Object.assign({
+    coursesUrl: "#",        // "Learn with a member" (Central AI course schedule)
+    matchUrl: "#",          // "Get matched to someone" (advisory/consulting form)
+    newsletterUrl: "#",     // separate newsletter opt-in
+    contentBaseUrl: "",     // prefix for sibling pieces: contentBaseUrl + slug + ".html"
+    linkTarget: ""          // optional, e.g. "_top" when embedded in an iframe
+  }, window.AICHANNEL_CONFIG || {});
+  var CFG = window.AICHANNEL_CONFIG;
+  var root = document.getElementById('aic-ai-and-jobs-explained');
+  if(!root) return;
+  var SLUG = 'ai-and-jobs-explained', AUDIENCE = 'business', NAME = 'AI and jobs explained';
+  var role = '';
+
+  root.querySelectorAll('[data-aic-slug]').forEach(function(a){
+    a.setAttribute('href', (CFG.contentBaseUrl || '') + a.getAttribute('data-aic-slug') + '.html');
+    if(CFG.linkTarget) a.setAttribute('target', CFG.linkTarget);
+  });
+  root.querySelectorAll('[data-aic-cfg]').forEach(function(a){
+    var u = CFG[a.getAttribute('data-aic-cfg')];
+    if(u) a.setAttribute('href', u);
+    if(CFG.linkTarget) a.setAttribute('target', CFG.linkTarget);
+  });
+
+  function track(name, extra){
+    var d = Object.assign({event:name, lead_type:'content', audience:AUDIENCE, source_page:location.href,
+      source_content_or_tool:SLUG, assessment_name:NAME}, extra||{});
+    try{ window.dispatchEvent(new CustomEvent('aichannel:event',{detail:d})); }catch(e){}
+    try{ if(window.parent && window.parent !== window) window.parent.postMessage(Object.assign({type:'aichannel:event'}, d), '*'); }catch(e){}
+  }
+  var started = false;
+  function start(){ if(!started){ started = true; track('tool_started'); } }
+
+  root.addEventListener('click', function(ev){
+    var a = ev.target.closest ? ev.target.closest('a[data-aic-cta]') : null;
+    if(a) track('cta_clicked', Object.assign({cta_clicked:a.getAttribute('data-aic-cta')}, role ? {assessment_result:role} : {}));
+  });
+
+  /* ---- 1. Views: tabs ---- */
+  var tablist = root.querySelector('[data-aic-tabs]');
+  if(tablist){
+    var tabs = Array.prototype.slice.call(tablist.querySelectorAll('[role="tab"]'));
+    var panels = tabs.map(function(t){ return document.getElementById(t.getAttribute('aria-controls')); });
+    panels.forEach(function(p, i){ p.setAttribute('role','tabpanel'); p.setAttribute('tabindex','0'); p.setAttribute('aria-labelledby', tabs[i].id); });
+    var selectTab = function(i, focus){
+      tabs.forEach(function(t, j){
+        var on = i === j;
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        t.setAttribute('tabindex', on ? '0' : '-1');
+        panels[j].hidden = !on;
+      });
+      if(focus) tabs[i].focus();
+    };
+    tabs.forEach(function(t, i){
+      t.addEventListener('click', function(){ start(); selectTab(i, false); });
+      t.addEventListener('keydown', function(e){
+        var k = e.key, n = tabs.length, j = null;
+        if(k === 'ArrowRight' || k === 'ArrowDown') j = (i + 1) % n;
+        else if(k === 'ArrowLeft' || k === 'ArrowUp') j = (i - 1 + n) % n;
+        else if(k === 'Home') j = 0;
+        else if(k === 'End') j = n - 1;
+        if(j !== null){ e.preventDefault(); start(); selectTab(j, true); }
+      });
+    });
+    tablist.hidden = false;
+    selectTab(0, false);
+  }
+
+  /* ---- 2. Forecast step-through ---- */
+  var stages = Array.prototype.slice.call(root.querySelectorAll('[data-aic-stage]'));
+  var nav = root.querySelector('[data-aic-stepnav]');
+  var ctl = root.querySelector('[data-aic-stepctl]');
+  if(stages.length && nav && ctl){
+    var dots = Array.prototype.slice.call(nav.querySelectorAll('[data-aic-go]'));
+    var prev = ctl.querySelector('[data-aic-prev]'), next = ctl.querySelector('[data-aic-next]');
+    var count = ctl.querySelector('[data-aic-count]');
+    var cur = 0, done = false;
+    var show = function(i){
+      cur = Math.max(0, Math.min(stages.length - 1, i));
+      stages.forEach(function(s, j){ s.hidden = j !== cur; });
+      dots.forEach(function(d, j){ d.setAttribute('aria-pressed', j === cur ? 'true' : 'false'); });
+      prev.disabled = cur === 0;
+      next.disabled = cur === stages.length - 1;
+      count.textContent = 'Stage ' + (cur + 1) + ' of ' + stages.length;
+      if(cur === stages.length - 1 && !done){ done = true; track('tool_completed'); }
+    };
+    dots.forEach(function(d){ d.addEventListener('click', function(){ start(); show(parseInt(d.getAttribute('data-aic-go'), 10)); }); });
+    prev.addEventListener('click', function(){ start(); show(cur - 1); if(prev.disabled) next.focus(); });
+    next.addEventListener('click', function(){ start(); show(cur + 1); if(next.disabled) prev.focus(); });
+    nav.hidden = false; ctl.hidden = false;
+    show(0);
+  }
+
+  /* ---- 3. Actions by role ---- */
+  var roleBar = root.querySelector('[data-aic-roles]');
+  var ctaLine = root.querySelector('[data-aic-ctaline]');
+  var ctaText = {
+    business: 'If you want a second pair of eyes on where AI fits in your business, and what it really costs, someone who does this for a living can help you get the sequence right.',
+    hr: 'If you are redesigning roles or junior intakes around AI, a member can help with the workforce plan, and a course with a member trainer gets your people checking AI on their own tasks.',
+    individual: 'If you want to get good at using and checking AI in your own field, a course with a member trainer works on your real tasks, not demos.'
+  };
+  var ctaOrder = { business:'matchUrl', hr:'matchUrl', individual:'coursesUrl' };
+  if(roleBar){
+    var rbtns = Array.prototype.slice.call(roleBar.querySelectorAll('[data-aic-role]'));
+    var rpanels = Array.prototype.slice.call(root.querySelectorAll('[data-aic-rolepanel]'));
+    var btnRow = root.querySelector('.aic-cta .aic-btnrow');
+    var pickRole = function(r){
+      if(r === role) r = '';   /* pressing the active role again shows all three */
+      role = r;
+      rbtns.forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-aic-role') === r ? 'true' : 'false'); });
+      rpanels.forEach(function(p){ p.hidden = !!r && p.getAttribute('data-aic-rolepanel') !== r; });
+      if(!r) return;
+      if(ctaLine && ctaText[r]) ctaLine.textContent = ctaText[r];
+      if(btnRow){
+        var first = btnRow.querySelector('[data-aic-cfg="' + ctaOrder[r] + '"]');
+        btnRow.querySelectorAll('a').forEach(function(a){
+          var on = a === first;
+          a.classList.toggle('aic-btn-primary', on);
+          a.classList.toggle('aic-btn-ghost', !on);
+        });
+        if(first) btnRow.insertBefore(first, btnRow.firstChild);
+      }
+      track('result_viewed', {assessment_result:r});
+    };
+    rbtns.forEach(function(b){ b.addEventListener('click', function(){ start(); pickRole(b.getAttribute('data-aic-role')); }); });
+    roleBar.hidden = false;
+    /* all three lists stay visible until a role is picked */
+  }
+})();
+</script>
+<!-- AIC:END -->
+</body>
+</html>
+
+</body></html>

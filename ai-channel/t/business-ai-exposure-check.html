@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How exposed is your business's AI use? — The Business AI Exposure Check</title>
+<meta name="description" content="A 5-minute self-assessment for small and medium business owners. No email, nothing stored.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EFF0F3; --card:#FFFFFF; --ink:#171B38; --ink-soft:#4A4E6A; --ink-mute:#7B7F99;
+    --accent:#E8892F; --accent-deep:#C9711F; --accent-wash:#FBEFE2;
+    --blue:#3E7FA0; --blue-wash:#E6F0F5; --line:#DCDEE8;
+    --radius:14px; --radius-sm:10px;
+    --serif:"Instrument Serif", Georgia, "Times New Roman", serif;
+    --sans:"Instrument Sans", "Helvetica Neue", Arial, system-ui, sans-serif;
+    --mono:"IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --ease:cubic-bezier(.22,.8,.3,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.55;min-height:100vh}
+  button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+  :focus-visible{outline:3px solid var(--blue);outline-offset:3px;border-radius:6px}
+  .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+  /* ---------- Top bar ---------- */
+  .topbar{position:sticky;top:0;z-index:20;background:rgba(239,240,243,.9);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .topbar-inner{max-width:880px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .brand{display:flex;align-items:center;gap:10px;font-family:var(--serif);font-size:22px;letter-spacing:-.01em}
+  .brand-mark{width:26px;height:26px;flex:none}
+  .topbar-meta{font-family:var(--mono);font-size:12px;color:var(--ink-mute);letter-spacing:.02em;white-space:nowrap}
+  .progress{height:3px;background:var(--line)}
+  .progress-fill{display:block;height:100%;width:0;background:var(--accent);transition:width .45s var(--ease)}
+
+  /* ---------- Layout ---------- */
+  main{max-width:880px;margin:0 auto;padding:36px 20px 80px}
+  .screen{display:none;animation:rise .45s var(--ease)}
+  .screen.active{display:block}
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:28px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--blue)}
+  h1,h2,h3{font-family:var(--serif);font-weight:400;letter-spacing:-.015em;line-height:1.08}
+  h1{font-size:clamp(40px,7vw,64px)}
+  h2{font-size:clamp(30px,4.5vw,40px)}
+  h3{font-size:24px}
+  p.lede{font-size:19px;color:var(--ink-soft);max-width:600px}
+
+  /* ---------- Intro ---------- */
+  .intro-hero{padding:24px 0 34px;border-bottom:1px solid var(--line);margin-bottom:34px;position:relative;overflow:hidden}
+  .intro-hero h1{max-width:680px;margin:14px 0 18px}
+  .horizon{position:absolute;right:-20px;bottom:0;width:260px;height:130px;pointer-events:none;opacity:.9}
+  @media(max-width:640px){.horizon{width:170px;height:85px;opacity:.6}}
+  .preview{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:26px 0}
+  .preview .card:last-child{grid-column:1/-1}
+  @media(max-width:600px){.preview{grid-template-columns:1fr}}
+  .preview .card{padding:20px 22px}
+  .preview .card h3{font-size:22px;margin:6px 0 6px}
+  .preview .card p{font-size:15px;color:var(--ink-soft)}
+  .privacy{font-family:var(--mono);font-size:13px;color:var(--ink-mute);margin-top:18px;display:flex;gap:8px;align-items:flex-start}
+  .privacy svg{flex:none;margin-top:3px}
+  .btn{display:inline-flex;align-items:center;gap:10px;padding:14px 22px;border-radius:999px;font-weight:600;font-size:16px;transition:transform .2s var(--ease),background .2s,opacity .2s}
+  .btn-primary{background:var(--ink);color:#fff}
+  .btn-primary:hover{background:#0f1229;transform:translateY(-1px)}
+  .btn-accent{background:var(--accent);color:#fff}
+  .btn-accent:hover{background:var(--accent-deep);transform:translateY(-1px)}
+  .btn-ghost{color:var(--ink-soft);padding-left:12px}
+  .btn-ghost:hover{color:var(--ink)}
+  .btn[disabled]{opacity:.4;cursor:not-allowed;transform:none}
+
+  /* ---------- Sections ---------- */
+  .section-head{margin-bottom:26px}
+  .section-head h2{margin:10px 0 12px}
+  .why{background:var(--blue-wash);border-left:3px solid var(--blue);padding:14px 18px;border-radius:0 var(--radius-sm) var(--radius-sm) 0;color:var(--ink-soft);font-size:16px;max-width:720px}
+  .aside{background:var(--accent-wash);border:1px solid #F1D5B8;border-radius:var(--radius);padding:18px 22px;margin:0 0 24px;font-size:16px;color:var(--ink-soft)}
+  .aside strong{color:var(--ink);font-family:var(--serif);font-size:20px;font-weight:400;display:block;margin-bottom:4px}
+  .question{margin-bottom:16px;padding:24px}
+  .q-num{font-family:var(--mono);font-size:12px;color:var(--ink-mute);letter-spacing:.04em;margin-bottom:6px}
+  .q-text{font-size:19px;font-weight:500;line-height:1.35;margin-bottom:16px;max-width:680px}
+  .q-text em{font-style:italic;font-weight:400;color:var(--ink-soft)}
+  .options{display:grid;gap:8px}
+  .opt{display:flex;align-items:flex-start;gap:12px;text-align:left;padding:12px 14px;border:1px solid var(--line);border-radius:var(--radius-sm);background:#FAFAFC;transition:border-color .15s,background .15s,box-shadow .15s;line-height:1.4;font-size:16px}
+  .opt:hover{border-color:#B8BCCF;background:#fff}
+  .opt .dot{flex:none;width:18px;height:18px;border-radius:50%;border:2px solid #B8BCCF;margin-top:2px;position:relative;transition:border-color .15s}
+  .opt .dot::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--accent);transform:scale(0);transition:transform .2s var(--ease)}
+  .opt[aria-checked="true"]{border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px var(--accent-wash)}
+  .opt[aria-checked="true"] .dot{border-color:var(--accent)}
+  .opt[aria-checked="true"] .dot::after{transform:scale(1)}
+  .nav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:28px;padding-top:22px;border-top:1px solid var(--line)}
+  .nav-hint{font-family:var(--mono);font-size:12px;color:var(--ink-mute)}
+
+  /* ---------- Results ---------- */
+  .score-row{display:grid;grid-template-columns:200px 1fr;gap:30px;align-items:center;padding:30px}
+  @media(max-width:600px){.score-row{grid-template-columns:1fr;text-align:center;justify-items:center}}
+  .dial{width:200px;height:200px;position:relative}
+  .dial svg{width:100%;height:100%;transform:rotate(-90deg)}
+  .dial .track{fill:none;stroke:var(--line);stroke-width:12}
+  .dial .arc{fill:none;stroke:var(--accent);stroke-width:12;stroke-linecap:round;stroke-dasharray:502.65;stroke-dashoffset:502.65;transition:stroke-dashoffset 1.4s var(--ease)}
+  .dial-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .dial-num b{font-family:var(--serif);font-weight:400;font-size:64px;line-height:1;letter-spacing:-.03em}
+  .dial-num span{font-family:var(--mono);font-size:11px;color:var(--ink-mute);letter-spacing:.06em;text-transform:uppercase;margin-top:4px}
+  .level h2{margin:8px 0 10px}
+  .level p{color:var(--ink-soft);font-size:17px}
+  .bars{margin-top:18px;padding:26px 30px}
+  .bar-row{display:grid;grid-template-columns:180px 1fr 52px;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+  .bar-row:last-child{border-bottom:0}
+  @media(max-width:600px){.bar-row{grid-template-columns:1fr 52px}.bar-row .bar-label{grid-column:1/-1;padding-bottom:0}}
+  .bar-label{font-weight:500;font-size:15px}
+  .bar{display:block;height:10px;background:var(--bg);border-radius:999px;overflow:hidden}
+  .bar-fill{display:block;height:100%;width:0;border-radius:999px;background:var(--blue);transition:width 1s var(--ease)}
+  .bar-fill.low{background:var(--accent)}
+  .bar-pct{font-family:var(--mono);font-size:14px;text-align:right}
+  .checklist{margin-top:40px}
+  .checklist h2{margin:8px 0 8px}
+  .checklist .intro{color:var(--ink-soft);max-width:660px;margin-bottom:22px}
+  .check-item{display:grid;grid-template-columns:120px 1fr;gap:18px;padding:22px 26px;margin-bottom:12px}
+  @media(max-width:600px){.check-item{grid-template-columns:1fr;gap:8px}}
+  .tag{font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--accent-deep);background:var(--accent-wash);padding:5px 10px;border-radius:999px;align-self:start;justify-self:start;white-space:nowrap}
+  .tag.ongoing{color:var(--blue);background:var(--blue-wash)}
+  .check-item h3{margin-bottom:6px}
+  .check-item p{color:var(--ink-soft);font-size:16px}
+  .check-item .for{font-family:var(--mono);font-size:12px;color:var(--ink-mute);margin-bottom:6px}
+  .closing{margin-top:40px;background:var(--ink);color:#E8E9F1;border-radius:var(--radius);padding:38px 34px;position:relative;overflow:hidden}
+  .closing h2{color:#fff;margin-bottom:14px}
+  .closing p{font-size:18px;max-width:640px;line-height:1.6}
+  .closing .glow{position:absolute;right:-60px;bottom:-110px;width:280px;height:280px;border-radius:50%;background:var(--accent);opacity:.18;filter:blur(20px)}
+  .bench{margin-top:22px;font-size:15px;color:var(--ink-soft);padding:20px 24px}
+  .bench p{margin-bottom:6px}
+  .bench small{display:block;font-family:var(--mono);font-size:12px;color:var(--ink-mute);line-height:1.6;margin-top:10px}
+  .bench a{color:var(--blue)}
+  .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+
+  /* ---------- Motion ---------- */
+  @media(prefers-reduced-motion:reduce){
+    *,*::before,*::after{transition:none!important;animation:none!important}
+  }
+
+  /* ---------- Print ---------- */
+  @media print{
+    body{background:#fff;font-size:12pt}
+    .topbar,.actions,.no-print{display:none!important}
+    main{padding:0;max-width:none}
+    .screen{display:none!important}
+    #screen-results{display:block!important;animation:none}
+    .card,.closing,.bench{border:1px solid #ccc;break-inside:avoid;box-shadow:none}
+    .closing{background:#171B38!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .bar-fill,.dial .arc,.tag{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .closing .glow{display:none}
+  }
+</style>
+<!-- AI Channel design A: tool design system v2 (visual layer only; no behaviour changes) -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style id="aic-theme">
+/* ---------- tokens ---------- */
+:root,html{color-scheme:light!important;
+ --pine:#2859c7!important;--pine-deep:#1945ac!important;--accent:#2859c7!important;--accent-deep:#1945ac!important;--primary:#2859c7!important;--blue:#2859c7!important;--blue-d:#1945ac!important;
+ --paper:#ffffff!important;--bg:#ffffff!important;--white:#fff!important;--card:#fff!important;--ink:#14213d!important;--ink-soft:#3f4a5c!important;--ink-mute:#5b6577!important;--muted:#3f4a5c!important;
+ --line:#d9e2f0!important;--sage:#eef3fc!important;--amber-soft:#fbf3e4!important;--accent-wash:#eef3fc!important;--blue-wash:#eef3fc!important;--sky:#eef3fc!important;--pale:#f4f7fc!important;--warm:#f4f7fc!important;
+ --serif:"Newsreader",Georgia,serif!important;--sans:"Inter",system-ui,sans-serif!important;--mono:"IBM Plex Mono",ui-monospace,monospace!important}
+html body .aic-tool,html body .aic-article{
+ --aic-paper:#ffffff!important;--aic-white:#ffffff!important;--aic-ink:#14213d!important;--aic-soft:#46526a!important;--aic-line:#d9e2f0!important;--aic-sage:#eef3fc!important;
+ --aic-blue:#2859c7!important;--aic-blue-deep:#1945ac!important;--aic-blue-soft:#eef3fc!important;--aic-on-blue:#ffffff!important;--aic-focus:#9fbcff!important;
+ --aic-grey:#46526a!important;--aic-grey-soft:#f4f7fc!important;
+ --aic-radius:16px!important;--aic-radius-sm:12px!important;--aic-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important;
+ color-scheme:light!important;background:#fff!important;color:#14213d!important;
+ font-family:"Inter",system-ui,sans-serif!important;-webkit-font-smoothing:antialiased}
+html,body{background:#fff!important}
+html body .aic-tool{padding:56px 0 96px!important}
+html body .aic-article{padding:0 0 112px!important}
+html body .aic-tool .aic-col,html body .aic-article .aic-col{max-width:860px!important}
+@media(min-width:600px){html body .aic-tool .aic-col,html body .aic-article .aic-col{padding-inline:32px!important}}
+
+/* ---------- type ---------- */
+html body .aic-tool .aic-h1,html body .aic-article h1,body h1{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important;line-height:1.02!important;font-size:clamp(38px,5.4vw,62px)!important;color:#14213d}
+html body .aic-tool .aic-h2,html body .aic-article h2,body h2{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important;line-height:1.1!important}
+html body .aic-article h2{font-size:clamp(28px,3.6vw,38px)!important;margin-top:72px!important}
+html body .aic-tool .aic-h2{font-size:clamp(26px,3.4vw,36px)!important}
+html body .aic-tool .aic-h3,html body .aic-article h3,body h3{font-family:"Newsreader",Georgia,serif!important;font-weight:550!important;letter-spacing:-.01em!important;font-size:22px!important;line-height:1.2!important}
+body h4,body h5,body h6{font-family:"Inter",system-ui,sans-serif!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow,html body .aic-tool .aic-qnum,html body .aic-tool .aic-nav-hint,.aic-mono{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;letter-spacing:.06em!important;text-transform:uppercase;font-size:12px!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow{color:#2859c7!important;display:flex!important;align-items:center;gap:12px}
+html body .aic-tool .aic-eyebrow::before,html body .aic-article .aic-head .aic-eyebrow::before{content:"";width:28px;height:1px;background:#2859c7;flex:none}
+html body .aic-tool .aic-lede,html body .aic-article .aic-lede,html body .aic-article .aic-dek{font-size:20px!important;line-height:1.55!important;color:#3f4a5c!important;max-width:60ch}
+html body .aic-tool .aic-soft,html body .aic-tool .aic-small{color:#46526a!important}
+html body .aic-tool .aic-small{font-size:14px!important}
+html body .aic-article{font-size:18.5px!important;line-height:1.72!important}
+html body .aic-article p+p{margin-top:22px!important}
+html body .aic-article .aic-head{padding:72px 0 40px!important;border-bottom:1px solid #d9e2f0;margin-bottom:48px}
+html body .aic-article .aic-meta,html body .aic-article .aic-head p:not(.aic-lede):not(.aic-dek){font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px!important;letter-spacing:.03em;color:#5b6577!important}
+html body .aic-tool a,html body .aic-article a{color:#2859c7}
+
+/* ---------- panels ---------- */
+html body .aic-tool .aic-card,html body .aic-article .aic-card{background:#fff!important;border:1px solid #d9e2f0!important;border-radius:16px!important;box-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important}
+@media(min-width:600px){html body .aic-tool .aic-card{padding:36px 40px!important}html body .aic-article .aic-card{padding:32px 36px!important}}
+html body .aic-tool .aic-stack>*+*{margin-top:20px!important}
+html body .aic-tool .aic-grid2,html body .aic-article .aic-grid{gap:16px!important}
+/* the short answer: a framed figure, like the site's tool previews */
+html body .aic-article .aic-short{background:#fff!important;border:1px solid #d9e2f0!important;box-shadow:0 0 0 10px #eef3fc,0 0 0 11px #d9e2f0!important;margin:12px 11px 56px!important;border-radius:12px!important;border-left:1px solid #d9e2f0!important}
+html body .aic-article .aic-short .aic-eyebrow,html body .aic-article .aic-short>:first-child{color:#2859c7!important}
+/* notes and callouts */
+html body .aic-tool .aic-note,html body .aic-article .aic-note,html body .aic-article .aic-callout{background:#f4f7fc!important;border-left:3px solid #2859c7!important;border-radius:0 12px 12px 0!important;padding:18px 22px!important;font-size:15.5px!important;color:#14213d!important}
+html body .aic-tool .aic-note.aic-warn{background:#fdf7ec!important;border-left-color:#a46207!important}
+html body .aic-tool .aic-note.aic-bad{background:#fdf0ee!important;border-left-color:#b42318!important}
+html body .aic-tool .aic-note.aic-good{background:#eef8f1!important;border-left-color:#2f7a4e!important}
+/* calls to action become navy bands */
+html body .aic-tool .aic-cta,html body .aic-article .aic-cta,html body .aic-tool .aic-dark,html body .aic-article .aic-dark{--aic-ink:#ffffff!important;--aic-soft:#c9d6ee!important;--aic-white:#13264a!important;--aic-line:#2a3f6a!important;--aic-blue:#9fbcff!important;--aic-blue-soft:#1d3563!important;--aic-on-blue:#13264a!important;
+ background:#13264a!important;color:#fff!important;border-color:#13264a!important;box-shadow:none!important}
+html body .aic-tool .aic-cta *:not(.aic-btn):not(.aic-btn *),html body .aic-article .aic-cta *:not(.aic-btn):not(.aic-btn *){color:inherit}
+html body .aic-tool .aic-cta .aic-btn-primary,html body .aic-article .aic-cta .aic-btn-primary{background:#fff!important;color:#13264a!important;border-color:#fff!important}
+html body .aic-tool .aic-cta a:not(.aic-btn),html body .aic-article .aic-cta a:not(.aic-btn){color:#9fbcff!important}
+
+/* ---------- questions and answer options ---------- */
+html body .aic-tool .aic-q{margin-top:28px!important}
+html body .aic-tool .aic-qnum{color:#2859c7!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;font-size:clamp(22px,2.6vw,27px)!important;line-height:1.22!important;letter-spacing:-.01em!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qhint{font-size:15px!important;color:#46526a!important;margin-bottom:18px!important}
+html body .aic-tool .aic-opts{gap:10px!important;margin-top:18px!important}
+html body .aic-tool .aic-opt,html body .aic-tool .aic-pick,html body .aic-tool .aic-check{background:#fff!important;border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:16px 18px!important;font-size:16px!important;gap:14px!important;transition:border-color .15s,box-shadow .15s,background-color .15s,transform .15s!important}
+html body .aic-tool .aic-opt:hover,html body .aic-tool .aic-pick:hover,html body .aic-tool .aic-check:hover{border-color:#2859c7!important;box-shadow:0 6px 18px rgba(40,89,199,.10)!important;transform:translateY(-1px)}
+html body .aic-tool .aic-opt[aria-checked="true"],html body .aic-tool .aic-opt[aria-pressed="true"],html body .aic-tool .aic-pick:has(input:checked),html body .aic-tool .aic-check:has(input:checked),html body .aic-tool .aic-opt:has(input:checked){border-color:#2859c7!important;background:#f4f7fc!important;box-shadow:0 0 0 3px #dbe6fb!important}
+html body .aic-tool .aic-dot{width:22px!important;height:22px!important;border:2px solid #9aa8c0!important}
+html body .aic-tool .aic-dot::after{inset:4px!important;background:#2859c7!important}
+html body .aic-tool .aic-opt[aria-checked="true"] .aic-dot{border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-size:14px!important;color:#46526a!important;margin-top:4px!important}
+html body .aic-tool .aic-opt.aic-opt-unsure{background:transparent!important;border-style:dashed!important}
+html body .aic-tool input[type=text],html body .aic-tool input[type=search],html body .aic-tool input[type=email],html body .aic-tool textarea,html body .aic-tool select,html body .aic-tool .aic-input{border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:14px 16px!important;background:#fff!important;font-size:16px!important}
+html body .aic-tool input:focus,html body .aic-tool textarea:focus,html body .aic-tool select:focus{border-color:#2859c7!important;outline:none!important;box-shadow:0 0 0 3px #dbe6fb!important}
+
+/* ---------- controls ---------- */
+html body .aic-tool .aic-btn,html body .aic-article .aic-btn{min-height:50px!important;padding:14px 24px!important;font-weight:600!important;font-size:15px!important;border-radius:999px!important;border:1.5px solid #c9d6ee!important;box-shadow:none!important}
+html body .aic-tool .aic-btn:hover,html body .aic-article .aic-btn:hover{border-color:#2859c7!important}
+html body .aic-tool .aic-btn-primary,html body .aic-article .aic-btn-primary{background:#2859c7!important;border-color:#2859c7!important;color:#fff!important}
+html body .aic-tool .aic-btn-primary:hover,html body .aic-article .aic-btn-primary:hover{background:#1945ac!important;border-color:#1945ac!important}
+html body .aic-tool .aic-btn-ghost{border-color:transparent!important;text-decoration:underline;text-underline-offset:4px;color:#3f4a5c!important}
+html body .aic-tool .aic-btn[disabled]{opacity:.4!important}
+html body .aic-tool .aic-nav{margin-top:36px!important;padding-top:24px!important;border-top:1px solid #d9e2f0!important}
+html body .aic-tool .aic-actions{gap:12px!important}
+html body .aic-tool .aic-seg{border:1.5px solid #d9e2f0!important;padding:4px!important}
+html body .aic-tool .aic-seg button{font-weight:600!important;color:#3f4a5c!important}
+html body .aic-tool .aic-seg button[aria-pressed="true"],html body .aic-tool .aic-seg button[aria-checked="true"]{background:#13264a!important;color:#fff!important}
+html body .aic-tool .aic-progress{height:4px!important;background:#e3eaf6!important;margin:20px 0 8px!important}
+html body .aic-tool .aic-progress span,html body .aic-tool .aic-progress i{background:#2859c7!important}
+html body .aic-tool .aic-chip,html body .aic-tool .aic-pill{border:1.5px solid #d9e2f0!important;background:#fff!important;font-weight:600!important;border-radius:999px!important}
+html body .aic-tool .aic-chip[aria-pressed="true"],html body .aic-tool .aic-chip.aic-on,html body .aic-tool .aic-pill.aic-on{background:#eef3fc!important;border-color:#2859c7!important;color:#1945ac!important}
+html body .aic-tool .aic-tag,html body .aic-article .aic-tag{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;padding:5px 11px!important}
+html body .aic-tool .aic-privacy{font-size:14px!important;color:#46526a!important;margin-top:20px!important}
+
+/* ---------- results ---------- */
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-stat b,html body .aic-tool .aic-stat strong,html body .aic-tool .aic-display{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important}
+html body .aic-tool .aic-bar{height:8px!important;background:#e3eaf6!important}
+html body .aic-tool .aic-bar-row{padding:14px 0!important;border-bottom-color:#e3eaf6!important}
+html body .aic-tool .aic-bar-label{font-weight:600!important}
+html body .aic-tool table,html body .aic-article table{border-collapse:collapse}
+html body .aic-tool th,html body .aic-article th{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;text-transform:uppercase;color:#2859c7!important;background:#f4f7fc!important}
+html body .aic-tool td,html body .aic-article td{border-color:#e3eaf6!important}
+html body .aic-article .aic-sources,html body .aic-tool .aic-sources{font-size:14px!important;color:#46526a!important;border-top:1px solid #d9e2f0;padding-top:32px!important;margin-top:72px!important}
+html body .aic-article .aic-related,html body .aic-article .aic-deeper{margin-top:72px!important}
+
+/* ---------- pages outside the shared system ---------- */
+body:not(:has(.aic-tool)):not(:has(.aic-article)) h1,body:not(:has(.aic-tool)):not(:has(.aic-article)) h2,body:not(:has(.aic-tool)):not(:has(.aic-article)) h3{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important}
+html,body{font-family:"Inter",system-ui,sans-serif}
+input[type=range],input[type=checkbox],input[type=radio]{accent-color:#2859c7!important}
+:focus-visible{outline-color:#2859c7!important}
+[tabindex="-1"]:focus,h1:focus,h2:focus,h3:focus{outline:none!important;box-shadow:none!important}
+
+/* ================= v3: product-grade tool shell ================= */
+html,body{background:#f4f7fc!important}
+html body .aic-tool{background:#f4f7fc!important}
+html body .aic-tool .aic-col{max-width:980px!important}
+html body .aic-tool .aic-h1{font-size:clamp(40px,5vw,62px)!important;max-width:20ch}
+html body .aic-tool .aic-grid2>.aic-card{box-shadow:none!important;background:#fff!important;border-radius:14px!important}
+html body .aic-tool.aic-in-q .aic-h1{font-size:22px!important;line-height:1.2!important;max-width:none;margin:6px 0 20px!important;font-weight:500!important}
+html body .aic-tool.aic-in-q .aic-lede,html body .aic-tool.aic-in-q > .aic-col > .aic-privacy,html body .aic-tool.aic-in-q .aic-col > * > .aic-privacy{display:none!important}
+html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:56px 64px 44px!important;border:0!important;border-radius:24px!important;box-shadow:0 1px 0 rgba(19,38,74,.05),0 30px 70px rgba(19,38,74,.10)!important;min-height:460px}
+@media(max-width:700px){html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:32px 22px 28px!important;border-radius:18px!important;min-height:0}}
+html body .aic-tool .aic-progress{height:3px!important;background:#e3eaf6!important;border-radius:0!important;margin:14px 0 36px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-size:clamp(26px,3.2vw,38px)!important;line-height:1.12!important;letter-spacing:-.02em!important;margin-bottom:12px!important;max-width:28ch}
+html body .aic-tool .aic-qhint{font-size:16px!important;margin-bottom:24px!important}
+html body .aic-tool .aic-opts{counter-reset:aicopt;gap:12px!important}
+html body .aic-tool .aic-opt{counter-increment:aicopt;align-items:center!important;min-height:64px;padding:16px 20px!important;font-size:17px!important;font-weight:500;border-radius:14px!important}
+html body .aic-tool .aic-opt .aic-dot{display:none!important}
+html body .aic-tool .aic-opt::before{content:counter(aicopt,upper-alpha);flex:none;width:30px;height:30px;display:grid;place-items:center;border:1.5px solid #c9d6ee;border-radius:8px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;font-weight:500;color:#2859c7;background:#fff;transition:all .15s}
+html body .aic-tool .aic-opt:hover::before{border-color:#2859c7}
+html body .aic-tool .aic-opt[aria-checked="true"]::before{background:#2859c7;border-color:#2859c7;color:#fff;content:"\2713"}
+html body .aic-tool .aic-opt[aria-checked="true"]{background:#eef3fc!important;box-shadow:0 0 0 2px #2859c7!important;border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-weight:400}
+html body .aic-tool .aic-nav{border-top:0!important;margin-top:40px!important;padding-top:0!important}
+html body .aic-tool .aic-nav .aic-btn-primary{min-width:150px}
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-display{font-size:clamp(56px,8vw,96px)!important;line-height:.95!important;color:#14213d}
+
+/* ================= v4: legibility ================= */
+html body .aic-tool{font-size:17px!important;line-height:1.6!important}
+html body .aic-tool,html body .aic-article{--aic-soft:#334055!important}
+html body .aic-tool .aic-small,html body .aic-tool .aic-opt-sub,html body .aic-tool .aic-privacy,html body .aic-tool .aic-nav-hint{font-size:15px!important;color:#334055!important}
+html body .aic-tool p,html body .aic-tool li{color:#1d2a44}
+html body .aic-tool .aic-lede{font-size:20px!important;color:#2a364d!important}
+html body .aic-tool .aic-note{font-size:16.5px!important}
+html body .aic-tool .aic-opt{font-size:18px!important;color:#14213d!important}
+html body .aic-tool .aic-qhint{font-size:17px!important;color:#334055!important}
+html body .aic-tool .aic-eyebrow,html body .aic-tool .aic-qnum,.aic-mono{font-size:12.5px!important;color:#2859c7!important;letter-spacing:.05em!important}
+html body .aic-tool .aic-tag{font-size:12.5px!important}
+html body .aic-tool th,html body .aic-article th{font-size:12.5px!important}
+html body .aic-tool td{font-size:16px}
+html body .aic-article{color:#14213d!important}
+html body .aic-article p,html body .aic-article li{color:#1d2a44}
+</style>
+<script>
+(function(){
+  function hsl(c){var m=c&&c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/);if(!m)return null;var r=m[1]/255,g=m[2]/255,b=m[3]/255,a=m[4]===undefined?1:+m[4];
+    var mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn,s=d?d/(1-Math.abs(2*l-1)):0,h=0;
+    if(d){h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;if(h<0)h+=360}return {h:h,s:s,l:l,a:a}}
+  function blue(c){var x=hsl(c);return x&&x.a>0.05&&x.s>0.3&&x.l>0.28&&x.l<0.95&&x.h>=205&&x.h<=240?x:null}
+  function N(x,dark,light){return x.a<0.95?"rgba(40,89,199,"+Math.min(x.a,0.12).toFixed(3)+")":(x.l>0.82?light:dark)}
+  function fix(el){var c0=getComputedStyle(el),bg=hsl(c0.backgroundColor),fg=hsl(c0.color);if(bg&&fg&&bg.a>0.9&&bg.l<0.6&&bg.s>0.3&&bg.h>=205&&bg.h<=240&&fg.l<0.6)el.style.setProperty("color","#ffffff","important");
+    if(el.closest(".aic-cta,.aic-dark")||el.matches(".aic-opt,.aic-pick,.aic-check,.aic-btn,.aic-chip,.aic-pill,.aic-seg button,.aic-card,.aic-note"))return;var cs=getComputedStyle(el),x;
+    if((x=blue(cs.color)))el.style.setProperty("color",x.l>0.75?"#eef3fc":"#2859c7","important");
+    if((x=blue(cs.backgroundColor)))el.style.setProperty("background-color",N(x,"#2859c7",x.l>0.9?"#eef3fc":"#d6e2f8"),"important");
+    if(el instanceof SVGElement){if((x=blue(cs.fill)))el.style.setProperty("fill",N(x,"#2859c7","#eef3fc"),"important");if((x=blue(cs.stroke)))el.style.setProperty("stroke",N(x,"#2859c7","#d6e2f8"),"important")}
+    if(cs.textTransform==="uppercase"&&parseFloat(cs.fontSize)<=13.5&&!el.closest("button")&&!el.classList.contains("aic-mono"))el.classList.add("aic-mono");}
+  var t;function mode(){document.querySelectorAll(".aic-tool").forEach(function(r){var q=[].some.call(r.querySelectorAll(".aic-progress,.aic-qtext,.aic-q-text"),function(e){return e.offsetParent!==null});if(q!==r.classList.contains("aic-in-q"))r.classList.toggle("aic-in-q",q)})}
+  function run(){clearTimeout(t);t=setTimeout(function(){mode();document.querySelectorAll("body *").forEach(fix)},30)}
+  document.addEventListener("DOMContentLoaded",function(){run();new MutationObserver(run).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class","aria-pressed","aria-checked","data-state"]});
+    document.addEventListener("change",run,true);document.addEventListener("click",run,true);});
+})();
+</script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 26 26" aria-hidden="true">
+        <clipPath id="half"><rect x="0" y="0" width="26" height="15"/></clipPath>
+        <circle cx="13" cy="15" r="8" fill="#E8892F" clip-path="url(#half)"/>
+        <line x1="1" y1="15.5" x2="25" y2="15.5" stroke="#171B38" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span>The Business AI Exposure Check</span>
+    </div>
+    <div class="topbar-meta">5 sections · ~6 minutes · no email required</div>
+  </div>
+  <div class="progress" role="progressbar" aria-label="Questions answered" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span class="progress-fill" id="progress"></span></div>
+</header>
+
+<main id="app">
+
+  <!-- ===== INTRO ===== -->
+  <section class="screen active" id="screen-intro" aria-labelledby="intro-h">
+    <div class="intro-hero">
+      <div class="eyebrow">A self-assessment for business owners and managers</div>
+      <h1 id="intro-h">How exposed is your business's AI use?</h1>
+      <p class="lede">Eighteen plain questions about the day something goes wrong: a leak, a confident wrong answer that went out, a voice that sounded like the boss. You'll get a 0–100 score, a named level, a bar for each of five areas, and a starter checklist matched to where your business is most exposed.</p>
+      <svg class="horizon" viewBox="0 0 260 130" aria-hidden="true">
+        <clipPath id="hz"><rect x="0" y="0" width="260" height="100"/></clipPath>
+        <circle cx="180" cy="100" r="62" fill="#E8892F" clip-path="url(#hz)" opacity=".85"/>
+        <line x1="0" y1="100.5" x2="260" y2="100.5" stroke="#171B38" stroke-width="2"/>
+      </svg>
+    </div>
+
+    <div class="eyebrow">What the check covers</div>
+    <div class="preview">
+      <div class="card"><div class="q-num">Section 1</div><h3>Do you know what’s being used?</h3><p>The AI in daily use is rarely the AI that was approved.</p></div>
+      <div class="card"><div class="q-num">Section 2</div><h3>What’s going in, and where does it go?</h3><p>Rules, accounts, and whether you’ve read the data terms.</p></div>
+      <div class="card"><div class="q-num">Section 3</div><h3>Who checks the work?</h3><p>Confident wrong answers, and what catches them.</p></div>
+      <div class="card"><div class="q-num">Section 4</div><h3>Could someone impersonate you?</h3><p>Voice clones, urgent transfers, and the call-back rule.</p></div>
+      <div class="card"><div class="q-num">Section 5</div><h3>What happens on the bad day?</h3><p>Who gets told, what stops, and what you owe people.</p></div>
+    </div>
+
+    <button class="btn btn-accent" id="start-btn" type="button">Start the check
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <p class="privacy">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="2" y="6" width="10" height="7" rx="1.5" stroke="#7B7F99" stroke-width="1.5"/><path d="M4.5 6V4.5a2.5 2.5 0 015 0V6" stroke="#7B7F99" stroke-width="1.5"/></svg>
+      <span>Answers stay in your browser for this session only. Nothing is stored or sent.</span>
+    </p>
+  </section>
+
+  <!-- ===== SECTIONS (rendered by JS) ===== -->
+  <div id="sections"></div>
+
+  <!-- ===== RESULTS ===== -->
+  <section class="screen" id="screen-results" aria-labelledby="results-h">
+    <div class="eyebrow">Your results</div>
+    <h2 id="results-h" class="visually-hidden">Your results</h2>
+    <div class="card score-row">
+      <div class="dial" role="img" id="dial-wrap" aria-label="">
+        <svg viewBox="0 0 180 180" aria-hidden="true">
+          <circle class="track" cx="90" cy="90" r="80"/>
+          <circle class="arc" id="dial-arc" cx="90" cy="90" r="80"/>
+        </svg>
+        <div class="dial-num"><b id="score-num">0</b><span>out of 100</span></div>
+      </div>
+      <div class="level">
+        <div class="eyebrow">Your level</div>
+        <h2 id="level-name"></h2>
+        <p id="level-desc"></p>
+      </div>
+    </div>
+
+    <div class="card bars" id="bars"></div>
+
+    <div class="checklist">
+      <div class="eyebrow">Your starter checklist</div>
+      <h2>Where to begin</h2>
+      <p class="intro">Matched to where you're most exposed. Every item here is a no-regrets move: worth doing even if AI progress stalls tomorrow, because each one is also just good data hygiene, good process, and good fraud prevention.</p>
+      <div id="checklist"></div>
+    </div>
+
+    <div class="closing">
+      <div class="glow"></div>
+      <h2>Two businesses, one bad day</h2>
+      <p>The same thing will happen to two businesses this year: someone pastes something they shouldn't into an AI tool, and a customer finds out. One of them has a page of rules, the right accounts, a person to tell, and a first-hour checklist. The other has a very long week. The difference isn't luck or budget. It's that one of them spent an afternoon on this while nothing was wrong. Retake this check in six months. The questions won't change; your answers should.</p>
+    </div>
+
+    <div class="card bench">
+      <p><strong>Benchmark note.</strong> In a 2026 multi-country survey, nine in ten executives said they had good visibility into AI use in their organisation, while more than half of their knowledge workers admitted using AI tools without approval — and 58% of those organisations reported an AI-related security incident or near-miss in the past year. In a separate survey, two in five office workers said they would rather use AI without telling anyone than risk being told it isn't allowed.</p>
+      <small>
+        Guidance this check draws on: the joint Five Eyes cyber-security guidance on using AI (CISA, NSA, NCSC-UK, ASD ACSC and partners — <em>Deploying AI Systems Securely</em>, 2024, and <em>Careful Adoption of Agentic AI Services</em>, 2026); the NIST AI Risk Management Framework; and your national data-protection regulator's guidance on AI and personal data (for example the UK ICO). Benchmark figures: Okta / Apprize360 <em>AI Agents at Work 2026</em>; PagerDuty <em>Shadow AI Survey 2026</em> (Wakefield Research) — both vendor-commissioned and enterprise-weighted, so treat them as directional. Current as of August 2026; obligations vary by jurisdiction and sector.<br>
+        This check is general orientation, not legal, security, or compliance advice, and it does not assess compliance with any specific law. The scoring is an unvalidated orientation tool, not a measured diagnostic — use it to start a conversation, not to settle one.
+      </small>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" type="button" id="print-btn">Print / Save as PDF</button>
+      <button class="btn btn-ghost" type="button" id="retake-btn">Retake the check</button>
+    </div>
+  </section>
+</main>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ---------------- Data ---------------- */
+  const SECTIONS = [
+    {
+      id:'visibility', title:'Do you know what\u2019s being used?',
+      why:'You can\u2019t protect what you can\u2019t see. In most businesses the AI in daily use isn\u2019t the tools IT approved \u2014 it\u2019s whatever people signed up for on their own. This section checks how much of that you can actually see.',
+      questions:[
+        {t:'If asked today, could you list the AI tools people in your business use for work?',
+         o:[['No \u2014 I\u2019d be guessing',0],['The ones we officially bought, but people use others',1],['A fairly complete picture from asking around',2],['A maintained list, reviewed at least a couple of times a year',3]]},
+        {t:'Do you know which tasks AI is being used for \u2014 drafting, summarising, analysing data, customer replies, code?',
+         o:[['No idea',0],['A rough sense',1],['Yes, for the main teams',2],['Yes, and we\u2019ve marked which of those tasks touch sensitive information',3]]},
+        {t:'Is there someone whose job includes keeping an eye on how AI is used across the business?',
+         o:[['No one',0],['It sort of falls to IT or whoever cares most',1],['A named person, informally',2],['A named person, with the time and authority to act',3]]},
+        {t:'When a team wants to start using a new AI tool, what happens?',
+         o:[['They just start',0],['They might mention it to someone',1],['There\u2019s a quick check \u2014 who\u2019s the vendor, what data goes in',2],['A short, fast approval that people actually use because it isn\u2019t painful',3]]}
+      ],
+      action:{tag:'This week',title:'Run the ten-minute inventory.',detail:'Send one message: \u201cReply with every AI tool you\u2019ve used for work this month, including free ones.\u201d Promise no consequences. The list you get back is the real starting point \u2014 and it\u2019s usually longer than anyone expected.'}
+    },
+    {
+      id:'data', title:'What\u2019s going in, and where does it go?',
+      why:'The most common real AI incident isn\u2019t a rogue robot. It\u2019s a well-meaning employee pasting a client contract, a customer list, or a medical note into a free chatbot whose terms let the provider keep it. A page of rules and the right accounts prevent most of it.',
+      questions:[
+        {t:'Is there a written rule about what must never go into an AI tool \u2014 customer details, financials, anything under NDA, health or HR information?',
+         o:[['No',0],['It\u2019s been mentioned, nothing written',1],['Written and circulated',2],['Written, and everyone\u2019s been walked through it with real examples',3]]},
+        {t:'What kind of accounts is AI work done on?',
+         o:[['Whatever people signed up for personally',0],['A mix of personal and a few paid seats',1],['Mostly business accounts',2],['Business accounts chosen partly for their data terms \u2014 no training on our inputs, deletion on request',3]]},
+        {t:'Do you know whether your AI providers keep, train on, or share what your people type in?',
+         o:[['Never looked',0],['Assumed it\u2019s fine',1],['Checked for the main tools',2],['Checked, documented, and re-checked when terms change',3]]},
+        {t:'If a customer, patient, or client asked, \u201cDo you use AI on my information, and what happens to it?\u201d \u2014 could you answer?',
+         o:[['Not really',0],['Roughly, off the cuff',1],['Yes, clearly',2],['Yes, and it\u2019s written down where staff and customers can find it',3]]}
+      ],
+      action:{tag:'This week',title:'Write the one-page rule and fix the accounts.',detail:'One page: the never-list (customer details, financials, NDA material, health and HR data) and which accounts to use for what. Then move anyone using AI weekly onto an business account whose terms you\u2019ve actually read. The data terms are the point, not the features.'}
+    },
+    {
+      id:'oversight', title:'Who checks the work?',
+      why:'AI tools are confident when they\u2019re wrong. The question isn\u2019t whether that happens \u2014 it does \u2014 but whether anything catches it before it reaches a customer, a court, or a bank transfer.',
+      questions:[
+        {t:'When AI drafts something that goes to a customer, client, or the public, does a person check it first?',
+         o:[['Often it goes straight out',0],['Depends on who\u2019s doing it',1],['Yes, as a norm',2],['Yes, as a rule \u2014 and people know what to check for',3]]},
+        {t:'Is there anything AI is explicitly not allowed to decide on its own \u2014 payments, hiring, medical or legal calls, deletions?',
+         o:[['We haven\u2019t thought about it',0],['It\u2019s understood informally',1],['A short written list of \u201chuman decides\u201d actions',2],['A written list, and the tools are set up so those actions need a person',3]]},
+        {t:'Do people know AI tools can make things up \u2014 fake citations, wrong figures, invented policy \u2014 and how to check?',
+         o:[['I doubt most do',0],['The tech-comfortable ones do',1],['We\u2019ve told everyone',2],['We\u2019ve shown everyone real examples and how to verify',3]]},
+        {t:'Has an AI-produced error ever caused a real problem here \u2014 and if so, what changed afterwards?',
+         o:[['I wouldn\u2019t know if it had',0],['Probably, but nothing changed',1],['Yes, and we fixed that specific thing',2],['Yes, and we changed the process so the whole class of error is caught',3]]}
+      ],
+      action:{tag:'This month',title:'Draw the \u201chuman decides\u201d line.',detail:'List the actions that can\u2019t be undone \u2014 money moving, records deleted, offers made, anything sent to a regulator. Rule: AI can draft, a person decides. Then show every team one real example of a confident, wrong AI answer in their own domain. Nothing teaches verification faster.'}
+    },
+    {
+      id:'scams', title:'Could someone impersonate you?',
+      why:'A few seconds of audio is enough to clone a voice. The \u201cboss\u201d asking finance for an urgent transfer, the \u201cIT desk\u201d asking for a password \u2014 these are the AI attacks that actually hit ordinary businesses, and process beats technology at stopping them.',
+      questions:[
+        {t:'If someone who sounded exactly like your CEO or finance lead called asking for an urgent payment, what would stop it?',
+         o:[['Probably nothing',0],['Someone would likely get suspicious',1],['A rule: urgent money requests get a call-back on a known number',2],['A rule everyone\u2019s practised, plus two-person approval on unusual payments',3]]},
+        {t:'Have your people been shown what a voice clone or deepfake video can do today?',
+         o:[['No',0],['They\u2019ve seen headlines',1],['We\u2019ve talked about it',2],['We\u2019ve demonstrated it and run a practice scenario',3]]},
+        {t:'Is there a simple way for staff to verify an unusual request from a colleague or leader?',
+         o:[['No',0],['Use your judgement',1],['Call them back on a number you already have',2],['A call-back rule plus an agreed code word for anything involving money or access',3]]}
+      ],
+      action:{tag:'This week',title:'Agree the call-back rule and a code word.',detail:'Any request involving money, credentials, or sensitive data that arrives with urgency gets verified on a channel you already trusted before the request. Pick a code word for the leadership team and finance. Cost: one meeting. This blocks the most common AI-enabled attack on businesses.'}
+    },
+    {
+      id:'incident', title:'What happens on the bad day?',
+      why:'Every business using AI will eventually have a bad day: a leak, a wrong answer that went out, a complaint, a regulator\u2019s letter. The ones that come through fine aren\u2019t the ones that never made mistakes. They\u2019re the ones who knew what to do in the first hour.',
+      questions:[
+        {t:'If someone realised they\u2019d pasted confidential data into an AI tool, would they know what to do \u2014 and feel safe saying so?',
+         o:[['They\u2019d probably keep quiet',0],['They might tell their manager',1],['There\u2019s a known person to tell, no blame',2],['A known person, no blame, and a written first-hour checklist',3]]},
+        {t:'Do you know what your legal or regulatory obligations are if AI use leads to a data leak or a harmful decision?',
+         o:[['No',0],['Vaguely',1],['Yes, for our main risks',2],['Yes, written down, with who to call',3]]},
+        {t:'Do you disclose to customers, clients, or the public where AI is used in what you deliver?',
+         o:[['No, and we haven\u2019t considered it',0],['We\u2019d tell people if asked',1],['We disclose in the places that matter',2],['Clear, standing disclosure, reviewed as our use changes',3]]}
+      ],
+      action:{tag:'This quarter',title:'Write the first-hour checklist and run it once.',detail:'One page: who to tell, what to stop, what to preserve, who decides on disclosure. Then run a 45-minute tabletop \u2014 \u201ca customer list went into a free chatbot; go\u201d \u2014 and fix whatever the exercise exposes. Businesses that have practised once look calm on the real day.'}
+    }
+  ];
+
+  const EVERGREEN = {tag:'Ongoing',title:'Treat this as a habit, not a project.',detail:'Tools, terms, and attacks change every few months. Re-run the inventory twice a year, re-read the data terms when a provider updates them, and retake this check in six months. The questions won\u2019t change; your answers should.'};
+
+  const LEVELS = [
+    {max:25,name:'Flying blind',desc:'AI is almost certainly in use in your business, and almost nothing is in place around it. That\u2019s normal \u2014 most businesses are here \u2014 but it means a bad day would be a surprise and a scramble. The first steps below are cheap and fast.'},
+    {max:50,name:'Aware, not protected',desc:'You know AI is in use and you\u2019ve had the conversations, but the protection lives in people\u2019s good sense rather than in rules, accounts, and process. That works until someone\u2019s in a hurry. Your checklist targets the gaps that would hurt most.'},
+    {max:75,name:'Mostly covered',desc:'You have real rules, the right accounts, and people who check the work. The remaining gaps are specific \u2014 usually impersonation or incident readiness \u2014 and the checklist below names them.'},
+    {max:100,name:'Ready for the bad day',desc:'You\u2019d handle a leak, a wrong answer, or a voice-clone attempt with a process rather than a panic. Your job now is keeping it current as tools change \u2014 and sharing what works with your suppliers and partners, whose bad day can become yours.'}
+  ];
+
+  /* ---------------- State (memory only) ---------------- */
+  const TOTAL_Q = SECTIONS.reduce((n,s)=>n+s.questions.length,0); // 18
+  const MAX_POINTS = TOTAL_Q*3; // 54
+  let answers = {}; // key "s-q" -> points
+  let current = 'intro';
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------------- Render sections ---------------- */
+  const host = document.getElementById('sections');
+  let qCounter = 0;
+  SECTIONS.forEach((sec,si)=>{
+    const el = document.createElement('section');
+    el.className='screen'; el.id='screen-'+si; el.setAttribute('aria-labelledby','h-'+si);
+    let html = `<div class="section-head"><div class="eyebrow">Section ${si+1} of ${SECTIONS.length}</div><h2 id="h-${si}">${sec.title}</h2><p class="why">${sec.why}</p></div>`;
+    if(sec.aside) html += `<div class="aside"><strong>${sec.aside.title}</strong>${sec.aside.body}</div>`;
+    sec.questions.forEach((q,qi)=>{
+      qCounter++;
+      const gid = `q-${si}-${qi}`;
+      html += `<div class="card question"><div class="q-num">Question ${qCounter} of ${TOTAL_Q}</div><div class="q-text" id="${gid}-label">${q.t}</div><div class="options" role="radiogroup" aria-labelledby="${gid}-label">`;
+      q.o.forEach((opt,oi)=>{
+        html += `<button type="button" class="opt" role="radio" aria-checked="false" data-s="${si}" data-q="${qi}" data-p="${opt[1]}" data-o="${oi}"><span class="dot" aria-hidden="true"></span><span>${opt[0]}</span></button>`;
+      });
+      html += `</div></div>`;
+    });
+    const isLast = si===SECTIONS.length-1;
+    html += `<div class="nav"><button type="button" class="btn btn-ghost" data-nav="back">\u2190 Back</button><span class="nav-hint" id="hint-${si}">Answer every question to continue</span><button type="button" class="btn ${isLast?'btn-accent':'btn-primary'}" data-nav="next" disabled>${isLast?'See my results':'Next section \u2192'}</button></div>`;
+    el.innerHTML = html;
+    host.appendChild(el);
+  });
+
+  /* ---------------- Events ---------------- */
+  document.addEventListener('click', e=>{
+    const opt = e.target.closest('.opt');
+    if(opt){ select(opt); return; }
+    const nav = e.target.closest('[data-nav]');
+    if(nav){
+      const si = Number(nav.closest('.screen').id.split('-')[1]);
+      if(nav.dataset.nav==='back') show(si===0?'intro':si-1);
+      else if(sectionComplete(si)) show(si===SECTIONS.length-1?'results':si+1);
+    }
+  });
+  // Arrow-key movement within a radiogroup
+  document.addEventListener('keydown', e=>{
+    const opt = e.target.closest('.opt'); if(!opt) return;
+    const opts=[...opt.parentElement.querySelectorAll('.opt')]; const i=opts.indexOf(opt);
+    let n=null;
+    if(e.key==='ArrowDown'||e.key==='ArrowRight') n=opts[(i+1)%opts.length];
+    if(e.key==='ArrowUp'||e.key==='ArrowLeft') n=opts[(i-1+opts.length)%opts.length];
+    if(n){ e.preventDefault(); n.focus(); select(n); }
+  });
+  document.getElementById('start-btn').addEventListener('click', ()=>show(0));
+  document.getElementById('retake-btn').addEventListener('click', ()=>{
+    answers={};
+    document.querySelectorAll('.opt').forEach(o=>o.setAttribute('aria-checked','false'));
+    SECTIONS.forEach((_,si)=>refreshNav(si));
+    updateProgress(); show('intro');
+  });
+  document.getElementById('print-btn').addEventListener('click', ()=>window.print());
+
+  function select(opt){
+    const group = opt.parentElement;
+    group.querySelectorAll('.opt').forEach(o=>o.setAttribute('aria-checked','false'));
+    opt.setAttribute('aria-checked','true');
+    answers[`${opt.dataset.s}-${opt.dataset.q}`] = Number(opt.dataset.p);
+    refreshNav(Number(opt.dataset.s)); updateProgress();
+  }
+  function sectionComplete(si){ return SECTIONS[si].questions.every((_,qi)=>answers[`${si}-${qi}`]!==undefined); }
+  function refreshNav(si){
+    const done = sectionComplete(si);
+    const scr = document.getElementById('screen-'+si);
+    scr.querySelector('[data-nav="next"]').disabled = !done;
+    document.getElementById('hint-'+si).textContent = done ? 'All answered' : `${SECTIONS[si].questions.filter((_,qi)=>answers[`${si}-${qi}`]!==undefined).length} of ${SECTIONS[si].questions.length} answered`;
+  }
+  function updateProgress(){
+    const pct = Math.round(Object.keys(answers).length/TOTAL_Q*100);
+    document.getElementById('progress').style.width = pct+'%';
+    document.querySelector('.progress').setAttribute('aria-valuenow',pct);
+  }
+  function show(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    const target = id==='intro'?'screen-intro': id==='results'?'screen-results':'screen-'+id;
+    document.getElementById(target).classList.add('active');
+    current=id;
+    window.scrollTo({top:0,behavior:reducedMotion?'auto':'smooth'});
+    if(id==='results') renderResults();
+    else { const h=document.querySelector('#'+target+' h1, #'+target+' h2'); if(h){h.setAttribute('tabindex','-1');h.focus({preventScroll:true});} }
+  }
+
+  /* ---------------- Scoring & results ---------------- */
+  function compute(){
+    const sections = SECTIONS.map((sec,si)=>{
+      const pts = sec.questions.reduce((n,_,qi)=>n+(answers[`${si}-${qi}`]||0),0);
+      return {index:si,title:sec.title,pct:Math.round(pts/(sec.questions.length*3)*100),pts};
+    });
+    const total = sections.reduce((n,s)=>n+s.pts,0);
+    return {sections,score:Math.round(total/MAX_POINTS*100)};
+  }
+  function levelFor(score){ return LEVELS.find(l=>score<=l.max); }
+  function pickChecklist(sections){
+    const sorted=[...sections].sort((a,b)=>a.pct-b.pct||a.index-b.index);
+    return sorted.filter(s=>s.pct<85).slice(0,3).map(s=>({...SECTIONS[s.index].action,forSection:s.title}));
+  }
+
+  function renderResults(){
+    const {sections,score}=compute();
+    const lvl=levelFor(score);
+    document.getElementById('level-name').textContent=lvl.name;
+    document.getElementById('level-desc').textContent=lvl.desc;
+    document.getElementById('dial-wrap').setAttribute('aria-label',`Score ${score} out of 100`);
+
+    // dial + counter
+    const arc=document.getElementById('dial-arc'), C=2*Math.PI*80, numEl=document.getElementById('score-num');
+    arc.style.strokeDashoffset=C;
+    if(reducedMotion){ arc.style.strokeDashoffset=C*(1-score/100); numEl.textContent=score; }
+    else {
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{ arc.style.strokeDashoffset=C*(1-score/100); }));
+      const t0=performance.now(), dur=1300;
+      (function tick(now){ const p=Math.min(1,(now-t0)/dur), e=1-Math.pow(1-p,3); numEl.textContent=Math.round(score*e); if(p<1) requestAnimationFrame(tick); })(t0);
+    }
+
+    // bars
+    const bars=document.getElementById('bars');
+    bars.innerHTML='<div class="eyebrow" style="margin-bottom:10px">By section</div>'+sections.map(s=>
+      `<div class="bar-row"><span class="bar-label">${s.title}</span><span class="bar" role="img" aria-label="${s.title}: ${s.pct} percent"><span class="bar-fill ${s.pct<50?'low':''}" data-w="${s.pct}"></span></span><span class="bar-pct">${s.pct}%</span></div>`).join('');
+    const fills=bars.querySelectorAll('.bar-fill');
+    if(reducedMotion) fills.forEach(f=>f.style.width=f.dataset.w+'%');
+    else requestAnimationFrame(()=>requestAnimationFrame(()=>fills.forEach((f,i)=>setTimeout(()=>f.style.width=f.dataset.w+'%',i*120))));
+
+    // checklist
+    const items=[...pickChecklist(sections),{...EVERGREEN,forSection:null}];
+    document.getElementById('checklist').innerHTML=items.map(it=>
+      `<div class="card check-item"><span class="tag ${it.tag==='Ongoing'?'ongoing':''}">${it.tag}</span><div>${it.forSection?`<div class="for">For: ${it.forSection}</div>`:'<div class="for">Always</div>'}<h3>${it.title}</h3><p>${it.detail}</p></div></div>`).join('');
+
+    const h=document.getElementById('results-h'); h.setAttribute('tabindex','-1'); h.focus({preventScroll:true});
+  }
+
+  /* expose for self-check in console (harmless) */
+  window.__audit={SECTIONS,compute,levelFor,pickChecklist,answers:()=>answers};
+})();
+</script>
+</body>
+</html>

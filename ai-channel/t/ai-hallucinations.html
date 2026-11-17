@@ -1,0 +1,626 @@
+<!--
+TITLE: Why does AI sound so confident when it's wrong?  (explainer on AI hallucinations; the plan's question)
+FILE: ai-hallucinations.html   SLUG: ai-hallucinations   TYPE: guide / explainer (backlog item)   ~1584 words incl. sources
+AUDIENCE: Everyone (For You), business users, technical teams ("Why is my model so confident when it's wrong?").
+
+WHAT IT COVERS: The short answer; what a hallucination is (NIST's 'confabulation'); four reasons they happen
+  (prediction not lookup; tests that reward guessing; the 'I know this' switch misfiring; trained to please);
+  why the tone stays confident; whether it's getting better (fairly clear / still uncertain, with dated figures);
+  when it matters most (riskier vs safer uses); how to reduce them (asking, checking, choosing tools and setting up
+  for an organization); what you can do; newsletter line. Distinct from when-ai-gets-it-wrong.html (the what-to-do
+  guide); cross-linked both ways.
+
+SOURCES CHECKED (on the web, 4 Nov 2026):
+  NIST AI 600-1 Generative AI Profile (Jul 2024): confabulation definition, quoted from the PDF.
+  Kalai, Nachum, Vempala, Zhang, 'Why Language Models Hallucinate', arXiv 2509.04664 (Sep 2025): guessing rewarded;
+    exam analogy; birthday example (three wrong dates) - read on arxiv.org.
+  Anthropic, 'Tracing the thoughts of a large language model' (27 Mar 2025): default 'can't answer' circuit, misfire.
+  Sharma et al., sycophancy, arXiv 2310.13548.
+  OpenAI o3 and o4-mini System Card (16 Apr 2025), Table 4 PersonQA hallucination rate: o1 0.16, o3 0.33, o4-mini 0.48.
+  Stanford HAI / RegLab (23 May 2024, updated 30 May 2024): general chatbots 58-82% on legal queries; Lexis+ AI and
+    Ask Practical Law AI more than 17%; Westlaw AI-Assisted Research more than 34%.
+  EBU and BBC, News Integrity in AI Assistants (21 Oct 2025): 22 broadcasters, 18 countries, 14 languages, 3,000+
+    answers; 45% at least one significant issue, 31% sourcing, 20% major accuracy issues.
+
+WHAT CHANGED VS AIDOOMSDAYGUIDE.COM: No hallucination explainer existed on the old site (the nearest was the Evidence
+  desk's scheming/alignment-faking pieces, a different topic). New piece; answers the Library Plan's video question
+  in article form, with the mechanism explained in plain words and dated figures.
+
+HOW TO EMBED IN WORDPRESS:
+  Option A - Custom HTML block: paste everything between AIC:START and AIC:END. Scoped CSS, JS in an IIFE, no network.
+  Option B - iframe: <iframe src="/path/ai-hallucinations.html" title="Why does AI sound so confident when it's wrong?" style="width:100%;min-height:2400px;border:0" loading="lazy"></iframe>
+
+CONFIG (window.AICHANNEL_CONFIG): newsletterUrl (used here: 'Keep up without keeping up with everything.'),
+  coursesUrl, matchUrl, contentBaseUrl. Events: content_viewed, cta_clicked, related_clicked.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why does AI sound so confident when it&#x27;s wrong? | AI Channel</title>
+<meta name="description" content="A plain explainer on AI hallucinations: what they are, why they happen, whether they&#x27;re getting better, when they matter most, and how to reduce them.">
+<!-- AI Channel design A: tool design system v2 (visual layer only; no behaviour changes) -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style id="aic-theme">
+/* ---------- tokens ---------- */
+:root,html{color-scheme:light!important;
+ --pine:#2859c7!important;--pine-deep:#1945ac!important;--accent:#2859c7!important;--accent-deep:#1945ac!important;--primary:#2859c7!important;--blue:#2859c7!important;--blue-d:#1945ac!important;
+ --paper:#ffffff!important;--bg:#ffffff!important;--white:#fff!important;--card:#fff!important;--ink:#14213d!important;--ink-soft:#3f4a5c!important;--ink-mute:#5b6577!important;--muted:#3f4a5c!important;
+ --line:#d9e2f0!important;--sage:#eef3fc!important;--amber-soft:#fbf3e4!important;--accent-wash:#eef3fc!important;--blue-wash:#eef3fc!important;--sky:#eef3fc!important;--pale:#f4f7fc!important;--warm:#f4f7fc!important;
+ --serif:"Newsreader",Georgia,serif!important;--sans:"Inter",system-ui,sans-serif!important;--mono:"IBM Plex Mono",ui-monospace,monospace!important}
+html body .aic-tool,html body .aic-article{
+ --aic-paper:#ffffff!important;--aic-white:#ffffff!important;--aic-ink:#14213d!important;--aic-soft:#46526a!important;--aic-line:#d9e2f0!important;--aic-sage:#eef3fc!important;
+ --aic-blue:#2859c7!important;--aic-blue-deep:#1945ac!important;--aic-blue-soft:#eef3fc!important;--aic-on-blue:#ffffff!important;--aic-focus:#9fbcff!important;
+ --aic-grey:#46526a!important;--aic-grey-soft:#f4f7fc!important;
+ --aic-radius:16px!important;--aic-radius-sm:12px!important;--aic-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important;
+ color-scheme:light!important;background:#fff!important;color:#14213d!important;
+ font-family:"Inter",system-ui,sans-serif!important;-webkit-font-smoothing:antialiased}
+html,body{background:#fff!important}
+html body .aic-tool{padding:56px 0 96px!important}
+html body .aic-article{padding:0 0 112px!important}
+html body .aic-tool .aic-col,html body .aic-article .aic-col{max-width:860px!important}
+@media(min-width:600px){html body .aic-tool .aic-col,html body .aic-article .aic-col{padding-inline:32px!important}}
+
+/* ---------- type ---------- */
+html body .aic-tool .aic-h1,html body .aic-article h1,body h1{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important;line-height:1.02!important;font-size:clamp(38px,5.4vw,62px)!important;color:#14213d}
+html body .aic-tool .aic-h2,html body .aic-article h2,body h2{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important;line-height:1.1!important}
+html body .aic-article h2{font-size:clamp(28px,3.6vw,38px)!important;margin-top:72px!important}
+html body .aic-tool .aic-h2{font-size:clamp(26px,3.4vw,36px)!important}
+html body .aic-tool .aic-h3,html body .aic-article h3,body h3{font-family:"Newsreader",Georgia,serif!important;font-weight:550!important;letter-spacing:-.01em!important;font-size:22px!important;line-height:1.2!important}
+body h4,body h5,body h6{font-family:"Inter",system-ui,sans-serif!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow,html body .aic-tool .aic-qnum,html body .aic-tool .aic-nav-hint,.aic-mono{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;letter-spacing:.06em!important;text-transform:uppercase;font-size:12px!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow{color:#2859c7!important;display:flex!important;align-items:center;gap:12px}
+html body .aic-tool .aic-eyebrow::before,html body .aic-article .aic-head .aic-eyebrow::before{content:"";width:28px;height:1px;background:#2859c7;flex:none}
+html body .aic-tool .aic-lede,html body .aic-article .aic-lede,html body .aic-article .aic-dek{font-size:20px!important;line-height:1.55!important;color:#3f4a5c!important;max-width:60ch}
+html body .aic-tool .aic-soft,html body .aic-tool .aic-small{color:#46526a!important}
+html body .aic-tool .aic-small{font-size:14px!important}
+html body .aic-article{font-size:18.5px!important;line-height:1.72!important}
+html body .aic-article p+p{margin-top:22px!important}
+html body .aic-article .aic-head{padding:72px 0 40px!important;border-bottom:1px solid #d9e2f0;margin-bottom:48px}
+html body .aic-article .aic-meta,html body .aic-article .aic-head p:not(.aic-lede):not(.aic-dek){font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px!important;letter-spacing:.03em;color:#5b6577!important}
+html body .aic-tool a,html body .aic-article a{color:#2859c7}
+
+/* ---------- panels ---------- */
+html body .aic-tool .aic-card,html body .aic-article .aic-card{background:#fff!important;border:1px solid #d9e2f0!important;border-radius:16px!important;box-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important}
+@media(min-width:600px){html body .aic-tool .aic-card{padding:36px 40px!important}html body .aic-article .aic-card{padding:32px 36px!important}}
+html body .aic-tool .aic-stack>*+*{margin-top:20px!important}
+html body .aic-tool .aic-grid2,html body .aic-article .aic-grid{gap:16px!important}
+/* the short answer: a framed figure, like the site's tool previews */
+html body .aic-article .aic-short{background:#fff!important;border:1px solid #d9e2f0!important;box-shadow:0 0 0 10px #eef3fc,0 0 0 11px #d9e2f0!important;margin:12px 11px 56px!important;border-radius:12px!important;border-left:1px solid #d9e2f0!important}
+html body .aic-article .aic-short .aic-eyebrow,html body .aic-article .aic-short>:first-child{color:#2859c7!important}
+/* notes and callouts */
+html body .aic-tool .aic-note,html body .aic-article .aic-note,html body .aic-article .aic-callout{background:#f4f7fc!important;border-left:3px solid #2859c7!important;border-radius:0 12px 12px 0!important;padding:18px 22px!important;font-size:15.5px!important;color:#14213d!important}
+html body .aic-tool .aic-note.aic-warn{background:#fdf7ec!important;border-left-color:#a46207!important}
+html body .aic-tool .aic-note.aic-bad{background:#fdf0ee!important;border-left-color:#b42318!important}
+html body .aic-tool .aic-note.aic-good{background:#eef8f1!important;border-left-color:#2f7a4e!important}
+/* calls to action become navy bands */
+html body .aic-tool .aic-cta,html body .aic-article .aic-cta,html body .aic-tool .aic-dark,html body .aic-article .aic-dark{--aic-ink:#ffffff!important;--aic-soft:#c9d6ee!important;--aic-white:#13264a!important;--aic-line:#2a3f6a!important;--aic-blue:#9fbcff!important;--aic-blue-soft:#1d3563!important;--aic-on-blue:#13264a!important;
+ background:#13264a!important;color:#fff!important;border-color:#13264a!important;box-shadow:none!important}
+html body .aic-tool .aic-cta *:not(.aic-btn):not(.aic-btn *),html body .aic-article .aic-cta *:not(.aic-btn):not(.aic-btn *){color:inherit}
+html body .aic-tool .aic-cta .aic-btn-primary,html body .aic-article .aic-cta .aic-btn-primary{background:#fff!important;color:#13264a!important;border-color:#fff!important}
+html body .aic-tool .aic-cta a:not(.aic-btn),html body .aic-article .aic-cta a:not(.aic-btn){color:#9fbcff!important}
+
+/* ---------- questions and answer options ---------- */
+html body .aic-tool .aic-q{margin-top:28px!important}
+html body .aic-tool .aic-qnum{color:#2859c7!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;font-size:clamp(22px,2.6vw,27px)!important;line-height:1.22!important;letter-spacing:-.01em!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qhint{font-size:15px!important;color:#46526a!important;margin-bottom:18px!important}
+html body .aic-tool .aic-opts{gap:10px!important;margin-top:18px!important}
+html body .aic-tool .aic-opt,html body .aic-tool .aic-pick,html body .aic-tool .aic-check{background:#fff!important;border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:16px 18px!important;font-size:16px!important;gap:14px!important;transition:border-color .15s,box-shadow .15s,background-color .15s,transform .15s!important}
+html body .aic-tool .aic-opt:hover,html body .aic-tool .aic-pick:hover,html body .aic-tool .aic-check:hover{border-color:#2859c7!important;box-shadow:0 6px 18px rgba(40,89,199,.10)!important;transform:translateY(-1px)}
+html body .aic-tool .aic-opt[aria-checked="true"],html body .aic-tool .aic-opt[aria-pressed="true"],html body .aic-tool .aic-pick:has(input:checked),html body .aic-tool .aic-check:has(input:checked),html body .aic-tool .aic-opt:has(input:checked){border-color:#2859c7!important;background:#f4f7fc!important;box-shadow:0 0 0 3px #dbe6fb!important}
+html body .aic-tool .aic-dot{width:22px!important;height:22px!important;border:2px solid #9aa8c0!important}
+html body .aic-tool .aic-dot::after{inset:4px!important;background:#2859c7!important}
+html body .aic-tool .aic-opt[aria-checked="true"] .aic-dot{border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-size:14px!important;color:#46526a!important;margin-top:4px!important}
+html body .aic-tool .aic-opt.aic-opt-unsure{background:transparent!important;border-style:dashed!important}
+html body .aic-tool input[type=text],html body .aic-tool input[type=search],html body .aic-tool input[type=email],html body .aic-tool textarea,html body .aic-tool select,html body .aic-tool .aic-input{border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:14px 16px!important;background:#fff!important;font-size:16px!important}
+html body .aic-tool input:focus,html body .aic-tool textarea:focus,html body .aic-tool select:focus{border-color:#2859c7!important;outline:none!important;box-shadow:0 0 0 3px #dbe6fb!important}
+
+/* ---------- controls ---------- */
+html body .aic-tool .aic-btn,html body .aic-article .aic-btn{min-height:50px!important;padding:14px 24px!important;font-weight:600!important;font-size:15px!important;border-radius:999px!important;border:1.5px solid #c9d6ee!important;box-shadow:none!important}
+html body .aic-tool .aic-btn:hover,html body .aic-article .aic-btn:hover{border-color:#2859c7!important}
+html body .aic-tool .aic-btn-primary,html body .aic-article .aic-btn-primary{background:#2859c7!important;border-color:#2859c7!important;color:#fff!important}
+html body .aic-tool .aic-btn-primary:hover,html body .aic-article .aic-btn-primary:hover{background:#1945ac!important;border-color:#1945ac!important}
+html body .aic-tool .aic-btn-ghost{border-color:transparent!important;text-decoration:underline;text-underline-offset:4px;color:#3f4a5c!important}
+html body .aic-tool .aic-btn[disabled]{opacity:.4!important}
+html body .aic-tool .aic-nav{margin-top:36px!important;padding-top:24px!important;border-top:1px solid #d9e2f0!important}
+html body .aic-tool .aic-actions{gap:12px!important}
+html body .aic-tool .aic-seg{border:1.5px solid #d9e2f0!important;padding:4px!important}
+html body .aic-tool .aic-seg button{font-weight:600!important;color:#3f4a5c!important}
+html body .aic-tool .aic-seg button[aria-pressed="true"],html body .aic-tool .aic-seg button[aria-checked="true"]{background:#13264a!important;color:#fff!important}
+html body .aic-tool .aic-progress{height:4px!important;background:#e3eaf6!important;margin:20px 0 8px!important}
+html body .aic-tool .aic-progress span,html body .aic-tool .aic-progress i{background:#2859c7!important}
+html body .aic-tool .aic-chip,html body .aic-tool .aic-pill{border:1.5px solid #d9e2f0!important;background:#fff!important;font-weight:600!important;border-radius:999px!important}
+html body .aic-tool .aic-chip[aria-pressed="true"],html body .aic-tool .aic-chip.aic-on,html body .aic-tool .aic-pill.aic-on{background:#eef3fc!important;border-color:#2859c7!important;color:#1945ac!important}
+html body .aic-tool .aic-tag,html body .aic-article .aic-tag{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;padding:5px 11px!important}
+html body .aic-tool .aic-privacy{font-size:14px!important;color:#46526a!important;margin-top:20px!important}
+
+/* ---------- results ---------- */
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-stat b,html body .aic-tool .aic-stat strong,html body .aic-tool .aic-display{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important}
+html body .aic-tool .aic-bar{height:8px!important;background:#e3eaf6!important}
+html body .aic-tool .aic-bar-row{padding:14px 0!important;border-bottom-color:#e3eaf6!important}
+html body .aic-tool .aic-bar-label{font-weight:600!important}
+html body .aic-tool table,html body .aic-article table{border-collapse:collapse}
+html body .aic-tool th,html body .aic-article th{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;text-transform:uppercase;color:#2859c7!important;background:#f4f7fc!important}
+html body .aic-tool td,html body .aic-article td{border-color:#e3eaf6!important}
+html body .aic-article .aic-sources,html body .aic-tool .aic-sources{font-size:14px!important;color:#46526a!important;border-top:1px solid #d9e2f0;padding-top:32px!important;margin-top:72px!important}
+html body .aic-article .aic-related,html body .aic-article .aic-deeper{margin-top:72px!important}
+
+/* ---------- pages outside the shared system ---------- */
+body:not(:has(.aic-tool)):not(:has(.aic-article)) h1,body:not(:has(.aic-tool)):not(:has(.aic-article)) h2,body:not(:has(.aic-tool)):not(:has(.aic-article)) h3{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important}
+html,body{font-family:"Inter",system-ui,sans-serif}
+input[type=range],input[type=checkbox],input[type=radio]{accent-color:#2859c7!important}
+:focus-visible{outline-color:#2859c7!important}
+[tabindex="-1"]:focus,h1:focus,h2:focus,h3:focus{outline:none!important;box-shadow:none!important}
+
+/* ================= v3: product-grade tool shell ================= */
+html,body{background:#f4f7fc!important}
+html body .aic-tool{background:#f4f7fc!important}
+html body .aic-tool .aic-col{max-width:980px!important}
+html body .aic-tool .aic-h1{font-size:clamp(40px,5vw,62px)!important;max-width:20ch}
+html body .aic-tool .aic-grid2>.aic-card{box-shadow:none!important;background:#fff!important;border-radius:14px!important}
+html body .aic-tool.aic-in-q .aic-h1{font-size:22px!important;line-height:1.2!important;max-width:none;margin:6px 0 20px!important;font-weight:500!important}
+html body .aic-tool.aic-in-q .aic-lede,html body .aic-tool.aic-in-q > .aic-col > .aic-privacy,html body .aic-tool.aic-in-q .aic-col > * > .aic-privacy{display:none!important}
+html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:56px 64px 44px!important;border:0!important;border-radius:24px!important;box-shadow:0 1px 0 rgba(19,38,74,.05),0 30px 70px rgba(19,38,74,.10)!important;min-height:460px}
+@media(max-width:700px){html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:32px 22px 28px!important;border-radius:18px!important;min-height:0}}
+html body .aic-tool .aic-progress{height:3px!important;background:#e3eaf6!important;border-radius:0!important;margin:14px 0 36px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-size:clamp(26px,3.2vw,38px)!important;line-height:1.12!important;letter-spacing:-.02em!important;margin-bottom:12px!important;max-width:28ch}
+html body .aic-tool .aic-qhint{font-size:16px!important;margin-bottom:24px!important}
+html body .aic-tool .aic-opts{counter-reset:aicopt;gap:12px!important}
+html body .aic-tool .aic-opt{counter-increment:aicopt;align-items:center!important;min-height:64px;padding:16px 20px!important;font-size:17px!important;font-weight:500;border-radius:14px!important}
+html body .aic-tool .aic-opt .aic-dot{display:none!important}
+html body .aic-tool .aic-opt::before{content:counter(aicopt,upper-alpha);flex:none;width:30px;height:30px;display:grid;place-items:center;border:1.5px solid #c9d6ee;border-radius:8px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;font-weight:500;color:#2859c7;background:#fff;transition:all .15s}
+html body .aic-tool .aic-opt:hover::before{border-color:#2859c7}
+html body .aic-tool .aic-opt[aria-checked="true"]::before{background:#2859c7;border-color:#2859c7;color:#fff;content:"\2713"}
+html body .aic-tool .aic-opt[aria-checked="true"]{background:#eef3fc!important;box-shadow:0 0 0 2px #2859c7!important;border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-weight:400}
+html body .aic-tool .aic-nav{border-top:0!important;margin-top:40px!important;padding-top:0!important}
+html body .aic-tool .aic-nav .aic-btn-primary{min-width:150px}
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-display{font-size:clamp(56px,8vw,96px)!important;line-height:.95!important;color:#14213d}
+
+/* ================= v4: legibility ================= */
+html body .aic-tool{font-size:17px!important;line-height:1.6!important}
+html body .aic-tool,html body .aic-article{--aic-soft:#334055!important}
+html body .aic-tool .aic-small,html body .aic-tool .aic-opt-sub,html body .aic-tool .aic-privacy,html body .aic-tool .aic-nav-hint{font-size:15px!important;color:#334055!important}
+html body .aic-tool p,html body .aic-tool li{color:#1d2a44}
+html body .aic-tool .aic-lede{font-size:20px!important;color:#2a364d!important}
+html body .aic-tool .aic-note{font-size:16.5px!important}
+html body .aic-tool .aic-opt{font-size:18px!important;color:#14213d!important}
+html body .aic-tool .aic-qhint{font-size:17px!important;color:#334055!important}
+html body .aic-tool .aic-eyebrow,html body .aic-tool .aic-qnum,.aic-mono{font-size:12.5px!important;color:#2859c7!important;letter-spacing:.05em!important}
+html body .aic-tool .aic-tag{font-size:12.5px!important}
+html body .aic-tool th,html body .aic-article th{font-size:12.5px!important}
+html body .aic-tool td{font-size:16px}
+html body .aic-article{color:#14213d!important}
+html body .aic-article p,html body .aic-article li{color:#1d2a44}
+</style>
+<script>
+(function(){
+  function hsl(c){var m=c&&c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/);if(!m)return null;var r=m[1]/255,g=m[2]/255,b=m[3]/255,a=m[4]===undefined?1:+m[4];
+    var mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn,s=d?d/(1-Math.abs(2*l-1)):0,h=0;
+    if(d){h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;if(h<0)h+=360}return {h:h,s:s,l:l,a:a}}
+  function blue(c){var x=hsl(c);return x&&x.a>0.05&&x.s>0.3&&x.l>0.28&&x.l<0.95&&x.h>=205&&x.h<=240?x:null}
+  function N(x,dark,light){return x.a<0.95?"rgba(40,89,199,"+Math.min(x.a,0.12).toFixed(3)+")":(x.l>0.82?light:dark)}
+  function fix(el){var c0=getComputedStyle(el),bg=hsl(c0.backgroundColor),fg=hsl(c0.color);if(bg&&fg&&bg.a>0.9&&bg.l<0.6&&bg.s>0.3&&bg.h>=205&&bg.h<=240&&fg.l<0.6)el.style.setProperty("color","#ffffff","important");
+    if(el.closest(".aic-cta,.aic-dark")||el.matches(".aic-opt,.aic-pick,.aic-check,.aic-btn,.aic-chip,.aic-pill,.aic-seg button,.aic-card,.aic-note"))return;var cs=getComputedStyle(el),x;
+    if((x=blue(cs.color)))el.style.setProperty("color",x.l>0.75?"#eef3fc":"#2859c7","important");
+    if((x=blue(cs.backgroundColor)))el.style.setProperty("background-color",N(x,"#2859c7",x.l>0.9?"#eef3fc":"#d6e2f8"),"important");
+    if(el instanceof SVGElement){if((x=blue(cs.fill)))el.style.setProperty("fill",N(x,"#2859c7","#eef3fc"),"important");if((x=blue(cs.stroke)))el.style.setProperty("stroke",N(x,"#2859c7","#d6e2f8"),"important")}
+    if(cs.textTransform==="uppercase"&&parseFloat(cs.fontSize)<=13.5&&!el.closest("button")&&!el.classList.contains("aic-mono"))el.classList.add("aic-mono");}
+  var t;function mode(){document.querySelectorAll(".aic-tool").forEach(function(r){var q=[].some.call(r.querySelectorAll(".aic-progress,.aic-qtext,.aic-q-text"),function(e){return e.offsetParent!==null});if(q!==r.classList.contains("aic-in-q"))r.classList.toggle("aic-in-q",q)})}
+  function run(){clearTimeout(t);t=setTimeout(function(){mode();document.querySelectorAll("body *").forEach(fix)},30)}
+  document.addEventListener("DOMContentLoaded",function(){run();new MutationObserver(run).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class","aria-pressed","aria-checked","data-state"]});
+    document.addEventListener("change",run,true);document.addEventListener("click",run,true);});
+})();
+</script>
+</head>
+<body style="margin:0;background:#F7F8FA">
+<!-- ===== AIC:START — for a WordPress Custom HTML block, paste everything from here to AIC:END ===== -->
+<style>
+/* ===== AI Channel article base (scoped to .aic-article) ===== */
+.aic-article{
+  --aic-paper:#F7F8FA; --aic-white:#FFFFFF; --aic-ink:#162033; --aic-soft:#667085; --aic-body:#2A3447; --aic-line:#DEE3EA; --aic-sage:#EEF1F6;
+  --aic-blue:#315EFB; --aic-blue-deep:#2448C9; --aic-blue-soft:#EEF3FF; --aic-on-blue:#FFFFFF;
+  --aic-amber:#A46207; --aic-amber-soft:#FBF3E4; --aic-green:#2F7A4E; --aic-green-soft:#E9F5EE;
+  --aic-red:#B42318; --aic-red-soft:#FDEDEB;
+  --aic-radius:18px; --aic-radius-sm:12px; --aic-shadow:0 10px 28px rgba(21,32,51,.055);
+  --aic-measure:68ch;
+  display:block; background:var(--aic-paper); color:var(--aic-ink);
+  font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size:18px; line-height:1.7; padding:32px 0 64px; -webkit-text-size-adjust:100%; text-align:left;
+}
+@media (prefers-color-scheme:dark){
+  .aic-article{
+    --aic-paper:#101B2D; --aic-white:#162033; --aic-ink:#F2F4F8; --aic-soft:#A6B3C7; --aic-body:#D9DFEA; --aic-line:#2A3850; --aic-sage:#1E2A40;
+    --aic-blue:#7A97FF; --aic-blue-deep:#9BB2FF; --aic-blue-soft:#1F2B45; --aic-on-blue:#0B1426;
+    --aic-amber:#E0A34A; --aic-amber-soft:#2D2617; --aic-green:#6FC592; --aic-green-soft:#15302A;
+    --aic-red:#F97066; --aic-red-soft:#3A1E22; --aic-shadow:none; color-scheme:dark;
+  }
+}
+.aic-article *,.aic-article *::before,.aic-article *::after{box-sizing:border-box}
+.aic-article h1,.aic-article h2,.aic-article h3,.aic-article h4,.aic-article p,.aic-article ul,.aic-article ol,.aic-article li,.aic-article figure,.aic-article dl,.aic-article dd,.aic-article dt{margin:0;padding:0}
+.aic-article ul,.aic-article ol{list-style:none}
+.aic-article button{font:inherit;color:inherit}
+.aic-article a{color:var(--aic-blue);font-weight:650;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+.aic-article a:hover{color:var(--aic-blue-deep);text-decoration-thickness:2px}
+.aic-article :focus-visible{outline:3px solid #9DB2FF;outline-offset:2px;border-radius:6px}
+.aic-article [hidden]{display:none!important}
+.aic-article .aic-col{max-width:760px;margin:0 auto;padding-inline:16px}
+@media (min-width:600px){.aic-article .aic-col{padding-inline:24px}}
+.aic-article .aic-eyebrow{display:block;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--aic-blue);line-height:1.4}
+.aic-article .aic-h1{font-size:clamp(32px,6.6vw,52px);line-height:1.05;font-weight:800;letter-spacing:-.035em;margin:12px 0 14px;color:var(--aic-ink);overflow-wrap:break-word}
+.aic-article .aic-dek{font-size:clamp(18px,2.6vw,21px);line-height:1.5;color:var(--aic-soft);max-width:var(--aic-measure)}
+.aic-article .aic-meta{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:16px;font-size:14px;color:var(--aic-soft);line-height:1.5}
+.aic-article .aic-meta span+span::before{content:"";display:inline-block;width:4px;height:4px;border-radius:50%;background:var(--aic-line);margin-right:16px;vertical-align:middle}
+.aic-article .aic-answer{margin:28px 0 8px;padding:22px 22px 22px 24px;background:var(--aic-white);border:1px solid var(--aic-line);border-left:5px solid var(--aic-blue);border-radius:var(--aic-radius);box-shadow:var(--aic-shadow)}
+.aic-article .aic-answer p{font-size:19px;line-height:1.65;color:var(--aic-ink);max-width:var(--aic-measure)}
+.aic-article .aic-answer p+p{margin-top:10px}
+.aic-article .aic-answer .aic-eyebrow{margin-bottom:8px}
+.aic-article .aic-toc{margin:28px 0 8px;padding:18px 20px;border:1px solid var(--aic-line);border-radius:var(--aic-radius-sm);background:var(--aic-sage)}
+.aic-article .aic-toc ol{counter-reset:aic-toc;display:grid;gap:4px;margin-top:8px}
+.aic-article .aic-toc li{counter-increment:aic-toc;font-size:16px;line-height:1.45;padding-left:28px;position:relative}
+.aic-article .aic-toc li::before{content:counter(aic-toc);position:absolute;left:0;top:1px;font-size:12px;font-weight:800;color:var(--aic-blue);width:20px;text-align:right}
+.aic-article .aic-toc a{font-weight:600;text-decoration:none}
+.aic-article .aic-toc a:hover{text-decoration:underline}
+.aic-article .aic-section{margin-top:48px;scroll-margin-top:24px}
+.aic-article .aic-h2{font-size:clamp(25px,4.4vw,33px);line-height:1.12;font-weight:800;letter-spacing:-.03em;margin:6px 0 14px;color:var(--aic-ink)}
+.aic-article .aic-h3{font-size:20px;line-height:1.3;font-weight:800;letter-spacing:-.02em;margin:26px 0 8px;color:var(--aic-ink)}
+.aic-article .aic-prose>p,.aic-article .aic-section>p{color:var(--aic-body);max-width:var(--aic-measure)}
+.aic-article .aic-section>p+p{margin-top:16px}
+.aic-article .aic-section>p+.aic-h3{margin-top:30px}
+.aic-article .aic-section>.aic-bullets+p,.aic-article .aic-section>.aic-steps+p,.aic-article .aic-section>.aic-checks+p,.aic-article .aic-section>.aic-rows+p,.aic-article .aic-section>.aic-callout+p{margin-top:18px}
+.aic-article .aic-blurb{font-size:17px;color:var(--aic-soft);margin:-6px 0 16px;max-width:var(--aic-measure)}
+.aic-article strong{font-weight:750;color:var(--aic-ink)}
+.aic-article sup.aic-ref{font-size:.62em;line-height:0;vertical-align:super;margin-left:1px;white-space:nowrap}
+.aic-article sup.aic-ref a{font-weight:700;text-decoration:none;padding:0 1px}
+.aic-article .aic-bullets{margin:16px 0 0;display:grid;gap:10px;max-width:var(--aic-measure)}
+.aic-article .aic-bullets li{position:relative;padding-left:22px;color:var(--aic-body)}
+.aic-article .aic-bullets li::before{content:"";position:absolute;left:4px;top:.72em;width:7px;height:7px;border-radius:50%;background:var(--aic-blue)}
+.aic-article .aic-steps{margin:18px 0 0;counter-reset:aic-step;display:grid;gap:12px;max-width:var(--aic-measure)}
+.aic-article .aic-steps>li{counter-increment:aic-step;position:relative;padding:16px 18px 16px 58px;background:var(--aic-white);border:1px solid var(--aic-line);border-radius:var(--aic-radius-sm);color:var(--aic-body)}
+.aic-article .aic-steps>li::before{content:counter(aic-step);position:absolute;left:16px;top:15px;width:28px;height:28px;border-radius:50%;background:var(--aic-blue-soft);color:var(--aic-blue);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;line-height:1}
+.aic-article .aic-steps strong{display:block;margin-bottom:2px}
+.aic-article .aic-grid{display:grid;gap:12px;margin-top:18px}
+@media (min-width:640px){.aic-article .aic-grid-2{grid-template-columns:1fr 1fr}.aic-article .aic-grid-3{grid-template-columns:1fr 1fr 1fr}}
+.aic-article .aic-card{background:var(--aic-white);border:1px solid var(--aic-line);border-radius:var(--aic-radius);padding:18px 20px;box-shadow:var(--aic-shadow);min-width:0}
+.aic-article .aic-card p,.aic-article .aic-card li{font-size:16px;line-height:1.6;color:var(--aic-body)}
+.aic-article .aic-card p+p{margin-top:8px}
+.aic-article .aic-card .aic-h3{margin:4px 0 6px;font-size:18px}
+.aic-article .aic-card .aic-bullets{margin-top:8px;gap:6px}
+.aic-article .aic-tag{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;padding:3px 9px;border-radius:999px;background:var(--aic-blue-soft);color:var(--aic-blue);line-height:1.5}
+.aic-article .aic-tag-green{background:var(--aic-green-soft);color:var(--aic-green)}
+.aic-article .aic-tag-amber{background:var(--aic-amber-soft);color:var(--aic-amber)}
+.aic-article .aic-tag-red{background:var(--aic-red-soft);color:var(--aic-red)}
+.aic-article .aic-card-green{border-top:4px solid var(--aic-green)}
+.aic-article .aic-card-amber{border-top:4px solid var(--aic-amber)}
+.aic-article .aic-card-red{border-top:4px solid var(--aic-red)}
+.aic-article .aic-card-blue{border-top:4px solid var(--aic-blue)}
+.aic-article .aic-callout{margin-top:20px;padding:16px 18px;border-radius:var(--aic-radius-sm);background:var(--aic-amber-soft);border:1px solid transparent;max-width:var(--aic-measure)}
+.aic-article .aic-callout p{font-size:16.5px;line-height:1.6;color:var(--aic-ink)}
+.aic-article .aic-callout p+p{margin-top:8px}
+.aic-article .aic-callout-blue{background:var(--aic-blue-soft)}
+.aic-article .aic-help{margin-top:22px;padding:20px 22px;border-radius:var(--aic-radius);background:var(--aic-green-soft);border:1px solid transparent}
+.aic-article .aic-help .aic-h3{margin-top:2px}
+.aic-article .aic-help p,.aic-article .aic-help li{font-size:16.5px;line-height:1.6;color:var(--aic-ink)}
+.aic-article .aic-help ul{display:grid;gap:6px;margin-top:10px}
+.aic-article .aic-help li{padding-left:20px;position:relative}
+.aic-article .aic-help li::before{content:"";position:absolute;left:3px;top:.62em;width:7px;height:7px;border-radius:50%;background:var(--aic-green)}
+.aic-article .aic-rows{margin-top:18px;border:1px solid var(--aic-line);border-radius:var(--aic-radius);overflow:hidden;background:var(--aic-white)}
+.aic-article .aic-row{display:grid;gap:4px 18px;padding:14px 18px;border-top:1px solid var(--aic-line)}
+.aic-article .aic-row:first-child{border-top:0}
+@media (min-width:640px){.aic-article .aic-row{grid-template-columns:minmax(150px,30%) 1fr}}
+.aic-article .aic-row dt{font-weight:800;font-size:16px;line-height:1.45;color:var(--aic-ink)}
+.aic-article .aic-row dd{font-size:16px;line-height:1.6;color:var(--aic-body)}
+.aic-article .aic-row dt .aic-tag{margin-bottom:4px}
+.aic-article .aic-checks{margin-top:14px;display:grid;gap:10px;max-width:var(--aic-measure)}
+.aic-article .aic-checks li{position:relative;padding-left:32px;color:var(--aic-body)}
+.aic-article .aic-checks li::before{content:"";position:absolute;left:0;top:.28em;width:20px;height:20px;border-radius:6px;border:2px solid var(--aic-line);background:var(--aic-white)}
+.aic-article .aic-actions{display:grid;gap:14px;margin-top:18px}
+@media (min-width:700px){.aic-article .aic-actions{grid-template-columns:1fr 1fr}}
+.aic-article .aic-actions .aic-card ul{display:grid;gap:14px;margin-top:12px}
+.aic-article .aic-actions .aic-card li strong{display:block;font-size:16.5px;margin-bottom:2px}
+.aic-article .aic-printcard{margin-top:20px;background:var(--aic-white);border:2px dashed #B8C7FF;border-radius:var(--aic-radius);padding:22px 22px 18px}
+.aic-article .aic-printcard .aic-h3{margin-top:4px;font-size:21px}
+.aic-article .aic-printcard dl{margin-top:10px}
+.aic-article .aic-printcard .aic-pc-row{padding:10px 0;border-top:1px solid var(--aic-line)}
+.aic-article .aic-printcard .aic-pc-row:first-child{border-top:0}
+.aic-article .aic-printcard dt{font-weight:800;font-size:15px;color:var(--aic-ink);line-height:1.4}
+.aic-article .aic-printcard dd{font-size:15.5px;line-height:1.6;color:var(--aic-body);margin-top:2px}
+.aic-article .aic-blank{display:inline-block;min-width:9em;border-bottom:1.5px solid var(--aic-soft);height:1.1em;vertical-align:baseline}
+.aic-article .aic-printbar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-top:14px;font-size:14px;color:var(--aic-soft)}
+.aic-article .aic-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 20px;min-height:44px;border-radius:999px;border:1px solid var(--aic-line);background:var(--aic-white);color:var(--aic-ink);font-weight:750;font-size:15px;cursor:pointer;text-decoration:none;line-height:1.2}
+.aic-article .aic-btn:hover{border-color:#B8C7FF;text-decoration:none;color:var(--aic-ink)}
+.aic-article .aic-btn-primary{background:var(--aic-blue);border-color:var(--aic-blue);color:var(--aic-on-blue)}
+.aic-article .aic-btn-primary:hover{background:var(--aic-blue-deep);border-color:var(--aic-blue-deep);color:var(--aic-on-blue)}
+.aic-article .aic-cta{margin-top:48px;padding:24px;border-radius:var(--aic-radius);border:1px solid #C7D3FF;background:linear-gradient(180deg,var(--aic-blue-soft),var(--aic-white) 75%)}
+.aic-article .aic-cta .aic-h2{margin-top:6px;font-size:clamp(23px,4vw,29px)}
+.aic-article .aic-cta p{color:var(--aic-body);max-width:var(--aic-measure);font-size:17px}
+.aic-article .aic-cta .aic-btn{margin-top:14px}
+.aic-article .aic-cta .aic-small{margin-top:12px;font-size:14.5px;color:var(--aic-soft)}
+.aic-article .aic-related{margin-top:40px}
+.aic-article .aic-related ul{display:grid;gap:10px;margin-top:12px}
+@media (min-width:640px){.aic-article .aic-related ul{grid-template-columns:1fr 1fr}}
+.aic-article .aic-related li a{display:block;height:100%;padding:14px 16px;background:var(--aic-white);border:1px solid var(--aic-line);border-radius:var(--aic-radius-sm);text-decoration:none;color:var(--aic-ink);font-weight:750;font-size:16px;line-height:1.4}
+.aic-article .aic-related li a span{display:block;font-weight:500;font-size:14.5px;color:var(--aic-soft);margin-top:3px}
+.aic-article .aic-related li a:hover{border-color:#B8C7FF}
+.aic-article .aic-sources{margin-top:44px;padding-top:24px;border-top:1px solid var(--aic-line)}
+.aic-article .aic-sources ol{margin-top:12px;display:grid;gap:10px;counter-reset:aic-src}
+.aic-article .aic-sources li{counter-increment:aic-src;position:relative;padding-left:34px;font-size:14.5px;line-height:1.55;color:var(--aic-body);overflow-wrap:anywhere;scroll-margin-top:24px}
+.aic-article .aic-sources li::before{content:counter(aic-src) ".";position:absolute;left:0;top:0;width:26px;text-align:right;font-weight:800;color:var(--aic-soft)}
+.aic-article .aic-sources li:target{background:var(--aic-blue-soft);border-radius:8px}
+.aic-article .aic-sources a{font-weight:600}
+.aic-article .aic-small{font-size:14.5px;color:var(--aic-soft);line-height:1.55}
+.aic-article .aic-fineprint{margin-top:18px;font-size:14px;color:var(--aic-soft);max-width:var(--aic-measure)}
+@media (prefers-reduced-motion:no-preference){.aic-article .aic-btn,.aic-article .aic-related li a{transition:background .15s,border-color .15s}}
+@media print{
+  .aic-article{background:#fff;color:#000;padding:0;font-size:11.5pt;line-height:1.5}
+  .aic-article .aic-toc,.aic-article .aic-cta,.aic-article .aic-related,.aic-article .aic-printbar{display:none!important}
+  .aic-article .aic-card,.aic-article .aic-answer,.aic-article .aic-steps>li,.aic-article .aic-rows,.aic-article .aic-printcard{box-shadow:none;break-inside:avoid}
+  .aic-article a{color:#000}
+  .aic-article.aic-printing-card .aic-col>*:not(.aic-has-card),.aic-article.aic-printing-card .aic-has-card>*:not(.aic-printcard){display:none!important}
+  .aic-article.aic-printing-card .aic-has-card{margin:0}
+  .aic-article.aic-printing-card .aic-printcard{border:1.5px solid #000;margin:0}
+}
+</style>
+<article class="aic-article" id="aic-ai-hallucinations" lang="en">
+<div class="aic-col">
+<header>
+  <span class="aic-eyebrow">Explainer · AI hallucinations</span>
+  <h1 class="aic-h1">Why does AI sound so confident when it's wrong?</h1>
+  <p class="aic-dek">What hallucinations are, why they happen, when they matter most, and how to get fewer of them.</p>
+  <p class="aic-meta"><span>About 9 minutes</span><span>Last checked November 2026</span></p>
+</header>
+
+<section class="aic-answer" aria-labelledby="aic-ai-hallucinations-answer">
+  <span class="aic-eyebrow" id="aic-ai-hallucinations-answer">The short answer</span>
+  <p>Because sounding right and being right are different skills, and AI tools are much better at the first. They write the most plausible next words, and the tests used to grade them have long rewarded a confident guess over "I don't know." So a made-up answer comes out in the same calm voice as a correct one.</p>
+  <p>It's getting better in places, but it won't disappear. The useful question is when it matters, and how to catch it.</p>
+</section>
+
+<nav class="aic-toc" aria-label="On this page">
+  <span class="aic-eyebrow">On this page</span>
+  <ol>
+    <li><a href="#aic-ai-hallucinations-what">What a hallucination is</a></li>
+    <li><a href="#aic-ai-hallucinations-why">Why it happens: four reasons</a></li>
+    <li><a href="#aic-ai-hallucinations-better">Is it getting better?</a></li>
+    <li><a href="#aic-ai-hallucinations-when">When it matters most</a></li>
+    <li><a href="#aic-ai-hallucinations-reduce">How to get fewer of them</a></li>
+    <li><a href="#aic-ai-hallucinations-do">What you can do</a></li>
+  </ol>
+</nav>
+
+<section class="aic-section" id="aic-ai-hallucinations-what" aria-labelledby="aic-ai-hallucinations-what-h">
+  <span class="aic-eyebrow">1 · The idea</span>
+  <h2 class="aic-h2" id="aic-ai-hallucinations-what-h">What a hallucination is</h2>
+  <p>A hallucination is when an AI tool states something false as if it were fact: a court case that never happened, a statistic nobody measured, a quote nobody said, a feature your product doesn't have. The US standards body NIST prefers the word "confabulation" and defines it as "confidently stated but erroneous or false content," known colloquially as hallucinations or fabrications.<sup class="aic-ref"><a href="#aic-ai-hallucinations-s1" aria-label="Source 1">1</a></sup></p>
+  <p>Two things make it different from an ordinary mistake. First, it often looks <strong>more</strong> convincing than a true answer, because it's specific and tidy. Second, the tool isn't lying in the human sense; it has no idea it's wrong. (Whether AI can deceive on purpose is a separate question: see <a href="can-ai-lie.html" data-aic-slug="can-ai-lie">Can AI lie?</a>)</p>
+</section>
+
+<section class="aic-section" id="aic-ai-hallucinations-why" aria-labelledby="aic-ai-hallucinations-why-h">
+  <span class="aic-eyebrow">2 · The mechanism</span>
+  <h2 class="aic-h2" id="aic-ai-hallucinations-why-h">Why it happens: four reasons</h2>
+  <ol class="aic-steps">
+    <li><strong>It predicts; it doesn't look things up.</strong> Tools like ChatGPT learn the patterns of enormous amounts of text and then produce the words most likely to come next. NIST calls confabulation "a natural result" of that design.<sup class="aic-ref"><a href="#aic-ai-hallucinations-s1" aria-label="Source 1">1</a></sup> Most of the time the likely answer is also the true one. When the tool hasn't seen enough about something, the likely-sounding answer can be pure invention.</li>
+    <li><strong>The tests reward guessing.</strong> Researchers at OpenAI and Georgia Tech compare it to a multiple-choice exam: a student who guesses scores better than one who leaves a blank. Most AI benchmarks grade the same way, so "I don't know" scores zero while a confident guess sometimes scores a point. Training follows the scores. Asked for one of the authors' birthdays, one model gave three different wrong dates in three tries.<sup class="aic-ref"><a href="#aic-ai-hallucinations-s2" aria-label="Source 2">2</a></sup></li>
+    <li><strong>The "I know this" switch misfires.</strong> Researchers at Anthropic looked inside one of their models and found that declining to answer is its default; a "known entity" signal switches that off when it recognizes a subject. Sometimes it recognizes a name without actually knowing anything about the person, the switch flips anyway, and the model makes something up.<sup class="aic-ref"><a href="#aic-ai-hallucinations-s3" aria-label="Source 3">3</a></sup></li>
+    <li><strong>It's trained to please.</strong> AI assistants are tuned partly on which answers people prefer, and people tend to prefer answers that agree with them. Research on this "sycophancy" found it's a general behavior of today's assistants.<sup class="aic-ref"><a href="#aic-ai-hallucinations-s4" aria-label="Source 4">4</a></sup> Ask a leading question and you often get a confident yes.</li>
+  </ol>
+  <h3 class="aic-h3">So why the confident tone?</h3>
+  <p>Because the tone isn't connected to the accuracy. The tool writes a fluent, assured sentence the same way whether the facts inside it are solid or invented. People read confidence as a sign of knowledge. With AI, it's mostly a sign of style.</p>
+</section>
+
+<section class="aic-section" id="aic-ai-hallucinations-better" aria-labelledby="aic-ai-hallucinations-better-h">
+  <span class="aic-eyebrow">3 · Evidence</span>
+  <h2 class="aic-h2" id="aic-ai-hallucinations-better-h">Is it getting better?</h2>
+  <p class="aic-blurb">In places, yes. Newer isn't automatically more accurate, and the rate depends heavily on the task.</p>
+  <div class="aic-grid aic-grid-2">
+    <div class="aic-card aic-card-green">
+      <span class="aic-tag aic-tag-green">Fairly clear</span>
+      <h3 class="aic-h3">Newer models aren't always better</h3>
+      <p>On OpenAI's own test of questions about real people, its April 2025 reasoning models hallucinated more than the model before them:<sup class="aic-ref"><a href="#aic-ai-hallucinations-s5" aria-label="Source 5">5</a></sup></p>
+      <dl class="aic-rows" style="margin-top:10px">
+        <div class="aic-row"><dt>o1 (older)</dt><dd>16% of answers</dd></div>
+        <div class="aic-row"><dt>o3</dt><dd>33%</dd></div>
+        <div class="aic-row"><dt>o4-mini (smaller)</dt><dd>48%</dd></div>
+      </dl>
+      <p style="margin-top:10px">OpenAI said o3 "tends to make more claims overall," right and wrong, and that more research was needed to understand why.</p>
+    </div>
+    <div class="aic-card aic-card-green">
+      <span class="aic-tag aic-tag-green">Fairly clear</span>
+      <h3 class="aic-h3">Specialist tools help, but don't solve it</h3>
+      <p>Stanford researchers found general chatbots hallucinated on 58% to 82% of legal questions. Specialist legal research tools, built to answer from real case law, did better but still got it wrong more than 17% of the time, and one more than 34%.<sup class="aic-ref"><a href="#aic-ai-hallucinations-s6" aria-label="Source 6">6</a></sup></p>
+      <p>In news, a study by 22 public broadcasters in 18 countries found 45% of AI assistants' answers about the news had at least one significant problem; about a fifth had major accuracy issues, including invented or outdated details.<sup class="aic-ref"><a href="#aic-ai-hallucinations-s7" aria-label="Source 7">7</a></sup></p>
+    </div>
+    <div class="aic-card aic-card-amber">
+      <span class="aic-tag aic-tag-amber">Still uncertain</span>
+      <h3 class="aic-h3">Can it be fixed?</h3>
+      <p>The OpenAI and Georgia Tech researchers argue rates can come down if tests stop punishing "I don't know."<sup class="aic-ref"><a href="#aic-ai-hallucinations-s2" aria-label="Source 2">2</a></sup> That would mean tools that answer less often but are wrong less often. Nobody serious claims it can reach zero for a system that generates text by prediction.</p>
+    </div>
+    <div class="aic-card aic-card-amber">
+      <span class="aic-tag aic-tag-amber">Still uncertain</span>
+      <h3 class="aic-h3">What's your error rate?</h3>
+      <p>Published figures come from specific tests, models and dates; they go out of date fast and aren't your error rate. The only number that tells you about your work is one you measure on your own tasks (see "Run the twenty-question test" below).</p>
+    </div>
+  </div>
+</section>
+
+<section class="aic-section" id="aic-ai-hallucinations-when" aria-labelledby="aic-ai-hallucinations-when-h">
+  <span class="aic-eyebrow">4 · Where to be careful</span>
+  <h2 class="aic-h2" id="aic-ai-hallucinations-when-h">When it matters most</h2>
+  <p>Hallucinations aren't spread evenly. They cluster where the tool has little to go on and where you're least able to check.</p>
+  <div class="aic-grid aic-grid-2">
+    <div class="aic-card aic-card-red">
+      <span class="aic-tag aic-tag-red">Riskier</span>
+      <ul class="aic-bullets">
+        <li><strong>Citations, quotes and references.</strong> The classic. They look real and often aren't.</li>
+        <li><strong>Niche facts.</strong> Smaller companies, local rules, less-famous people, your own organization.</li>
+        <li><strong>Numbers.</strong> Statistics, calculations, dates, prices.</li>
+        <li><strong>Recent events.</strong> Anything after the tool's training, unless it's searching the web, and even then.</li>
+        <li><strong>Long documents.</strong> Summaries can drop a "not" or invent a conclusion.</li>
+        <li><strong>Leading questions.</strong> "Why did X happen?" when X didn't.</li>
+      </ul>
+    </div>
+    <div class="aic-card aic-card-green">
+      <span class="aic-tag aic-tag-green">Safer</span>
+      <ul class="aic-bullets">
+        <li><strong>Brainstorming</strong>, where a wrong idea costs nothing.</li>
+        <li><strong>Rewriting your own text</strong>, where you know what it should say.</li>
+        <li><strong>Formatting and structure</strong>: tables, outlines, tone changes.</li>
+        <li><strong>Drafts in your own field</strong>, where you'll spot what's off.</li>
+        <li><strong>Working only from a document you supplied</strong>, and then checking against it.</li>
+      </ul>
+    </div>
+  </div>
+  <p style="margin-top:18px">The rule of thumb: <strong>the less you could check it yourself, the more it needs checking.</strong> For what to do when one gets through at work, see <a href="when-ai-gets-it-wrong.html" data-aic-slug="when-ai-gets-it-wrong">What should you do when AI gets it wrong at work?</a></p>
+</section>
+
+<section class="aic-section" id="aic-ai-hallucinations-reduce" aria-labelledby="aic-ai-hallucinations-reduce-h">
+  <span class="aic-eyebrow">5 · Practical</span>
+  <h2 class="aic-h2" id="aic-ai-hallucinations-reduce-h">How to get fewer of them</h2>
+  <p class="aic-blurb">You can't switch hallucinations off. You can make them rarer and easier to spot.</p>
+  <h3 class="aic-h3">When you ask</h3>
+  <ul class="aic-bullets">
+    <li><strong>Give it the source.</strong> Paste or attach the document and say "answer only from this; if it isn't there, say so."</li>
+    <li><strong>Ask where it found it.</strong> Request the exact quote and where it appears, so you can find the line yourself.</li>
+    <li><strong>Make "I don't know" allowed.</strong> Say it out loud in the prompt: "If you're not sure, say you're not sure."</li>
+    <li><strong>Ask neutral questions.</strong> "What happened to X?" rather than "Why did X fail?"</li>
+    <li><strong>Break big jobs up.</strong> Smaller, specific questions are easier to answer and to check.</li>
+  </ul>
+  <h3 class="aic-h3">When you check</h3>
+  <ul class="aic-bullets">
+    <li><strong>Check the specifics.</strong> Names, numbers, dates, quotes and links: open the source, find the sentence.</li>
+    <li><strong>Ask again in a fresh chat.</strong> Real facts tend to stay put. Invented ones tend to move.</li>
+    <li><strong>Don't treat a link as proof.</strong> Tools that search the web still misquote what they find.</li>
+  </ul>
+  <h3 class="aic-h3">If you're choosing tools or setting them up for others</h3>
+  <ul class="aic-bullets">
+    <li><strong>Prefer tools that show their sources</strong>, and spot-check that the sources say what's claimed.</li>
+    <li><strong>Connect it to your own documents</strong> for questions about your own policies and products, then test it on questions where you know the answer.</li>
+    <li><strong>Keep a person on anything high-stakes.</strong> Money, legal, health, public statements. AI can draft; a person decides.</li>
+    <li><strong>Measure it on your work.</strong> Vendor benchmarks don't tell you how a tool does on your questions.</li>
+  </ul>
+</section>
+
+<section class="aic-section" id="aic-ai-hallucinations-do" aria-labelledby="aic-ai-hallucinations-do-h">
+  <span class="aic-eyebrow">6 · Actions</span>
+  <h2 class="aic-h2" id="aic-ai-hallucinations-do-h">What you can do</h2>
+  <div class="aic-actions">
+    <div class="aic-card">
+      <span class="aic-tag">For you</span>
+      <ul>
+        <li><strong>Catch one on purpose.</strong> Ask your usual AI tool about something you know very well: your town, your field, your own company. Note what it gets wrong and how sure it sounds. You'll trust its tone less from then on, which is the point.</li>
+        <li><strong>Add one line to your prompts.</strong> "If you're not sure, say so, and tell me where you found each fact."</li>
+        <li><strong>Check the specifics.</strong> Every name, number, quote and link in anything you'll send or rely on.</li>
+      </ul>
+    </div>
+    <div class="aic-card">
+      <span class="aic-tag">For your team</span>
+      <ul>
+        <li><strong>Run the twenty-question test.</strong> Write twenty questions from your own work where you know the answers. Run them through the tools you use. Count the confident wrong ones. That's your real starting point, in an hour.</li>
+        <li><strong>Show a real example.</strong> Share one confident, wrong AI answer from your own field at the next team meeting. Nothing teaches checking faster.</li>
+        <li><strong>Mark the riskier tasks.</strong> List where your team uses AI for citations, numbers, niche facts or summaries, and agree how each gets checked.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<aside class="aic-cta" aria-labelledby="aic-ai-hallucinations-cta-h">
+  <span class="aic-eyebrow">Need more than an answer?</span>
+  <h2 class="aic-h2" id="aic-ai-hallucinations-cta-h">Keep up without keeping up with everything.</h2>
+  <p>One short email when something changes that's worth your attention, such as a new finding on how often AI tools get things wrong. No hype.</p>
+  <a class="aic-btn aic-btn-primary" href="#" data-aic-cta="newsletterUrl">Get the newsletter</a>
+</aside>
+
+<nav class="aic-related" aria-labelledby="aic-ai-hallucinations-rel-h">
+  <span class="aic-eyebrow" id="aic-ai-hallucinations-rel-h">Related</span>
+  <ul>
+    <li><a href="when-ai-gets-it-wrong.html" data-aic-slug="when-ai-gets-it-wrong">What should you do when AI gets it wrong at work?<span>Catching, checking, correcting, and who's accountable</span></a></li>
+    <li><a href="can-ai-lie.html" data-aic-slug="can-ai-lie">Can AI lie?<span>Where mistakes end and deception begins</span></a></li>
+    <li><a href="healthy-ai-use.html" data-aic-slug="healthy-ai-use">Am I leaning on AI too much?<span>Habits that keep you the editor</span></a></li>
+    <li><a href="small-business-ai-safety.html" data-aic-slug="small-business-ai-safety">Practical AI safety for sole traders and small teams<span>Checking output is one of five basics</span></a></li>
+    <li><a href="the-ai-sandbox.html" data-aic-slug="the-ai-sandbox">The AI Sandbox<span>Try AI on real work without exposing your data</span></a></li>
+  </ul>
+</nav>
+
+<section class="aic-sources" aria-labelledby="aic-ai-hallucinations-src-h">
+  <span class="aic-eyebrow" id="aic-ai-hallucinations-src-h">Sources</span>
+  <p class="aic-small" style="margin-top:6px">Last checked November 2026. Hallucination rates are as of each study's date and test; they change as models change.</p>
+  <ol class="aic-src-list">
+    <li id="aic-ai-hallucinations-s1">National Institute of Standards and Technology. <em>Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile</em> (NIST AI 600-1), section 2.2 "Confabulation." July 2024. <a href="https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf" rel="noopener">nvlpubs.nist.gov</a></li>
+    <li id="aic-ai-hallucinations-s2">Kalai, A. T., Nachum, O., Vempala, S. S. and Zhang, E. "Why Language Models Hallucinate." OpenAI and Georgia Tech. arXiv 2509.04664, 4 September 2025. <a href="https://arxiv.org/abs/2509.04664" rel="noopener">arxiv.org/abs/2509.04664</a></li>
+    <li id="aic-ai-hallucinations-s3">Anthropic. "Tracing the thoughts of a large language model." 27 March 2025. <a href="https://www.anthropic.com/research/tracing-thoughts-language-model" rel="noopener">anthropic.com/research</a></li>
+    <li id="aic-ai-hallucinations-s4">Sharma, M. et al. "Towards Understanding Sycophancy in Language Models." Anthropic. arXiv 2310.13548, October 2023 (revised May 2025). <a href="https://arxiv.org/abs/2310.13548" rel="noopener">arxiv.org/abs/2310.13548</a></li>
+    <li id="aic-ai-hallucinations-s5">OpenAI. "OpenAI o3 and o4-mini System Card," Table 4 (PersonQA hallucination rate). 16 April 2025. <a href="https://cdn.openai.com/pdf/2221c875-02dc-4789-800b-e7758f3722c1/o3-and-o4-mini-system-card.pdf" rel="noopener">cdn.openai.com</a></li>
+    <li id="aic-ai-hallucinations-s6">Stanford HAI. "AI on Trial: Legal Models Hallucinate in 1 out of 6 (or More) Benchmarking Queries." 23 May 2024 (updated 30 May 2024). <a href="https://hai.stanford.edu/news/ai-trial-legal-models-hallucinate-1-out-6-or-more-benchmarking-queries" rel="noopener">hai.stanford.edu</a></li>
+    <li id="aic-ai-hallucinations-s7">European Broadcasting Union and BBC. "News Integrity in AI Assistants." 21 October 2025 (ChatGPT, Copilot, Gemini and Perplexity; 3,000+ answers in 14 languages). <a href="https://www.ebu.ch/research/open/report/news-integrity-in-ai-assistants" rel="noopener">ebu.ch</a>. Figures as reported by journalism.co.uk, "Nearly half of AI-generated answers contain an error, finds EBU-BBC report." <a href="https://www.journalism.co.uk/nearly-half-of-ai-generated-answers-contain-an-error-ebu-bbc-report/" rel="noopener">journalism.co.uk</a></li>
+  </ol>
+</section>
+</div>
+</article>
+<script>
+window.AICHANNEL_CONFIG = Object.assign({
+  coursesUrl: "#",             // "Learn with a member" (Central AI course schedule)
+  matchUrl: "#",               // "Get matched to someone" (advisory/consulting form)
+  newsletterUrl: "#",          // newsletter opt-in
+  contentBaseUrl: ""           // prefix for sibling pieces: contentBaseUrl + slug + ".html"
+}, window.AICHANNEL_CONFIG || {});
+(function () {
+  'use strict';
+  var ROOT = document.getElementById('aic-ai-hallucinations');
+  if (!ROOT) return;
+  var CFG = window.AICHANNEL_CONFIG;
+  var SLUG = 'ai-hallucinations';
+  var base = CFG.contentBaseUrl || '';
+  function each(sel, fn) { Array.prototype.forEach.call(ROOT.querySelectorAll(sel), fn); }
+  function utm() {
+    var o = {};
+    try { new URLSearchParams(window.location.search).forEach(function (v, k) { if (/^utm_/i.test(k)) o[k] = v; }); } catch (e) {}
+    return o;
+  }
+  function emit(name, extra) {
+    var d = { event: name, source_content_or_tool: SLUG, content_type: 'guide', audience: 'for-you;business;technical' };
+    for (var k in extra) if (Object.prototype.hasOwnProperty.call(extra, k)) d[k] = extra[k];
+    try { window.dispatchEvent(new CustomEvent('aichannel:event', { detail: d })); } catch (e) {}
+    try { if (window.parent && window.parent !== window) window.parent.postMessage(Object.assign({ type: 'aichannel:event' }, d), '*'); } catch (e) {}
+  }
+  function withParams(url, cta) {
+    if (!url || url === '#') return url || '#';
+    var p = { lead_type: cta === 'matchUrl' ? 'advisory' : (cta === 'coursesUrl' ? 'training' : 'newsletter'),
+              audience: 'for-you;business;technical', source_page: window.location.href, source_content_or_tool: SLUG, cta_clicked: cta };
+    var u = utm(); for (var k in u) p[k] = u[k];
+    var q = Object.keys(p).map(function (k) { return encodeURIComponent(k) + '=' + encodeURIComponent(p[k]); }).join('&');
+    return url + (url.indexOf('?') > -1 ? '&' : '?') + q;
+  }
+  each('a[data-aic-slug]', function (a) { a.href = base + a.getAttribute('data-aic-slug') + '.html'; });
+  each('a[data-aic-cfg]', function (a) {
+    var v = CFG[a.getAttribute('data-aic-cfg')];
+    a.href = (v && v !== '#') ? v : base + a.getAttribute('data-aic-fallback') + '.html';
+  });
+  each('a[data-aic-cta]', function (a) {
+    var key = a.getAttribute('data-aic-cta');
+    a.href = withParams(CFG[key], key);
+    a.addEventListener('click', function () { emit('cta_clicked', { cta_clicked: key, cta_label: a.textContent.trim() }); });
+  });
+  each('a[data-aic-slug], a[data-aic-cfg]', function (a) {
+    a.addEventListener('click', function () { emit('related_clicked', { target: a.getAttribute('data-aic-slug') || a.getAttribute('data-aic-cfg') }); });
+  });
+  each('[data-aic-print]', function (b) {
+    b.addEventListener('click', function () {
+      var card = b.getAttribute('data-aic-print') === 'card';
+      var sec = b.closest('.aic-section');
+      if (card && sec) { sec.classList.add('aic-has-card'); ROOT.classList.add('aic-printing-card'); }
+      emit('print_clicked', { what: card ? 'card' : 'page' });
+      try { window.print(); } catch (e) {}
+      if (card) setTimeout(function () { ROOT.classList.remove('aic-printing-card'); }, 400);
+    });
+  });
+  try { window.addEventListener('afterprint', function () { ROOT.classList.remove('aic-printing-card'); }); } catch (e) {}
+  emit('content_viewed', {});
+})();
+</script>
+<!-- ===== AIC:END ===== -->
+</body>
+</html>

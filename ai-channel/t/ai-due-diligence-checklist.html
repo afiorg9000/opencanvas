@@ -1,0 +1,898 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ai-due-diligence-checklist</title><style>html,body{margin:0;background:#F7F8FA}@media (prefers-color-scheme:dark){html,body{background:#F7F8FA}}</style></head><body>
+<!--
+Copy rewritten in house voice, 3 Nov 2026.
+TOOL: AI Due Diligence Checklist
+FILE: ai-due-diligence-checklist.html
+AUDIENCE: Business (owners, buyers, IT leads); also Executives and Government buyers (procurement).
+
+WHAT IT DOES: "Before your business adopts any AI tool, run through this checklist. Covers data, privacy,
+  compliance, and operational risk." 34 checks in eight areas (purpose and fit; data and confidentiality;
+  privacy; security; compliance and legal; output quality and oversight; operational and vendor risk; people and
+  adoption). Each check has five answer states: Yes / Partly / No / Not sure / N/A. Nine checks are marked
+  Critical: No or Not sure on a critical check = red flag; any other No / Partly / Not sure = condition (amber).
+  A "personal data: No" switch marks privacy checks N/A. Optional note per check. "Generate summary" builds a
+  printable summary (tool, vendor, use, reviewer, date; decision: Stop / Proceed with conditions / Ready to
+  proceed, marked Provisional while checks are unanswered; red flags; conditions; full table; sign-off lines)
+  with a print stylesheet that prints only the summary. Next step: copy the "Not sure" questions for the vendor
+  (or print). Solution step: matchUrl when red flags sit in data/privacy/security/compliance (or conditions remain);
+  coursesUrl when the gaps are in usage rules/training (or everything is in order). "Email me my results" +
+  separate newsletter link.
+
+DATA / SOURCES (as of November 2026): GDPR (Arts. 22, 28, 33, 35; transfers); EU AI Act, Regulation (EU)
+  2024/1689 as amended by Regulation (EU) 2026/1744 of 8 July 2026 (Art. 4 AI literacy since 2 Feb 2025, reworded
+  2026 to "take measures to support"; Art. 5 prohibitions since 2 Feb 2025, two more from 2 Dec 2026; Art. 50
+  transparency from 2 Aug 2026; high-risk duties from 2 Dec 2027 / 2 Aug 2028). AI Act wording updated 4 Nov 2026. One figure: "around 60% of Microsoft Copilot licences go unused within 90 days"
+  (LLPA member data, from the September 2026 AI Channel operating plan). Flag rules are a heuristic, not a
+  validated scoring model.
+
+PRIVACY: Runs entirely in the browser. Answers and notes are kept in sessionStorage for this tab only (so a
+  reload doesn't lose work); wrapped in try/catch, cleared when the tab closes or with "Start a new checklist".
+  No network requests or cookies.
+
+HOW TO EMBED IN WORDPRESS:
+  Option A — Custom HTML block: paste everything between AIC:START and AIC:END below (style + div + script).
+    CSS is scoped to .aic-tool, classes prefixed aic-, JS in an IIFE. Note: when printing from a WordPress page,
+    the theme's own header/footer may print too; the iframe option prints cleanly.
+  Option B — iframe: <iframe src="/path/ai-due-diligence-checklist.html" title="AI due diligence checklist"
+    style="width:100%;min-height:1400px;border:0" loading="lazy"></iframe>
+
+CONFIG URLS TO SET (window.AICHANNEL_CONFIG):
+  matchUrl       — "Get matched to someone" (advisory) — solution step when risks need review
+  coursesUrl     — "Learn with a member" — solution step when gaps are about training/adoption
+  resultsFormUrl — "Email me my results"
+  newsletterUrl  — separate newsletter opt-in
+  CTA query params: lead_type, audience, source_page, source_content_or_tool, cta_clicked, assessment_name,
+  assessment_result (decision label), plus utm_* from the page URL.
+
+TRACKING: 'aichannel:event' CustomEvent + parent.postMessage for tool_started (first answer), tool_completed and
+  result_viewed (summary generated), cta_clicked.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Due Diligence Checklist</title>
+<meta name="description" content="Before your business adopts any AI tool, run through this checklist. Covers data, privacy, compliance and operational risk, with a printable summary.">
+<!-- AI Channel design A: tool design system v2 (visual layer only; no behaviour changes) -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style id="aic-theme">
+/* ---------- tokens ---------- */
+:root,html{color-scheme:light!important;
+ --pine:#2859c7!important;--pine-deep:#1945ac!important;--accent:#2859c7!important;--accent-deep:#1945ac!important;--primary:#2859c7!important;--blue:#2859c7!important;--blue-d:#1945ac!important;
+ --paper:#ffffff!important;--bg:#ffffff!important;--white:#fff!important;--card:#fff!important;--ink:#14213d!important;--ink-soft:#3f4a5c!important;--ink-mute:#5b6577!important;--muted:#3f4a5c!important;
+ --line:#d9e2f0!important;--sage:#eef3fc!important;--amber-soft:#fbf3e4!important;--accent-wash:#eef3fc!important;--blue-wash:#eef3fc!important;--sky:#eef3fc!important;--pale:#f4f7fc!important;--warm:#f4f7fc!important;
+ --serif:"Newsreader",Georgia,serif!important;--sans:"Inter",system-ui,sans-serif!important;--mono:"IBM Plex Mono",ui-monospace,monospace!important}
+html body .aic-tool,html body .aic-article{
+ --aic-paper:#ffffff!important;--aic-white:#ffffff!important;--aic-ink:#14213d!important;--aic-soft:#46526a!important;--aic-line:#d9e2f0!important;--aic-sage:#eef3fc!important;
+ --aic-blue:#2859c7!important;--aic-blue-deep:#1945ac!important;--aic-blue-soft:#eef3fc!important;--aic-on-blue:#ffffff!important;--aic-focus:#9fbcff!important;
+ --aic-grey:#46526a!important;--aic-grey-soft:#f4f7fc!important;
+ --aic-radius:16px!important;--aic-radius-sm:12px!important;--aic-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important;
+ color-scheme:light!important;background:#fff!important;color:#14213d!important;
+ font-family:"Inter",system-ui,sans-serif!important;-webkit-font-smoothing:antialiased}
+html,body{background:#fff!important}
+html body .aic-tool{padding:56px 0 96px!important}
+html body .aic-article{padding:0 0 112px!important}
+html body .aic-tool .aic-col,html body .aic-article .aic-col{max-width:860px!important}
+@media(min-width:600px){html body .aic-tool .aic-col,html body .aic-article .aic-col{padding-inline:32px!important}}
+
+/* ---------- type ---------- */
+html body .aic-tool .aic-h1,html body .aic-article h1,body h1{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important;line-height:1.02!important;font-size:clamp(38px,5.4vw,62px)!important;color:#14213d}
+html body .aic-tool .aic-h2,html body .aic-article h2,body h2{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important;line-height:1.1!important}
+html body .aic-article h2{font-size:clamp(28px,3.6vw,38px)!important;margin-top:72px!important}
+html body .aic-tool .aic-h2{font-size:clamp(26px,3.4vw,36px)!important}
+html body .aic-tool .aic-h3,html body .aic-article h3,body h3{font-family:"Newsreader",Georgia,serif!important;font-weight:550!important;letter-spacing:-.01em!important;font-size:22px!important;line-height:1.2!important}
+body h4,body h5,body h6{font-family:"Inter",system-ui,sans-serif!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow,html body .aic-tool .aic-qnum,html body .aic-tool .aic-nav-hint,.aic-mono{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;letter-spacing:.06em!important;text-transform:uppercase;font-size:12px!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow{color:#2859c7!important;display:flex!important;align-items:center;gap:12px}
+html body .aic-tool .aic-eyebrow::before,html body .aic-article .aic-head .aic-eyebrow::before{content:"";width:28px;height:1px;background:#2859c7;flex:none}
+html body .aic-tool .aic-lede,html body .aic-article .aic-lede,html body .aic-article .aic-dek{font-size:20px!important;line-height:1.55!important;color:#3f4a5c!important;max-width:60ch}
+html body .aic-tool .aic-soft,html body .aic-tool .aic-small{color:#46526a!important}
+html body .aic-tool .aic-small{font-size:14px!important}
+html body .aic-article{font-size:18.5px!important;line-height:1.72!important}
+html body .aic-article p+p{margin-top:22px!important}
+html body .aic-article .aic-head{padding:72px 0 40px!important;border-bottom:1px solid #d9e2f0;margin-bottom:48px}
+html body .aic-article .aic-meta,html body .aic-article .aic-head p:not(.aic-lede):not(.aic-dek){font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px!important;letter-spacing:.03em;color:#5b6577!important}
+html body .aic-tool a,html body .aic-article a{color:#2859c7}
+
+/* ---------- panels ---------- */
+html body .aic-tool .aic-card,html body .aic-article .aic-card{background:#fff!important;border:1px solid #d9e2f0!important;border-radius:16px!important;box-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important}
+@media(min-width:600px){html body .aic-tool .aic-card{padding:36px 40px!important}html body .aic-article .aic-card{padding:32px 36px!important}}
+html body .aic-tool .aic-stack>*+*{margin-top:20px!important}
+html body .aic-tool .aic-grid2,html body .aic-article .aic-grid{gap:16px!important}
+/* the short answer: a framed figure, like the site's tool previews */
+html body .aic-article .aic-short{background:#fff!important;border:1px solid #d9e2f0!important;box-shadow:0 0 0 10px #eef3fc,0 0 0 11px #d9e2f0!important;margin:12px 11px 56px!important;border-radius:12px!important;border-left:1px solid #d9e2f0!important}
+html body .aic-article .aic-short .aic-eyebrow,html body .aic-article .aic-short>:first-child{color:#2859c7!important}
+/* notes and callouts */
+html body .aic-tool .aic-note,html body .aic-article .aic-note,html body .aic-article .aic-callout{background:#f4f7fc!important;border-left:3px solid #2859c7!important;border-radius:0 12px 12px 0!important;padding:18px 22px!important;font-size:15.5px!important;color:#14213d!important}
+html body .aic-tool .aic-note.aic-warn{background:#fdf7ec!important;border-left-color:#a46207!important}
+html body .aic-tool .aic-note.aic-bad{background:#fdf0ee!important;border-left-color:#b42318!important}
+html body .aic-tool .aic-note.aic-good{background:#eef8f1!important;border-left-color:#2f7a4e!important}
+/* calls to action become navy bands */
+html body .aic-tool .aic-cta,html body .aic-article .aic-cta,html body .aic-tool .aic-dark,html body .aic-article .aic-dark{--aic-ink:#ffffff!important;--aic-soft:#c9d6ee!important;--aic-white:#13264a!important;--aic-line:#2a3f6a!important;--aic-blue:#9fbcff!important;--aic-blue-soft:#1d3563!important;--aic-on-blue:#13264a!important;
+ background:#13264a!important;color:#fff!important;border-color:#13264a!important;box-shadow:none!important}
+html body .aic-tool .aic-cta *:not(.aic-btn):not(.aic-btn *),html body .aic-article .aic-cta *:not(.aic-btn):not(.aic-btn *){color:inherit}
+html body .aic-tool .aic-cta .aic-btn-primary,html body .aic-article .aic-cta .aic-btn-primary{background:#fff!important;color:#13264a!important;border-color:#fff!important}
+html body .aic-tool .aic-cta a:not(.aic-btn),html body .aic-article .aic-cta a:not(.aic-btn){color:#9fbcff!important}
+
+/* ---------- questions and answer options ---------- */
+html body .aic-tool .aic-q{margin-top:28px!important}
+html body .aic-tool .aic-qnum{color:#2859c7!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;font-size:clamp(22px,2.6vw,27px)!important;line-height:1.22!important;letter-spacing:-.01em!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qhint{font-size:15px!important;color:#46526a!important;margin-bottom:18px!important}
+html body .aic-tool .aic-opts{gap:10px!important;margin-top:18px!important}
+html body .aic-tool .aic-opt,html body .aic-tool .aic-pick,html body .aic-tool .aic-check{background:#fff!important;border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:16px 18px!important;font-size:16px!important;gap:14px!important;transition:border-color .15s,box-shadow .15s,background-color .15s,transform .15s!important}
+html body .aic-tool .aic-opt:hover,html body .aic-tool .aic-pick:hover,html body .aic-tool .aic-check:hover{border-color:#2859c7!important;box-shadow:0 6px 18px rgba(40,89,199,.10)!important;transform:translateY(-1px)}
+html body .aic-tool .aic-opt[aria-checked="true"],html body .aic-tool .aic-opt[aria-pressed="true"],html body .aic-tool .aic-pick:has(input:checked),html body .aic-tool .aic-check:has(input:checked),html body .aic-tool .aic-opt:has(input:checked){border-color:#2859c7!important;background:#f4f7fc!important;box-shadow:0 0 0 3px #dbe6fb!important}
+html body .aic-tool .aic-dot{width:22px!important;height:22px!important;border:2px solid #9aa8c0!important}
+html body .aic-tool .aic-dot::after{inset:4px!important;background:#2859c7!important}
+html body .aic-tool .aic-opt[aria-checked="true"] .aic-dot{border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-size:14px!important;color:#46526a!important;margin-top:4px!important}
+html body .aic-tool .aic-opt.aic-opt-unsure{background:transparent!important;border-style:dashed!important}
+html body .aic-tool input[type=text],html body .aic-tool input[type=search],html body .aic-tool input[type=email],html body .aic-tool textarea,html body .aic-tool select,html body .aic-tool .aic-input{border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:14px 16px!important;background:#fff!important;font-size:16px!important}
+html body .aic-tool input:focus,html body .aic-tool textarea:focus,html body .aic-tool select:focus{border-color:#2859c7!important;outline:none!important;box-shadow:0 0 0 3px #dbe6fb!important}
+
+/* ---------- controls ---------- */
+html body .aic-tool .aic-btn,html body .aic-article .aic-btn{min-height:50px!important;padding:14px 24px!important;font-weight:600!important;font-size:15px!important;border-radius:999px!important;border:1.5px solid #c9d6ee!important;box-shadow:none!important}
+html body .aic-tool .aic-btn:hover,html body .aic-article .aic-btn:hover{border-color:#2859c7!important}
+html body .aic-tool .aic-btn-primary,html body .aic-article .aic-btn-primary{background:#2859c7!important;border-color:#2859c7!important;color:#fff!important}
+html body .aic-tool .aic-btn-primary:hover,html body .aic-article .aic-btn-primary:hover{background:#1945ac!important;border-color:#1945ac!important}
+html body .aic-tool .aic-btn-ghost{border-color:transparent!important;text-decoration:underline;text-underline-offset:4px;color:#3f4a5c!important}
+html body .aic-tool .aic-btn[disabled]{opacity:.4!important}
+html body .aic-tool .aic-nav{margin-top:36px!important;padding-top:24px!important;border-top:1px solid #d9e2f0!important}
+html body .aic-tool .aic-actions{gap:12px!important}
+html body .aic-tool .aic-seg{border:1.5px solid #d9e2f0!important;padding:4px!important}
+html body .aic-tool .aic-seg button{font-weight:600!important;color:#3f4a5c!important}
+html body .aic-tool .aic-seg button[aria-pressed="true"],html body .aic-tool .aic-seg button[aria-checked="true"]{background:#13264a!important;color:#fff!important}
+html body .aic-tool .aic-progress{height:4px!important;background:#e3eaf6!important;margin:20px 0 8px!important}
+html body .aic-tool .aic-progress span,html body .aic-tool .aic-progress i{background:#2859c7!important}
+html body .aic-tool .aic-chip,html body .aic-tool .aic-pill{border:1.5px solid #d9e2f0!important;background:#fff!important;font-weight:600!important;border-radius:999px!important}
+html body .aic-tool .aic-chip[aria-pressed="true"],html body .aic-tool .aic-chip.aic-on,html body .aic-tool .aic-pill.aic-on{background:#eef3fc!important;border-color:#2859c7!important;color:#1945ac!important}
+html body .aic-tool .aic-tag,html body .aic-article .aic-tag{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;padding:5px 11px!important}
+html body .aic-tool .aic-privacy{font-size:14px!important;color:#46526a!important;margin-top:20px!important}
+
+/* ---------- results ---------- */
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-stat b,html body .aic-tool .aic-stat strong,html body .aic-tool .aic-display{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important}
+html body .aic-tool .aic-bar{height:8px!important;background:#e3eaf6!important}
+html body .aic-tool .aic-bar-row{padding:14px 0!important;border-bottom-color:#e3eaf6!important}
+html body .aic-tool .aic-bar-label{font-weight:600!important}
+html body .aic-tool table,html body .aic-article table{border-collapse:collapse}
+html body .aic-tool th,html body .aic-article th{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;text-transform:uppercase;color:#2859c7!important;background:#f4f7fc!important}
+html body .aic-tool td,html body .aic-article td{border-color:#e3eaf6!important}
+html body .aic-article .aic-sources,html body .aic-tool .aic-sources{font-size:14px!important;color:#46526a!important;border-top:1px solid #d9e2f0;padding-top:32px!important;margin-top:72px!important}
+html body .aic-article .aic-related,html body .aic-article .aic-deeper{margin-top:72px!important}
+
+/* ---------- pages outside the shared system ---------- */
+body:not(:has(.aic-tool)):not(:has(.aic-article)) h1,body:not(:has(.aic-tool)):not(:has(.aic-article)) h2,body:not(:has(.aic-tool)):not(:has(.aic-article)) h3{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important}
+html,body{font-family:"Inter",system-ui,sans-serif}
+input[type=range],input[type=checkbox],input[type=radio]{accent-color:#2859c7!important}
+:focus-visible{outline-color:#2859c7!important}
+[tabindex="-1"]:focus,h1:focus,h2:focus,h3:focus{outline:none!important;box-shadow:none!important}
+
+/* ================= v3: product-grade tool shell ================= */
+html,body{background:#f4f7fc!important}
+html body .aic-tool{background:#f4f7fc!important}
+html body .aic-tool .aic-col{max-width:980px!important}
+html body .aic-tool .aic-h1{font-size:clamp(40px,5vw,62px)!important;max-width:20ch}
+html body .aic-tool .aic-grid2>.aic-card{box-shadow:none!important;background:#fff!important;border-radius:14px!important}
+html body .aic-tool.aic-in-q .aic-h1{font-size:22px!important;line-height:1.2!important;max-width:none;margin:6px 0 20px!important;font-weight:500!important}
+html body .aic-tool.aic-in-q .aic-lede,html body .aic-tool.aic-in-q > .aic-col > .aic-privacy,html body .aic-tool.aic-in-q .aic-col > * > .aic-privacy{display:none!important}
+html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:56px 64px 44px!important;border:0!important;border-radius:24px!important;box-shadow:0 1px 0 rgba(19,38,74,.05),0 30px 70px rgba(19,38,74,.10)!important;min-height:460px}
+@media(max-width:700px){html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:32px 22px 28px!important;border-radius:18px!important;min-height:0}}
+html body .aic-tool .aic-progress{height:3px!important;background:#e3eaf6!important;border-radius:0!important;margin:14px 0 36px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-size:clamp(26px,3.2vw,38px)!important;line-height:1.12!important;letter-spacing:-.02em!important;margin-bottom:12px!important;max-width:28ch}
+html body .aic-tool .aic-qhint{font-size:16px!important;margin-bottom:24px!important}
+html body .aic-tool .aic-opts{counter-reset:aicopt;gap:12px!important}
+html body .aic-tool .aic-opt{counter-increment:aicopt;align-items:center!important;min-height:64px;padding:16px 20px!important;font-size:17px!important;font-weight:500;border-radius:14px!important}
+html body .aic-tool .aic-opt .aic-dot{display:none!important}
+html body .aic-tool .aic-opt::before{content:counter(aicopt,upper-alpha);flex:none;width:30px;height:30px;display:grid;place-items:center;border:1.5px solid #c9d6ee;border-radius:8px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;font-weight:500;color:#2859c7;background:#fff;transition:all .15s}
+html body .aic-tool .aic-opt:hover::before{border-color:#2859c7}
+html body .aic-tool .aic-opt[aria-checked="true"]::before{background:#2859c7;border-color:#2859c7;color:#fff;content:"\2713"}
+html body .aic-tool .aic-opt[aria-checked="true"]{background:#eef3fc!important;box-shadow:0 0 0 2px #2859c7!important;border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-weight:400}
+html body .aic-tool .aic-nav{border-top:0!important;margin-top:40px!important;padding-top:0!important}
+html body .aic-tool .aic-nav .aic-btn-primary{min-width:150px}
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-display{font-size:clamp(56px,8vw,96px)!important;line-height:.95!important;color:#14213d}
+
+/* ================= v4: legibility ================= */
+html body .aic-tool{font-size:17px!important;line-height:1.6!important}
+html body .aic-tool,html body .aic-article{--aic-soft:#334055!important}
+html body .aic-tool .aic-small,html body .aic-tool .aic-opt-sub,html body .aic-tool .aic-privacy,html body .aic-tool .aic-nav-hint{font-size:15px!important;color:#334055!important}
+html body .aic-tool p,html body .aic-tool li{color:#1d2a44}
+html body .aic-tool .aic-lede{font-size:20px!important;color:#2a364d!important}
+html body .aic-tool .aic-note{font-size:16.5px!important}
+html body .aic-tool .aic-opt{font-size:18px!important;color:#14213d!important}
+html body .aic-tool .aic-qhint{font-size:17px!important;color:#334055!important}
+html body .aic-tool .aic-eyebrow,html body .aic-tool .aic-qnum,.aic-mono{font-size:12.5px!important;color:#2859c7!important;letter-spacing:.05em!important}
+html body .aic-tool .aic-tag{font-size:12.5px!important}
+html body .aic-tool th,html body .aic-article th{font-size:12.5px!important}
+html body .aic-tool td{font-size:16px}
+html body .aic-article{color:#14213d!important}
+html body .aic-article p,html body .aic-article li{color:#1d2a44}
+</style>
+<script>
+(function(){
+  function hsl(c){var m=c&&c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/);if(!m)return null;var r=m[1]/255,g=m[2]/255,b=m[3]/255,a=m[4]===undefined?1:+m[4];
+    var mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn,s=d?d/(1-Math.abs(2*l-1)):0,h=0;
+    if(d){h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;if(h<0)h+=360}return {h:h,s:s,l:l,a:a}}
+  function blue(c){var x=hsl(c);return x&&x.a>0.05&&x.s>0.3&&x.l>0.28&&x.l<0.95&&x.h>=205&&x.h<=240?x:null}
+  function N(x,dark,light){return x.a<0.95?"rgba(40,89,199,"+Math.min(x.a,0.12).toFixed(3)+")":(x.l>0.82?light:dark)}
+  function fix(el){var c0=getComputedStyle(el),bg=hsl(c0.backgroundColor),fg=hsl(c0.color);if(bg&&fg&&bg.a>0.9&&bg.l<0.6&&bg.s>0.3&&bg.h>=205&&bg.h<=240&&fg.l<0.6)el.style.setProperty("color","#ffffff","important");
+    if(el.closest(".aic-cta,.aic-dark")||el.matches(".aic-opt,.aic-pick,.aic-check,.aic-btn,.aic-chip,.aic-pill,.aic-seg button,.aic-card,.aic-note"))return;var cs=getComputedStyle(el),x;
+    if((x=blue(cs.color)))el.style.setProperty("color",x.l>0.75?"#eef3fc":"#2859c7","important");
+    if((x=blue(cs.backgroundColor)))el.style.setProperty("background-color",N(x,"#2859c7",x.l>0.9?"#eef3fc":"#d6e2f8"),"important");
+    if(el instanceof SVGElement){if((x=blue(cs.fill)))el.style.setProperty("fill",N(x,"#2859c7","#eef3fc"),"important");if((x=blue(cs.stroke)))el.style.setProperty("stroke",N(x,"#2859c7","#d6e2f8"),"important")}
+    if(cs.textTransform==="uppercase"&&parseFloat(cs.fontSize)<=13.5&&!el.closest("button")&&!el.classList.contains("aic-mono"))el.classList.add("aic-mono");}
+  var t;function mode(){document.querySelectorAll(".aic-tool").forEach(function(r){var q=[].some.call(r.querySelectorAll(".aic-progress,.aic-qtext,.aic-q-text"),function(e){return e.offsetParent!==null});if(q!==r.classList.contains("aic-in-q"))r.classList.toggle("aic-in-q",q)})}
+  function run(){clearTimeout(t);t=setTimeout(function(){mode();document.querySelectorAll("body *").forEach(fix)},30)}
+  document.addEventListener("DOMContentLoaded",function(){run();new MutationObserver(run).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class","aria-pressed","aria-checked","data-state"]});
+    document.addEventListener("change",run,true);document.addEventListener("click",run,true);});
+})();
+</script>
+</head>
+<body style="margin:0;background:#F7F8FA">
+<!-- ===== AIC:START — for a WordPress Custom HTML block, paste everything from here to AIC:END ===== -->
+<style>
+/* ===== AI Channel tool base (scoped to .aic-tool) ===== */
+.aic-tool{
+  --aic-paper:#F7F8FA; --aic-white:#FFFFFF; --aic-ink:#162033; --aic-soft:#667085; --aic-line:#DEE3EA; --aic-sage:#EEF1F6;
+  --aic-blue:#315EFB; --aic-blue-deep:#2448C9; --aic-blue-soft:#EEF3FF; --aic-on-blue:#FFFFFF;
+  --aic-amber:#A46207; --aic-amber-soft:#FBF3E4; --aic-green:#2F7A4E; --aic-green-soft:#E9F5EE;
+  --aic-red:#B42318; --aic-red-soft:#FDEDEB; --aic-violet:#6D5BD0; --aic-violet-soft:#F1EFFC;
+  --aic-radius:18px; --aic-radius-sm:12px; --aic-shadow:0 10px 28px rgba(21,32,51,.055);
+  background:var(--aic-paper); color:var(--aic-ink);
+  font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size:16px; line-height:1.55; padding:32px 0 56px; -webkit-text-size-adjust:100%; text-align:left;
+}
+@media (prefers-color-scheme:dark){
+  .aic-tool{
+    --aic-paper:#101B2D; --aic-white:#162033; --aic-ink:#F2F4F8; --aic-soft:#A6B3C7; --aic-line:#2A3850; --aic-sage:#1E2A40;
+    --aic-blue:#7A97FF; --aic-blue-deep:#9BB2FF; --aic-blue-soft:#1F2B45; --aic-on-blue:#0B1426;
+    --aic-amber:#E0A34A; --aic-amber-soft:#2D2617; --aic-green:#6FC592; --aic-green-soft:#15302A;
+    --aic-red:#F97066; --aic-red-soft:#3A1E22; --aic-violet:#A99CF0; --aic-violet-soft:#25223F; --aic-shadow:none; color-scheme:dark;
+  }
+}
+.aic-tool *,.aic-tool *::before,.aic-tool *::after{box-sizing:border-box}
+.aic-tool h1,.aic-tool h2,.aic-tool h3,.aic-tool h4,.aic-tool p,.aic-tool ul,.aic-tool ol,.aic-tool li,.aic-tool fieldset,.aic-tool legend{margin:0;padding:0}
+.aic-tool ul,.aic-tool ol{list-style:none}
+.aic-tool fieldset{border:0;min-width:0}
+.aic-tool button,.aic-tool input,.aic-tool textarea,.aic-tool select{font:inherit;color:inherit}
+.aic-tool a{color:var(--aic-blue);font-weight:700;text-decoration:none}
+.aic-tool a:hover{text-decoration:underline}
+.aic-tool :focus-visible{outline:3px solid #9DB2FF;outline-offset:2px;border-radius:8px}
+.aic-tool [hidden]{display:none!important}
+.aic-tool .aic-sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;margin:-1px;padding:0;border:0}
+.aic-tool .aic-col{max-width:800px;margin:0 auto;padding-inline:16px}
+@media (min-width:600px){.aic-tool .aic-col{padding-inline:24px}}
+.aic-tool .aic-eyebrow{display:block;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--aic-blue)}
+.aic-tool .aic-h1{font-size:clamp(30px,6.4vw,50px);line-height:1.04;font-weight:800;letter-spacing:-.035em;margin:12px 0 16px}
+.aic-tool .aic-h2{font-size:clamp(24px,4.4vw,34px);line-height:1.1;font-weight:800;letter-spacing:-.035em;margin:8px 0 10px}
+.aic-tool .aic-h3{font-size:19px;line-height:1.25;font-weight:800;letter-spacing:-.02em;margin:0 0 6px}
+.aic-tool .aic-lede{font-size:18px;color:var(--aic-soft);max-width:640px}
+.aic-tool .aic-soft{color:var(--aic-soft)}
+.aic-tool .aic-small{font-size:13.5px;color:var(--aic-soft);line-height:1.55}
+.aic-tool .aic-card{background:var(--aic-white);border:1px solid var(--aic-line);border-radius:var(--aic-radius);box-shadow:var(--aic-shadow);padding:22px}
+@media (min-width:600px){.aic-tool .aic-card{padding:26px 28px}}
+.aic-tool .aic-stack>*+*{margin-top:14px}
+.aic-tool .aic-grid2{display:grid;gap:12px;grid-template-columns:1fr}
+@media (min-width:640px){.aic-tool .aic-grid2{grid-template-columns:1fr 1fr}}
+.aic-tool .aic-fade{animation:aicFade .35s ease both}
+@keyframes aicFade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* Buttons */
+.aic-tool .aic-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;min-height:46px;border-radius:999px;border:1px solid var(--aic-line);background:var(--aic-white);color:var(--aic-ink);font-weight:750;font-size:15px;cursor:pointer;text-decoration:none;line-height:1.2;transition:background .15s,border-color .15s,transform .15s}
+.aic-tool .aic-btn:hover{border-color:#B8C7FF;text-decoration:none}
+.aic-tool .aic-btn-primary{background:var(--aic-blue);border-color:var(--aic-blue);color:var(--aic-on-blue);box-shadow:0 6px 16px rgba(49,94,251,.14)}
+.aic-tool .aic-btn-primary:hover{background:var(--aic-blue-deep);border-color:var(--aic-blue-deep);color:var(--aic-on-blue)}
+.aic-tool .aic-btn-ghost{background:none;border-color:transparent;color:var(--aic-soft);padding-inline:10px}
+.aic-tool .aic-btn-ghost:hover{color:var(--aic-ink);border-color:transparent}
+.aic-tool .aic-btn[disabled]{opacity:.45;cursor:not-allowed;box-shadow:none}
+.aic-tool .aic-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.aic-tool .aic-nav{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-top:22px;padding-top:18px;border-top:1px solid var(--aic-line)}
+.aic-tool .aic-nav-hint{font-size:13px;color:var(--aic-soft);font-weight:650}
+
+/* Segmented switch */
+.aic-tool .aic-seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--aic-line);border-radius:999px;background:var(--aic-white);padding:3px;gap:2px}
+.aic-tool .aic-seg button{border:0;background:none;padding:9px 15px;border-radius:999px;font-size:14px;font-weight:750;color:var(--aic-soft);cursor:pointer;min-height:40px}
+.aic-tool .aic-seg button[aria-pressed="true"],.aic-tool .aic-seg button[aria-checked="true"]{background:var(--aic-blue);color:var(--aic-on-blue)}
+
+/* Progress */
+.aic-tool .aic-progress{height:6px;border-radius:999px;background:var(--aic-sage);overflow:hidden;margin:14px 0 4px}
+.aic-tool .aic-progress span{display:block;height:100%;width:0;background:var(--aic-blue);border-radius:999px;transition:width .35s ease}
+
+/* Radio-style options */
+.aic-tool .aic-q{margin-top:14px}
+.aic-tool .aic-qnum{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--aic-soft);margin-bottom:6px}
+.aic-tool .aic-qtext{font-size:18px;font-weight:750;line-height:1.35;letter-spacing:-.01em;margin-bottom:6px}
+.aic-tool .aic-qhint{font-size:14px;color:var(--aic-soft);margin-bottom:12px}
+.aic-tool .aic-opts{display:grid;gap:8px;margin-top:12px}
+.aic-tool .aic-opt{display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;padding:12px 14px;border:1px solid var(--aic-line);border-radius:var(--aic-radius-sm);background:var(--aic-paper);cursor:pointer;font-size:15.5px;line-height:1.4;transition:border-color .15s,background .15s}
+.aic-tool .aic-opt:hover{border-color:#B8C7FF;background:var(--aic-white)}
+.aic-tool .aic-dot{flex:none;width:18px;height:18px;border-radius:50%;border:2px solid #A9B4C6;margin-top:1px;position:relative}
+.aic-tool .aic-opt[data-multi] .aic-dot{border-radius:5px}
+.aic-tool .aic-dot::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--aic-blue);transform:scale(0);transition:transform .15s}
+.aic-tool .aic-opt[data-multi] .aic-dot::after{border-radius:2px}
+.aic-tool .aic-opt[aria-checked="true"]{border-color:var(--aic-blue);background:var(--aic-white);box-shadow:0 0 0 3px var(--aic-blue-soft)}
+.aic-tool .aic-opt[aria-checked="true"] .aic-dot{border-color:var(--aic-blue)}
+.aic-tool .aic-opt[aria-checked="true"] .aic-dot::after{transform:scale(1)}
+.aic-tool .aic-opt-sub{display:block;font-size:13.5px;color:var(--aic-soft);margin-top:2px}
+.aic-tool .aic-opt.aic-opt-unsure{background:none;border-style:dashed}
+
+/* Callouts and tags */
+.aic-tool .aic-note{border-radius:var(--aic-radius-sm);padding:14px 16px;background:var(--aic-blue-soft);border-left:3px solid var(--aic-blue);font-size:15px;color:var(--aic-ink)}
+.aic-tool .aic-note.aic-warn{background:var(--aic-amber-soft);border-left-color:var(--aic-amber)}
+.aic-tool .aic-note.aic-bad{background:var(--aic-red-soft);border-left-color:var(--aic-red)}
+.aic-tool .aic-note.aic-good{background:var(--aic-green-soft);border-left-color:var(--aic-green)}
+.aic-tool .aic-note strong{font-weight:800}
+.aic-tool .aic-tag{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:5px 10px;border-radius:999px;background:var(--aic-sage);color:var(--aic-soft);max-width:100%;white-space:normal;line-height:1.35}
+.aic-tool .aic-tag.aic-t-good{background:var(--aic-green-soft);color:var(--aic-green)}
+.aic-tool .aic-tag.aic-t-warn{background:var(--aic-amber-soft);color:var(--aic-amber)}
+.aic-tool .aic-tag.aic-t-bad{background:var(--aic-red-soft);color:var(--aic-red)}
+.aic-tool .aic-tag.aic-t-blue{background:var(--aic-blue-soft);color:var(--aic-blue)}
+.aic-tool .aic-privacy{display:flex;gap:8px;align-items:flex-start;font-size:13.5px;color:var(--aic-soft);margin-top:14px}
+.aic-tool .aic-privacy svg{flex:none;margin-top:3px}
+
+/* Bars */
+.aic-tool .aic-bars{display:grid;gap:4px}
+.aic-tool .aic-bar-row{display:grid;grid-template-columns:1fr 48px;gap:6px 12px;align-items:center;padding:9px 0;border-bottom:1px solid var(--aic-line)}
+.aic-tool .aic-bar-row:last-child{border-bottom:0}
+.aic-tool .aic-bar-label{grid-column:1/-1;font-weight:750;font-size:15px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+@media (min-width:640px){.aic-tool .aic-bar-row{grid-template-columns:230px 1fr 48px}.aic-tool .aic-bar-label{grid-column:auto}}
+.aic-tool .aic-bar{display:block;height:10px;border-radius:999px;background:var(--aic-sage);overflow:hidden}
+.aic-tool .aic-bar i{display:block;height:100%;border-radius:999px;background:var(--aic-green);width:0;transition:width .8s ease}
+.aic-tool .aic-bar i.aic-mid{background:var(--aic-amber)}
+.aic-tool .aic-bar i.aic-low{background:var(--aic-red)}
+.aic-tool .aic-bar-pct{font-weight:800;font-variant-numeric:tabular-nums;text-align:right;font-size:14px}
+
+.aic-tool .aic-list li{position:relative;padding-left:18px;margin-top:8px}
+.aic-tool .aic-list li::before{content:"";position:absolute;left:2px;top:.62em;width:7px;height:7px;border-radius:50%;background:var(--aic-blue)}
+/* Results hand-off */
+.aic-tool .aic-next{display:grid;gap:12px;grid-template-columns:1fr}
+@media (min-width:700px){.aic-tool .aic-next{grid-template-columns:1fr 1fr}}
+.aic-tool .aic-next .aic-card{display:flex;flex-direction:column;gap:10px}
+.aic-tool .aic-next .aic-card .aic-btn{align-self:flex-start;margin-top:auto}
+.aic-tool .aic-solution{border-color:#C7D3FF;background:linear-gradient(180deg,var(--aic-blue-soft),var(--aic-white) 70%)}
+.aic-tool .aic-handoff{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;font-size:14px;margin-top:6px}
+.aic-tool .aic-linkbtn{background:none;border:0;padding:4px 0;color:var(--aic-blue);font-weight:750;cursor:pointer;text-decoration:underline;text-underline-offset:3px;font-size:14px}
+.aic-tool .aic-sources{font-size:13px;color:var(--aic-soft);line-height:1.6}
+.aic-tool .aic-sources a{font-weight:650}
+.aic-tool details.aic-more{border-top:1px solid var(--aic-line);padding-top:4px}
+.aic-tool details.aic-more summary{cursor:pointer;padding:12px 0;font-weight:800;list-style:none;display:flex;justify-content:space-between;gap:10px}
+.aic-tool details.aic-more summary::-webkit-details-marker{display:none}
+.aic-tool details.aic-more summary::after{content:"+";color:var(--aic-soft)}
+.aic-tool details.aic-more[open] summary::after{content:"\2013"}
+
+@media (prefers-reduced-motion:reduce){
+  .aic-tool .aic-fade{animation:none}
+  .aic-tool *{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+}
+@media print{
+  .aic-tool{--aic-paper:#fff;--aic-white:#fff;--aic-ink:#000;--aic-soft:#444;--aic-line:#bbb;--aic-sage:#eee;--aic-blue:#2448C9;--aic-blue-soft:#EEF3FF;--aic-amber:#8A5206;--aic-amber-soft:#FBF3E4;--aic-green:#2F7A4E;--aic-green-soft:#E9F5EE;--aic-red:#B42318;--aic-red-soft:#FDEDEB;--aic-shadow:none;background:#fff!important;color:#000;padding:0;font-size:11pt}
+  .aic-tool .aic-noprint{display:none!important}
+  .aic-tool .aic-card{box-shadow:none;border-color:#bbb;break-inside:avoid;padding:14px 16px}
+  .aic-tool .aic-col{max-width:none;padding:0}
+  .aic-tool .aic-bar i,.aic-tool .aic-tag,.aic-tool .aic-note{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .aic-tool a{color:#000;text-decoration:underline}
+}
+
+/* due diligence checklist */
+.aic-tool .aic-dd-meta{display:grid;gap:12px;grid-template-columns:1fr;margin-top:10px}
+@media (min-width:640px){.aic-tool .aic-dd-meta{grid-template-columns:1fr 1fr}}
+.aic-tool .aic-dd-field{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:750;color:var(--aic-soft)}
+.aic-tool .aic-dd-field input,.aic-tool .aic-dd-note{width:100%;padding:11px 13px;border:1px solid var(--aic-line);border-radius:12px;background:var(--aic-paper);color:var(--aic-ink);font-size:15px;font-weight:500}
+.aic-tool .aic-dd-field input:focus,.aic-tool .aic-dd-note:focus{border-color:#A9BAFF;outline:3px solid #C9D5FF;outline-offset:0}
+.aic-tool .aic-dd-sechead{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap}
+.aic-tool .aic-dd-items{margin-top:6px}
+.aic-tool .aic-dd-item{padding:16px 0;border-bottom:1px solid var(--aic-line)}
+.aic-tool .aic-dd-item:last-child{border-bottom:0;padding-bottom:0}
+.aic-tool .aic-dd-itop{display:grid;grid-template-columns:28px 1fr;gap:10px}
+.aic-tool .aic-dd-n{font-size:13px;font-weight:800;color:var(--aic-soft);font-variant-numeric:tabular-nums;padding-top:2px}
+.aic-tool .aic-dd-t{font-weight:700;font-size:16px;line-height:1.4;margin-bottom:3px}
+.aic-tool .aic-dd-crit{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--aic-red);border:1px solid currentColor;border-radius:999px;padding:1px 7px;vertical-align:2px;white-space:nowrap}
+.aic-tool .aic-dd-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:10px 0 0 38px}
+@media (max-width:480px){.aic-tool .aic-dd-row{margin-left:0}}
+.aic-tool .aic-dd-ans{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;flex:1 1 320px;max-width:470px}
+.aic-tool .aic-dd-ans button{border:1px solid var(--aic-line);background:var(--aic-paper);border-radius:999px;padding:8px 4px;min-height:40px;font-size:13.5px;font-weight:750;color:var(--aic-soft);cursor:pointer;line-height:1.15}
+.aic-tool .aic-dd-ans button:hover{border-color:#B8C7FF;color:var(--aic-ink)}
+.aic-tool .aic-dd-ans button[aria-checked="true"]{color:#fff;border-color:transparent}
+.aic-tool .aic-dd-ans .aic-dd-yes[aria-checked="true"]{background:var(--aic-green)}
+.aic-tool .aic-dd-ans .aic-dd-part[aria-checked="true"]{background:var(--aic-amber)}
+.aic-tool .aic-dd-ans .aic-dd-no[aria-checked="true"]{background:var(--aic-red)}
+.aic-tool .aic-dd-ans .aic-dd-unsure[aria-checked="true"]{background:var(--aic-violet)}
+.aic-tool .aic-dd-ans .aic-dd-na[aria-checked="true"]{background:var(--aic-soft)}
+@media (prefers-color-scheme:dark){.aic-tool .aic-dd-ans button[aria-checked="true"]{color:#0B1426}}
+.aic-tool .aic-dd-item[data-state="red"]{box-shadow:inset 3px 0 0 var(--aic-red);padding-left:12px;margin-left:-12px}
+.aic-tool .aic-dd-notebtn{margin:6px 0 0 38px;font-size:13px}
+@media (max-width:480px){.aic-tool .aic-dd-notebtn{margin-left:0}}
+.aic-tool .aic-dd-note{margin-top:6px;resize:vertical;min-height:60px}
+.aic-tool .aic-dd-tally{position:sticky;bottom:10px;z-index:5;margin-top:16px;display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;background:var(--aic-white);border:1px solid var(--aic-line);border-radius:999px;padding:8px 8px 8px 18px;box-shadow:0 10px 30px rgba(21,32,51,.12);font-size:14px}
+@media (max-width:420px){.aic-tool .aic-dd-tally{border-radius:18px;padding:10px 12px}.aic-tool .aic-dd-tally .aic-btn{width:100%}}
+.aic-tool .aic-dd-tr{color:var(--aic-red);font-weight:800}
+.aic-tool .aic-dd-ta{color:var(--aic-amber);font-weight:800}
+.aic-tool .aic-dd-tg{color:var(--aic-green);font-weight:800}
+.aic-tool .aic-dd-summary{margin-top:28px}
+.aic-tool .aic-dd-dl{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin:12px 0 16px}
+@media (min-width:700px){.aic-tool .aic-dd-dl{grid-template-columns:repeat(4,1fr)}}
+.aic-tool .aic-dd-dl dt{font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--aic-soft)}
+.aic-tool .aic-dd-dl dd{margin:2px 0 0;font-weight:650;overflow-wrap:anywhere}
+.aic-tool .aic-dd-decision{border-radius:14px;padding:16px 18px;background:var(--aic-sage)}
+.aic-tool .aic-dd-d-bad{background:var(--aic-red-soft)}
+.aic-tool .aic-dd-d-warn{background:var(--aic-amber-soft)}
+.aic-tool .aic-dd-d-good{background:var(--aic-green-soft)}
+.aic-tool .aic-dd-counts{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:14px;font-size:14px;color:var(--aic-soft)}
+.aic-tool .aic-dd-counts b{font-size:20px;color:var(--aic-ink);margin-right:3px;font-variant-numeric:tabular-nums}
+.aic-tool .aic-dd-counts b.aic-dd-tr{color:var(--aic-red)}.aic-tool .aic-dd-counts b.aic-dd-ta{color:var(--aic-amber)}.aic-tool .aic-dd-counts b.aic-dd-tg{color:var(--aic-green)}
+.aic-tool .aic-dd-flist{list-style:decimal;padding-left:22px;margin-top:8px}
+.aic-tool .aic-dd-flist li{margin-top:8px;padding-left:4px}
+.aic-tool .aic-dd-fred li::marker{color:var(--aic-red);font-weight:800}
+.aic-tool .aic-dd-famber li::marker{color:var(--aic-amber);font-weight:800}
+.aic-tool .aic-dd-table{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px}
+.aic-tool .aic-dd-table caption{text-align:left;font-weight:800;padding:6px 0}
+.aic-tool .aic-dd-table th{text-align:left;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--aic-soft);border-bottom:1px solid var(--aic-line);padding:6px 6px 6px 0}
+.aic-tool .aic-dd-table td{border-bottom:1px solid var(--aic-line);padding:8px 6px 8px 0;vertical-align:top}
+.aic-tool .aic-dd-table td:nth-child(2),.aic-tool .aic-dd-table td:nth-child(3){white-space:nowrap;width:1%}
+@media (max-width:480px){.aic-tool .aic-dd-table td:nth-child(3),.aic-tool .aic-dd-table th:nth-child(3){display:none}}
+.aic-tool .aic-dd-sign{margin-top:20px;padding-top:14px;border-top:1px dashed var(--aic-line);font-size:14px}
+.aic-tool .aic-dd-sign p{margin-top:10px}
+@media print{
+  .aic-tool.aic-dd-has-summary .aic-dd-form{display:none!important}
+  .aic-tool .aic-dd-summary{margin-top:0}
+  .aic-tool .aic-dd-full summary::after{display:none}
+  .aic-tool .aic-dd-table td:nth-child(3),.aic-tool .aic-dd-table th:nth-child(3){display:table-cell}
+  .aic-tool .aic-dd-table tr{break-inside:avoid}
+  .aic-tool .aic-dd-sumcard{border:0;padding:0}
+  .aic-tool .aic-dd-decision{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .aic-tool .aic-dd-tally{display:none}
+}
+</style>
+<div class="aic-tool" id="aic-ai-due-diligence-checklist"><noscript><div class="aic-col"><p>This checklist needs JavaScript to run. It all happens in your browser, and nothing is sent.</p></div></noscript></div>
+<script>
+window.AICHANNEL_CONFIG = Object.assign({
+  resultsFormUrl: "#",      // "Email me my results" form (WordPress form page)
+  coursesUrl: "#",          // "Learn with a member" (Central AI course schedule)
+  matchUrl: "#",            // "Get matched to someone" (advisory/consulting form)
+  newsletterUrl: "#"        // separate newsletter opt-in
+}, window.AICHANNEL_CONFIG || {});
+(function () {
+  'use strict';
+  /* ---------- Shared helpers (results hand-off, events, DOM) ---------- */
+  var CFG = window.AICHANNEL_CONFIG;
+  var reducedMotion = false;
+  try { reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function $(sel, ctx) { return (ctx || ROOT).querySelector(sel); }
+  function $$(sel, ctx) { return Array.prototype.slice.call((ctx || ROOT).querySelectorAll(sel)); }
+
+  function utmParams() {
+    var out = {};
+    try {
+      var sp = new URLSearchParams(window.location.search);
+      sp.forEach(function (v, k) { if (/^utm_/i.test(k)) out[k] = v; });
+    } catch (e) {}
+    return out;
+  }
+
+  /* Fires a DOM event and a postMessage so GA4/GTM on the host page can track. No direct analytics calls. */
+  function emit(name, extra) {
+    var detail = { event: name, tool: SLUG, assessment_name: TOOL_NAME, audience: currentAudience() };
+    if (extra) for (var k in extra) if (Object.prototype.hasOwnProperty.call(extra, k)) detail[k] = extra[k];
+    try { window.dispatchEvent(new CustomEvent('aichannel:event', { detail: detail })); } catch (e) {}
+    try {
+      var msg = { type: 'aichannel:event' };
+      for (var j in detail) msg[j] = detail[j];
+      window.parent.postMessage(msg, '*');
+    } catch (e) {}
+  }
+
+  /* Builds the "Email me my results" / CTA URL with the lead fields from the brief. */
+  function buildUrl(base, cta, result) {
+    var params = {
+      lead_type: result.lead_type || 'tool_result',
+      audience: currentAudience(),
+      source_page: window.location.href,
+      source_content_or_tool: SLUG,
+      cta_clicked: cta,
+      assessment_name: TOOL_NAME,
+      assessment_result: result.label || ''
+    };
+    if (result.score != null) params.score = String(result.score);
+    var utm = utmParams();
+    for (var u in utm) params[u] = utm[u];
+    var url;
+    try {
+      url = new URL(base || '#', window.location.href);
+      for (var p in params) url.searchParams.set(p, params[p]);
+      return url.toString();
+    } catch (e) {
+      var qs = Object.keys(params).map(function (k) { return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]); }).join('&');
+      return (base || '#') + (String(base).indexOf('?') > -1 ? '&' : '?') + qs;
+    }
+  }
+
+  /* Wires every [data-aic-cta] link inside a container: sets href and tracks the click. */
+  function wireCtas(container, result) {
+    $$('[data-aic-cta]', container).forEach(function (a) {
+      var kind = a.getAttribute('data-aic-cta');
+      var base = CFG[a.getAttribute('data-aic-url')] || '#';
+      a.setAttribute('href', kind === 'newsletter' ? base : buildUrl(base, kind, result));
+      a.addEventListener('click', function () {
+        emit('cta_clicked', { cta_clicked: kind, assessment_result: result.label || '', score: result.score == null ? null : result.score });
+      });
+    });
+  }
+
+  function focusHeading(el) {
+    if (!el) return;
+    el.setAttribute('tabindex', '-1');
+    try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
+  }
+  function scrollToEl(el) {
+    if (!el) return;
+    try { el.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' }); } catch (e) { el.scrollIntoView(); }
+  }
+
+  /* Arrow-key movement inside role=radiogroup option lists */
+  function radioKeys(container, onSelect) {
+    container.addEventListener('keydown', function (e) {
+      var opt = e.target.closest && e.target.closest('[role="radio"]');
+      if (!opt) return;
+      var group = opt.closest('[role="radiogroup"]');
+      var opts = $$('[role="radio"]', group);
+      var i = opts.indexOf(opt), n = null;
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') n = opts[(i + 1) % opts.length];
+      if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') n = opts[(i - 1 + opts.length) % opts.length];
+      if (n) { e.preventDefault(); n.focus(); onSelect(n); }
+    });
+  }
+  /* Roving tabindex so each radiogroup is one tab stop */
+  function rovingTabs(group) {
+    var opts = $$('[role="radio"]', group);
+    var checked = opts.filter(function (o) { return o.getAttribute('aria-checked') === 'true'; })[0] || opts[0];
+    opts.forEach(function (o) { o.setAttribute('tabindex', o === checked ? '0' : '-1'); });
+  }
+
+  var LOCK_SVG = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="2" y="6" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M4.5 6V4.5a2.5 2.5 0 015 0V6" stroke="currentColor" stroke-width="1.5"/></svg>';
+
+  /* ---------- Tool: AI due diligence checklist ---------- */
+  var SLUG = 'ai-due-diligence-checklist';
+  var TOOL_NAME = 'AI Due Diligence Checklist';
+  var ROOT = document.getElementById('aic-' + SLUG);
+  if (!ROOT) return;
+  function currentAudience() { return 'business'; }
+
+  var STORE_KEY = 'aic-dd-v1';
+  var S = { meta: { tool: '', vendor: '', use: '', who: '', date: new Date().toISOString().slice(0, 10) }, personal: null, ans: {}, notes: {} };
+  var started = false;
+
+  var STATES = [
+    { v: 'yes', label: 'Yes' },
+    { v: 'part', label: 'Partly' },
+    { v: 'no', label: 'No' },
+    { v: 'unsure', label: 'Not sure' },
+    { v: 'na', label: 'N/A' }
+  ];
+
+  var SECTIONS = [
+    { id: 'pf', title: 'Purpose and fit', items: [
+      { id: 'pf1', t: 'We can state the problem this tool solves, and how we will measure whether it worked.', why: 'Without a success measure you can’t tell, three months in, whether to keep paying.' },
+      { id: 'pf2', t: 'We have tested it on our own real (non-confidential) examples, not only the vendor\'s demo.', why: 'Demos show the best case. Your own examples show the errors you’ll actually get.' },
+      { id: 'pf3', t: 'We considered a simpler option, including not using AI for this task.', why: 'Sometimes the answer is “you don’t need this yet.” A template, a rule or a better process can do the job with less risk.' },
+      { id: 'pf4', crit: true, t: 'A named person in the business owns this tool: how it is used, its risks, and the decision to stop.', why: 'When something goes wrong, a tool “everyone” owns is a tool no one acts on.' }
+    ] },
+    { id: 'data', title: 'Data and confidentiality', items: [
+      { id: 'd1', crit: true, t: 'We know exactly what data will go into the tool, and what must never go in.', why: 'The most common AI incident in a business is confidential information pasted into the wrong tool.' },
+      { id: 'd2', crit: true, t: 'The terms say whether the vendor uses our inputs and outputs to train its models, and the setting we need is switched on.', why: 'Free and consumer plans often allow training on your data; business plans usually don’t. Check the plan you’ll actually buy.' },
+      { id: 'd3', t: 'We know how long the vendor keeps our data, and we can get it deleted, including when we leave.', why: 'Retention periods vary from zero days to indefinitely. Deletion on exit should be in writing.' },
+      { id: 'd4', t: 'We know where our data is stored and processed (which countries) and which sub-processors are involved.', why: 'Data location matters for privacy law, for some contracts and for some customers.' },
+      { id: 'd5', t: 'We know whether vendor staff can see our prompts or files (for example for abuse monitoring or support), and under what controls.', why: 'Human review of content by the vendor is common and is often switched on by default.' }
+    ] },
+    { id: 'priv', title: 'Privacy', personal: true, items: [
+      { id: 'pr1', crit: true, personal: true, t: 'We have a lawful basis for using personal data in this tool, and our privacy notice covers this use.', why: 'Under the GDPR and similar laws, a new use of personal data needs a lawful basis and must be explained to the people concerned.' },
+      { id: 'pr2', crit: true, personal: true, t: 'A data processing agreement (DPA) is in place with the vendor.', why: 'When a vendor processes personal data on your behalf, the GDPR requires a written contract covering how it does so.' },
+      { id: 'pr3', personal: true, t: 'We have checked whether a data protection impact assessment (DPIA) is needed, and done one if so.', why: 'A DPIA is required where processing is likely to result in a high risk to people, for example systematic evaluation of people or large-scale sensitive data.' },
+      { id: 'pr4', crit: true, personal: true, t: 'If the tool makes or shapes decisions about people, a person reviews those decisions and people can contest them.', why: 'People have rights around decisions based solely on automated processing that significantly affect them (GDPR Article 22).' },
+      { id: 'pr5', personal: true, t: 'Transfers of personal data to other countries have a valid legal mechanism.', why: 'For EU or UK personal data, for example an adequacy decision or standard contractual clauses.' }
+    ] },
+    { id: 'sec', title: 'Security', items: [
+      { id: 's1', t: 'We will use business accounts with single sign-on or multi-factor authentication, and admin control over who has access.', why: 'With personal accounts, you can’t remove access when someone leaves.' },
+      { id: 's2', t: 'The vendor provides security evidence, such as an independent certification or audit report (for example ISO/IEC 27001 or SOC 2 Type II) and recent penetration testing.', why: 'Ask for the report, not just a logo on the website.' },
+      { id: 's3', crit: true, t: 'If the tool can read email, files or web pages, or take actions, we have limited its permissions and considered prompt injection.', why: 'Hidden instructions in a document or web page can make an AI assistant leak data or take actions it shouldn’t. Give it the minimum access it needs.' },
+      { id: 's4', t: 'The contract commits the vendor to tell us promptly about security incidents affecting our data.', why: 'You may have your own notification deadlines, for example 72 hours to a regulator under the GDPR.' }
+    ] },
+    { id: 'law', title: 'Compliance and legal', items: [
+      { id: 'l1', crit: true, t: 'If we operate in or serve the EU, we have checked this use against the EU AI Act: it is not a prohibited practice, and we know whether it is high-risk.', why: 'Prohibited practices have been banned since February 2025. High-risk uses, such as screening job applicants or credit scoring, carry extra duties for the business using them.' },
+      { id: 'l2', t: 'We have checked sector rules that apply to this use (for example financial services, health, employment, education or the public sector).', why: 'Existing rules on discrimination, consumer protection and record-keeping apply to AI-assisted work too.' },
+      { id: 'l3', t: 'We know who owns the outputs, and whether the vendor offers protection against intellectual-property claims.', why: 'Some vendors indemnify business customers against copyright claims over outputs; many do not.' },
+      { id: 'l4', t: 'Customers or staff will be told when they are dealing with AI or AI-generated content, where that is required.', why: 'EU AI Act transparency duties (Article 50) cover chatbots, deepfakes and some AI-generated text. Being upfront also protects trust.' }
+    ] },
+    { id: 'q', title: 'Output quality and oversight', items: [
+      { id: 'q1', t: 'We know the tool\'s typical errors on our tasks, including confident wrong answers, and have written them down for users.', why: 'AI tools can be fluent and wrong at the same time. Users need to know where to look.' },
+      { id: 'q2', crit: true, t: 'Outputs that reach customers, or affect decisions about people, are checked by a person first.', why: 'A human check is the cheapest control against the most visible failures.' },
+      { id: 'q3', t: 'Where the tool affects people, we have checked that it does not work worse for some groups than others.', why: 'Uneven error rates can become a discrimination problem. Mark N/A if the tool doesn’t affect people.' },
+      { id: 'q4', t: 'We can see usage logs: who used it, for what, and what it produced.', why: 'Logs let you investigate a complaint and see whether the tool is actually used.' }
+    ] },
+    { id: 'ops', title: 'Operational and vendor risk', items: [
+      { id: 'o1', t: 'The vendor looks viable, and its support and uptime commitments suit how much we will rely on it.', why: 'Many AI vendors are young companies. Match the commitment to the dependency.' },
+      { id: 'o2', t: 'We will get notice before the vendor changes the underlying model or features in ways that could change results.', why: 'A silent model update can change quality, tone or cost overnight.' },
+      { id: 'o3', t: 'We can export our data, prompts and configurations, and leave without losing them.', why: 'Lock-in is cheapest to avoid before you sign.' },
+      { id: 'o4', t: 'We have a fallback if the tool is unavailable, or if we have to stop using it.', why: 'If the work can’t be done without the tool, its outage is your outage.' },
+      { id: 'o5', t: 'We know the full cost: licenses or seats, usage-based charges, integration and training time.', why: 'Companies buy the AI tool, hand it to staff, and it just... sits there. By LLPA’s September 2026 figures, around 60% of Microsoft Copilot licenses go unused within 90 days.' }
+    ] },
+    { id: 'ppl', title: 'People and adoption', items: [
+      { id: 'h1', t: 'There are written usage rules: what the tool is for, what data may go in, and when outputs must be checked.', why: 'One page is enough. Without it, people guess.' },
+      { id: 'h2', t: 'Users will be trained before rollout, including on when not to trust the tool.', why: 'In the EU, organizations using AI must take measures to support the AI literacy of their staff (AI Act Article 4, applying since February 2025).' },
+      { id: 'h3', t: 'We have set a review date (for example after 90 days) to check usage, value and problems, and decide whether to continue.', why: 'A review date turns a purchase into a trial you can end.' }
+    ] }
+  ];
+  var ITEMS = []; SECTIONS.forEach(function (s) { s.items.forEach(function (it) { it.sec = s.title; ITEMS.push(it); }); });
+
+  function flagOf(it) {
+    var a = S.ans[it.id];
+    if (!a) return 'none';
+    if (a === 'yes' || a === 'na') return 'ok';
+    if (it.crit && (a === 'no' || a === 'unsure')) return 'red';
+    return 'amber';
+  }
+  var FLAG_LABEL = { red: 'Red flag', amber: 'Condition', ok: 'OK', none: 'Not reviewed' };
+  var FLAG_TONE = { red: 'bad', amber: 'warn', ok: 'good', none: '' };
+
+  function save() { try { window.sessionStorage.setItem(STORE_KEY, JSON.stringify(S)); } catch (e) {} }
+  function load() {
+    try {
+      var raw = window.sessionStorage.getItem(STORE_KEY);
+      if (raw) { var d = JSON.parse(raw); if (d && d.ans) { S = d; started = Object.keys(S.ans).length > 0; } }
+    } catch (e) {}
+  }
+  load();
+
+  /* ---------- Render form ---------- */
+  function itemHtml(it, n) {
+    var gid = 'aic-dd-' + it.id;
+    return '<li class="aic-dd-item" data-item="' + it.id + '">' +
+      '<div class="aic-dd-itop"><span class="aic-dd-n" aria-hidden="true">' + n + '</span><div>' +
+        '<p class="aic-dd-t" id="' + gid + '">' + esc(it.t) + (it.crit ? ' <span class="aic-dd-crit" title="Critical item">Critical</span>' : '') + '</p>' +
+        '<p class="aic-small">' + esc(it.why) + '</p></div></div>' +
+      '<div class="aic-dd-row"><div class="aic-dd-ans" role="radiogroup" aria-labelledby="' + gid + '">' +
+        STATES.map(function (s) { return '<button type="button" role="radio" aria-checked="false" data-i="' + it.id + '" data-v="' + s.v + '" class="aic-dd-' + s.v + '">' + s.label + '</button>'; }).join('') +
+      '</div><span class="aic-dd-flag" data-flag="' + it.id + '" aria-live="polite"></span></div>' +
+      '<button type="button" class="aic-linkbtn aic-dd-notebtn" data-note="' + it.id + '" aria-expanded="false" aria-controls="' + gid + '-note">Add a note</button>' +
+      '<textarea class="aic-dd-note" id="' + gid + '-note" data-notefor="' + it.id + '" rows="2" aria-label="Note for: ' + esc(it.t) + '" placeholder="For example: vendor confirmed by email on 3 Nov; DPA signed version 2.1" hidden></textarea>' +
+      '</li>';
+  }
+
+  var n = 0;
+  var formHtml = '<div class="aic-dd-form">' +
+    '<header class="aic-fade"><span class="aic-eyebrow">AI Due Diligence Checklist · for owners, buyers and IT leads</span>' +
+    '<h1 class="aic-h1" id="aic-dd-h1">Before your business adopts any AI tool, run through this checklist.</h1>' +
+    '<p class="aic-lede">' + ITEMS.length + ' plain checks covering data, privacy, compliance and operational risk. Mark each one and you’ll get a one-page summary to attach to the purchase decision, with the red flags, the conditions, and the questions to send the vendor.</p>' +
+    '<p class="aic-privacy">' + LOCK_SVG + '<span>Answers stay in this browser tab, so a reload won’t lose them. Nothing is sent.</span></p></header>' +
+
+    '<div class="aic-card" style="margin-top:22px"><span class="aic-eyebrow">The tool you’re checking</span>' +
+      '<div class="aic-dd-meta">' +
+        field('tool', 'AI tool or product', 'e.g. meeting-notes assistant') +
+        field('vendor', 'Vendor', 'e.g. company name') +
+        field('use', 'What you will use it for', 'e.g. summarizing client calls') +
+        field('who', 'Reviewed by', 'Name and role') +
+        '<label class="aic-dd-field"><span>Date</span><input type="date" data-meta="date"></label>' +
+      '</div>' +
+      '<div class="aic-qtext" style="margin-top:16px;font-size:16px" id="aic-dd-pl">Will the tool handle personal data (about customers, staff or anyone else)?</div>' +
+      '<div class="aic-seg" role="radiogroup" aria-labelledby="aic-dd-pl" id="aic-dd-personal">' +
+        '<button type="button" role="radio" aria-checked="false" data-personal="yes">Yes</button><button type="button" role="radio" aria-checked="false" data-personal="no">No</button><button type="button" role="radio" aria-checked="false" data-personal="unsure">Not sure</button>' +
+      '</div><p class="aic-small" style="margin-top:6px">If you choose No, the privacy checks are marked N/A. You can still change them.</p>' +
+    '</div>' +
+
+    '<div class="aic-card aic-dd-legend" style="margin-top:14px"><span class="aic-eyebrow">How the flags work</span>' +
+      '<ul class="aic-list aic-small"><li><b>Critical</b> items answered No or Not sure become a <span class="aic-tag aic-t-bad">Red flag</span>: resolve before you sign.</li>' +
+      '<li>Any other No, Partly or Not sure becomes a <span class="aic-tag aic-t-warn">Condition</span>: something to fix, or accept knowingly, as part of the purchase.</li>' +
+      '<li>Yes and N/A are <span class="aic-tag aic-t-good">OK</span>. “Not sure” usually means ask the vendor, in writing.</li></ul></div>' +
+
+    SECTIONS.map(function (s, si) {
+      return '<section class="aic-card aic-dd-sec" style="margin-top:14px" aria-labelledby="aic-dd-s' + si + '">' +
+        '<div class="aic-dd-sechead"><div><span class="aic-eyebrow">Area ' + (si + 1) + ' of ' + SECTIONS.length + '</span><h2 class="aic-h3" style="font-size:22px;margin-top:4px" id="aic-dd-s' + si + '">' + esc(s.title) + '</h2></div><span class="aic-small" data-secount="' + s.id + '"></span></div>' +
+        '<ol class="aic-dd-items">' + s.items.map(function (it) { n++; return itemHtml(it, n); }).join('') + '</ol></section>';
+    }).join('') +
+
+    '<div class="aic-dd-tally aic-noprint" role="status" aria-live="polite"><span id="aic-dd-tally"></span><button type="button" class="aic-btn aic-btn-primary" id="aic-dd-go">Show my summary</button></div>' +
+    '</div>';
+
+  function field(k, label, ph) { return '<label class="aic-dd-field"><span>' + label + '</span><input type="text" data-meta="' + k + '" placeholder="' + esc(ph) + '" maxlength="120" autocomplete="off"></label>'; }
+
+  ROOT.innerHTML = '<div class="aic-col">' + formHtml + '<section class="aic-dd-summary" aria-labelledby="aic-dd-sumh" hidden></section></div>';
+
+  /* restore state to the DOM */
+  $$('[data-meta]').forEach(function (inp) { inp.value = S.meta[inp.getAttribute('data-meta')] || ''; });
+  if (S.personal) setPersonalUI(S.personal);
+  ITEMS.forEach(function (it) {
+    if (S.ans[it.id]) markAnswer(it.id, S.ans[it.id]);
+    if (S.notes[it.id]) { var ta = $('[data-notefor="' + it.id + '"]'); ta.value = S.notes[it.id]; ta.hidden = false; $('[data-note="' + it.id + '"]').setAttribute('aria-expanded', 'true'); $('[data-note="' + it.id + '"]').textContent = 'Note'; }
+  });
+  $$('[role="radiogroup"]').forEach(rovingTabs);
+  tally();
+
+  function markAnswer(id, v) {
+    $$('[data-i="' + id + '"]').forEach(function (b) { b.setAttribute('aria-checked', b.getAttribute('data-v') === v ? 'true' : 'false'); });
+    var it = ITEMS.filter(function (x) { return x.id === id; })[0];
+    var f = flagOf(it), el = $('[data-flag="' + id + '"]');
+    el.innerHTML = f === 'none' ? '' : '<span class="aic-tag aic-t-' + FLAG_TONE[f] + '">' + FLAG_LABEL[f] + '</span>';
+    $('[data-item="' + id + '"]').setAttribute('data-state', f);
+  }
+  function setPersonalUI(v) {
+    $$('[data-personal]').forEach(function (b) { b.setAttribute('aria-checked', b.getAttribute('data-personal') === v ? 'true' : 'false'); });
+  }
+  function counts() {
+    var c = { red: 0, amber: 0, ok: 0, none: 0, na: 0 };
+    ITEMS.forEach(function (it) { var f = flagOf(it); c[f]++; if (S.ans[it.id] === 'na') c.na++; });
+    return c;
+  }
+  function tally() {
+    var c = counts(), done = ITEMS.length - c.none;
+    $('#aic-dd-tally').innerHTML = '<b>' + done + ' of ' + ITEMS.length + '</b> checked · <span class="aic-dd-tr">' + c.red + ' red</span> · <span class="aic-dd-ta">' + c.amber + ' conditions</span>';
+    SECTIONS.forEach(function (s) {
+      var d = s.items.filter(function (it) { return S.ans[it.id]; }).length;
+      $('[data-secount="' + s.id + '"]').textContent = d + ' of ' + s.items.length;
+    });
+  }
+  function touch() {
+    if (!started) { started = true; emit('tool_started', {}); }
+    save(); tally();
+  }
+
+  ROOT.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-i]');
+    if (b) {
+      var id = b.getAttribute('data-i'), v = b.getAttribute('data-v');
+      S.ans[id] = v; markAnswer(id, v); rovingTabs(b.parentNode); touch(); return;
+    }
+    var p = e.target.closest('[data-personal]');
+    if (p) {
+      var pv = p.getAttribute('data-personal'); S.personal = pv; setPersonalUI(pv); rovingTabs(p.parentNode);
+      if (pv === 'no') ITEMS.forEach(function (it) { if (it.personal && !S.ans[it.id]) { S.ans[it.id] = 'na'; markAnswer(it.id, 'na'); } });
+      touch(); return;
+    }
+    var nb = e.target.closest('[data-note]');
+    if (nb) {
+      var ta = $('[data-notefor="' + nb.getAttribute('data-note') + '"]');
+      ta.hidden = !ta.hidden; nb.setAttribute('aria-expanded', String(!ta.hidden));
+      nb.textContent = ta.hidden ? (ta.value ? 'Show note' : 'Add a note') : 'Hide note';
+      if (!ta.hidden) ta.focus();
+      return;
+    }
+    if (e.target.closest('#aic-dd-go')) { renderSummary(); return; }
+    if (e.target.closest('[data-act="print"]')) { window.print(); return; }
+    if (e.target.closest('[data-act="edit"]')) { var first = firstGap(); scrollToEl(first || $('.aic-dd-form')); if (first) { var btn = $('[role="radio"][tabindex="0"]', first); if (btn) btn.focus({ preventScroll: true }); } return; }
+    if (e.target.closest('[data-act="copy"]')) { copyQuestions(e.target.closest('[data-act="copy"]')); return; }
+    if (e.target.closest('[data-act="reset"]')) {
+      if (!window.confirm('Clear all answers and notes?')) return;
+      S = { meta: { tool: '', vendor: '', use: '', who: '', date: new Date().toISOString().slice(0, 10) }, personal: null, ans: {}, notes: {} };
+      save();
+      $$('[data-meta]').forEach(function (inp) { inp.value = S.meta[inp.getAttribute('data-meta')] || ''; });
+      setPersonalUI(null);
+      ITEMS.forEach(function (it) { markAnswer(it.id, null); var ta = $('[data-notefor="' + it.id + '"]'); ta.value = ''; ta.hidden = true; var nbt = $('[data-note="' + it.id + '"]'); nbt.textContent = 'Add a note'; nbt.setAttribute('aria-expanded', 'false'); });
+      $$('[role="radiogroup"]').forEach(rovingTabs);
+      $('.aic-dd-summary').hidden = true; ROOT.classList.remove('aic-dd-has-summary');
+      tally(); scrollToEl(ROOT); focusHeading($('#aic-dd-h1'));
+    }
+  });
+  ROOT.addEventListener('input', function (e) {
+    var m = e.target.getAttribute('data-meta'), nf = e.target.getAttribute('data-notefor');
+    if (m) S.meta[m] = e.target.value;
+    if (nf) S.notes[nf] = e.target.value;
+    if (m || nf) save();
+  });
+  radioKeys(ROOT, function (o) { o.click(); });
+
+  function firstGap() {
+    for (var i = 0; i < ITEMS.length; i++) if (!S.ans[ITEMS[i].id]) return $('[data-item="' + ITEMS[i].id + '"]');
+    return null;
+  }
+
+  /* ---------- Summary ---------- */
+  function decision(c) {
+    if (c.red) return { label: 'Stop: resolve red flags first', tone: 'bad', text: 'At least one critical check failed or is unknown. Don’t sign until each red flag is resolved, or a named person has accepted the risk in writing and said why.' };
+    if (c.amber) return { label: 'Proceed with conditions', tone: 'warn', text: 'No critical problems, but some checks are only partly met or unknown. Attach the conditions below to the purchase, with an owner and a date for each.' };
+    return { label: 'Ready to proceed', tone: 'good', text: 'Every check is met or not applicable. Keep this summary with the purchase record and repeat the check at your review date or at renewal.' };
+  }
+  function ansLabel(v) { var s = STATES.filter(function (x) { return x.v === v; })[0]; return s ? s.label : 'Not answered'; }
+
+  function vendorQuestions() {
+    return ITEMS.filter(function (it) { return S.ans[it.id] === 'unsure' && ['data', 'priv', 'sec', 'law', 'ops'].indexOf(secOf(it)) > -1; }).map(function (it) { return it.t; });
+  }
+  function secOf(it) { for (var i = 0; i < SECTIONS.length; i++) if (SECTIONS[i].items.indexOf(it) > -1) return SECTIONS[i].id; }
+
+  function copyQuestions(btn) {
+    var qs = vendorQuestions();
+    var text = 'Questions for ' + (S.meta.vendor || 'the vendor') + (S.meta.tool ? ' about ' + S.meta.tool : '') + '\nBefore we decide, please help us confirm the following in writing:\n' + qs.map(function (q, i) { return (i + 1) + '. ' + q; }).join('\n');
+    function done(ok) { btn.textContent = ok ? 'Copied' : 'Copy failed: select the list and copy it'; }
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(false); });
+      else done(false);
+    } catch (e) { done(false); }
+  }
+
+  function renderSummary() {
+    var c = counts(), d = decision(c);
+    var provisional = c.none > 0;
+    var label = (provisional ? 'Provisional: ' : '') + d.label;
+    var host = $('.aic-dd-summary');
+    var reds = ITEMS.filter(function (it) { return flagOf(it) === 'red'; });
+    var ambers = ITEMS.filter(function (it) { return flagOf(it) === 'amber'; });
+    function li(it) { return '<li><b>' + esc(it.t) + '</b> <span class="aic-small">(' + esc(it.sec) + ' · answered ' + ansLabel(S.ans[it.id]) + ')</span>' + (S.notes[it.id] ? '<br><span class="aic-small">Note: ' + esc(S.notes[it.id]) + '</span>' : '') + '</li>'; }
+    var m = S.meta;
+    var vq = vendorQuestions();
+
+    var html = '<div class="aic-fade">' +
+      '<div class="aic-card aic-dd-sumcard">' +
+      '<span class="aic-eyebrow">AI due diligence summary</span>' +
+      '<h2 class="aic-h2" id="aic-dd-sumh">' + esc(m.tool || 'AI tool under review') + (m.vendor ? ' <span class="aic-soft" style="font-weight:700">· ' + esc(m.vendor) + '</span>' : '') + '</h2>' +
+      '<dl class="aic-dd-dl">' +
+        '<div><dt>Intended use</dt><dd>' + esc(m.use || 'Not stated') + '</dd></div>' +
+        '<div><dt>Reviewed by</dt><dd>' + esc(m.who || 'Not stated') + '</dd></div>' +
+        '<div><dt>Date</dt><dd>' + esc(m.date || '') + '</dd></div>' +
+        '<div><dt>Personal data</dt><dd>' + ({ yes: 'Yes', no: 'No', unsure: 'Not sure' }[S.personal] || 'Not stated') + '</dd></div>' +
+      '</dl>' +
+      '<div class="aic-dd-decision aic-dd-d-' + d.tone + '"><span class="aic-tag aic-t-' + d.tone + '">' + (provisional ? 'Provisional' : 'Result') + '</span><h3 class="aic-h3" style="font-size:22px;margin-top:8px">' + esc(d.label) + '</h3><p>' + esc(d.text) + '</p>' +
+        (provisional ? '<p class="aic-small" style="margin-top:6px"><b>' + c.none + ' of ' + ITEMS.length + ' checks aren’t answered yet</b>, so this result could still get worse. <button type="button" class="aic-linkbtn aic-noprint" data-act="edit">Go to the first unanswered check</button></p>' : '') +
+      '</div>' +
+      '<div class="aic-dd-counts" role="list">' +
+        '<span role="listitem"><b class="aic-dd-tr">' + c.red + '</b> red flags</span><span role="listitem"><b class="aic-dd-ta">' + c.amber + '</b> conditions</span><span role="listitem"><b class="aic-dd-tg">' + c.ok + '</b> OK (incl. ' + c.na + ' N/A)</span><span role="listitem"><b>' + c.none + '</b> not reviewed</span>' +
+      '</div>';
+
+    html += '<h3 class="aic-h3" style="margin-top:20px">Red flags: resolve before signing</h3>' +
+      (reds.length ? '<ol class="aic-dd-flist aic-dd-fred">' + reds.map(li).join('') + '</ol>' : '<p class="aic-small">None.</p>');
+    html += '<h3 class="aic-h3" style="margin-top:18px">Conditions to attach to the purchase</h3>' +
+      (ambers.length ? '<ol class="aic-dd-flist aic-dd-famber">' + ambers.map(li).join('') + '</ol>' : '<p class="aic-small">None.</p>');
+
+    html += '<details class="aic-more aic-dd-full" style="margin-top:18px" open><summary>Full checklist (' + ITEMS.length + ' items)</summary>' +
+      SECTIONS.map(function (s) {
+        return '<table class="aic-dd-table"><caption>' + esc(s.title) + '</caption><thead><tr><th scope="col">Check</th><th scope="col">Answer</th><th scope="col">Flag</th></tr></thead><tbody>' +
+          s.items.map(function (it) {
+            var f = flagOf(it);
+            return '<tr><td>' + esc(it.t) + (it.crit ? ' <span class="aic-dd-crit">Critical</span>' : '') + (S.notes[it.id] ? '<div class="aic-small">Note: ' + esc(S.notes[it.id]) + '</div>' : '') + '</td><td>' + ansLabel(S.ans[it.id]) + '</td><td>' + (f === 'none' ? '-' : '<span class="aic-tag aic-t-' + FLAG_TONE[f] + '">' + FLAG_LABEL[f] + '</span>') + '</td></tr>';
+          }).join('') + '</tbody></table>';
+      }).join('') + '</details>';
+
+    html += '<div class="aic-dd-sign"><p><b>Decision</b> (circle one): proceed / proceed with conditions / do not proceed</p><p>Approved by: ______________________ &nbsp; Signature: ______________ &nbsp; Date: __________</p><p>Review date: __________</p></div>' +
+      '<p class="aic-small" style="margin-top:12px">Made with AI Channel’s AI Due Diligence Checklist. The flags reflect the reviewer’s answers and haven’t been checked by anyone else. This is a self-check, not legal, security or procurement advice. Legal references as of November 2026.</p>' +
+      '</div>';
+
+    /* next step + solution step */
+    var lawRed = reds.some(function (it) { return ['data', 'priv', 'sec', 'law'].indexOf(secOf(it)) > -1; });
+    var peopleGap = ['h1', 'h2', 'q1'].some(function (id) { return S.ans[id] && S.ans[id] !== 'yes' && S.ans[id] !== 'na'; });
+    var useMatch = lawRed || (!peopleGap && (c.red || c.amber));
+    var sol = useMatch
+      ? { cta: 'get_matched', url: 'matchUrl', btn: 'Get matched to someone', h: 'Get a second pair of eyes on the risks', p: lawRed ? 'Your red flags sit in data, privacy, security or compliance. A member who advises on AI adoption can review the vendor terms and controls with you before you sign.' : 'You have open conditions on this purchase. A member who advises on AI adoption can help you settle them with the vendor and set the tool up safely.' }
+      : { cta: 'learn_with_member', url: 'coursesUrl', btn: 'Learn with a member', h: peopleGap ? 'Get your team ready to use it well' : 'Get the value you’re paying for', p: peopleGap ? 'Your gaps are in usage rules and training. A short course with a member gets people using the tool on real work, and teaches them when not to trust it.' : 'The checks are in good shape. What usually goes wrong next is that the tool gets bought, handed to staff, and just sits there. A short course with a member gets people using it on real work.' };
+    html += '<div class="aic-next aic-noprint" style="margin-top:18px">' +
+      '<div class="aic-card"><span class="aic-eyebrow">Your next step</span>' +
+        (vq.length ? '<h3 class="aic-h3">Send your “Not sure” questions to the vendor</h3><p class="aic-soft">You have ' + vq.length + ' unanswered question' + (vq.length > 1 ? 's' : '') + ' about data, privacy, security, compliance or operations. Ask for answers in writing, then update this checklist.</p><div class="aic-actions"><button type="button" class="aic-btn" data-act="copy">Copy vendor questions</button><button type="button" class="aic-btn aic-btn-ghost" data-act="print">Print summary</button></div>'
+          : '<h3 class="aic-h3">Attach this summary to the purchase decision</h3><p class="aic-soft">Print it or save it as a PDF, get it signed, and put the review date in the calendar now.</p><button type="button" class="aic-btn" data-act="print">Print or save as PDF</button>') +
+      '</div>' +
+      '<div class="aic-card aic-solution"><span class="aic-eyebrow">Need more than an answer?</span><h3 class="aic-h3">' + esc(sol.h) + '</h3><p class="aic-soft">' + esc(sol.p) + '</p><a class="aic-btn aic-btn-primary" data-aic-cta="' + sol.cta + '" data-aic-url="' + sol.url + '" target="_blank" rel="noopener">' + sol.btn + '</a></div>' +
+      '</div>' +
+      '<div class="aic-handoff aic-noprint"><a data-aic-cta="email_results" data-aic-url="resultsFormUrl" target="_blank" rel="noopener">Email me my results</a><a data-aic-cta="newsletter" data-aic-url="newsletterUrl" target="_blank" rel="noopener">Newsletter: keep up without keeping up with everything</a><button type="button" class="aic-linkbtn" data-act="edit">Edit answers</button><button type="button" class="aic-linkbtn" data-act="reset">Start a new checklist</button></div>';
+
+    host.innerHTML = html;
+    host.hidden = false;
+    ROOT.classList.add('aic-dd-has-summary');
+    var info = { label: label, score: null, lead_type: 'tool_result' };
+    wireCtas(host, info);
+    scrollToEl(host);
+    focusHeading($('#aic-dd-sumh'));
+    emit('tool_completed', { assessment_result: label, red_flags: c.red, conditions: c.amber, unanswered: c.none });
+    emit('result_viewed', { assessment_result: label });
+  }
+
+})();
+</script>
+<!-- ===== AIC:END ===== -->
+</body>
+</html>
+
+</body></html>

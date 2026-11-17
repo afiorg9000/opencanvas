@@ -1,0 +1,1128 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ai-dependency-score</title><style>html,body{margin:0;background:#F7F8FA}@media (prefers-color-scheme:dark){html,body{background:#F7F8FA}}</style></head><body>
+<!--
+TOOL: AI & Digital Dependency Score
+FILE: ai-dependency-score.html   (slug: ai-dependency-score)   TYPE: tool
+TITLE (H1): business edition "Which systems would stop you trading if they failed?" (library-plan wording for the
+  business "Single-Point-of-Failure Check"); household edition "What would stop your household if one account, phone
+  or service failed?". Eyebrow keeps the plan name "AI & Digital Dependency Score".
+AUDIENCE: Business owners and managers of small businesses (default edition, the stronger one); households / For You
+  (switch at the top).
+
+WHAT IT DOES: 3 steps, ~6 minutes. (1) Pick the systems you rely on (11 per edition; common ones pre-ticked).
+  (2) For each: impact of a day without it (3 levels) and fallback (none / improvise / written workaround / tested
+  backup); business edition also asks who can get in if the usual person is away. (3) Six "keys" questions (sign-in,
+  admin/recovery access, backups, bank-detail call-back or family code word, offline plan, AI-tool dependency or
+  trusted contact). Result: 0-100 score (55% system cover weighted by impact, 45% keys), named level, ranked single
+  points of failure with a specific fix each, an impact x fallback map, key fixes tagged This week / This month, a
+  printable outage card (systems by impact, fallback or suggested idea, blank "who to call" lines, editable name /
+  who decides / where the card lives), a "fork" closing, then one next step (Digital Resilience Checklist) and one
+  member route: business with single points of failure or score < 65 -> matchUrl (Get matched to someone); otherwise
+  coursesUrl (Learn with a member). Email me my results + separate newsletter link. Scoring is a rule of thumb, said
+  once in the method note.
+
+SOURCES (all checked 4 Nov 2026):
+  - Microsoft, "Helping our customers through the CrowdStrike outage", 20 Jul 2024: 8.5 million Windows devices.
+  - AWS post-event summary, DynamoDB disruption US-EAST-1, 19-20 Oct 2025 (11:48 PM to 2:20 PM PDT, ~14.5 h).
+  - NCSC Small organisations guide to cyber security (published 9 Apr 2026, reviewed 21 Jul 2026): passkeys first,
+    2SV otherwise; two backups (online + device), device unplugged, know how to restore.
+  - DSIT Cyber security breaches survey 2025/2026 (30 Apr 2026): 25% of businesses have a formal incident response plan.
+  - FBI IC3 2025 Internet Crime Report (Apr 2026): BEC losses $3,046,598,558.
+  - FTC Family emergency scams page (call back on a known number); Ready.gov Power outages (medicines, devices).
+
+WHAT CHANGED vs aidoomsdayguide.com/tools/ai-dependency-score/: the original was 8 yes/no checkboxes with the same
+  three static tips for every result ("Resilience coverage - 50%"). This version maps the reader's actual systems,
+  finds and ranks real single points of failure (including key-person dependency and AI-tool dependency), gives a
+  fix per weak point, adds a business edition (the library plan's "which systems would stop you trading"), a
+  printable outage card, verified outage facts, and AI Channel next steps. No "doomsday" branding, no ads.
+
+PRIVACY: runs in the browser; answers kept in sessionStorage for this tab only (try/catch), cleared by "Start again".
+  No network requests, cookies or localStorage.
+
+HOW TO EMBED IN WORDPRESS: (a) Custom HTML block: paste everything between "BEGIN AI CHANNEL TOOL" and "END AI
+  CHANNEL TOOL". CSS is scoped to .aic-tool, classes prefixed aic-, JS in an IIFE (only global: AICHANNEL_CONFIG).
+  (b) iframe: <iframe src="/tools/ai-dependency-score.html" title="AI & Digital Dependency Score"
+  style="width:100%;min-height:1500px;border:0" loading="lazy"></iframe> (prints most cleanly).
+
+CONFIG URLS (window.AICHANNEL_CONFIG): resultsFormUrl, coursesUrl, matchUrl, newsletterUrl, contentBaseUrl (prefix
+  for the sibling link digital-resilience-checklist.html). Query fields on CTA links: lead_type, audience
+  (business | individual), source_page, source_content_or_tool, cta_clicked, assessment_name, assessment_result
+  (level name), score, utm_*. Events (window 'aichannel:event' + parent.postMessage): tool_started, tool_completed,
+  result_viewed, cta_clicked.
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Which systems would stop you if they failed? AI & Digital Dependency Score</title>
+<meta name="description" content="Find the single points of failure in your small business or household before an outage finds them for you. Ranked weak points, fixes and a printable outage card.">
+<!-- AI Channel design A: tool design system v2 (visual layer only; no behaviour changes) -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style id="aic-theme">
+/* ---------- tokens ---------- */
+:root,html{color-scheme:light!important;
+ --pine:#2859c7!important;--pine-deep:#1945ac!important;--accent:#2859c7!important;--accent-deep:#1945ac!important;--primary:#2859c7!important;--blue:#2859c7!important;--blue-d:#1945ac!important;
+ --paper:#ffffff!important;--bg:#ffffff!important;--white:#fff!important;--card:#fff!important;--ink:#14213d!important;--ink-soft:#3f4a5c!important;--ink-mute:#5b6577!important;--muted:#3f4a5c!important;
+ --line:#d9e2f0!important;--sage:#eef3fc!important;--amber-soft:#fbf3e4!important;--accent-wash:#eef3fc!important;--blue-wash:#eef3fc!important;--sky:#eef3fc!important;--pale:#f4f7fc!important;--warm:#f4f7fc!important;
+ --serif:"Newsreader",Georgia,serif!important;--sans:"Inter",system-ui,sans-serif!important;--mono:"IBM Plex Mono",ui-monospace,monospace!important}
+html body .aic-tool,html body .aic-article{
+ --aic-paper:#ffffff!important;--aic-white:#ffffff!important;--aic-ink:#14213d!important;--aic-soft:#46526a!important;--aic-line:#d9e2f0!important;--aic-sage:#eef3fc!important;
+ --aic-blue:#2859c7!important;--aic-blue-deep:#1945ac!important;--aic-blue-soft:#eef3fc!important;--aic-on-blue:#ffffff!important;--aic-focus:#9fbcff!important;
+ --aic-grey:#46526a!important;--aic-grey-soft:#f4f7fc!important;
+ --aic-radius:16px!important;--aic-radius-sm:12px!important;--aic-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important;
+ color-scheme:light!important;background:#fff!important;color:#14213d!important;
+ font-family:"Inter",system-ui,sans-serif!important;-webkit-font-smoothing:antialiased}
+html,body{background:#fff!important}
+html body .aic-tool{padding:56px 0 96px!important}
+html body .aic-article{padding:0 0 112px!important}
+html body .aic-tool .aic-col,html body .aic-article .aic-col{max-width:860px!important}
+@media(min-width:600px){html body .aic-tool .aic-col,html body .aic-article .aic-col{padding-inline:32px!important}}
+
+/* ---------- type ---------- */
+html body .aic-tool .aic-h1,html body .aic-article h1,body h1{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important;line-height:1.02!important;font-size:clamp(38px,5.4vw,62px)!important;color:#14213d}
+html body .aic-tool .aic-h2,html body .aic-article h2,body h2{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important;line-height:1.1!important}
+html body .aic-article h2{font-size:clamp(28px,3.6vw,38px)!important;margin-top:72px!important}
+html body .aic-tool .aic-h2{font-size:clamp(26px,3.4vw,36px)!important}
+html body .aic-tool .aic-h3,html body .aic-article h3,body h3{font-family:"Newsreader",Georgia,serif!important;font-weight:550!important;letter-spacing:-.01em!important;font-size:22px!important;line-height:1.2!important}
+body h4,body h5,body h6{font-family:"Inter",system-ui,sans-serif!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow,html body .aic-tool .aic-qnum,html body .aic-tool .aic-nav-hint,.aic-mono{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;letter-spacing:.06em!important;text-transform:uppercase;font-size:12px!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow{color:#2859c7!important;display:flex!important;align-items:center;gap:12px}
+html body .aic-tool .aic-eyebrow::before,html body .aic-article .aic-head .aic-eyebrow::before{content:"";width:28px;height:1px;background:#2859c7;flex:none}
+html body .aic-tool .aic-lede,html body .aic-article .aic-lede,html body .aic-article .aic-dek{font-size:20px!important;line-height:1.55!important;color:#3f4a5c!important;max-width:60ch}
+html body .aic-tool .aic-soft,html body .aic-tool .aic-small{color:#46526a!important}
+html body .aic-tool .aic-small{font-size:14px!important}
+html body .aic-article{font-size:18.5px!important;line-height:1.72!important}
+html body .aic-article p+p{margin-top:22px!important}
+html body .aic-article .aic-head{padding:72px 0 40px!important;border-bottom:1px solid #d9e2f0;margin-bottom:48px}
+html body .aic-article .aic-meta,html body .aic-article .aic-head p:not(.aic-lede):not(.aic-dek){font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px!important;letter-spacing:.03em;color:#5b6577!important}
+html body .aic-tool a,html body .aic-article a{color:#2859c7}
+
+/* ---------- panels ---------- */
+html body .aic-tool .aic-card,html body .aic-article .aic-card{background:#fff!important;border:1px solid #d9e2f0!important;border-radius:16px!important;box-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important}
+@media(min-width:600px){html body .aic-tool .aic-card{padding:36px 40px!important}html body .aic-article .aic-card{padding:32px 36px!important}}
+html body .aic-tool .aic-stack>*+*{margin-top:20px!important}
+html body .aic-tool .aic-grid2,html body .aic-article .aic-grid{gap:16px!important}
+/* the short answer: a framed figure, like the site's tool previews */
+html body .aic-article .aic-short{background:#fff!important;border:1px solid #d9e2f0!important;box-shadow:0 0 0 10px #eef3fc,0 0 0 11px #d9e2f0!important;margin:12px 11px 56px!important;border-radius:12px!important;border-left:1px solid #d9e2f0!important}
+html body .aic-article .aic-short .aic-eyebrow,html body .aic-article .aic-short>:first-child{color:#2859c7!important}
+/* notes and callouts */
+html body .aic-tool .aic-note,html body .aic-article .aic-note,html body .aic-article .aic-callout{background:#f4f7fc!important;border-left:3px solid #2859c7!important;border-radius:0 12px 12px 0!important;padding:18px 22px!important;font-size:15.5px!important;color:#14213d!important}
+html body .aic-tool .aic-note.aic-warn{background:#fdf7ec!important;border-left-color:#a46207!important}
+html body .aic-tool .aic-note.aic-bad{background:#fdf0ee!important;border-left-color:#b42318!important}
+html body .aic-tool .aic-note.aic-good{background:#eef8f1!important;border-left-color:#2f7a4e!important}
+/* calls to action become navy bands */
+html body .aic-tool .aic-cta,html body .aic-article .aic-cta,html body .aic-tool .aic-dark,html body .aic-article .aic-dark{--aic-ink:#ffffff!important;--aic-soft:#c9d6ee!important;--aic-white:#13264a!important;--aic-line:#2a3f6a!important;--aic-blue:#9fbcff!important;--aic-blue-soft:#1d3563!important;--aic-on-blue:#13264a!important;
+ background:#13264a!important;color:#fff!important;border-color:#13264a!important;box-shadow:none!important}
+html body .aic-tool .aic-cta *:not(.aic-btn):not(.aic-btn *),html body .aic-article .aic-cta *:not(.aic-btn):not(.aic-btn *){color:inherit}
+html body .aic-tool .aic-cta .aic-btn-primary,html body .aic-article .aic-cta .aic-btn-primary{background:#fff!important;color:#13264a!important;border-color:#fff!important}
+html body .aic-tool .aic-cta a:not(.aic-btn),html body .aic-article .aic-cta a:not(.aic-btn){color:#9fbcff!important}
+
+/* ---------- questions and answer options ---------- */
+html body .aic-tool .aic-q{margin-top:28px!important}
+html body .aic-tool .aic-qnum{color:#2859c7!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;font-size:clamp(22px,2.6vw,27px)!important;line-height:1.22!important;letter-spacing:-.01em!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qhint{font-size:15px!important;color:#46526a!important;margin-bottom:18px!important}
+html body .aic-tool .aic-opts{gap:10px!important;margin-top:18px!important}
+html body .aic-tool .aic-opt,html body .aic-tool .aic-pick,html body .aic-tool .aic-check{background:#fff!important;border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:16px 18px!important;font-size:16px!important;gap:14px!important;transition:border-color .15s,box-shadow .15s,background-color .15s,transform .15s!important}
+html body .aic-tool .aic-opt:hover,html body .aic-tool .aic-pick:hover,html body .aic-tool .aic-check:hover{border-color:#2859c7!important;box-shadow:0 6px 18px rgba(40,89,199,.10)!important;transform:translateY(-1px)}
+html body .aic-tool .aic-opt[aria-checked="true"],html body .aic-tool .aic-opt[aria-pressed="true"],html body .aic-tool .aic-pick:has(input:checked),html body .aic-tool .aic-check:has(input:checked),html body .aic-tool .aic-opt:has(input:checked){border-color:#2859c7!important;background:#f4f7fc!important;box-shadow:0 0 0 3px #dbe6fb!important}
+html body .aic-tool .aic-dot{width:22px!important;height:22px!important;border:2px solid #9aa8c0!important}
+html body .aic-tool .aic-dot::after{inset:4px!important;background:#2859c7!important}
+html body .aic-tool .aic-opt[aria-checked="true"] .aic-dot{border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-size:14px!important;color:#46526a!important;margin-top:4px!important}
+html body .aic-tool .aic-opt.aic-opt-unsure{background:transparent!important;border-style:dashed!important}
+html body .aic-tool input[type=text],html body .aic-tool input[type=search],html body .aic-tool input[type=email],html body .aic-tool textarea,html body .aic-tool select,html body .aic-tool .aic-input{border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:14px 16px!important;background:#fff!important;font-size:16px!important}
+html body .aic-tool input:focus,html body .aic-tool textarea:focus,html body .aic-tool select:focus{border-color:#2859c7!important;outline:none!important;box-shadow:0 0 0 3px #dbe6fb!important}
+
+/* ---------- controls ---------- */
+html body .aic-tool .aic-btn,html body .aic-article .aic-btn{min-height:50px!important;padding:14px 24px!important;font-weight:600!important;font-size:15px!important;border-radius:999px!important;border:1.5px solid #c9d6ee!important;box-shadow:none!important}
+html body .aic-tool .aic-btn:hover,html body .aic-article .aic-btn:hover{border-color:#2859c7!important}
+html body .aic-tool .aic-btn-primary,html body .aic-article .aic-btn-primary{background:#2859c7!important;border-color:#2859c7!important;color:#fff!important}
+html body .aic-tool .aic-btn-primary:hover,html body .aic-article .aic-btn-primary:hover{background:#1945ac!important;border-color:#1945ac!important}
+html body .aic-tool .aic-btn-ghost{border-color:transparent!important;text-decoration:underline;text-underline-offset:4px;color:#3f4a5c!important}
+html body .aic-tool .aic-btn[disabled]{opacity:.4!important}
+html body .aic-tool .aic-nav{margin-top:36px!important;padding-top:24px!important;border-top:1px solid #d9e2f0!important}
+html body .aic-tool .aic-actions{gap:12px!important}
+html body .aic-tool .aic-seg{border:1.5px solid #d9e2f0!important;padding:4px!important}
+html body .aic-tool .aic-seg button{font-weight:600!important;color:#3f4a5c!important}
+html body .aic-tool .aic-seg button[aria-pressed="true"],html body .aic-tool .aic-seg button[aria-checked="true"]{background:#13264a!important;color:#fff!important}
+html body .aic-tool .aic-progress{height:4px!important;background:#e3eaf6!important;margin:20px 0 8px!important}
+html body .aic-tool .aic-progress span,html body .aic-tool .aic-progress i{background:#2859c7!important}
+html body .aic-tool .aic-chip,html body .aic-tool .aic-pill{border:1.5px solid #d9e2f0!important;background:#fff!important;font-weight:600!important;border-radius:999px!important}
+html body .aic-tool .aic-chip[aria-pressed="true"],html body .aic-tool .aic-chip.aic-on,html body .aic-tool .aic-pill.aic-on{background:#eef3fc!important;border-color:#2859c7!important;color:#1945ac!important}
+html body .aic-tool .aic-tag,html body .aic-article .aic-tag{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;padding:5px 11px!important}
+html body .aic-tool .aic-privacy{font-size:14px!important;color:#46526a!important;margin-top:20px!important}
+
+/* ---------- results ---------- */
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-stat b,html body .aic-tool .aic-stat strong,html body .aic-tool .aic-display{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important}
+html body .aic-tool .aic-bar{height:8px!important;background:#e3eaf6!important}
+html body .aic-tool .aic-bar-row{padding:14px 0!important;border-bottom-color:#e3eaf6!important}
+html body .aic-tool .aic-bar-label{font-weight:600!important}
+html body .aic-tool table,html body .aic-article table{border-collapse:collapse}
+html body .aic-tool th,html body .aic-article th{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;text-transform:uppercase;color:#2859c7!important;background:#f4f7fc!important}
+html body .aic-tool td,html body .aic-article td{border-color:#e3eaf6!important}
+html body .aic-article .aic-sources,html body .aic-tool .aic-sources{font-size:14px!important;color:#46526a!important;border-top:1px solid #d9e2f0;padding-top:32px!important;margin-top:72px!important}
+html body .aic-article .aic-related,html body .aic-article .aic-deeper{margin-top:72px!important}
+
+/* ---------- pages outside the shared system ---------- */
+body:not(:has(.aic-tool)):not(:has(.aic-article)) h1,body:not(:has(.aic-tool)):not(:has(.aic-article)) h2,body:not(:has(.aic-tool)):not(:has(.aic-article)) h3{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important}
+html,body{font-family:"Inter",system-ui,sans-serif}
+input[type=range],input[type=checkbox],input[type=radio]{accent-color:#2859c7!important}
+:focus-visible{outline-color:#2859c7!important}
+[tabindex="-1"]:focus,h1:focus,h2:focus,h3:focus{outline:none!important;box-shadow:none!important}
+
+/* ================= v3: product-grade tool shell ================= */
+html,body{background:#f4f7fc!important}
+html body .aic-tool{background:#f4f7fc!important}
+html body .aic-tool .aic-col{max-width:980px!important}
+html body .aic-tool .aic-h1{font-size:clamp(40px,5vw,62px)!important;max-width:20ch}
+html body .aic-tool .aic-grid2>.aic-card{box-shadow:none!important;background:#fff!important;border-radius:14px!important}
+html body .aic-tool.aic-in-q .aic-h1{font-size:22px!important;line-height:1.2!important;max-width:none;margin:6px 0 20px!important;font-weight:500!important}
+html body .aic-tool.aic-in-q .aic-lede,html body .aic-tool.aic-in-q > .aic-col > .aic-privacy,html body .aic-tool.aic-in-q .aic-col > * > .aic-privacy{display:none!important}
+html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:56px 64px 44px!important;border:0!important;border-radius:24px!important;box-shadow:0 1px 0 rgba(19,38,74,.05),0 30px 70px rgba(19,38,74,.10)!important;min-height:460px}
+@media(max-width:700px){html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:32px 22px 28px!important;border-radius:18px!important;min-height:0}}
+html body .aic-tool .aic-progress{height:3px!important;background:#e3eaf6!important;border-radius:0!important;margin:14px 0 36px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-size:clamp(26px,3.2vw,38px)!important;line-height:1.12!important;letter-spacing:-.02em!important;margin-bottom:12px!important;max-width:28ch}
+html body .aic-tool .aic-qhint{font-size:16px!important;margin-bottom:24px!important}
+html body .aic-tool .aic-opts{counter-reset:aicopt;gap:12px!important}
+html body .aic-tool .aic-opt{counter-increment:aicopt;align-items:center!important;min-height:64px;padding:16px 20px!important;font-size:17px!important;font-weight:500;border-radius:14px!important}
+html body .aic-tool .aic-opt .aic-dot{display:none!important}
+html body .aic-tool .aic-opt::before{content:counter(aicopt,upper-alpha);flex:none;width:30px;height:30px;display:grid;place-items:center;border:1.5px solid #c9d6ee;border-radius:8px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;font-weight:500;color:#2859c7;background:#fff;transition:all .15s}
+html body .aic-tool .aic-opt:hover::before{border-color:#2859c7}
+html body .aic-tool .aic-opt[aria-checked="true"]::before{background:#2859c7;border-color:#2859c7;color:#fff;content:"\2713"}
+html body .aic-tool .aic-opt[aria-checked="true"]{background:#eef3fc!important;box-shadow:0 0 0 2px #2859c7!important;border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-weight:400}
+html body .aic-tool .aic-nav{border-top:0!important;margin-top:40px!important;padding-top:0!important}
+html body .aic-tool .aic-nav .aic-btn-primary{min-width:150px}
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-display{font-size:clamp(56px,8vw,96px)!important;line-height:.95!important;color:#14213d}
+
+/* ================= v4: legibility ================= */
+html body .aic-tool{font-size:17px!important;line-height:1.6!important}
+html body .aic-tool,html body .aic-article{--aic-soft:#334055!important}
+html body .aic-tool .aic-small,html body .aic-tool .aic-opt-sub,html body .aic-tool .aic-privacy,html body .aic-tool .aic-nav-hint{font-size:15px!important;color:#334055!important}
+html body .aic-tool p,html body .aic-tool li{color:#1d2a44}
+html body .aic-tool .aic-lede{font-size:20px!important;color:#2a364d!important}
+html body .aic-tool .aic-note{font-size:16.5px!important}
+html body .aic-tool .aic-opt{font-size:18px!important;color:#14213d!important}
+html body .aic-tool .aic-qhint{font-size:17px!important;color:#334055!important}
+html body .aic-tool .aic-eyebrow,html body .aic-tool .aic-qnum,.aic-mono{font-size:12.5px!important;color:#2859c7!important;letter-spacing:.05em!important}
+html body .aic-tool .aic-tag{font-size:12.5px!important}
+html body .aic-tool th,html body .aic-article th{font-size:12.5px!important}
+html body .aic-tool td{font-size:16px}
+html body .aic-article{color:#14213d!important}
+html body .aic-article p,html body .aic-article li{color:#1d2a44}
+</style>
+<script>
+(function(){
+  function hsl(c){var m=c&&c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/);if(!m)return null;var r=m[1]/255,g=m[2]/255,b=m[3]/255,a=m[4]===undefined?1:+m[4];
+    var mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn,s=d?d/(1-Math.abs(2*l-1)):0,h=0;
+    if(d){h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;if(h<0)h+=360}return {h:h,s:s,l:l,a:a}}
+  function blue(c){var x=hsl(c);return x&&x.a>0.05&&x.s>0.3&&x.l>0.28&&x.l<0.95&&x.h>=205&&x.h<=240?x:null}
+  function N(x,dark,light){return x.a<0.95?"rgba(40,89,199,"+Math.min(x.a,0.12).toFixed(3)+")":(x.l>0.82?light:dark)}
+  function fix(el){var c0=getComputedStyle(el),bg=hsl(c0.backgroundColor),fg=hsl(c0.color);if(bg&&fg&&bg.a>0.9&&bg.l<0.6&&bg.s>0.3&&bg.h>=205&&bg.h<=240&&fg.l<0.6)el.style.setProperty("color","#ffffff","important");
+    if(el.closest(".aic-cta,.aic-dark")||el.matches(".aic-opt,.aic-pick,.aic-check,.aic-btn,.aic-chip,.aic-pill,.aic-seg button,.aic-card,.aic-note"))return;var cs=getComputedStyle(el),x;
+    if((x=blue(cs.color)))el.style.setProperty("color",x.l>0.75?"#eef3fc":"#2859c7","important");
+    if((x=blue(cs.backgroundColor)))el.style.setProperty("background-color",N(x,"#2859c7",x.l>0.9?"#eef3fc":"#d6e2f8"),"important");
+    if(el instanceof SVGElement){if((x=blue(cs.fill)))el.style.setProperty("fill",N(x,"#2859c7","#eef3fc"),"important");if((x=blue(cs.stroke)))el.style.setProperty("stroke",N(x,"#2859c7","#d6e2f8"),"important")}
+    if(cs.textTransform==="uppercase"&&parseFloat(cs.fontSize)<=13.5&&!el.closest("button")&&!el.classList.contains("aic-mono"))el.classList.add("aic-mono");}
+  var t;function mode(){document.querySelectorAll(".aic-tool").forEach(function(r){var q=[].some.call(r.querySelectorAll(".aic-progress,.aic-qtext,.aic-q-text"),function(e){return e.offsetParent!==null});if(q!==r.classList.contains("aic-in-q"))r.classList.toggle("aic-in-q",q)})}
+  function run(){clearTimeout(t);t=setTimeout(function(){mode();document.querySelectorAll("body *").forEach(fix)},30)}
+  document.addEventListener("DOMContentLoaded",function(){run();new MutationObserver(run).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class","aria-pressed","aria-checked","data-state"]});
+    document.addEventListener("change",run,true);document.addEventListener("click",run,true);});
+})();
+</script>
+</head>
+<body style="margin:0;background:#F7F8FA">
+<!-- ===== BEGIN AI CHANNEL TOOL: copy from here to END into a WordPress Custom HTML block ===== -->
+<div class="aic-tool" id="aic-ai-dependency-score" data-theme="light">
+<style>
+.aic-tool{--aic-paper:#F7F8FA;--aic-card:#FFFFFF;--aic-ink:#162033;--aic-soft:#667085;--aic-line:#DEE3EA;--aic-sage:#EEF1F6;--aic-blue:#315EFB;--aic-blue-deep:#2448C9;--aic-blue-wash:#EEF3FF;--aic-amber:#A46207;--aic-amber-wash:#FBF4E8;--aic-green:#2F7A4E;--aic-green-wash:#EAF5EE;--aic-violet:#6D5BD0;--aic-radius:18px;--aic-radius-sm:12px;--aic-shadow:0 10px 28px rgba(21,32,51,.055);--aic-focus:#B8C7FF;
+  display:block;background:var(--aic-paper);color:var(--aic-ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.55;padding:28px 0 56px;-webkit-text-size-adjust:100%;text-align:left}
+@media (prefers-color-scheme:dark){.aic-tool:not([data-theme="light"]){--aic-paper:#101B2D;--aic-card:#162033;--aic-ink:#F2F4F8;--aic-soft:#A6B3C7;--aic-line:#2A3850;--aic-sage:#1E2A40;--aic-blue:#7A97FF;--aic-blue-deep:#9BB2FF;--aic-blue-wash:#1F2B45;--aic-amber:#E0A34A;--aic-amber-wash:#2B2618;--aic-green:#6FC592;--aic-green-wash:#16301F;--aic-violet:#A99CF0;--aic-shadow:none;--aic-focus:#4A63B8;color-scheme:dark}}
+.aic-tool[data-theme="dark"]{--aic-paper:#101B2D;--aic-card:#162033;--aic-ink:#F2F4F8;--aic-soft:#A6B3C7;--aic-line:#2A3850;--aic-sage:#1E2A40;--aic-blue:#7A97FF;--aic-blue-deep:#9BB2FF;--aic-blue-wash:#1F2B45;--aic-amber:#E0A34A;--aic-amber-wash:#2B2618;--aic-green:#6FC592;--aic-green-wash:#16301F;--aic-violet:#A99CF0;--aic-shadow:none;--aic-focus:#4A63B8;color-scheme:dark}
+.aic-tool *,.aic-tool *::before,.aic-tool *::after{box-sizing:border-box}
+.aic-tool h1,.aic-tool h2,.aic-tool h3,.aic-tool h4,.aic-tool p,.aic-tool ul,.aic-tool ol,.aic-tool figure,.aic-tool fieldset,.aic-tool legend{margin:0;padding:0}
+.aic-tool fieldset{border:0;min-width:0}
+.aic-tool ul,.aic-tool ol{padding-left:1.2em}
+.aic-tool button{font-family:inherit}
+.aic-tool a{color:var(--aic-blue);font-weight:700;text-decoration:none}
+.aic-tool a:hover{text-decoration:underline}
+.aic-tool a:focus-visible,.aic-tool button:focus-visible,.aic-tool input:focus-visible+.aic-opt-box,.aic-tool [tabindex]:focus-visible,.aic-tool summary:focus-visible{outline:3px solid var(--aic-focus);outline-offset:2px;border-radius:10px}
+.aic-tool [tabindex="-1"]:focus{outline:none}
+.aic-col{max-width:760px;margin:0 auto;padding-inline:clamp(16px,4vw,24px)}
+.aic-sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0;padding:0;margin:-1px}
+.aic-eyebrow{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--aic-blue);margin-bottom:10px}
+.aic-display{font-weight:800;letter-spacing:-.035em;line-height:1.06}
+.aic-h1{font-size:clamp(32px,6.4vw,50px);margin-bottom:16px}
+.aic-h2{font-size:clamp(24px,4.2vw,32px);font-weight:800;letter-spacing:-.03em;line-height:1.12;margin-bottom:10px}
+.aic-h3{font-size:18px;font-weight:800;letter-spacing:-.02em;line-height:1.25;margin-bottom:6px}
+.aic-lede{font-size:clamp(17px,2.3vw,19px);color:var(--aic-soft);max-width:640px}
+.aic-soft{color:var(--aic-soft)}
+.aic-small{font-size:13.5px}
+.aic-num{font-variant-numeric:tabular-nums}
+.aic-card{background:var(--aic-card);border:1px solid var(--aic-line);border-radius:var(--aic-radius);box-shadow:var(--aic-shadow);padding:clamp(18px,4vw,28px)}
+.aic-stack>*+*{margin-top:16px}
+.aic-gap{margin-top:28px}
+.aic-grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:620px){.aic-grid2{grid-template-columns:1fr}}
+.aic-meta{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 22px}
+.aic-pill{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--aic-soft);background:var(--aic-card);border:1px solid var(--aic-line);border-radius:999px;padding:6px 11px}
+.aic-tag{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:5px 9px;background:var(--aic-blue-wash);color:var(--aic-blue)}
+.aic-tag.is-amber{background:var(--aic-amber-wash);color:var(--aic-amber)}
+.aic-tag.is-green{background:var(--aic-green-wash);color:var(--aic-green)}
+.aic-tag.is-grey{background:var(--aic-sage);color:var(--aic-soft)}
+.aic-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:12px 20px;font-size:15.5px;font-weight:750;border-radius:999px;border:1px solid transparent;cursor:pointer;text-decoration:none!important;line-height:1.2;text-align:center}
+.aic-btn-primary{background:var(--aic-blue);color:#fff!important;box-shadow:0 6px 16px rgba(49,94,251,.16)}
+.aic-btn-primary:hover{background:var(--aic-blue-deep)}
+.aic-tool[data-theme="dark"] .aic-btn-primary{color:#0B1424!important}
+@media (prefers-color-scheme:dark){.aic-tool:not([data-theme="light"]) .aic-btn-primary{color:#0B1424!important}}
+.aic-btn-secondary{background:var(--aic-card);color:var(--aic-ink)!important;border-color:var(--aic-line)}
+.aic-btn-secondary:hover{border-color:var(--aic-blue);color:var(--aic-blue)!important}
+.aic-btn-link{background:none;border:0;color:var(--aic-soft);font-weight:700;font-size:14px;text-decoration:underline!important;padding:8px 4px;min-height:0;cursor:pointer}
+.aic-btn[disabled],.aic-btn[aria-disabled="true"]{opacity:.45;cursor:not-allowed;box-shadow:none}
+.aic-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.aic-row.is-between{justify-content:space-between}
+.aic-progress{height:6px;background:var(--aic-sage);border-radius:999px;overflow:hidden;margin:6px 0 22px}
+.aic-progress>span{display:block;height:100%;width:0;background:var(--aic-blue);border-radius:999px;transition:width .35s ease}
+.aic-qhead{display:flex;justify-content:space-between;gap:10px;align-items:baseline;font-size:13px;font-weight:700;color:var(--aic-soft)}
+.aic-qtext{font-size:clamp(19px,2.8vw,22px);font-weight:800;letter-spacing:-.02em;line-height:1.3;margin:4px 0 18px}
+.aic-opts{display:grid;gap:10px}
+.aic-opt{position:relative;display:block;cursor:pointer}
+.aic-opt input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.aic-opt-box{display:flex;gap:12px;align-items:flex-start;padding:13px 15px;border:1px solid var(--aic-line);border-radius:var(--aic-radius-sm);background:var(--aic-card);font-size:15.5px;line-height:1.45;transition:border-color .15s,background .15s,box-shadow .15s}
+.aic-opt:hover .aic-opt-box{border-color:#AFC0FF}
+.aic-opt-dot{flex:none;width:18px;height:18px;margin-top:2px;border-radius:50%;border:2px solid #B4BDCC;position:relative}
+.aic-opt-dot::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--aic-blue);transform:scale(0);transition:transform .15s}
+.aic-opt input:checked+.aic-opt-box{border-color:var(--aic-blue);box-shadow:0 0 0 3px var(--aic-blue-wash)}
+.aic-opt input:checked+.aic-opt-box .aic-opt-dot{border-color:var(--aic-blue)}
+.aic-opt input:checked+.aic-opt-box .aic-opt-dot::after{transform:scale(1)}
+.aic-opt input:disabled+.aic-opt-box{cursor:default}
+.aic-opt.is-correct input+.aic-opt-box{border-color:var(--aic-green);background:var(--aic-green-wash);box-shadow:none}
+.aic-opt.is-wrong input+.aic-opt-box{border-color:var(--aic-amber);background:var(--aic-amber-wash);box-shadow:none}
+.aic-opt-mark{display:block;font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-top:4px}
+.aic-opt-mark:empty{display:none}
+.aic-opt.is-correct input+.aic-opt-box .aic-opt-dot{border-color:var(--aic-green)}
+.aic-opt.is-wrong input+.aic-opt-box .aic-opt-dot{border-color:var(--aic-amber)}
+.aic-opt.is-wrong input+.aic-opt-box .aic-opt-dot::after{background:var(--aic-amber)}
+.aic-opt.is-correct .aic-opt-mark{color:var(--aic-green)}
+.aic-opt.is-wrong .aic-opt-mark{color:var(--aic-amber)}
+.aic-note{background:var(--aic-blue-wash);border-left:3px solid var(--aic-blue);border-radius:0 var(--aic-radius-sm) var(--aic-radius-sm) 0;padding:14px 16px;font-size:15px}
+.aic-note.is-amber{background:var(--aic-amber-wash);border-left-color:var(--aic-amber)}
+.aic-note.is-green{background:var(--aic-green-wash);border-left-color:var(--aic-green)}
+.aic-reveal{margin-top:18px;padding-top:18px;border-top:1px solid var(--aic-line)}
+.aic-verdict{font-weight:800;font-size:17px;letter-spacing:-.01em;margin-bottom:8px}
+.aic-verdict.is-right{color:var(--aic-green)}
+.aic-verdict.is-wrong{color:var(--aic-amber)}
+.aic-reveal p+p{margin-top:10px}
+.aic-src{margin-top:14px;font-size:14px;color:var(--aic-soft)}
+.aic-src a{overflow-wrap:anywhere}
+.aic-src li{margin-top:4px}
+.aic-nav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:22px;flex-wrap:wrap}
+.aic-bar-row{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr) 56px;gap:12px;align-items:center;padding:11px 0;border-top:1px solid var(--aic-line)}
+.aic-bar-row:first-child{border-top:0}
+@media (max-width:560px){.aic-bar-row{grid-template-columns:minmax(0,1fr) 56px}.aic-bar-row .aic-bar-label{grid-column:1/-1}}
+.aic-bar-label{font-weight:700;font-size:14.5px}
+.aic-bar{display:block;height:10px;background:var(--aic-sage);border-radius:999px;overflow:hidden}
+.aic-bar>span{display:block;height:100%;border-radius:999px;background:var(--aic-blue);transition:width .8s ease}
+.aic-bar>span.is-low{background:var(--aic-amber)}
+.aic-bar>span.is-high{background:var(--aic-green)}
+.aic-bar-pct{font-weight:800;font-size:14px;text-align:right;font-variant-numeric:tabular-nums}
+.aic-score{display:grid;grid-template-columns:auto minmax(0,1fr);gap:24px;align-items:center}
+@media (max-width:560px){.aic-score{grid-template-columns:1fr;gap:14px}}
+.aic-score-num{font-size:clamp(52px,11vw,76px);font-weight:800;letter-spacing:-.05em;line-height:1;font-variant-numeric:tabular-nums}
+.aic-score-num small{font-size:.32em;letter-spacing:0;color:var(--aic-soft);font-weight:700;margin-left:4px}
+.aic-list{display:grid;gap:12px;padding:0!important;list-style:none}
+.aic-item{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:start}
+.aic-item-n{width:30px;height:30px;border-radius:50%;background:var(--aic-blue-wash);color:var(--aic-blue);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center}
+.aic-item p{font-size:15px;color:var(--aic-soft)}
+.aic-dark{background:#162033;color:#E7ECF5;border-radius:var(--aic-radius);padding:clamp(20px,4.5vw,32px)}
+.aic-dark .aic-eyebrow{color:#9BB2FF}
+.aic-dark a{color:#B8C7FF}
+.aic-dark .aic-soft,.aic-dark p{color:#C9D2E1}
+.aic-dark .aic-h2,.aic-dark .aic-h3{color:#fff}
+.aic-dark .aic-btn-primary{background:#fff;color:#162033!important;box-shadow:none}
+.aic-dark .aic-btn-primary:hover{background:#E3E9FF}
+.aic-dark .aic-btn-secondary{background:transparent;color:#fff!important;border-color:#3A4A66}
+.aic-dark .aic-btn-secondary:hover{border-color:#B8C7FF;color:#B8C7FF!important}
+.aic-step{display:grid;gap:6px;padding:16px 0;border-top:1px solid #2E3C57}
+.aic-step:first-of-type{border-top:0;padding-top:4px}
+.aic-step .aic-row{margin-top:8px}
+.aic-keep{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;margin-top:16px;font-size:14px}
+.aic-keep a,.aic-keep button{font-size:14px}
+.aic-noregret li{margin-top:6px;font-size:15px}
+.aic-tool details{border-top:1px solid var(--aic-line)}
+.aic-tool details:last-child{border-bottom:1px solid var(--aic-line)}
+.aic-tool summary{cursor:pointer;list-style:none;padding:14px 0;font-weight:800;display:flex;justify-content:space-between;gap:12px;align-items:center}
+.aic-tool summary::-webkit-details-marker{display:none}
+.aic-tool summary::after{content:"+";color:var(--aic-soft);font-weight:800;font-size:18px}
+.aic-tool details[open] summary::after{content:"\2013"}
+.aic-details-body{padding:0 0 16px;font-size:15px;color:var(--aic-soft)}
+.aic-details-body p+p{margin-top:8px}
+.aic-foot{margin-top:28px;font-size:13px;color:var(--aic-soft);line-height:1.6}
+.aic-foot p+p{margin-top:6px}
+.aic-screen[hidden]{display:none!important}
+.aic-fade{animation:aicFade .3s ease both}
+@keyframes aicFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.aic-tool *,.aic-tool *::before,.aic-tool *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media print{
+  .aic-tool{background:#fff!important;color:#000;padding:0;font-size:11pt}
+  .aic-tool .aic-noprint{display:none!important}
+  .aic-tool .aic-card{box-shadow:none;border:1px solid #bbb;break-inside:avoid}
+  .aic-tool .aic-dark{background:#fff!important;color:#000!important;border:1px solid #bbb}
+  .aic-tool .aic-dark *{color:#000!important}
+  .aic-tool details{display:block}
+  .aic-tool details>*{display:block}
+  .aic-tool a{color:#000;text-decoration:underline}
+  .aic-tool .aic-bar>span,.aic-tool .aic-tag,.aic-tool svg{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+/* ---- extras shared by the four resilience / risk tools ---- */
+.aic-tool{--aic-red:#B42318;--aic-red-wash:#FDEDEB}
+.aic-tool[data-theme="dark"]{--aic-red:#F97066;--aic-red-wash:#3A1E22}
+@media (prefers-color-scheme:dark){.aic-tool:not([data-theme="light"]){--aic-red:#F97066;--aic-red-wash:#3A1E22}}
+.aic-tag.is-red{background:var(--aic-red-wash);color:var(--aic-red)}
+.aic-note.is-red{background:var(--aic-red-wash);border-left-color:var(--aic-red)}
+.aic-seg{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.aic-seg label{position:relative;cursor:pointer;display:inline-flex}
+.aic-seg input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.aic-seg span{display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:7px 13px;border:1px solid var(--aic-line);border-radius:999px;background:var(--aic-card);font-size:14px;font-weight:700;color:var(--aic-soft);line-height:1.25;transition:background .15s,border-color .15s,color .15s}
+.aic-seg label:hover span{border-color:#AFC0FF;color:var(--aic-ink)}
+.aic-seg input:checked+span{background:var(--aic-blue);border-color:var(--aic-blue);color:#fff}
+.aic-tool[data-theme="dark"] .aic-seg input:checked+span{color:#0B1424}
+.aic-seg input:focus-visible+span{outline:3px solid var(--aic-focus);outline-offset:2px}
+.aic-seg.is-chips input[type=checkbox]+span::before{content:"";width:14px;height:14px;border-radius:4px;border:2px solid #B4BDCC;flex:none}
+.aic-seg.is-chips input[type=checkbox]:checked+span::before{border-color:#fff;background:#fff;box-shadow:inset 0 0 0 2px var(--aic-blue)}
+.aic-seg-legend{font-size:13px;font-weight:800;color:var(--aic-soft);letter-spacing:.01em}
+.aic-edition{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:18px}
+.aic-edition .aic-seg{margin-top:0}
+.aic-chipgrid{display:grid;gap:8px;grid-template-columns:1fr}
+@media (min-width:620px){.aic-chipgrid{grid-template-columns:1fr 1fr}}
+.aic-pick{position:relative;display:block;cursor:pointer}
+.aic-pick input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.aic-pick-box{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1px solid var(--aic-line);border-radius:var(--aic-radius-sm);background:var(--aic-card);height:100%}
+.aic-pick:hover .aic-pick-box{border-color:#AFC0FF}
+.aic-pick-check{flex:none;width:20px;height:20px;border-radius:6px;border:2px solid #B4BDCC;margin-top:1px;display:flex;align-items:center;justify-content:center}
+.aic-pick input:checked+.aic-pick-box{border-color:var(--aic-blue);box-shadow:0 0 0 3px var(--aic-blue-wash)}
+.aic-pick input:checked+.aic-pick-box .aic-pick-check{background:var(--aic-blue);border-color:var(--aic-blue)}
+.aic-pick input:checked+.aic-pick-box .aic-pick-check::after{content:"";width:9px;height:5px;border-left:2.5px solid #fff;border-bottom:2.5px solid #fff;transform:rotate(-45deg) translate(1px,-1px)}
+.aic-pick input:focus-visible+.aic-pick-box{outline:3px solid var(--aic-focus);outline-offset:2px}
+.aic-pick-t{font-weight:800;font-size:15.5px;line-height:1.3;display:block}
+.aic-pick-h{font-size:13.5px;color:var(--aic-soft);display:block;margin-top:2px}
+.aic-rows>*+*{border-top:1px solid var(--aic-line)}
+.aic-rowq{padding:16px 0}
+.aic-rowq:first-child{padding-top:4px}
+.aic-rowq-t{font-weight:800;font-size:16.5px;letter-spacing:-.01em}
+.aic-rowq-h{font-size:13.5px;color:var(--aic-soft)}
+.aic-rowq fieldset{margin-top:10px}
+.aic-table{width:100%;border-collapse:collapse;font-size:14.5px}
+.aic-table th{text-align:left;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--aic-soft);font-weight:800;padding:8px 8px 8px 0;border-bottom:1px solid var(--aic-line);vertical-align:bottom}
+.aic-table td{padding:10px 8px 10px 0;border-bottom:1px solid var(--aic-line);vertical-align:top}
+.aic-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.aic-fix{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:start;padding:16px 0;border-top:1px solid var(--aic-line)}
+.aic-fix:first-child{border-top:0;padding-top:4px}
+.aic-fix p{font-size:15px;color:var(--aic-soft);margin-top:4px}
+.aic-fix .aic-tag{margin-bottom:6px}
+.aic-line{display:inline-block;min-width:9em;border-bottom:1px solid var(--aic-soft);height:1.1em;vertical-align:baseline}
+.aic-input{width:100%;padding:10px 12px;border:1px solid var(--aic-line);border-radius:10px;background:var(--aic-card);color:var(--aic-ink);font:inherit;font-size:15px}
+.aic-input:focus{outline:3px solid var(--aic-focus);outline-offset:0;border-color:var(--aic-blue)}
+.aic-field{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:800;color:var(--aic-soft)}
+.aic-fields{display:grid;gap:10px;grid-template-columns:1fr}
+@media (min-width:620px){.aic-fields{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.aic-printonly{display:none}
+@media print{
+  .aic-tool .aic-printonly{display:block!important}
+  .aic-tool .aic-screen[hidden]{display:none!important}
+  .aic-tool .aic-seg span,.aic-tool .aic-note,.aic-tool .aic-tag{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .aic-tool .aic-input{border:0;border-bottom:1px solid #999;border-radius:0;padding:2px 0}
+  .aic-tool .aic-pagebreak{break-before:page}
+  .aic-tool .aic-table tr{break-inside:avoid}
+}
+
+.aic-dep-map{width:100%;min-width:520px;border-collapse:separate;border-spacing:4px;font-size:13px}
+.aic-dep-map th{font-size:11.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--aic-soft);text-align:left;padding:4px;vertical-align:bottom}
+.aic-dep-map tbody th{width:110px;vertical-align:middle}
+.aic-dep-cell{background:var(--aic-sage);border-radius:10px;padding:6px;vertical-align:top;height:58px}
+.aic-dep-cell.is-danger{background:var(--aic-red-wash)}
+.aic-dep-cell.is-warn{background:var(--aic-amber-wash)}
+.aic-dep-chip{display:block;background:var(--aic-card);border:1px solid var(--aic-line);border-radius:8px;padding:4px 7px;margin:3px 0;font-weight:700;font-size:12.5px;line-height:1.25}
+.aic-dep-cardt{min-width:560px}
+.aic-dep-cardt td{font-size:14px}
+@media print{
+  #aic-ai-dependency-score .aic-dep-cell{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #aic-ai-dependency-score .aic-dep-map,#aic-ai-dependency-score .aic-dep-cardt{min-width:0}
+  #aic-ai-dependency-score #aic-dep-card{break-before:page}
+}
+
+</style>
+<div class="aic-col">
+  <noscript><p>This tool needs JavaScript. It runs in your browser and nothing is sent.</p></noscript>
+
+  <!-- ===== Intro ===== -->
+  <section class="aic-screen" id="aic-dep-intro" aria-labelledby="aic-dep-h1">
+    <div class="aic-edition aic-noprint">
+      <span class="aic-seg-legend" id="aic-dep-edl">This check is for</span>
+      <div class="aic-seg" role="radiogroup" aria-labelledby="aic-dep-edl">
+        <label><input type="radio" name="aic-dep-ed" value="business" checked><span>A small business</span></label>
+        <label><input type="radio" name="aic-dep-ed" value="household"><span>A household</span></label>
+      </div>
+    </div>
+    <p class="aic-eyebrow">AI &amp; Digital Dependency Score</p>
+    <h1 class="aic-display aic-h1" id="aic-dep-h1" data-focus></h1>
+    <p class="aic-lede" id="aic-dep-lede"></p>
+    <div class="aic-meta"><span class="aic-pill" id="aic-dep-effort"></span><span class="aic-pill">No email, nothing stored</span></div>
+    <div class="aic-note" id="aic-dep-why" style="margin-bottom:22px"></div>
+    <div class="aic-card">
+      <p class="aic-eyebrow">How it works</p>
+      <ol class="aic-list" style="counter-reset:n">
+        <li class="aic-item"><span class="aic-item-n">1</span><div><h3 class="aic-h3">Pick what you rely on</h3><p id="aic-dep-how1"></p></div></li>
+        <li class="aic-item"><span class="aic-item-n">2</span><div><h3 class="aic-h3">Say what happens if it stops</h3><p>For each one: how bad a day without it would be, and what you'd fall back on.</p></div></li>
+        <li class="aic-item"><span class="aic-item-n">3</span><div><h3 class="aic-h3">Check the keys</h3><p>Six questions about sign-ins, recovery, backups and the call-back rule.</p></div></li>
+      </ol>
+    </div>
+    <div class="aic-row" style="margin-top:22px"><button type="button" class="aic-btn aic-btn-primary" id="aic-dep-start">Start the check</button></div>
+    <p class="aic-privacy aic-small aic-soft" style="display:flex;gap:8px;margin-top:14px" id="aic-dep-privacy"></p>
+  </section>
+
+  <!-- ===== Step 1: pick systems ===== -->
+  <section class="aic-screen" id="aic-dep-s1" aria-labelledby="aic-dep-s1h" hidden>
+    <p class="aic-eyebrow">Step 1 of 3</p>
+    <div class="aic-progress" aria-hidden="true"><span style="width:20%"></span></div>
+    <h2 class="aic-h2" id="aic-dep-s1h" data-focus></h2>
+    <p class="aic-soft" id="aic-dep-s1p" style="margin-bottom:18px"></p>
+    <fieldset><legend class="aic-sr">Systems you rely on</legend><div class="aic-chipgrid" id="aic-dep-picks"></div></fieldset>
+    <div class="aic-nav"><button type="button" class="aic-btn-link" data-back="intro">&larr; Back</button><span class="aic-small aic-soft" id="aic-dep-s1hint" aria-live="polite"></span><button type="button" class="aic-btn aic-btn-primary" id="aic-dep-s1next">Next: what happens if they stop</button></div>
+  </section>
+
+  <!-- ===== Step 2: rate systems ===== -->
+  <section class="aic-screen" id="aic-dep-s2" aria-labelledby="aic-dep-s2h" hidden>
+    <p class="aic-eyebrow">Step 2 of 3</p>
+    <div class="aic-progress" aria-hidden="true"><span style="width:50%"></span></div>
+    <h2 class="aic-h2" id="aic-dep-s2h" data-focus>What happens if each one stops for a day?</h2>
+    <p class="aic-soft" id="aic-dep-s2p" style="margin-bottom:8px"></p>
+    <div class="aic-card"><div class="aic-rows" id="aic-dep-rate"></div></div>
+    <div class="aic-nav"><button type="button" class="aic-btn-link" data-back="s1">&larr; Back</button><span class="aic-small aic-soft" id="aic-dep-s2hint" aria-live="polite"></span><button type="button" class="aic-btn aic-btn-primary" id="aic-dep-s2next">Next: the keys</button></div>
+  </section>
+
+  <!-- ===== Step 3: keys and recovery ===== -->
+  <section class="aic-screen" id="aic-dep-s3" aria-labelledby="aic-dep-s3h" hidden>
+    <p class="aic-eyebrow">Step 3 of 3</p>
+    <div class="aic-progress" aria-hidden="true"><span style="width:80%"></span></div>
+    <h2 class="aic-h2" id="aic-dep-s3h" data-focus>Who holds the keys?</h2>
+    <p class="aic-soft">Most outages are survivable. Being locked out of your own accounts is what turns a bad day into a bad month.</p>
+    <div id="aic-dep-keys"></div>
+    <div class="aic-nav"><button type="button" class="aic-btn-link" data-back="s2">&larr; Back</button><span class="aic-small aic-soft" id="aic-dep-s3hint" aria-live="polite"></span><button type="button" class="aic-btn aic-btn-primary" id="aic-dep-s3next">See where you stand</button></div>
+  </section>
+
+  <!-- ===== Results ===== -->
+  <section class="aic-screen" id="aic-dep-res" aria-labelledby="aic-dep-resh" hidden>
+    <p class="aic-eyebrow">Where you stand</p>
+    <div class="aic-card">
+      <div class="aic-score">
+        <div class="aic-score-num aic-num" id="aic-dep-score" aria-hidden="true"></div>
+        <div>
+          <h2 class="aic-h2" id="aic-dep-resh" data-focus></h2>
+          <p class="aic-soft" id="aic-dep-resp"></p>
+        </div>
+      </div>
+      <p class="aic-sr" id="aic-dep-scoresr"></p>
+    </div>
+
+    <div class="aic-card aic-gap">
+      <p class="aic-eyebrow">Your single points of failure</p>
+      <h2 class="aic-h2" id="aic-dep-spofh"></h2>
+      <p class="aic-soft" id="aic-dep-spofp" style="margin-bottom:10px"></p>
+      <div id="aic-dep-spof"></div>
+    </div>
+
+    <div class="aic-card aic-gap aic-noprint">
+      <p class="aic-eyebrow">The map</p>
+      <h2 class="aic-h2">Where each system sits</h2>
+      <p class="aic-soft" style="margin-bottom:14px">Top left is where outages hurt: you need it, and there's nothing behind it. Move things right.</p>
+      <div id="aic-dep-map"></div>
+    </div>
+
+    <div class="aic-card aic-gap" id="aic-dep-keysres">
+      <p class="aic-eyebrow">The keys</p>
+      <h2 class="aic-h2">Fix these before the next outage</h2>
+      <div id="aic-dep-keyfix"></div>
+    </div>
+
+    <div class="aic-card aic-gap" id="aic-dep-card">
+      <p class="aic-eyebrow">Print this and keep it somewhere you can reach without a screen</p>
+      <h2 class="aic-h2" id="aic-dep-cardh"></h2>
+      <div class="aic-fields aic-noprint" style="margin:12px 0 4px">
+        <label class="aic-field">Name on the card<input class="aic-input" id="aic-dep-org" autocomplete="organization"></label>
+        <label class="aic-field" id="aic-dep-whol">Who decides it's an outage<input class="aic-input" id="aic-dep-who"></label>
+        <label class="aic-field">Where this card lives<input class="aic-input" id="aic-dep-where"></label>
+      </div>
+      <div id="aic-dep-cardbody"></div>
+      <div class="aic-row aic-noprint" style="margin-top:16px"><button type="button" class="aic-btn aic-btn-secondary" id="aic-dep-print">Print or save as PDF</button></div>
+    </div>
+
+    <div class="aic-dark aic-gap aic-noprint"><p class="aic-eyebrow">The fork</p><h2 class="aic-h2" id="aic-dep-forkh"></h2><p id="aic-dep-forkp"></p></div>
+
+    <div class="aic-gap" id="aic-dep-handoff"></div>
+    <div class="aic-row aic-noprint" style="margin-top:14px"><button type="button" class="aic-btn-link" id="aic-dep-edit">Change my answers</button><button type="button" class="aic-btn-link" id="aic-dep-restart">Start again</button></div>
+
+    <div class="aic-foot">
+      <details><summary>How the score works, and where the facts come from</summary><div class="aic-details-body" id="aic-dep-method"></div></details>
+    </div>
+  </section>
+</div>
+
+<script>
+window.AICHANNEL_CONFIG = Object.assign({
+  resultsFormUrl: "#",      // "Email me my results" form (WordPress form page)
+  coursesUrl: "#",          // "Learn with a member" (Central AI course schedule)
+  matchUrl: "#",            // "Get matched to someone" (advisory/consulting form)
+  newsletterUrl: "#",       // separate newsletter opt-in
+  contentBaseUrl: ""        // prefix for links to sibling AI Channel pieces by slug, e.g. "/tools/" ("" = same folder)
+}, window.AICHANNEL_CONFIG || {});
+(function () {
+  'use strict';
+  var TOOL = { slug: 'ai-dependency-score', rootId: 'aic-ai-dependency-score', audience: 'business', name: 'AI & Digital Dependency Score' };
+  /* ---------- Shared helpers (same in every AI Channel tool) ---------- */
+  var CFG = window.AICHANNEL_CONFIG;
+  var root = document.getElementById(TOOL.rootId);
+  if (!root) return;
+  var REDUCE = false;
+  try { REDUCE = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  var IN_FRAME = false;
+  try { IN_FRAME = window.self !== window.top; } catch (e) { IN_FRAME = true; }
+
+  function $(sel, el) { return (el || root).querySelector(sel); }
+  function $all(sel, el) { return Array.prototype.slice.call((el || root).querySelectorAll(sel)); }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function utmParams() {
+    var out = {};
+    try {
+      var p = new URLSearchParams(window.location.search);
+      p.forEach(function (v, k) { if (/^utm_/i.test(k)) out[k] = v; });
+    } catch (e) {}
+    return out;
+  }
+  function emit(name, extra) {
+    var detail = Object.assign({
+      event: name,
+      audience: TOOL.audience,
+      source_content_or_tool: TOOL.slug,
+      assessment_name: TOOL.name
+    }, extra || {});
+    try { window.dispatchEvent(new CustomEvent('aichannel:event', { detail: detail })); } catch (e) {}
+    try { if (window.parent) window.parent.postMessage(Object.assign({ type: 'aichannel:event' }, detail), '*'); } catch (e) {}
+  }
+  var LEAD_TYPES = { email_results: 'results_email', learn_with_member: 'training', get_matched: 'advisory', newsletter: 'newsletter' };
+  function handoffUrl(base, cta, result) {
+    if (!base || base === '#') return '#';
+    var f = Object.assign({
+      lead_type: LEAD_TYPES[cta] || 'other',
+      audience: TOOL.audience,
+      source_page: window.location.href,
+      source_content_or_tool: TOOL.slug,
+      cta_clicked: cta,
+      assessment_name: TOOL.name,
+      assessment_result: result && result.label,
+      score: result && result.score
+    }, utmParams());
+    var q = Object.keys(f).filter(function (k) { return f[k] !== undefined && f[k] !== null && f[k] !== ''; })
+      .map(function (k) { return encodeURIComponent(k) + '=' + encodeURIComponent(f[k]); }).join('&');
+    var hash = '', i = base.indexOf('#');
+    if (i > -1) { hash = base.slice(i); base = base.slice(0, i); }
+    return base + (base.indexOf('?') > -1 ? '&' : '?') + q + hash;
+  }
+  /* Wire a CTA link. getResult() returns {label, score} at click time. */
+  function wireCta(a, cta, cfgKey, getResult) {
+    if (!a) return;
+    function refresh() { a.href = handoffUrl(CFG[cfgKey], cta, getResult ? getResult() : null); }
+    refresh();
+    if (IN_FRAME) { a.target = '_blank'; a.rel = 'noopener'; }
+    a.addEventListener('click', function (ev) {
+      refresh();
+      var r = getResult ? getResult() : {};
+      emit('cta_clicked', { cta_clicked: cta, assessment_result: r && r.label, score: r && r.score });
+      if (a.getAttribute('href') === '#') ev.preventDefault();
+    });
+  }
+  function scrollToRoot() {
+    try {
+      var top = root.getBoundingClientRect().top;
+      if (top < 0 || top > window.innerHeight * 0.5) {
+        window.scrollTo({ top: window.pageYOffset + top - 12, behavior: REDUCE ? 'auto' : 'smooth' });
+      }
+    } catch (e) {}
+  }
+  function focusHeading(el) {
+    if (!el) return;
+    el.setAttribute('tabindex', '-1');
+    try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
+  }
+  function show(screen) {
+    $all('.aic-screen').forEach(function (s) { s.hidden = s !== screen; });
+    screen.classList.remove('aic-fade'); void screen.offsetWidth; screen.classList.add('aic-fade');
+    scrollToRoot();
+    focusHeading(screen.querySelector('[data-focus]') || screen.querySelector('h1,h2'));
+  }
+  function store(key, val) { try { sessionStorage.setItem(TOOL.slug + ':' + key, JSON.stringify(val)); } catch (e) {} }
+  function load(key) { try { var v = sessionStorage.getItem(TOOL.slug + ':' + key); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
+  function clearStore() { try { Object.keys(sessionStorage).forEach(function (k) { if (k.indexOf(TOOL.slug + ':') === 0) sessionStorage.removeItem(k); }); } catch (e) {} }
+  function contentUrl(slug) { return (CFG.contentBaseUrl || '') + slug + '.html'; }
+  var started = false;
+  function startOnce(extra) { if (started) return; started = true; emit('tool_started', extra || {}); }
+
+  /* Result hand-off: one next step, one member route, then email + newsletter. o = {
+     next:{title, body, href, label, newTab}, sol:{kind:'courses'|'match', title, body}, getResult } */
+  function renderHandoff(host, o) {
+    var solCta = o.sol.kind === 'match' ? 'get_matched' : 'learn_with_member';
+    var solKey = o.sol.kind === 'match' ? 'matchUrl' : 'coursesUrl';
+    var solLabel = o.sol.kind === 'match' ? 'Get matched to someone' : 'Learn with a member';
+    host.innerHTML =
+      '<div class="aic-grid2 aic-noprint">' +
+        '<div class="aic-card"><p class="aic-eyebrow">What to do next</p><h3 class="aic-h3">' + esc(o.next.title) + '</h3>' +
+          '<p class="aic-soft" style="font-size:15px">' + esc(o.next.body) + '</p>' +
+          '<div class="aic-row" style="margin-top:14px"><a class="aic-btn aic-btn-secondary" data-aic-next href="' + esc(o.next.href) + '">' + esc(o.next.label) + '</a></div></div>' +
+        '<div class="aic-card" style="border-color:#C7D3FF"><p class="aic-eyebrow">Need more than an answer?</p><h3 class="aic-h3">' + esc(o.sol.title) + '</h3>' +
+          '<p class="aic-soft" style="font-size:15px">' + esc(o.sol.body) + '</p>' +
+          '<div class="aic-row" style="margin-top:14px"><a class="aic-btn aic-btn-primary" data-aic-sol href="#">' + solLabel + '</a></div></div>' +
+      '</div>' +
+      '<div class="aic-keep aic-noprint">' +
+        '<a href="#" data-aic-email>Email me my results</a>' +
+        '<span class="aic-soft">Optional. It opens a short form and doesn’t sign you up to anything.</span>' +
+      '</div>' +
+      '<p class="aic-keep aic-noprint aic-soft" style="margin-top:8px">Keep up without keeping up with everything. <a href="#" data-aic-news>Get the newsletter</a></p>';
+    wireCta($('[data-aic-sol]', host), solCta, solKey, o.getResult);
+    wireCta($('[data-aic-email]', host), 'email_results', 'resultsFormUrl', o.getResult);
+    var news = $('[data-aic-news]', host);
+    news.href = CFG.newsletterUrl || '#';
+    if (IN_FRAME) { news.target = '_blank'; news.rel = 'noopener'; }
+    news.addEventListener('click', function (ev) { var r = o.getResult(); emit('cta_clicked', { cta_clicked: 'newsletter', assessment_result: r.label, score: r.score }); if (news.getAttribute('href') === '#') ev.preventDefault(); });
+    var nx = $('[data-aic-next]', host);
+    if (IN_FRAME) { nx.target = '_top'; }
+    nx.addEventListener('click', function () { var r = o.getResult(); emit('cta_clicked', { cta_clicked: 'next_step', next_step: o.next.label, assessment_result: r.label, score: r.score }); });
+  }
+  function radioQ(name, text, opts, sel, hint) {
+    return '<fieldset class="aic-q" style="margin-top:22px"><legend class="aic-qtext" style="font-size:18px;margin-bottom:12px">' + text + '</legend>' +
+      (hint ? '<p class="aic-small aic-soft" style="margin:-6px 0 12px">' + hint + '</p>' : '') +
+      '<div class="aic-opts">' + opts.map(function (o, i) {
+        return '<label class="aic-opt"><input type="radio" name="' + name + '" value="' + i + '"' + (String(sel) === String(i) ? ' checked' : '') + '><span class="aic-opt-box"><span class="aic-opt-dot" aria-hidden="true"></span><span>' + esc(o[0]) + '</span></span></label>';
+      }).join('') + '</div></fieldset>';
+  }
+  function segQ(name, legend, opts, sel) {
+    return '<fieldset><legend class="aic-seg-legend">' + esc(legend) + '</legend><div class="aic-seg">' + opts.map(function (o, i) {
+      return '<label><input type="radio" name="' + name + '" value="' + i + '"' + (String(sel) === String(i) ? ' checked' : '') + '><span>' + esc(o) + '</span></label>';
+    }).join('') + '</div></fieldset>';
+  }
+  var LOCK_SVG = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true" style="flex:none;margin-top:3px"><rect x="2" y="6" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M4.5 6V4.5a2.5 2.5 0 015 0V6" stroke="currentColor" stroke-width="1.5"/></svg>';
+
+  /* ================= AI & Digital Dependency Score ================= */
+  var ED = {
+    business: {
+      audience: 'business',
+      h1: 'Which systems would stop you trading if they failed?',
+      lede: 'Find the single points of failure in your business before an outage finds them for you. Pick the systems you rely on, say what happens if each one stops, and you’ll get your weak points ranked, the fixes that matter most, and a one-page outage card to print.',
+      effort: 'About 6 minutes',
+      why: '<strong>Outages aren’t rare, and they’re rarely your fault.</strong> On 19 July 2024 one faulty security update crashed about 8.5 million Windows computers, by Microsoft’s count. On 20 October 2025 a fault in one Amazon Web Services region took apps, banking and booking systems offline for around 14 hours. The businesses that kept trading weren’t bigger. They had a fallback.',
+      how1: 'Email, payments, bookings, files, the AI tools people now lean on. Tick the ones you’d miss.',
+      s1h: 'What does the business run on?',
+      s1p: 'Tick everything you’d miss within a day. The usual suspects are already ticked; untick what doesn’t apply.',
+      s2p: 'Two quick answers for each, plus who can get in if the usual person is away. Be honest about the fallback: “we’d figure it out” is improvising.',
+      impact: ['Annoying', 'Slows us down', 'We stop trading'],
+      access: true,
+      cardh: 'Our outage card',
+      wholbl: 'Who decides it’s an outage',
+      forkh: 'Two businesses, one outage',
+      fork: 'Same morning, same outage: the card reader stops, the inbox won’t load, the booking system shows a spinner. One business texts customers from a paper list, takes payment by link, and loses an hour. The other loses the day. The difference isn’t size or budget. One of them spent an afternoon on this while nothing was wrong. Re-run this check when you add a system or someone leaves.',
+      systems: [
+        { id: 'email', t: 'Email and calendar', h: 'Microsoft 365, Google Workspace or similar', on: 1,
+          fix: 'Put passkeys or 2-step verification on every mailbox, admins first, and give a second person admin access. Agree now what you’ll use if email is down: a group text or a messaging list.',
+          idea: 'Group text for staff; customer numbers on paper' },
+        { id: 'payments', t: 'Taking payments', h: 'Card reader, online checkout, invoicing', on: 1,
+          fix: 'Set up a second way to get paid before you need it: payment links you can text, or a backup reader that works on mobile data. Write down how to take a payment by phone.',
+          idea: 'Payment links by text; backup reader on mobile data' },
+        { id: 'banking', t: 'Online banking and payroll', h: 'Paying suppliers, staff and tax', on: 1,
+          fix: 'Make sure two people can log in and approve, each with their own login, not a shared one. Put the bank’s business helpline and fraud line on paper.',
+          idea: 'Second authorized person; bank’s business line' },
+        { id: 'accounts', t: 'Accounting and bookkeeping', h: 'Xero, QuickBooks, Sage or a spreadsheet', on: 0,
+          fix: 'Export your records on a schedule (monthly is fine) to somewhere the accounting software doesn’t control.',
+          idea: 'Monthly export, saved separately' },
+        { id: 'customers', t: 'Customer records and bookings', h: 'CRM, booking system, or the big spreadsheet', on: 1,
+          fix: 'Export bookings and contacts regularly, and keep the next week’s appointments somewhere you can open offline.',
+          idea: 'Next week’s bookings exported or printed' },
+        { id: 'files', t: 'Shared files and documents', h: 'OneDrive, Google Drive, Dropbox, an office server', on: 1,
+          fix: 'A sync isn’t a backup: if files are deleted or locked by ransomware, the sync copies that too. Add a separate backup and restore one folder from it this month.',
+          idea: 'Separate backup, restore tested' },
+        { id: 'website', t: 'Website, domain and online shop', h: 'Including who controls the domain name', on: 0,
+          fix: 'Find out who holds the domain and hosting logins and make sure it’s the business, not a former supplier. Turn on auto-renew and 2-step verification.',
+          idea: 'Domain logins held by the business; web supplier’s number' },
+        { id: 'phones', t: 'Phones and messaging', h: 'Mobiles, WhatsApp Business, internet phone system', on: 0,
+          fix: 'Know how to divert the main number to a mobile, and keep a second way to reach staff and key customers.',
+          idea: 'Divert the main number to a mobile' },
+        { id: 'internet', t: 'Internet and power at the premises', h: 'Broadband, Wi-Fi, the router in the cupboard', on: 1,
+          fix: 'Test a phone hotspot for the essentials (payments, email) and keep a charged power bank at the till or desk.',
+          idea: 'Phone hotspot; power bank; paper forms' },
+        { id: 'ai', t: 'AI tools in daily work', h: 'Drafting, customer replies, meeting notes, code', on: 1,
+          fix: 'Write down which work now depends on which AI tool, and keep the old way (or a second tool) working. Prices, terms and availability can change with little notice.',
+          idea: 'Second tool, or the manual process written down' },
+        { id: 'supplier', t: 'One key supplier or platform', h: 'Marketplace, point-of-sale provider, IT contractor', on: 0,
+          fix: 'Ask the supplier what happens if they fail, keep their emergency contact on paper, and name one alternative you could switch to within a week.',
+          idea: 'Supplier’s emergency contact; one named alternative' }
+      ],
+      keys: [
+        { q: 'How do people sign in to email and the main business accounts?',
+          o: [['Passwords only', 0], ['Some people have 2-step codes, not everyone', 1], ['Everyone has 2-step verification', 2], ['Passkeys or an authenticator app for everyone, admins first', 3]],
+          fix: ['Secure the inbox first.', 'Email resets every other account, so it’s the one attackers want. The UK’s National Cyber Security Centre now says to use passkeys where your provider supports them, and strong unique passwords with 2-step verification where it doesn’t. Start with whoever has admin rights.'] },
+        { q: 'If the person who manages your accounts was unreachable for two weeks, could someone else get into the admin side of email, the domain, the website and banking?',
+          o: [['No — it all lives with one person', 0], ['Probably, with a lot of digging', 1], ['Yes, a second person has access', 2], ['Yes — two people, and the recovery details are written down and stored safely', 3]],
+          fix: ['End the one-person dependency.', 'Give a second, trusted person their own admin access (not a shared password), and put the recovery details somewhere two people can reach: a password manager’s shared vault or a sealed envelope in the safe.'] },
+        { q: 'If ransomware locked your files tonight, what would you restore from?',
+          o: [['Honestly, I don’t know', 0], ['The cloud sync copy (OneDrive, Google Drive)', 1], ['A separate backup', 2], ['A separate backup, kept apart from our systems, that we’ve restored from in the last year', 3]],
+          fix: ['Restore one folder this month.', 'A backup you’ve never restored is a hope, not a backup. Keep at least one copy that isn’t permanently connected to your systems, protect any online backup with 2-step verification, then put a restore test in the calendar.'] },
+        { q: 'When a supplier or customer emails to say their bank details have changed, what happens?',
+          o: [['We update them', 0], ['Depends who picks it up', 1], ['We usually check by phone', 2], ['Always a call-back on a number we already had, and a second person approves', 3]],
+          fix: ['Agree the call-back rule.', 'Any change of bank details, and any urgent payment request, gets checked by calling a number you already had — never one in the email. Business email compromise cost US victims about $3 billion in 2025, by the FBI’s count. A voice that sounds right is no longer proof.'] },
+        { q: 'Could you keep trading for a morning with no internet?',
+          o: [['No — everything stops', 0], ['We’d muddle through', 1], ['Partly: a phone hotspot, paper forms, contacts offline', 2], ['Yes — there’s a written outage plan and we’ve tried it', 3]],
+          fix: ['Write the one-page outage plan.', 'Who decides you’re in outage mode, what you tell customers, and the manual workaround for each system on your outage card below. Only about a quarter of UK businesses have a formal incident response plan, so a single page puts you ahead.'] },
+        { q: 'If a key AI tool went down, doubled its price or changed its terms, could you do that work another way?',
+          o: [['We’d be stuck', 0], ['Slowly, by hand', 1], ['Yes, with a second tool or the old process', 2], ['Yes, and we’ve written down which work depends on which tool', 3]],
+          fix: ['Map the work that depends on AI.', 'List the tasks where an AI tool is now part of the process: replies, quotes, notes, code. For each, name the fallback. It takes twenty minutes and stops a pricing email or an outage becoming a crisis.'] }
+      ],
+      levels: [
+        { min: 0, name: 'One bad day from a standstill', desc: 'Too much of what the business runs on has nothing behind it, or sits with one person. That’s common in small businesses, and it’s the cheapest kind of problem to fix: most of the moves below take an afternoon.' },
+        { min: 40, name: 'Fragile in places', desc: 'You’d cope with some outages and stall on others. The weak points are specific, which makes them easy to target. Start at the top of the list.' },
+        { min: 65, name: 'Mostly covered', desc: 'You have fallbacks for most of what matters. What’s left is usually one system, or one person, that everything quietly depends on.' },
+        { min: 85, name: 'Ready for the outage', desc: 'You’d handle a cloud outage, a lost laptop or a locked account with a plan rather than a panic. Keep it current: re-run this when you add a system or someone leaves.' }
+      ]
+    },
+    household: {
+      audience: 'individual',
+      h1: 'What would stop your household if one account, phone or service failed?',
+      lede: 'Find the single points of failure at home before an outage finds them for you. Pick what you rely on, say what happens if it stops, and you’ll get your weak points ranked, the fixes that matter most, and a one-page card for the kitchen drawer.',
+      effort: 'About 5 minutes',
+      why: '<strong>Most households have one phone or one email account that everything hangs off.</strong> Lose it, or lose the power for a day, and bank logins, photos, 2-step codes and family contacts can all go with it. None of the fixes are technical. They’re a few things written down and a second copy of what you can’t replace.',
+      how1: 'Your main email, your phone, banking, photos, the AI tools you’ve started leaning on. Tick the ones you’d miss.',
+      s1h: 'What does your household run on?',
+      s1p: 'Tick everything you’d miss within a day. The usual suspects are already ticked; untick what doesn’t apply.',
+      s2p: 'Two quick answers for each. Be honest about the fallback: “I’d figure it out” is improvising.',
+      impact: ['Annoying', 'Real hassle', 'We’d be stuck'],
+      access: false,
+      cardh: 'Our household outage card',
+      wholbl: 'Who to call first',
+      forkh: 'Two households, one lost phone',
+      fork: 'Same day, same problem: a phone left in a taxi. In one household it’s an afternoon of admin, because the backup codes are in the drawer, the photos are in two places and the family knows the code word. In the other it’s weeks of locked accounts and lost pictures. The difference is an hour spent while nothing was wrong.',
+      systems: [
+        { id: 'email', t: 'Main email account', h: 'The one your password resets go to', on: 1,
+          fix: 'Put a passkey or 2-step verification on it and keep the backup codes on paper somewhere safe. Every other account can be reset through this one.',
+          idea: 'Backup codes on paper; a recovery email or phone' },
+        { id: 'phone', t: 'Your smartphone', h: '2-step codes, banking app, photos, contacts', on: 1,
+          fix: 'Make sure losing your phone doesn’t lock you out: backup codes, a second signed-in device, and contacts and photos backed up.',
+          idea: 'Backup codes; second device; phone backup' },
+        { id: 'banking', t: 'Banking and payments', h: 'Banking app, cards, phone payments', on: 1,
+          fix: 'Keep a second way to pay (another card, some cash) and the bank’s fraud number on paper, not only in the app.',
+          idea: 'Second card; some cash; fraud number on paper' },
+        { id: 'passwords', t: 'Password manager or saved passwords', h: 'Including passwords saved in your browser', on: 0,
+          fix: 'Know how you’d get into your password manager from a new device, and write the recovery key down somewhere safe.',
+          idea: 'Recovery key written down, stored safely' },
+        { id: 'photos', t: 'Photos and important files', h: 'Family photos, documents, scans', on: 1,
+          fix: 'Keep two copies in different places (the cloud and an external drive is enough) and open a few files from the copy to check it works.',
+          idea: 'Cloud copy plus an external drive' },
+        { id: 'internet', t: 'Home internet and power', h: 'Wi-Fi, the router, charging', on: 1,
+          fix: 'Keep a charged power bank and know how to use your phone as a hotspot for the essentials.',
+          idea: 'Power bank; phone hotspot' },
+        { id: 'messaging', t: 'Messages and calls with family', h: 'WhatsApp, family group chats, contacts', on: 1,
+          fix: 'Write the key family numbers on paper. Most people know two or three by heart, at best.',
+          idea: 'Key numbers on paper' },
+        { id: 'health', t: 'Health, medicines and care', h: 'Prescription apps, powered medical devices, carers’ contacts', on: 0,
+          fix: 'Keep a paper list of medicines and doctors, and a plan for anything that needs power or refrigeration. Talk it through with your doctor or pharmacist.',
+          idea: 'Paper list of medicines; plan for powered devices' },
+        { id: 'ai', t: 'AI tools you lean on', h: 'Assistants, translation, writing or homework help', on: 0,
+          fix: 'Notice what you’ve stopped being able to do without the tool, and keep important answers and documents saved outside the chat.',
+          idea: 'Important answers saved outside the chat' },
+        { id: 'work', t: 'Working from home', h: 'Laptop, work logins, video calls', on: 0,
+          fix: 'Know what you’d do if your laptop died on a deadline day: work files backed up, and a second device you could sign in on.',
+          idea: 'Files backed up; second device' },
+        { id: 'smart', t: 'Smart home and security', h: 'Locks, cameras, heating, alarms', on: 0,
+          fix: 'Check what each device does when the internet or power is out, and keep a physical key or manual override.',
+          idea: 'Physical key; manual override' }
+      ],
+      keys: [
+        { q: 'How do you sign in to your main email?',
+          o: [['Just a password', 0], ['Password plus text-message codes', 1], ['Password plus an authenticator app', 2], ['A passkey or an app, with backup codes stored safely', 3]],
+          fix: ['Put a passkey on your main email.', 'Your email resets every other account. The UK’s National Cyber Security Centre recommends passkeys where they’re offered, and 2-step verification otherwise: any kind is better than none.'] },
+        { q: 'If you lost your phone today, could you get back into your email and your bank?',
+          o: [['I don’t think so', 0], ['Eventually, after a lot of calls', 1], ['Yes — I have backup codes or a second device', 2], ['Yes, and the recovery steps are written down where my family can find them', 3]],
+          fix: ['Make losing your phone a nuisance, not a lockout.', 'Print or write down the backup codes for your email and password manager, keep a second device signed in if you have one, and write the steps down.'] },
+        { q: 'If your phone or laptop died tonight, where would your photos and documents be?',
+          o: [['Only on the device', 0], ['Synced to one cloud account', 1], ['In the cloud, plus a separate copy on a drive', 2], ['Two copies, and I’ve checked I can actually open them', 3]],
+          fix: ['Keep two copies of what you can’t replace.', 'The NCSC suggests using both an online backup and a storage device, kept unplugged when you’re not using it. Then check you can open the files.'] },
+        { q: 'If a family member called in a panic asking for money, how would you check it was really them?',
+          o: [['I’d probably just help', 0], ['I’d ask a few questions', 1], ['I’d hang up and call them back on their usual number', 2], ['Call-back, plus a family code word we’ve agreed', 3]],
+          fix: ['Agree a family code word.', 'Voice cloning makes a panicked call sound exactly right. The US Federal Trade Commission’s advice is to call the person back on a number you know. A code word only your family knows settles it in seconds.'] },
+        { q: 'If the power and internet were out for a whole day, how would you manage?',
+          o: [['We’d be stuck', 0], ['We’d muddle through', 1], ['A power bank and a few numbers written down', 2], ['Charged power bank, paper list of key numbers, some cash, and a plan for medicines', 3]],
+          fix: ['Pack the outage drawer.', 'A charged power bank, a paper list of key numbers, some cash, and a plan for medicines or powered medical devices. Ready.gov’s power-outage advice covers the last one.'] },
+        { q: 'If someone in your household couldn’t manage their accounts for a while, could someone they trust step in?',
+          o: [['No', 0], ['Maybe', 1], ['Yes, for some things', 2], ['Yes — trusted or legacy contacts are set up, and where things are is written down', 3]],
+          fix: ['Set up a trusted contact.', 'Most big providers let you name someone who can get access if you can’t. Set it up for email and photos, and write down where the important things are.'] }
+      ],
+      levels: [
+        { min: 0, name: 'One lost phone from a lockout', desc: 'A lot hangs off one device or one account, with little behind it. That’s normal, and the fixes are mostly a pen, a drawer and an hour.' },
+        { min: 40, name: 'Fragile in places', desc: 'You’d cope with some things and get stuck on others. The weak points are specific, so start at the top of the list.' },
+        { min: 65, name: 'Mostly covered', desc: 'You have fallbacks for most of what matters. What’s left is usually one account or one device everything quietly depends on.' },
+        { min: 85, name: 'Ready for the bad day', desc: 'A lost phone or a day without power would be a nuisance, not a crisis. Keep it current when you change phones or accounts.' }
+      ]
+    }
+  };
+  var FALLBACK = ['None — we’d wait', 'We’d improvise', 'Written workaround', 'Tested backup'];
+  var ACCESS = ['Only one person', 'Two people', 'Two people, recovery written down'];
+
+  var S = load('state') || { ed: 'business', picks: null, rate: {}, keys: {} };
+  if (!ED[S.ed]) S.ed = 'business';
+  function E() { return ED[S.ed]; }
+  function save() { store('state', S); }
+  function picks() {
+    if (!S.picks) S.picks = E().systems.filter(function (s) { return s.on; }).map(function (s) { return s.id; });
+    return S.picks;
+  }
+  function sys(id) { return E().systems.filter(function (s) { return s.id === id; })[0]; }
+  var screens = { intro: $('#aic-dep-intro'), s1: $('#aic-dep-s1'), s2: $('#aic-dep-s2'), s3: $('#aic-dep-s3'), res: $('#aic-dep-res') };
+
+  function renderIntro() {
+    var e = E();
+    TOOL.audience = e.audience;
+    $('#aic-dep-h1').textContent = e.h1;
+    $('#aic-dep-lede').textContent = e.lede;
+    $('#aic-dep-effort').textContent = e.effort;
+    $('#aic-dep-why').innerHTML = e.why;
+    $('#aic-dep-how1').textContent = e.how1;
+    $('#aic-dep-privacy').innerHTML = LOCK_SVG + '<span>Answers stay in your browser for this session only. Nothing is stored or sent.</span>';
+    $all('input[name="aic-dep-ed"]').forEach(function (r) { r.checked = r.value === S.ed; });
+  }
+  $all('input[name="aic-dep-ed"]').forEach(function (r) {
+    r.addEventListener('change', function () {
+      if (r.value === S.ed) return;
+      S = { ed: r.value, picks: null, rate: {}, keys: {} };
+      save(); renderIntro();
+    });
+  });
+
+  function renderS1() {
+    var e = E(), p = picks();
+    $('#aic-dep-s1h').textContent = e.s1h;
+    $('#aic-dep-s1p').textContent = e.s1p;
+    $('#aic-dep-picks').innerHTML = e.systems.map(function (s) {
+      return '<label class="aic-pick"><input type="checkbox" value="' + s.id + '"' + (p.indexOf(s.id) > -1 ? ' checked' : '') + '><span class="aic-pick-box"><span class="aic-pick-check" aria-hidden="true"></span><span><span class="aic-pick-t">' + esc(s.t) + '</span><span class="aic-pick-h">' + esc(s.h) + '</span></span></span></label>';
+    }).join('');
+    $all('#aic-dep-picks input').forEach(function (c) {
+      c.addEventListener('change', function () {
+        startOnce({ edition: S.ed });
+        S.picks = $all('#aic-dep-picks input').filter(function (x) { return x.checked; }).map(function (x) { return x.value; });
+        save(); s1state();
+      });
+    });
+    s1state();
+  }
+  function s1state() {
+    var n = picks().length;
+    $('#aic-dep-s1hint').textContent = n < 2 ? 'Pick at least two' : n + ' picked';
+    $('#aic-dep-s1next').disabled = n < 2;
+  }
+
+  function renderS2() {
+    var e = E();
+    $('#aic-dep-s2p').textContent = e.s2p;
+    $('#aic-dep-rate').innerHTML = picks().map(function (id) {
+      var s = sys(id), r = S.rate[id] || {};
+      return '<div class="aic-rowq" data-id="' + id + '"><p class="aic-rowq-t">' + esc(s.t) + '</p><p class="aic-rowq-h">' + esc(s.h) + '</p>' +
+        segQ('aic-dep-i-' + id, 'If it stopped for a whole day', e.impact, r.i) +
+        segQ('aic-dep-f-' + id, 'What you’d fall back on', FALLBACK, r.f) +
+        (e.access ? segQ('aic-dep-a-' + id, 'Who can get in if the usual person is away', ACCESS, r.a) : '') +
+        '</div>';
+    }).join('');
+    $all('#aic-dep-rate input').forEach(function (inp) {
+      inp.addEventListener('change', function () {
+        startOnce({ edition: S.ed });
+        var parts = inp.name.split('-'), kind = parts[2], id = parts.slice(3).join('-');
+        S.rate[id] = S.rate[id] || {};
+        S.rate[id][kind] = parseInt(inp.value, 10);
+        save(); s2state();
+      });
+    });
+    s2state();
+  }
+  function rated(id) { var r = S.rate[id]; return r && r.i != null && r.f != null && (!E().access || r.a != null); }
+  function s2state() {
+    var left = picks().filter(function (id) { return !rated(id); }).length;
+    $('#aic-dep-s2hint').textContent = left ? left + ' still to answer' : 'All answered';
+    $('#aic-dep-s2next').disabled = left > 0;
+  }
+
+  function renderS3() {
+    var e = E();
+    $('#aic-dep-keys').innerHTML = e.keys.map(function (k, i) {
+      return radioQ('aic-dep-k-' + i, esc(k.q), k.o, S.keys[i]);
+    }).join('');
+    $all('#aic-dep-keys input').forEach(function (inp) {
+      inp.addEventListener('change', function () {
+        startOnce({ edition: S.ed });
+        S.keys[inp.name.split('-').pop()] = parseInt(inp.value, 10);
+        save(); s3state();
+      });
+    });
+    s3state();
+  }
+  function s3state() {
+    var left = E().keys.length - Object.keys(S.keys).length;
+    $('#aic-dep-s3hint').textContent = left ? left + ' still to answer' : 'All answered';
+    $('#aic-dep-s3next').disabled = left > 0;
+  }
+
+  /* ---------- scoring ---------- */
+  function compute() {
+    var e = E(), sw = 0, sc = 0, rows = [];
+    picks().forEach(function (id) {
+      var r = S.rate[id], s = sys(id), w = r.i + 1;
+      var cover = r.f / 3;
+      if (e.access) cover = 0.75 * cover + 0.25 * (r.a / 2);
+      sw += w; sc += w * cover;
+      var spof = (r.i === 2 && r.f <= 1) || (e.access && r.i >= 1 && r.a === 0 && r.f <= 2);
+      var why = [];
+      if (r.f <= 1) why.push(r.i === 2 ? 'Stops ' + (S.ed === 'business' ? 'trading' : 'you') + ', no fallback' : 'No real fallback');
+      if (e.access && r.a === 0) why.push('Only one person can get in');
+      rows.push({ id: id, s: s, r: r, w: w, risk: w * (1 - cover), spof: spof, why: why });
+    });
+    var sysScore = sw ? sc / sw : 1;
+    var kp = 0; e.keys.forEach(function (k, i) { kp += k.o[S.keys[i]][1]; });
+    var keyScore = kp / (e.keys.length * 3);
+    var score = Math.round(100 * (0.55 * sysScore + 0.45 * keyScore));
+    var lvl = e.levels[0]; e.levels.forEach(function (l) { if (score >= l.min) lvl = l; });
+    rows.sort(function (a, b) { return b.risk - a.risk; });
+    var weak = e.keys.map(function (k, i) { return { k: k, p: k.o[S.keys[i]][1], i: i }; }).filter(function (x) { return x.p <= 1; }).sort(function (a, b) { return a.p - b.p; });
+    return { score: score, level: lvl, rows: rows, spofs: rows.filter(function (x) { return x.spof; }), weak: weak, sysScore: sysScore, keyScore: keyScore };
+  }
+
+  var R = null;
+  function getResult() { return R ? { label: R.level.name, score: R.score } : {}; }
+
+  function renderResults(fresh) {
+    var e = E(); R = compute();
+    $('#aic-dep-score').innerHTML = R.score + '<small>/100</small>';
+    $('#aic-dep-scoresr').textContent = 'Score ' + R.score + ' out of 100: ' + R.level.name + '.';
+    $('#aic-dep-resh').textContent = R.level.name;
+    $('#aic-dep-resp').textContent = R.level.desc;
+
+    var n = R.spofs.length;
+    $('#aic-dep-spofh').textContent = n === 0 ? 'No single point of failure among what you picked' : n === 1 ? 'One single point of failure' : n + ' single points of failure';
+    $('#aic-dep-spofp').textContent = n === 0 ? 'Nothing you rely on heavily is without a fallback. Here are the systems with the most room to improve.' : 'Systems you\u2019d badly miss that have nothing behind them' + (E().access ? ', or that only one person can get into' : '') + '. Ranked by how much it would hurt, each with the fix that removes the weak point.';
+    var list = (n ? R.spofs : R.rows.filter(function (x) { return x.risk > 0; })).slice(0, n ? 8 : 4);
+    $('#aic-dep-spof').innerHTML = list.length ? list.map(function (x, i) {
+      var tags = x.why.map(function (w) { return '<span class="aic-tag ' + (x.spof ? 'is-red' : 'is-amber') + '">' + esc(w) + '</span> '; }).join('');
+      if (!tags) tags = '<span class="aic-tag is-amber">Fallback not tested</span>';
+      return '<div class="aic-fix"><span class="aic-item-n">' + (i + 1) + '</span><div><h3 class="aic-h3">' + esc(x.s.t) + '</h3>' + tags + '<p>' + esc(x.s.fix) + '</p></div></div>';
+    }).join('') : '<p class="aic-note is-green">Every system you picked has a tested backup. That’s rare. Keep testing it.</p>';
+
+    /* map: rows = impact (high to low), cols = fallback */
+    var cell = function (imp, fb) {
+      var items = R.rows.filter(function (x) { return x.r.i === imp && x.r.f === fb; });
+      var danger = imp === 2 && fb <= 1, warn = (imp === 2 && fb === 2) || (imp === 1 && fb <= 1);
+      return '<td class="aic-dep-cell' + (danger ? ' is-danger' : warn ? ' is-warn' : '') + '">' + items.map(function (x) { return '<span class="aic-dep-chip">' + esc(x.s.t) + '</span>'; }).join('') + '</td>';
+    };
+    var mh = '<div class="aic-scroll"><table class="aic-dep-map"><caption class="aic-sr">Systems by impact (rows) and fallback (columns)</caption><thead><tr><th scope="col"><span class="aic-sr">Impact</span></th>' +
+      FALLBACK.map(function (f) { return '<th scope="col">' + esc(f) + '</th>'; }).join('') + '</tr></thead><tbody>';
+    [2, 1, 0].forEach(function (imp) {
+      mh += '<tr><th scope="row">' + esc(e.impact[imp]) + '</th>' + [0, 1, 2, 3].map(function (fb) { return cell(imp, fb); }).join('') + '</tr>';
+    });
+    $('#aic-dep-map').innerHTML = mh + '</tbody></table></div>';
+
+    /* keys */
+    $('#aic-dep-keysres').hidden = false;
+    $('#aic-dep-keyfix').innerHTML = R.weak.length ? R.weak.slice(0, 4).map(function (x) {
+      return '<div class="aic-fix"><span class="aic-tag ' + (x.p === 0 ? 'is-red' : 'is-amber') + '">' + (x.p === 0 ? 'This week' : 'This month') + '</span><div><h3 class="aic-h3">' + esc(x.k.fix[0]) + '</h3><p>' + esc(x.k.fix[1]) + '</p></div></div>';
+    }).join('') : '<p class="aic-note is-green">Sign-ins, recovery, backups and the call-back rule are all in decent shape. The only job left is keeping them that way.</p>';
+
+    /* outage card */
+    $('#aic-dep-cardh').textContent = e.cardh;
+    $('#aic-dep-whol').firstChild.nodeValue = e.wholbl;
+    var byImp = R.rows.slice().sort(function (a, b) { return b.r.i - a.r.i || b.risk - a.risk; });
+    var ch = '<div class="aic-scroll"><table class="aic-table aic-dep-cardt"><thead><tr><th scope="col">System</th><th scope="col">If it’s down</th><th scope="col">Our fallback</th><th scope="col">Who to call</th>' + (e.access ? '<th scope="col">Who else can get in</th>' : '') + '</tr></thead><tbody>' +
+      byImp.map(function (x) {
+        var fb = x.r.f >= 2 ? FALLBACK[x.r.f] : '<span class="aic-soft">Idea: ' + esc(x.s.idea) + '</span>';
+        return '<tr><td><strong>' + esc(x.s.t) + '</strong></td><td>' + esc(e.impact[x.r.i]) + '</td><td>' + fb + '<br><span class="aic-line" aria-hidden="true"></span></td><td><span class="aic-line" aria-hidden="true"></span></td>' + (e.access ? '<td>' + esc(ACCESS[x.r.a]) + '</td>' : '') + '</tr>';
+      }).join('') + '</tbody></table></div>' +
+      '<p class="aic-small aic-soft" style="margin-top:12px">' + (S.ed === 'business'
+        ? 'On the back: the bank’s fraud line, your IT or web supplier, your insurer, and the providers’ status pages. Never write passwords on this card.'
+        : 'On the back: the bank’s fraud line, your doctor and pharmacy, a neighbour, and where the backup codes are kept. Never write passwords on this card.') + '</p>' +
+      '<p class="aic-small aic-printonly" id="aic-dep-cardmeta"></p>';
+    $('#aic-dep-cardbody').innerHTML = ch;
+    cardMeta();
+
+    $('#aic-dep-forkh').textContent = e.forkh;
+    $('#aic-dep-forkp').textContent = e.fork;
+
+    /* hand-off */
+    var biz = S.ed === 'business';
+    var sol = biz && (n > 0 || R.score < 65)
+      ? { kind: 'match', title: 'Get the weak points fixed properly', body: (n ? 'You have ' + n + ' system' + (n > 1 ? 's' : '') + ' that would stop you trading with nothing behind ' + (n > 1 ? 'them' : 'it') + '. ' : 'Your score says the gaps are real. ') + 'A member who advises small businesses on IT and AI adoption can set up the backups, admin access and outage plan with you, usually in days, not months.' }
+      : biz
+        ? { kind: 'courses', title: 'Make the plan everyone’s, not one person’s', body: 'Your systems are well covered. The weak point left is usually people: the call-back rule and the outage plan only work if the whole team knows them. A short course with a member covers AI, scams and safe everyday use for the team.' }
+        : { kind: 'courses', title: 'Get confident with the everyday tech', body: R.score < 65 ? 'Most of your fixes are about sign-ins, backups and spotting scams. A short course with a member walks you through them on your own devices, at your own pace.' : 'You’re in good shape. If you want to use AI tools more without adding new weak points, a short course with a member is a good next step.' };
+    renderHandoff($('#aic-dep-handoff'), {
+      next: { title: 'Work through the full checklist', body: 'Turn these fixes into a printable to-do list: accounts, backups, outages and scams, with what to do first.', href: contentUrl('digital-resilience-checklist'), label: 'Open the Digital Resilience Checklist' },
+      sol: sol, getResult: getResult
+    });
+
+    $('#aic-dep-method').innerHTML =
+      '<p>Your score blends two things. Systems (55%): for each system, how well it’s covered (the fallback' + (E().access ? ', and whether more than one person can get in' : '') + '), weighted by how badly you’d miss it. Keys (45%): the six sign-in, recovery, backup and verification questions. A single point of failure is anything you’d be stuck without that has no fallback beyond improvising' + (E().access ? ', or that only one person can get into' : '') + '. The weights are a rule of thumb, not a measured model: use the score to start a conversation, not to settle one.</p>' +
+      '<p>Sources, checked November 2026:</p><ol class="aic-src">' +
+      '<li>Microsoft, “Helping our customers through the CrowdStrike outage”, David Weston, 20 July 2024. <a href="https://blogs.microsoft.com/blog/2024/07/20/helping-our-customers-through-the-crowdstrike-outage/" target="_blank" rel="noopener">blogs.microsoft.com</a></li>' +
+      '<li>Amazon Web Services, “Summary of the Amazon DynamoDB Service Disruption in the Northern Virginia (US-EAST-1) Region” (11:48 PM PDT 19 Oct to 2:20 PM PDT 20 Oct 2025). <a href="https://aws.amazon.com/message/101925/" target="_blank" rel="noopener">aws.amazon.com/message/101925</a></li>' +
+      '<li>UK National Cyber Security Centre, Small organisations guide to cyber security (published 9 April 2026, reviewed 21 July 2026): secure your email, passkeys, backing up your data. <a href="https://www.ncsc.gov.uk/collection/small-organisations-guide-to-cyber-security" target="_blank" rel="noopener">ncsc.gov.uk</a></li>' +
+      '<li>UK Department for Science, Innovation and Technology, Cyber security breaches survey 2025/2026 (30 April 2026): 25% of businesses have a formal incident response plan. <a href="https://www.gov.uk/government/statistics/cyber-security-breaches-survey-20252026/cyber-security-breaches-survey-20252026" target="_blank" rel="noopener">gov.uk</a></li>' +
+      '<li>FBI Internet Crime Complaint Center, 2025 Internet Crime Report: business email compromise losses $3,046,598,558. <a href="https://www.ic3.gov/AnnualReport/Reports/2025_IC3Report.pdf" target="_blank" rel="noopener">ic3.gov</a></li>' +
+      '<li>US Federal Trade Commission, Family emergency scams. <a href="https://consumer.ftc.gov/scams/family-emergency-scams" target="_blank" rel="noopener">consumer.ftc.gov</a></li>' +
+      '<li>Ready.gov, Power outages. <a href="https://www.ready.gov/power-outages" target="_blank" rel="noopener">ready.gov/power-outages</a></li></ol>' +
+      '<p>This is general guidance, not security, legal or insurance advice.</p>';
+
+    if (fresh) {
+      emit('tool_completed', { assessment_result: R.level.name, score: R.score, edition: S.ed, single_points_of_failure: n });
+      emit('result_viewed', { assessment_result: R.level.name, score: R.score, edition: S.ed });
+    }
+  }
+  function cardMeta() {
+    var m = $('#aic-dep-cardmeta'); if (!m) return;
+    var org = $('#aic-dep-org').value, who = $('#aic-dep-who').value, where = $('#aic-dep-where').value;
+    m.textContent = (org ? org + ' · ' : '') + E().wholbl + ': ' + (who || '________________') + ' · Card kept: ' + (where || '________________') + ' · Made with AI Channel’s AI & Digital Dependency Score';
+  }
+  ['#aic-dep-org', '#aic-dep-who', '#aic-dep-where'].forEach(function (s) { $(s).addEventListener('input', cardMeta); });
+
+  /* ---------- navigation ---------- */
+  function go(name) {
+    if (name === 's1') renderS1();
+    if (name === 's2') renderS2();
+    if (name === 's3') renderS3();
+    show(screens[name]);
+  }
+  $('#aic-dep-start').addEventListener('click', function () { startOnce({ edition: S.ed }); go('s1'); });
+  $('#aic-dep-s1next').addEventListener('click', function () { go('s2'); });
+  $('#aic-dep-s2next').addEventListener('click', function () { go('s3'); });
+  $('#aic-dep-s3next').addEventListener('click', function () { renderResults(true); show(screens.res); });
+  $all('[data-back]').forEach(function (b) { b.addEventListener('click', function () { go(b.getAttribute('data-back')); }); });
+  $('#aic-dep-print').addEventListener('click', function () { cardMeta(); window.print(); });
+  $('#aic-dep-edit').addEventListener('click', function () { go('s1'); });
+  $('#aic-dep-restart').addEventListener('click', function () { var ed = S.ed; S = { ed: ed, picks: null, rate: {}, keys: {} }; clearStore(); save(); renderIntro(); show(screens.intro); });
+
+  renderIntro();
+  $all('.aic-screen').forEach(function (s) { s.hidden = s !== screens.intro; });
+
+})();
+</script>
+</div>
+<!-- ===== END AI CHANNEL TOOL ===== -->
+</body>
+</html>
+
+</body></html>

@@ -1,0 +1,1100 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>eu-ai-act-risk-tier-checker</title><style>html,body{margin:0;background:#F7F8FA}@media (prefers-color-scheme:dark){html,body{background:#F7F8FA}}</style></head><body>
+<!--
+Copy rewritten in house voice, 3 Nov 2026.
+Dates and duties updated for Regulation (EU) 2026/1744 ("Digital Omnibus on AI"), 4 Nov 2026.
+TOOL: What Risk Tier Is Your AI System Under the EU AI Act?
+FILE: eu-ai-act-risk-tier-checker.html
+AUDIENCE: Executives, Business, Government (public bodies get extra duties shown: FRIA, registration, Art. 111(2)),
+  Technical teams. Events report audience "government" when "A public body" is chosen, otherwise "business".
+
+WHAT IT DOES: "Answer a few questions about how your AI system is used. We'll classify it as prohibited, high-risk,
+  limited-risk or minimal-risk, then hand you the obligations and a readiness checklist. Everything runs in your
+  browser. No data leaves your device." Seven-step decision tree that follows the Act: (1) role, organisation type,
+  EU connection, scope exclusions (Art. 2); (2) prohibited practices (Art. 5); (3) Annex I regulated products
+  (Art. 6(1)); (4) Annex III use areas (Art. 6(2)); (5) Art. 6(3) exception incl. profiling rule (only shown if an
+  Annex III use is ticked); (6) Art. 50 transparency triggers; (7) general-purpose AI model provider (separate note,
+  Arts. 53–55). Result: tier ladder, reasons, open questions created by "Not sure" answers, Article 4 AI literacy
+  note (always shown), role-specific obligations, transparency duties, GPAI note, timeline (as amended by
+  Regulation (EU) 2026/1744, with a "check the consolidated text" note), interactive readiness checklist (printable), one next step, one solution step (matchUrl: compliance
+  support from members; for minimal-risk results the honest answer is "you probably don't need compliance help",
+  and the solution step becomes coursesUrl for AI literacy), "Email me my results", newsletter link.
+  Prominent "guidance, not legal advice" notice on intro and result.
+
+DATA / SOURCES (as of November 2026): Regulation (EU) 2024/1689 (AI Act, OJ 12 July 2024) as amended by
+  Regulation (EU) 2026/1744 of 8 July 2026 ("Digital Omnibus on AI", OJ L 24 July 2026, in force 27 July 2026;
+  http://data.europa.eu/eli/reg/2026/1744/oj): Arts. 2, 4, 5, 6, 9–17, 22–27, 43, 47–55, 72, 73, 86, 95, 99,
+  111, 113; Annexes I and III. Application dates as amended: 2 Feb 2025 (Art. 4, Art. 5 original bans),
+  2 Aug 2025 (GPAI, penalties, governance), 2 Aug 2026 (Art. 50 and remaining general rules), 2 Dec 2026 (new
+  Art. 5(1)(ba)/(bb) bans on non-consensual intimate material and CSAM; Art. 50(2) marking deadline for
+  generative systems already on the market before 2 Aug 2026, Art. 111(4)), 2 Aug 2027 (legacy GPAI models),
+  2 Dec 2027 (high-risk, Annex III / Art. 6(2), Art. 113(c)(i)), 2 Aug 2028 (high-risk, Annex I / Art. 6(1),
+  Art. 113(c)(ii)). Art. 4 still binds providers and deployers but now reads "take measures to support the
+  development of AI literacy" and no longer requires any specific level; Commission and Member States must
+  support them (Art. 4(2)). Art. 99: SMCs get the "whichever is lower" fine cap (Art. 99(6a)). Commission
+  guidelines on prohibited practices (Feb 2025) and on GPAI models (July 2025); GPAI Code of Practice (July 2025).
+  Re-check against the EUR-Lex consolidated text when it is published or further amended.
+
+PRIVACY: Runs entirely in the browser. No network requests, cookies or storage.
+
+HOW TO EMBED IN WORDPRESS:
+  Option A — Custom HTML block: paste everything between AIC:START and AIC:END below (style + div + script).
+    CSS is scoped to .aic-tool, classes prefixed aic-, JS in an IIFE.
+  Option B — iframe: <iframe src="/path/eu-ai-act-risk-tier-checker.html" title="EU AI Act risk tier checker"
+    style="width:100%;min-height:1100px;border:0" loading="lazy"></iframe>
+
+CONFIG URLS TO SET (window.AICHANNEL_CONFIG):
+  matchUrl       — "Get matched to someone" (compliance support from members) — main solution step
+  coursesUrl     — "Learn with a member" (shown for minimal-risk results: AI literacy training)
+  resultsFormUrl — "Email me my results"
+  newsletterUrl  — separate newsletter opt-in
+  CTA query params: lead_type, audience, source_page, source_content_or_tool, cta_clicked, assessment_name,
+  assessment_result (tier label), plus utm_* from the page URL. No numeric score for this tool.
+
+TRACKING: 'aichannel:event' CustomEvent + parent.postMessage for tool_started, tool_completed, result_viewed,
+  cta_clicked.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What Risk Tier Is Your AI System Under the EU AI Act?</title>
+<meta name="description" content="Answer a few questions about how your AI system is used. See its likely EU AI Act risk tier, the obligations that come with it and a readiness checklist. Guidance, not legal advice.">
+<!-- AI Channel design A: tool design system v2 (visual layer only; no behaviour changes) -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style id="aic-theme">
+/* ---------- tokens ---------- */
+:root,html{color-scheme:light!important;
+ --pine:#2859c7!important;--pine-deep:#1945ac!important;--accent:#2859c7!important;--accent-deep:#1945ac!important;--primary:#2859c7!important;--blue:#2859c7!important;--blue-d:#1945ac!important;
+ --paper:#ffffff!important;--bg:#ffffff!important;--white:#fff!important;--card:#fff!important;--ink:#14213d!important;--ink-soft:#3f4a5c!important;--ink-mute:#5b6577!important;--muted:#3f4a5c!important;
+ --line:#d9e2f0!important;--sage:#eef3fc!important;--amber-soft:#fbf3e4!important;--accent-wash:#eef3fc!important;--blue-wash:#eef3fc!important;--sky:#eef3fc!important;--pale:#f4f7fc!important;--warm:#f4f7fc!important;
+ --serif:"Newsreader",Georgia,serif!important;--sans:"Inter",system-ui,sans-serif!important;--mono:"IBM Plex Mono",ui-monospace,monospace!important}
+html body .aic-tool,html body .aic-article{
+ --aic-paper:#ffffff!important;--aic-white:#ffffff!important;--aic-ink:#14213d!important;--aic-soft:#46526a!important;--aic-line:#d9e2f0!important;--aic-sage:#eef3fc!important;
+ --aic-blue:#2859c7!important;--aic-blue-deep:#1945ac!important;--aic-blue-soft:#eef3fc!important;--aic-on-blue:#ffffff!important;--aic-focus:#9fbcff!important;
+ --aic-grey:#46526a!important;--aic-grey-soft:#f4f7fc!important;
+ --aic-radius:16px!important;--aic-radius-sm:12px!important;--aic-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important;
+ color-scheme:light!important;background:#fff!important;color:#14213d!important;
+ font-family:"Inter",system-ui,sans-serif!important;-webkit-font-smoothing:antialiased}
+html,body{background:#fff!important}
+html body .aic-tool{padding:56px 0 96px!important}
+html body .aic-article{padding:0 0 112px!important}
+html body .aic-tool .aic-col,html body .aic-article .aic-col{max-width:860px!important}
+@media(min-width:600px){html body .aic-tool .aic-col,html body .aic-article .aic-col{padding-inline:32px!important}}
+
+/* ---------- type ---------- */
+html body .aic-tool .aic-h1,html body .aic-article h1,body h1{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important;line-height:1.02!important;font-size:clamp(38px,5.4vw,62px)!important;color:#14213d}
+html body .aic-tool .aic-h2,html body .aic-article h2,body h2{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important;line-height:1.1!important}
+html body .aic-article h2{font-size:clamp(28px,3.6vw,38px)!important;margin-top:72px!important}
+html body .aic-tool .aic-h2{font-size:clamp(26px,3.4vw,36px)!important}
+html body .aic-tool .aic-h3,html body .aic-article h3,body h3{font-family:"Newsreader",Georgia,serif!important;font-weight:550!important;letter-spacing:-.01em!important;font-size:22px!important;line-height:1.2!important}
+body h4,body h5,body h6{font-family:"Inter",system-ui,sans-serif!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow,html body .aic-tool .aic-qnum,html body .aic-tool .aic-nav-hint,.aic-mono{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;letter-spacing:.06em!important;text-transform:uppercase;font-size:12px!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow{color:#2859c7!important;display:flex!important;align-items:center;gap:12px}
+html body .aic-tool .aic-eyebrow::before,html body .aic-article .aic-head .aic-eyebrow::before{content:"";width:28px;height:1px;background:#2859c7;flex:none}
+html body .aic-tool .aic-lede,html body .aic-article .aic-lede,html body .aic-article .aic-dek{font-size:20px!important;line-height:1.55!important;color:#3f4a5c!important;max-width:60ch}
+html body .aic-tool .aic-soft,html body .aic-tool .aic-small{color:#46526a!important}
+html body .aic-tool .aic-small{font-size:14px!important}
+html body .aic-article{font-size:18.5px!important;line-height:1.72!important}
+html body .aic-article p+p{margin-top:22px!important}
+html body .aic-article .aic-head{padding:72px 0 40px!important;border-bottom:1px solid #d9e2f0;margin-bottom:48px}
+html body .aic-article .aic-meta,html body .aic-article .aic-head p:not(.aic-lede):not(.aic-dek){font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px!important;letter-spacing:.03em;color:#5b6577!important}
+html body .aic-tool a,html body .aic-article a{color:#2859c7}
+
+/* ---------- panels ---------- */
+html body .aic-tool .aic-card,html body .aic-article .aic-card{background:#fff!important;border:1px solid #d9e2f0!important;border-radius:16px!important;box-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important}
+@media(min-width:600px){html body .aic-tool .aic-card{padding:36px 40px!important}html body .aic-article .aic-card{padding:32px 36px!important}}
+html body .aic-tool .aic-stack>*+*{margin-top:20px!important}
+html body .aic-tool .aic-grid2,html body .aic-article .aic-grid{gap:16px!important}
+/* the short answer: a framed figure, like the site's tool previews */
+html body .aic-article .aic-short{background:#fff!important;border:1px solid #d9e2f0!important;box-shadow:0 0 0 10px #eef3fc,0 0 0 11px #d9e2f0!important;margin:12px 11px 56px!important;border-radius:12px!important;border-left:1px solid #d9e2f0!important}
+html body .aic-article .aic-short .aic-eyebrow,html body .aic-article .aic-short>:first-child{color:#2859c7!important}
+/* notes and callouts */
+html body .aic-tool .aic-note,html body .aic-article .aic-note,html body .aic-article .aic-callout{background:#f4f7fc!important;border-left:3px solid #2859c7!important;border-radius:0 12px 12px 0!important;padding:18px 22px!important;font-size:15.5px!important;color:#14213d!important}
+html body .aic-tool .aic-note.aic-warn{background:#fdf7ec!important;border-left-color:#a46207!important}
+html body .aic-tool .aic-note.aic-bad{background:#fdf0ee!important;border-left-color:#b42318!important}
+html body .aic-tool .aic-note.aic-good{background:#eef8f1!important;border-left-color:#2f7a4e!important}
+/* calls to action become navy bands */
+html body .aic-tool .aic-cta,html body .aic-article .aic-cta,html body .aic-tool .aic-dark,html body .aic-article .aic-dark{--aic-ink:#ffffff!important;--aic-soft:#c9d6ee!important;--aic-white:#13264a!important;--aic-line:#2a3f6a!important;--aic-blue:#9fbcff!important;--aic-blue-soft:#1d3563!important;--aic-on-blue:#13264a!important;
+ background:#13264a!important;color:#fff!important;border-color:#13264a!important;box-shadow:none!important}
+html body .aic-tool .aic-cta *:not(.aic-btn):not(.aic-btn *),html body .aic-article .aic-cta *:not(.aic-btn):not(.aic-btn *){color:inherit}
+html body .aic-tool .aic-cta .aic-btn-primary,html body .aic-article .aic-cta .aic-btn-primary{background:#fff!important;color:#13264a!important;border-color:#fff!important}
+html body .aic-tool .aic-cta a:not(.aic-btn),html body .aic-article .aic-cta a:not(.aic-btn){color:#9fbcff!important}
+
+/* ---------- questions and answer options ---------- */
+html body .aic-tool .aic-q{margin-top:28px!important}
+html body .aic-tool .aic-qnum{color:#2859c7!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;font-size:clamp(22px,2.6vw,27px)!important;line-height:1.22!important;letter-spacing:-.01em!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qhint{font-size:15px!important;color:#46526a!important;margin-bottom:18px!important}
+html body .aic-tool .aic-opts{gap:10px!important;margin-top:18px!important}
+html body .aic-tool .aic-opt,html body .aic-tool .aic-pick,html body .aic-tool .aic-check{background:#fff!important;border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:16px 18px!important;font-size:16px!important;gap:14px!important;transition:border-color .15s,box-shadow .15s,background-color .15s,transform .15s!important}
+html body .aic-tool .aic-opt:hover,html body .aic-tool .aic-pick:hover,html body .aic-tool .aic-check:hover{border-color:#2859c7!important;box-shadow:0 6px 18px rgba(40,89,199,.10)!important;transform:translateY(-1px)}
+html body .aic-tool .aic-opt[aria-checked="true"],html body .aic-tool .aic-opt[aria-pressed="true"],html body .aic-tool .aic-pick:has(input:checked),html body .aic-tool .aic-check:has(input:checked),html body .aic-tool .aic-opt:has(input:checked){border-color:#2859c7!important;background:#f4f7fc!important;box-shadow:0 0 0 3px #dbe6fb!important}
+html body .aic-tool .aic-dot{width:22px!important;height:22px!important;border:2px solid #9aa8c0!important}
+html body .aic-tool .aic-dot::after{inset:4px!important;background:#2859c7!important}
+html body .aic-tool .aic-opt[aria-checked="true"] .aic-dot{border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-size:14px!important;color:#46526a!important;margin-top:4px!important}
+html body .aic-tool .aic-opt.aic-opt-unsure{background:transparent!important;border-style:dashed!important}
+html body .aic-tool input[type=text],html body .aic-tool input[type=search],html body .aic-tool input[type=email],html body .aic-tool textarea,html body .aic-tool select,html body .aic-tool .aic-input{border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:14px 16px!important;background:#fff!important;font-size:16px!important}
+html body .aic-tool input:focus,html body .aic-tool textarea:focus,html body .aic-tool select:focus{border-color:#2859c7!important;outline:none!important;box-shadow:0 0 0 3px #dbe6fb!important}
+
+/* ---------- controls ---------- */
+html body .aic-tool .aic-btn,html body .aic-article .aic-btn{min-height:50px!important;padding:14px 24px!important;font-weight:600!important;font-size:15px!important;border-radius:999px!important;border:1.5px solid #c9d6ee!important;box-shadow:none!important}
+html body .aic-tool .aic-btn:hover,html body .aic-article .aic-btn:hover{border-color:#2859c7!important}
+html body .aic-tool .aic-btn-primary,html body .aic-article .aic-btn-primary{background:#2859c7!important;border-color:#2859c7!important;color:#fff!important}
+html body .aic-tool .aic-btn-primary:hover,html body .aic-article .aic-btn-primary:hover{background:#1945ac!important;border-color:#1945ac!important}
+html body .aic-tool .aic-btn-ghost{border-color:transparent!important;text-decoration:underline;text-underline-offset:4px;color:#3f4a5c!important}
+html body .aic-tool .aic-btn[disabled]{opacity:.4!important}
+html body .aic-tool .aic-nav{margin-top:36px!important;padding-top:24px!important;border-top:1px solid #d9e2f0!important}
+html body .aic-tool .aic-actions{gap:12px!important}
+html body .aic-tool .aic-seg{border:1.5px solid #d9e2f0!important;padding:4px!important}
+html body .aic-tool .aic-seg button{font-weight:600!important;color:#3f4a5c!important}
+html body .aic-tool .aic-seg button[aria-pressed="true"],html body .aic-tool .aic-seg button[aria-checked="true"]{background:#13264a!important;color:#fff!important}
+html body .aic-tool .aic-progress{height:4px!important;background:#e3eaf6!important;margin:20px 0 8px!important}
+html body .aic-tool .aic-progress span,html body .aic-tool .aic-progress i{background:#2859c7!important}
+html body .aic-tool .aic-chip,html body .aic-tool .aic-pill{border:1.5px solid #d9e2f0!important;background:#fff!important;font-weight:600!important;border-radius:999px!important}
+html body .aic-tool .aic-chip[aria-pressed="true"],html body .aic-tool .aic-chip.aic-on,html body .aic-tool .aic-pill.aic-on{background:#eef3fc!important;border-color:#2859c7!important;color:#1945ac!important}
+html body .aic-tool .aic-tag,html body .aic-article .aic-tag{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;padding:5px 11px!important}
+html body .aic-tool .aic-privacy{font-size:14px!important;color:#46526a!important;margin-top:20px!important}
+
+/* ---------- results ---------- */
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-stat b,html body .aic-tool .aic-stat strong,html body .aic-tool .aic-display{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important}
+html body .aic-tool .aic-bar{height:8px!important;background:#e3eaf6!important}
+html body .aic-tool .aic-bar-row{padding:14px 0!important;border-bottom-color:#e3eaf6!important}
+html body .aic-tool .aic-bar-label{font-weight:600!important}
+html body .aic-tool table,html body .aic-article table{border-collapse:collapse}
+html body .aic-tool th,html body .aic-article th{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;text-transform:uppercase;color:#2859c7!important;background:#f4f7fc!important}
+html body .aic-tool td,html body .aic-article td{border-color:#e3eaf6!important}
+html body .aic-article .aic-sources,html body .aic-tool .aic-sources{font-size:14px!important;color:#46526a!important;border-top:1px solid #d9e2f0;padding-top:32px!important;margin-top:72px!important}
+html body .aic-article .aic-related,html body .aic-article .aic-deeper{margin-top:72px!important}
+
+/* ---------- pages outside the shared system ---------- */
+body:not(:has(.aic-tool)):not(:has(.aic-article)) h1,body:not(:has(.aic-tool)):not(:has(.aic-article)) h2,body:not(:has(.aic-tool)):not(:has(.aic-article)) h3{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important}
+html,body{font-family:"Inter",system-ui,sans-serif}
+input[type=range],input[type=checkbox],input[type=radio]{accent-color:#2859c7!important}
+:focus-visible{outline-color:#2859c7!important}
+[tabindex="-1"]:focus,h1:focus,h2:focus,h3:focus{outline:none!important;box-shadow:none!important}
+
+/* ================= v3: product-grade tool shell ================= */
+html,body{background:#f4f7fc!important}
+html body .aic-tool{background:#f4f7fc!important}
+html body .aic-tool .aic-col{max-width:980px!important}
+html body .aic-tool .aic-h1{font-size:clamp(40px,5vw,62px)!important;max-width:20ch}
+html body .aic-tool .aic-grid2>.aic-card{box-shadow:none!important;background:#fff!important;border-radius:14px!important}
+html body .aic-tool.aic-in-q .aic-h1{font-size:22px!important;line-height:1.2!important;max-width:none;margin:6px 0 20px!important;font-weight:500!important}
+html body .aic-tool.aic-in-q .aic-lede,html body .aic-tool.aic-in-q > .aic-col > .aic-privacy,html body .aic-tool.aic-in-q .aic-col > * > .aic-privacy{display:none!important}
+html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:56px 64px 44px!important;border:0!important;border-radius:24px!important;box-shadow:0 1px 0 rgba(19,38,74,.05),0 30px 70px rgba(19,38,74,.10)!important;min-height:460px}
+@media(max-width:700px){html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:32px 22px 28px!important;border-radius:18px!important;min-height:0}}
+html body .aic-tool .aic-progress{height:3px!important;background:#e3eaf6!important;border-radius:0!important;margin:14px 0 36px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-size:clamp(26px,3.2vw,38px)!important;line-height:1.12!important;letter-spacing:-.02em!important;margin-bottom:12px!important;max-width:28ch}
+html body .aic-tool .aic-qhint{font-size:16px!important;margin-bottom:24px!important}
+html body .aic-tool .aic-opts{counter-reset:aicopt;gap:12px!important}
+html body .aic-tool .aic-opt{counter-increment:aicopt;align-items:center!important;min-height:64px;padding:16px 20px!important;font-size:17px!important;font-weight:500;border-radius:14px!important}
+html body .aic-tool .aic-opt .aic-dot{display:none!important}
+html body .aic-tool .aic-opt::before{content:counter(aicopt,upper-alpha);flex:none;width:30px;height:30px;display:grid;place-items:center;border:1.5px solid #c9d6ee;border-radius:8px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;font-weight:500;color:#2859c7;background:#fff;transition:all .15s}
+html body .aic-tool .aic-opt:hover::before{border-color:#2859c7}
+html body .aic-tool .aic-opt[aria-checked="true"]::before{background:#2859c7;border-color:#2859c7;color:#fff;content:"\2713"}
+html body .aic-tool .aic-opt[aria-checked="true"]{background:#eef3fc!important;box-shadow:0 0 0 2px #2859c7!important;border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-weight:400}
+html body .aic-tool .aic-nav{border-top:0!important;margin-top:40px!important;padding-top:0!important}
+html body .aic-tool .aic-nav .aic-btn-primary{min-width:150px}
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-display{font-size:clamp(56px,8vw,96px)!important;line-height:.95!important;color:#14213d}
+
+/* ================= v4: legibility ================= */
+html body .aic-tool{font-size:17px!important;line-height:1.6!important}
+html body .aic-tool,html body .aic-article{--aic-soft:#334055!important}
+html body .aic-tool .aic-small,html body .aic-tool .aic-opt-sub,html body .aic-tool .aic-privacy,html body .aic-tool .aic-nav-hint{font-size:15px!important;color:#334055!important}
+html body .aic-tool p,html body .aic-tool li{color:#1d2a44}
+html body .aic-tool .aic-lede{font-size:20px!important;color:#2a364d!important}
+html body .aic-tool .aic-note{font-size:16.5px!important}
+html body .aic-tool .aic-opt{font-size:18px!important;color:#14213d!important}
+html body .aic-tool .aic-qhint{font-size:17px!important;color:#334055!important}
+html body .aic-tool .aic-eyebrow,html body .aic-tool .aic-qnum,.aic-mono{font-size:12.5px!important;color:#2859c7!important;letter-spacing:.05em!important}
+html body .aic-tool .aic-tag{font-size:12.5px!important}
+html body .aic-tool th,html body .aic-article th{font-size:12.5px!important}
+html body .aic-tool td{font-size:16px}
+html body .aic-article{color:#14213d!important}
+html body .aic-article p,html body .aic-article li{color:#1d2a44}
+</style>
+<script>
+(function(){
+  function hsl(c){var m=c&&c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/);if(!m)return null;var r=m[1]/255,g=m[2]/255,b=m[3]/255,a=m[4]===undefined?1:+m[4];
+    var mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn,s=d?d/(1-Math.abs(2*l-1)):0,h=0;
+    if(d){h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;if(h<0)h+=360}return {h:h,s:s,l:l,a:a}}
+  function blue(c){var x=hsl(c);return x&&x.a>0.05&&x.s>0.3&&x.l>0.28&&x.l<0.95&&x.h>=205&&x.h<=240?x:null}
+  function N(x,dark,light){return x.a<0.95?"rgba(40,89,199,"+Math.min(x.a,0.12).toFixed(3)+")":(x.l>0.82?light:dark)}
+  function fix(el){var c0=getComputedStyle(el),bg=hsl(c0.backgroundColor),fg=hsl(c0.color);if(bg&&fg&&bg.a>0.9&&bg.l<0.6&&bg.s>0.3&&bg.h>=205&&bg.h<=240&&fg.l<0.6)el.style.setProperty("color","#ffffff","important");
+    if(el.closest(".aic-cta,.aic-dark")||el.matches(".aic-opt,.aic-pick,.aic-check,.aic-btn,.aic-chip,.aic-pill,.aic-seg button,.aic-card,.aic-note"))return;var cs=getComputedStyle(el),x;
+    if((x=blue(cs.color)))el.style.setProperty("color",x.l>0.75?"#eef3fc":"#2859c7","important");
+    if((x=blue(cs.backgroundColor)))el.style.setProperty("background-color",N(x,"#2859c7",x.l>0.9?"#eef3fc":"#d6e2f8"),"important");
+    if(el instanceof SVGElement){if((x=blue(cs.fill)))el.style.setProperty("fill",N(x,"#2859c7","#eef3fc"),"important");if((x=blue(cs.stroke)))el.style.setProperty("stroke",N(x,"#2859c7","#d6e2f8"),"important")}
+    if(cs.textTransform==="uppercase"&&parseFloat(cs.fontSize)<=13.5&&!el.closest("button")&&!el.classList.contains("aic-mono"))el.classList.add("aic-mono");}
+  var t;function mode(){document.querySelectorAll(".aic-tool").forEach(function(r){var q=[].some.call(r.querySelectorAll(".aic-progress,.aic-qtext,.aic-q-text"),function(e){return e.offsetParent!==null});if(q!==r.classList.contains("aic-in-q"))r.classList.toggle("aic-in-q",q)})}
+  function run(){clearTimeout(t);t=setTimeout(function(){mode();document.querySelectorAll("body *").forEach(fix)},30)}
+  document.addEventListener("DOMContentLoaded",function(){run();new MutationObserver(run).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class","aria-pressed","aria-checked","data-state"]});
+    document.addEventListener("change",run,true);document.addEventListener("click",run,true);});
+})();
+</script>
+</head>
+<body style="margin:0;background:#F7F8FA">
+<!-- ===== AIC:START — for a WordPress Custom HTML block, paste everything from here to AIC:END ===== -->
+<style>
+/* ===== AI Channel tool base (scoped to .aic-tool) ===== */
+.aic-tool{
+  --aic-paper:#F7F8FA; --aic-white:#FFFFFF; --aic-ink:#162033; --aic-soft:#667085; --aic-line:#DEE3EA; --aic-sage:#EEF1F6;
+  --aic-blue:#315EFB; --aic-blue-deep:#2448C9; --aic-blue-soft:#EEF3FF; --aic-on-blue:#FFFFFF;
+  --aic-amber:#A46207; --aic-amber-soft:#FBF3E4; --aic-green:#2F7A4E; --aic-green-soft:#E9F5EE;
+  --aic-red:#B42318; --aic-red-soft:#FDEDEB; --aic-violet:#6D5BD0; --aic-violet-soft:#F1EFFC;
+  --aic-radius:18px; --aic-radius-sm:12px; --aic-shadow:0 10px 28px rgba(21,32,51,.055);
+  background:var(--aic-paper); color:var(--aic-ink);
+  font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size:16px; line-height:1.55; padding:32px 0 56px; -webkit-text-size-adjust:100%; text-align:left;
+}
+@media (prefers-color-scheme:dark){
+  .aic-tool{
+    --aic-paper:#101B2D; --aic-white:#162033; --aic-ink:#F2F4F8; --aic-soft:#A6B3C7; --aic-line:#2A3850; --aic-sage:#1E2A40;
+    --aic-blue:#7A97FF; --aic-blue-deep:#9BB2FF; --aic-blue-soft:#1F2B45; --aic-on-blue:#0B1426;
+    --aic-amber:#E0A34A; --aic-amber-soft:#2D2617; --aic-green:#6FC592; --aic-green-soft:#15302A;
+    --aic-red:#F97066; --aic-red-soft:#3A1E22; --aic-violet:#A99CF0; --aic-violet-soft:#25223F; --aic-shadow:none; color-scheme:dark;
+  }
+}
+.aic-tool *,.aic-tool *::before,.aic-tool *::after{box-sizing:border-box}
+.aic-tool h1,.aic-tool h2,.aic-tool h3,.aic-tool h4,.aic-tool p,.aic-tool ul,.aic-tool ol,.aic-tool li,.aic-tool fieldset,.aic-tool legend{margin:0;padding:0}
+.aic-tool ul,.aic-tool ol{list-style:none}
+.aic-tool fieldset{border:0;min-width:0}
+.aic-tool button,.aic-tool input,.aic-tool textarea,.aic-tool select{font:inherit;color:inherit}
+.aic-tool a{color:var(--aic-blue);font-weight:700;text-decoration:none}
+.aic-tool a:hover{text-decoration:underline}
+.aic-tool :focus-visible{outline:3px solid #9DB2FF;outline-offset:2px;border-radius:8px}
+.aic-tool [hidden]{display:none!important}
+.aic-tool .aic-sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;margin:-1px;padding:0;border:0}
+.aic-tool .aic-col{max-width:800px;margin:0 auto;padding-inline:16px}
+@media (min-width:600px){.aic-tool .aic-col{padding-inline:24px}}
+.aic-tool .aic-eyebrow{display:block;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--aic-blue)}
+.aic-tool .aic-h1{font-size:clamp(30px,6.4vw,50px);line-height:1.04;font-weight:800;letter-spacing:-.035em;margin:12px 0 16px}
+.aic-tool .aic-h2{font-size:clamp(24px,4.4vw,34px);line-height:1.1;font-weight:800;letter-spacing:-.035em;margin:8px 0 10px}
+.aic-tool .aic-h3{font-size:19px;line-height:1.25;font-weight:800;letter-spacing:-.02em;margin:0 0 6px}
+.aic-tool .aic-lede{font-size:18px;color:var(--aic-soft);max-width:640px}
+.aic-tool .aic-soft{color:var(--aic-soft)}
+.aic-tool .aic-small{font-size:13.5px;color:var(--aic-soft);line-height:1.55}
+.aic-tool .aic-card{background:var(--aic-white);border:1px solid var(--aic-line);border-radius:var(--aic-radius);box-shadow:var(--aic-shadow);padding:22px}
+@media (min-width:600px){.aic-tool .aic-card{padding:26px 28px}}
+.aic-tool .aic-stack>*+*{margin-top:14px}
+.aic-tool .aic-grid2{display:grid;gap:12px;grid-template-columns:1fr}
+@media (min-width:640px){.aic-tool .aic-grid2{grid-template-columns:1fr 1fr}}
+.aic-tool .aic-fade{animation:aicFade .35s ease both}
+@keyframes aicFade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* Buttons */
+.aic-tool .aic-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;min-height:46px;border-radius:999px;border:1px solid var(--aic-line);background:var(--aic-white);color:var(--aic-ink);font-weight:750;font-size:15px;cursor:pointer;text-decoration:none;line-height:1.2;transition:background .15s,border-color .15s,transform .15s}
+.aic-tool .aic-btn:hover{border-color:#B8C7FF;text-decoration:none}
+.aic-tool .aic-btn-primary{background:var(--aic-blue);border-color:var(--aic-blue);color:var(--aic-on-blue);box-shadow:0 6px 16px rgba(49,94,251,.14)}
+.aic-tool .aic-btn-primary:hover{background:var(--aic-blue-deep);border-color:var(--aic-blue-deep);color:var(--aic-on-blue)}
+.aic-tool .aic-btn-ghost{background:none;border-color:transparent;color:var(--aic-soft);padding-inline:10px}
+.aic-tool .aic-btn-ghost:hover{color:var(--aic-ink);border-color:transparent}
+.aic-tool .aic-btn[disabled]{opacity:.45;cursor:not-allowed;box-shadow:none}
+.aic-tool .aic-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.aic-tool .aic-nav{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-top:22px;padding-top:18px;border-top:1px solid var(--aic-line)}
+.aic-tool .aic-nav-hint{font-size:13px;color:var(--aic-soft);font-weight:650}
+
+/* Segmented switch */
+.aic-tool .aic-seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--aic-line);border-radius:999px;background:var(--aic-white);padding:3px;gap:2px}
+.aic-tool .aic-seg button{border:0;background:none;padding:9px 15px;border-radius:999px;font-size:14px;font-weight:750;color:var(--aic-soft);cursor:pointer;min-height:40px}
+.aic-tool .aic-seg button[aria-pressed="true"],.aic-tool .aic-seg button[aria-checked="true"]{background:var(--aic-blue);color:var(--aic-on-blue)}
+
+/* Progress */
+.aic-tool .aic-progress{height:6px;border-radius:999px;background:var(--aic-sage);overflow:hidden;margin:14px 0 4px}
+.aic-tool .aic-progress span{display:block;height:100%;width:0;background:var(--aic-blue);border-radius:999px;transition:width .35s ease}
+
+/* Radio-style options */
+.aic-tool .aic-q{margin-top:14px}
+.aic-tool .aic-qnum{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--aic-soft);margin-bottom:6px}
+.aic-tool .aic-qtext{font-size:18px;font-weight:750;line-height:1.35;letter-spacing:-.01em;margin-bottom:6px}
+.aic-tool .aic-qhint{font-size:14px;color:var(--aic-soft);margin-bottom:12px}
+.aic-tool .aic-opts{display:grid;gap:8px;margin-top:12px}
+.aic-tool .aic-opt{display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;padding:12px 14px;border:1px solid var(--aic-line);border-radius:var(--aic-radius-sm);background:var(--aic-paper);cursor:pointer;font-size:15.5px;line-height:1.4;transition:border-color .15s,background .15s}
+.aic-tool .aic-opt:hover{border-color:#B8C7FF;background:var(--aic-white)}
+.aic-tool .aic-dot{flex:none;width:18px;height:18px;border-radius:50%;border:2px solid #A9B4C6;margin-top:1px;position:relative}
+.aic-tool .aic-opt[data-multi] .aic-dot{border-radius:5px}
+.aic-tool .aic-dot::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--aic-blue);transform:scale(0);transition:transform .15s}
+.aic-tool .aic-opt[data-multi] .aic-dot::after{border-radius:2px}
+.aic-tool .aic-opt[aria-checked="true"]{border-color:var(--aic-blue);background:var(--aic-white);box-shadow:0 0 0 3px var(--aic-blue-soft)}
+.aic-tool .aic-opt[aria-checked="true"] .aic-dot{border-color:var(--aic-blue)}
+.aic-tool .aic-opt[aria-checked="true"] .aic-dot::after{transform:scale(1)}
+.aic-tool .aic-opt-sub{display:block;font-size:13.5px;color:var(--aic-soft);margin-top:2px}
+.aic-tool .aic-opt.aic-opt-unsure{background:none;border-style:dashed}
+
+/* Callouts and tags */
+.aic-tool .aic-note{border-radius:var(--aic-radius-sm);padding:14px 16px;background:var(--aic-blue-soft);border-left:3px solid var(--aic-blue);font-size:15px;color:var(--aic-ink)}
+.aic-tool .aic-note.aic-warn{background:var(--aic-amber-soft);border-left-color:var(--aic-amber)}
+.aic-tool .aic-note.aic-bad{background:var(--aic-red-soft);border-left-color:var(--aic-red)}
+.aic-tool .aic-note.aic-good{background:var(--aic-green-soft);border-left-color:var(--aic-green)}
+.aic-tool .aic-note strong{font-weight:800}
+.aic-tool .aic-tag{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:5px 10px;border-radius:999px;background:var(--aic-sage);color:var(--aic-soft);max-width:100%;white-space:normal;line-height:1.35}
+.aic-tool .aic-tag.aic-t-good{background:var(--aic-green-soft);color:var(--aic-green)}
+.aic-tool .aic-tag.aic-t-warn{background:var(--aic-amber-soft);color:var(--aic-amber)}
+.aic-tool .aic-tag.aic-t-bad{background:var(--aic-red-soft);color:var(--aic-red)}
+.aic-tool .aic-tag.aic-t-blue{background:var(--aic-blue-soft);color:var(--aic-blue)}
+.aic-tool .aic-privacy{display:flex;gap:8px;align-items:flex-start;font-size:13.5px;color:var(--aic-soft);margin-top:14px}
+.aic-tool .aic-privacy svg{flex:none;margin-top:3px}
+
+/* Bars */
+.aic-tool .aic-bars{display:grid;gap:4px}
+.aic-tool .aic-bar-row{display:grid;grid-template-columns:1fr 48px;gap:6px 12px;align-items:center;padding:9px 0;border-bottom:1px solid var(--aic-line)}
+.aic-tool .aic-bar-row:last-child{border-bottom:0}
+.aic-tool .aic-bar-label{grid-column:1/-1;font-weight:750;font-size:15px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+@media (min-width:640px){.aic-tool .aic-bar-row{grid-template-columns:230px 1fr 48px}.aic-tool .aic-bar-label{grid-column:auto}}
+.aic-tool .aic-bar{display:block;height:10px;border-radius:999px;background:var(--aic-sage);overflow:hidden}
+.aic-tool .aic-bar i{display:block;height:100%;border-radius:999px;background:var(--aic-green);width:0;transition:width .8s ease}
+.aic-tool .aic-bar i.aic-mid{background:var(--aic-amber)}
+.aic-tool .aic-bar i.aic-low{background:var(--aic-red)}
+.aic-tool .aic-bar-pct{font-weight:800;font-variant-numeric:tabular-nums;text-align:right;font-size:14px}
+
+.aic-tool .aic-list li{position:relative;padding-left:18px;margin-top:8px}
+.aic-tool .aic-list li::before{content:"";position:absolute;left:2px;top:.62em;width:7px;height:7px;border-radius:50%;background:var(--aic-blue)}
+/* Results hand-off */
+.aic-tool .aic-next{display:grid;gap:12px;grid-template-columns:1fr}
+@media (min-width:700px){.aic-tool .aic-next{grid-template-columns:1fr 1fr}}
+.aic-tool .aic-next .aic-card{display:flex;flex-direction:column;gap:10px}
+.aic-tool .aic-next .aic-card .aic-btn{align-self:flex-start;margin-top:auto}
+.aic-tool .aic-solution{border-color:#C7D3FF;background:linear-gradient(180deg,var(--aic-blue-soft),var(--aic-white) 70%)}
+.aic-tool .aic-handoff{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;font-size:14px;margin-top:6px}
+.aic-tool .aic-linkbtn{background:none;border:0;padding:4px 0;color:var(--aic-blue);font-weight:750;cursor:pointer;text-decoration:underline;text-underline-offset:3px;font-size:14px}
+.aic-tool .aic-sources{font-size:13px;color:var(--aic-soft);line-height:1.6}
+.aic-tool .aic-sources a{font-weight:650}
+.aic-tool details.aic-more{border-top:1px solid var(--aic-line);padding-top:4px}
+.aic-tool details.aic-more summary{cursor:pointer;padding:12px 0;font-weight:800;list-style:none;display:flex;justify-content:space-between;gap:10px}
+.aic-tool details.aic-more summary::-webkit-details-marker{display:none}
+.aic-tool details.aic-more summary::after{content:"+";color:var(--aic-soft)}
+.aic-tool details.aic-more[open] summary::after{content:"\2013"}
+
+@media (prefers-reduced-motion:reduce){
+  .aic-tool .aic-fade{animation:none}
+  .aic-tool *{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+}
+@media print{
+  .aic-tool{--aic-paper:#fff;--aic-white:#fff;--aic-ink:#000;--aic-soft:#444;--aic-line:#bbb;--aic-sage:#eee;--aic-blue:#2448C9;--aic-blue-soft:#EEF3FF;--aic-amber:#8A5206;--aic-amber-soft:#FBF3E4;--aic-green:#2F7A4E;--aic-green-soft:#E9F5EE;--aic-red:#B42318;--aic-red-soft:#FDEDEB;--aic-shadow:none;background:#fff!important;color:#000;padding:0;font-size:11pt}
+  .aic-tool .aic-noprint{display:none!important}
+  .aic-tool .aic-card{box-shadow:none;border-color:#bbb;break-inside:avoid;padding:14px 16px}
+  .aic-tool .aic-col{max-width:none;padding:0}
+  .aic-tool .aic-bar i,.aic-tool .aic-tag,.aic-tool .aic-note{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .aic-tool a{color:#000;text-decoration:underline}
+}
+
+/* EU AI Act checker */
+.aic-tool .aic-eu-group{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--aic-soft);margin:12px 0 2px}
+.aic-tool .aic-eu-group:first-child{margin-top:0}
+.aic-tool .aic-eu-ladder{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.aic-tool .aic-eu-ladder span{display:block;text-align:center;font-size:12px;font-weight:800;letter-spacing:.02em;padding:9px 2px;border-radius:10px;background:var(--aic-sage);color:var(--aic-soft)}
+.aic-tool .aic-eu-prohibited .aic-eu-ladder .aic-on{background:var(--aic-red);color:#fff}
+.aic-tool .aic-eu-high .aic-eu-ladder .aic-on{background:var(--aic-amber);color:#fff}
+.aic-tool .aic-eu-exempt .aic-eu-ladder .aic-on{background:var(--aic-amber-soft);color:var(--aic-amber);box-shadow:inset 0 0 0 2px var(--aic-amber)}
+.aic-tool .aic-eu-limited .aic-eu-ladder .aic-on{background:var(--aic-blue);color:var(--aic-on-blue)}
+.aic-tool .aic-eu-minimal .aic-eu-ladder .aic-on{background:var(--aic-green);color:#fff}
+@media (prefers-color-scheme:dark){.aic-tool .aic-eu-prohibited .aic-eu-ladder .aic-on,.aic-tool .aic-eu-high .aic-eu-ladder .aic-on,.aic-tool .aic-eu-minimal .aic-eu-ladder .aic-on{color:#0B1426}}
+.aic-tool .aic-eu-time li{display:grid;grid-template-columns:100px 1fr;gap:12px;padding:9px 0;border-bottom:1px solid var(--aic-line);font-size:15px}
+.aic-tool .aic-eu-time li:last-child{border-bottom:0}
+.aic-tool .aic-eu-time b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.aic-tool .aic-eu-chk li{border-bottom:1px solid var(--aic-line)}
+.aic-tool .aic-eu-chk li:last-child{border-bottom:0}
+.aic-tool .aic-eu-chk label{display:flex;gap:12px;align-items:flex-start;padding:11px 0;cursor:pointer}
+.aic-tool .aic-eu-chk input{width:20px;height:20px;margin:2px 0 0;flex:none;accent-color:var(--aic-blue)}
+.aic-tool .aic-eu-chk input:checked+span{color:var(--aic-soft);text-decoration:line-through}
+@media print{.aic-tool .aic-eu-chk input:checked+span{text-decoration:none}}
+</style>
+<div class="aic-tool" id="aic-eu-ai-act-risk-tier-checker"><noscript><div class="aic-col"><p>This tool needs JavaScript to run. Everything happens in your browser; nothing is sent anywhere.</p></div></noscript></div>
+<script>
+window.AICHANNEL_CONFIG = Object.assign({
+  resultsFormUrl: "#",      // "Email me my results" form (WordPress form page)
+  coursesUrl: "#",          // "Learn with a member" (Central AI course schedule)
+  matchUrl: "#",            // "Get matched to someone" (advisory/consulting form)
+  newsletterUrl: "#"        // separate newsletter opt-in
+}, window.AICHANNEL_CONFIG || {});
+(function () {
+  'use strict';
+  /* ---------- Shared helpers (results hand-off, events, DOM) ---------- */
+  var CFG = window.AICHANNEL_CONFIG;
+  var reducedMotion = false;
+  try { reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function $(sel, ctx) { return (ctx || ROOT).querySelector(sel); }
+  function $$(sel, ctx) { return Array.prototype.slice.call((ctx || ROOT).querySelectorAll(sel)); }
+
+  function utmParams() {
+    var out = {};
+    try {
+      var sp = new URLSearchParams(window.location.search);
+      sp.forEach(function (v, k) { if (/^utm_/i.test(k)) out[k] = v; });
+    } catch (e) {}
+    return out;
+  }
+
+  /* Fires a DOM event and a postMessage so GA4/GTM on the host page can track. No direct analytics calls. */
+  function emit(name, extra) {
+    var detail = { event: name, tool: SLUG, assessment_name: TOOL_NAME, audience: currentAudience() };
+    if (extra) for (var k in extra) if (Object.prototype.hasOwnProperty.call(extra, k)) detail[k] = extra[k];
+    try { window.dispatchEvent(new CustomEvent('aichannel:event', { detail: detail })); } catch (e) {}
+    try {
+      var msg = { type: 'aichannel:event' };
+      for (var j in detail) msg[j] = detail[j];
+      window.parent.postMessage(msg, '*');
+    } catch (e) {}
+  }
+
+  /* Builds the "Email me my results" / CTA URL with the lead fields from the brief. */
+  function buildUrl(base, cta, result) {
+    var params = {
+      lead_type: result.lead_type || 'tool_result',
+      audience: currentAudience(),
+      source_page: window.location.href,
+      source_content_or_tool: SLUG,
+      cta_clicked: cta,
+      assessment_name: TOOL_NAME,
+      assessment_result: result.label || ''
+    };
+    if (result.score != null) params.score = String(result.score);
+    var utm = utmParams();
+    for (var u in utm) params[u] = utm[u];
+    var url;
+    try {
+      url = new URL(base || '#', window.location.href);
+      for (var p in params) url.searchParams.set(p, params[p]);
+      return url.toString();
+    } catch (e) {
+      var qs = Object.keys(params).map(function (k) { return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]); }).join('&');
+      return (base || '#') + (String(base).indexOf('?') > -1 ? '&' : '?') + qs;
+    }
+  }
+
+  /* Wires every [data-aic-cta] link inside a container: sets href and tracks the click. */
+  function wireCtas(container, result) {
+    $$('[data-aic-cta]', container).forEach(function (a) {
+      var kind = a.getAttribute('data-aic-cta');
+      var base = CFG[a.getAttribute('data-aic-url')] || '#';
+      a.setAttribute('href', kind === 'newsletter' ? base : buildUrl(base, kind, result));
+      a.addEventListener('click', function () {
+        emit('cta_clicked', { cta_clicked: kind, assessment_result: result.label || '', score: result.score == null ? null : result.score });
+      });
+    });
+  }
+
+  function focusHeading(el) {
+    if (!el) return;
+    el.setAttribute('tabindex', '-1');
+    try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
+  }
+  function scrollToEl(el) {
+    if (!el) return;
+    try { el.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' }); } catch (e) { el.scrollIntoView(); }
+  }
+
+  /* Arrow-key movement inside role=radiogroup option lists */
+  function radioKeys(container, onSelect) {
+    container.addEventListener('keydown', function (e) {
+      var opt = e.target.closest && e.target.closest('[role="radio"]');
+      if (!opt) return;
+      var group = opt.closest('[role="radiogroup"]');
+      var opts = $$('[role="radio"]', group);
+      var i = opts.indexOf(opt), n = null;
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') n = opts[(i + 1) % opts.length];
+      if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') n = opts[(i - 1 + opts.length) % opts.length];
+      if (n) { e.preventDefault(); n.focus(); onSelect(n); }
+    });
+  }
+  /* Roving tabindex so each radiogroup is one tab stop */
+  function rovingTabs(group) {
+    var opts = $$('[role="radio"]', group);
+    var checked = opts.filter(function (o) { return o.getAttribute('aria-checked') === 'true'; })[0] || opts[0];
+    opts.forEach(function (o) { o.setAttribute('tabindex', o === checked ? '0' : '-1'); });
+  }
+
+  var LOCK_SVG = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="2" y="6" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M4.5 6V4.5a2.5 2.5 0 015 0V6" stroke="currentColor" stroke-width="1.5"/></svg>';
+
+  /* ---------- Tool: EU AI Act risk-tier checker ---------- */
+  var SLUG = 'eu-ai-act-risk-tier-checker';
+  var TOOL_NAME = 'What Risk Tier Is Your AI System Under the EU AI Act?';
+  var ROOT = document.getElementById('aic-' + SLUG);
+  if (!ROOT) return;
+
+  var A = {}; /* answers: single -> string, multi -> array */
+  var started = false, stepIndex = -1;
+  function currentAudience() { return A.org === 'pub' ? 'government' : 'business'; }
+  function has(id, v) { return Array.isArray(A[id]) && A[id].indexOf(v) > -1; }
+  function anyReal(id) { return Array.isArray(A[id]) && A[id].some(function (v) { return v !== 'none' && v !== 'unsure'; }); }
+
+  var STEPS = [
+    { id: 'scope', title: 'You and your system', intro: 'The Act gives different duties to whoever makes an AI system (the provider) and whoever uses it (the deployer). Start with which one you are.',
+      qs: [
+        { id: 'role', type: 'single', text: 'What is your organization\'s role for this AI system?',
+          opts: [
+            { v: 'deployer', label: 'We use it', sub: 'Deployer: you use a system under your own authority in a professional capacity, for example a tool bought from a vendor.' },
+            { v: 'provider', label: 'We build it, or have it built, and offer it under our name', sub: 'Provider: you develop the system and place it on the market or put it into service, paid or free.' },
+            { v: 'both', label: 'Both: we build it and use it ourselves', sub: 'An in-house system you developed and run makes you provider and deployer.' },
+            { v: 'importer', label: 'We import or resell it', sub: 'Importer or distributor of a system made by someone else.' },
+            { v: 'unsure', label: 'Not sure' }
+          ] },
+        { id: 'org', type: 'single', text: 'What kind of organization are you?',
+          hint: 'Some duties apply only to public bodies and to private organizations providing public services.',
+          opts: [
+            { v: 'pub', label: 'A public body', sub: 'Government, agency, municipality, or another body governed by public law.' },
+            { v: 'pubsvc', label: 'A private organization providing a public service', sub: 'For example education, healthcare, housing or social services delivered on behalf of the state.' },
+            { v: 'co', label: 'A company or other private organization' }
+          ] },
+        { id: 'eu', type: 'single', text: 'How is the system connected to the EU?',
+          opts: [
+            { v: 'in', label: 'We are established in the EU, or the system is used in the EU' },
+            { v: 'out', label: 'We are outside the EU, but the system or its output is used in the EU', sub: 'The Act can still apply to you, for example when you place a system on the EU market or its output is used in the EU.' },
+            { v: 'none', label: 'No connection to the EU at all' },
+            { v: 'unsure', label: 'Not sure' }
+          ] },
+        { id: 'excl', type: 'multi', text: 'Do any of these apply to the system?', hint: 'Tick all that apply.',
+          opts: [
+            { v: 'mil', label: 'It is used exclusively for military, defense or national security purposes' },
+            { v: 'rd', label: 'It is developed and used only for scientific research and development' },
+            { v: 'prem', label: 'It is still in research, development or testing and has not been placed on the market or put into service', sub: 'Testing in real-world conditions is not covered by this exclusion.' },
+            { v: 'personal', label: 'It is used by individuals purely for personal, non-professional activity' },
+            { v: 'none', label: 'None of these' }
+          ] }
+      ] },
+    { id: 'prohib', title: 'Prohibited practices', intro: 'Article 5 bans a short list of AI practices outright. Most of these bans have applied since 2 February 2025; two added in 2026 apply from 2 December 2026. Most systems tick "None of these." Read each line anyway.',
+      qs: [
+        { id: 'p', type: 'multi', text: 'Does the system do any of the following?', hint: 'Tick all that apply. Each line is a plain-language summary; the legal text has conditions and exceptions.',
+          opts: [
+            { v: 'manip', label: 'Uses subliminal, manipulative or deceptive techniques that materially distort people\'s behavior in a way likely to cause significant harm' },
+            { v: 'vuln', label: 'Exploits vulnerabilities due to age, disability or a social or economic situation, distorting behavior in a way likely to cause significant harm' },
+            { v: 'score', label: 'Scores or classifies people on social behavior or personal traits, leading to unjustified or disproportionate detrimental treatment ("social scoring")' },
+            { v: 'crime', label: 'Predicts the risk that a person will commit a crime based solely on profiling or personality traits' },
+            { v: 'scrape', label: 'Builds or expands facial recognition databases by untargeted scraping of images from the internet or CCTV' },
+            { v: 'emowork', label: 'Infers emotions of people in the workplace or in education', sub: 'Except for medical or safety reasons.' },
+            { v: 'biocat', label: 'Categorizes people from biometric data to infer race, political opinions, trade union membership, religious or philosophical beliefs, sex life or sexual orientation' },
+            { v: 'rbi', label: 'Real-time remote biometric identification in publicly accessible spaces for law enforcement', sub: 'Allowed only in narrow, authorized cases.' },
+            { v: 'intimate', label: 'Generates or manipulates realistic sexual or intimate images, video or audio of an identifiable real person without their explicit consent, or child sexual abuse material', sub: 'Banned from 2 December 2026. A general image or video tool is caught if this is its purpose, or if it can readily do it and lacks reasonable safeguards to stop it.' },
+            { v: 'none', label: 'None of these' },
+            { v: 'unsure', label: 'Not sure whether one of these applies' }
+          ] }
+      ] },
+    { id: 'annex1', title: 'Regulated products', intro: 'AI that is a product, or a safety component of a product, already covered by EU product-safety law is high-risk when that product needs an independent (third-party) conformity assessment (Article 6(1) and Annex I).',
+      qs: [
+        { id: 'a1', type: 'single', text: 'Is the AI system a product, or a safety component of a product, covered by EU product-safety legislation?',
+          hint: 'Examples of laws listed in Annex I: machinery, toys, lifts, radio equipment, medical devices, in vitro diagnostic devices, pressure equipment, personal protective equipment, gas appliances, recreational craft, cableways, motor vehicles, civil aviation, marine equipment and rail. Since 2026, AI used only for non-safety tasks such as user assistance, performance optimization, convenience or quality control is not a safety component (Article 6(1a)).',
+          opts: [{ v: 'yes', label: 'Yes' }, { v: 'no', label: 'No' }, { v: 'unsure', label: 'Not sure' }] },
+        { id: 'a1b', type: 'single', text: 'Does that product need a third-party conformity assessment (by a notified body) under that law?',
+          when: function () { return A.a1 === 'yes'; },
+          opts: [{ v: 'yes', label: 'Yes' }, { v: 'no', label: 'No: self-assessment only' }, { v: 'unsure', label: 'Not sure' }] }
+      ] },
+    { id: 'annex3', title: 'High-risk use areas', intro: 'Annex III lists eight areas where AI is treated as high-risk because it can affect safety or fundamental rights. Tick every use that matches what the system is intended to do.',
+      qs: [
+        { id: 'a3', type: 'multi', text: 'Is the system intended for any of these uses?', hint: 'Tick all that apply. Summaries of Annex III; the legal text is narrower in places.',
+          groups: [
+            ['Biometrics', ['bio_rbi', 'bio_cat', 'bio_emo']],
+            ['Critical infrastructure', ['crit']],
+            ['Education and vocational training', ['edu_access', 'edu_eval', 'edu_level', 'edu_proctor']],
+            ['Employment and workers', ['emp_hire', 'emp_manage']],
+            ['Essential private and public services', ['svc_benefit', 'svc_credit', 'svc_insur', 'svc_emerg']],
+            ['Law enforcement', ['law']],
+            ['Migration, asylum and border control', ['mig']],
+            ['Justice and democratic processes', ['just', 'elect']],
+            ['', ['none']]
+          ],
+          opts: [
+            { v: 'bio_rbi', label: 'Remote biometric identification of people', sub: 'Not simple verification that a person is who they claim to be.' },
+            { v: 'bio_cat', label: 'Biometric categorization by sensitive or protected attributes' },
+            { v: 'bio_emo', label: 'Emotion recognition' },
+            { v: 'crit', label: 'Safety component in managing critical digital infrastructure, road traffic, or the supply of water, gas, heating or electricity' },
+            { v: 'edu_access', label: 'Deciding access or admission to education or training' },
+            { v: 'edu_eval', label: 'Evaluating learning outcomes, including steering the learning process' },
+            { v: 'edu_level', label: 'Assessing the level of education a person should receive or can access' },
+            { v: 'edu_proctor', label: 'Monitoring students for prohibited behavior during tests' },
+            { v: 'emp_hire', label: 'Recruitment or selection: targeted job ads, filtering applications, evaluating candidates' },
+            { v: 'emp_manage', label: 'Decisions on promotion, termination or task allocation, or monitoring and evaluating workers\' performance and behavior' },
+            { v: 'svc_benefit', label: 'Public authorities evaluating eligibility for public benefits and services, or granting, reducing or revoking them' },
+            { v: 'svc_credit', label: 'Evaluating creditworthiness or establishing credit scores', sub: 'Not systems used to detect financial fraud.' },
+            { v: 'svc_insur', label: 'Risk assessment and pricing for life and health insurance' },
+            { v: 'svc_emerg', label: 'Evaluating and classifying emergency calls, dispatching emergency services, or emergency patient triage' },
+            { v: 'law', label: 'Law enforcement uses, such as assessing risk of victimization or reoffending, evaluating evidence reliability, or profiling in investigations' },
+            { v: 'mig', label: 'Migration, asylum or border control uses, such as assessing risks or examining applications for asylum, visas or residence permits' },
+            { v: 'just', label: 'Assisting a judicial authority (or alternative dispute resolution) in researching and interpreting facts and law and applying the law' },
+            { v: 'elect', label: 'Influencing the outcome of an election or referendum, or people\'s voting behavior', sub: 'Not tools used only to organize or optimize campaigns administratively.' },
+            { v: 'none', label: 'None of these' }
+          ] }
+      ] },
+    { id: 'filter', title: 'The high-risk exception', intro: 'A system in an Annex III area is not high-risk if it does not pose a significant risk of harm and only plays a limited role (Article 6(3)). The exception never applies if the system profiles people.',
+      when: function () { return anyReal('a3'); },
+      qs: [
+        { id: 'prof', type: 'single', text: 'Does the system profile people?', hint: 'Profiling means automatically evaluating personal aspects such as work performance, economic situation, health, preferences, interests, reliability, behavior, location or movements.',
+          opts: [{ v: 'yes', label: 'Yes' }, { v: 'no', label: 'No' }, { v: 'unsure', label: 'Not sure' }] },
+        { id: 'role6', type: 'single', text: 'Which best describes the system\'s role in the decision?',
+          when: function () { return A.prof === 'no'; },
+          opts: [
+            { v: 'narrow', label: 'It performs a narrow procedural task', sub: 'For example converting unstructured data into structured data, or sorting incoming documents into categories.' },
+            { v: 'improve', label: 'It improves the result of an activity a person has already completed', sub: 'For example improving the language of a document already drafted by a person.' },
+            { v: 'pattern', label: 'It detects decision patterns or deviations, without replacing or influencing a human assessment without proper human review' },
+            { v: 'prep', label: 'It performs a preparatory task for an assessment', sub: 'For example indexing, searching or translating files.' },
+            { v: 'shapes', label: 'None of these: it makes, or materially shapes, the decision' },
+            { v: 'unsure', label: 'Not sure' }
+          ] }
+      ] },
+    { id: 'transp', title: 'Transparency', intro: 'Some systems must tell people they are dealing with AI, whatever their risk tier (Article 50). These duties have applied since 2 August 2026.',
+      qs: [
+        { id: 't', type: 'multi', text: 'Does the system do any of the following?', hint: 'Tick all that apply.',
+          opts: [
+            { v: 'chat', label: 'Interacts directly with people, for example a chatbot or voice assistant' },
+            { v: 'synth', label: 'Generates synthetic audio, images, video or text' },
+            { v: 'emo', label: 'Recognizes emotions or categorizes people from biometric data (outside the banned uses)' },
+            { v: 'deepfake', label: 'Is used to create or publish deepfakes: realistic images, audio or video of real people, places or events' },
+            { v: 'pubtext', label: 'Generates text published to inform the public on matters of public interest' },
+            { v: 'none', label: 'None of these' }
+          ] }
+      ] },
+    { id: 'gpai', title: 'General-purpose AI models', intro: 'Separate rules apply to the underlying general-purpose AI models (the large models behind tools like ChatGPT), not to the tools built on them. Most organizations are not model providers.',
+      qs: [
+        { id: 'g', type: 'single', text: 'Are you developing a general-purpose AI model and making it available, for example through an API, a download or a product?',
+          opts: [
+            { v: 'no', label: 'No: we use or build on models made by others', sub: 'Including fine-tuning or prompting someone else\'s model for our own system.' },
+            { v: 'yes', label: 'Yes, we provide a general-purpose AI model' },
+            { v: 'sys', label: 'Yes, and it is very large', sub: 'Trained with more than 10^25 floating-point operations, or designated by the Commission as having systemic risk.' },
+            { v: 'unsure', label: 'Not sure' }
+          ] }
+      ] }
+  ];
+
+  function optLabel(qid, v) {
+    for (var s = 0; s < STEPS.length; s++) for (var i = 0; i < STEPS[s].qs.length; i++) {
+      var q = STEPS[s].qs[i];
+      if (q.id === qid) for (var j = 0; j < q.opts.length; j++) if (q.opts[j].v === v) return q.opts[j].label;
+    }
+    return v;
+  }
+
+  /* ---------- Render ---------- */
+  function renderQ(q) {
+    var gid = 'aic-eu-' + q.id;
+    var multi = q.type === 'multi';
+    function opt(o) {
+      var unsure = o.v === 'unsure' || o.v === 'none';
+      return '<button type="button" class="aic-opt' + (unsure ? ' aic-opt-unsure' : '') + '" role="' + (multi ? 'checkbox' : 'radio') + '" aria-checked="false" data-q="' + q.id + '" data-v="' + o.v + '"' + (multi ? ' data-multi' : '') + '><span class="aic-dot" aria-hidden="true"></span><span>' + esc(o.label) + (o.sub ? '<span class="aic-opt-sub">' + esc(o.sub) + '</span>' : '') + '</span></button>';
+    }
+    var body;
+    if (q.groups) {
+      var byV = {}; q.opts.forEach(function (o) { byV[o.v] = o; });
+      body = q.groups.map(function (g) {
+        return (g[0] ? '<div class="aic-eu-group">' + esc(g[0]) + '</div>' : '<div style="height:6px"></div>') + g[1].map(function (v) { return opt(byV[v]); }).join('');
+      }).join('');
+    } else body = q.opts.map(opt).join('');
+    return '<div class="aic-card aic-q" data-qwrap="' + q.id + '"' + (q.when && !q.when() ? ' hidden' : '') + '>' +
+      '<div class="aic-qtext" id="' + gid + '">' + esc(q.text) + '</div>' +
+      (q.hint ? '<p class="aic-qhint">' + esc(q.hint) + '</p>' : '') +
+      '<div class="aic-opts" role="' + (multi ? 'group' : 'radiogroup') + '" aria-labelledby="' + gid + '">' + body + '</div></div>';
+  }
+
+  function stepHtml(s, si) {
+    return '<section class="aic-screen aic-fade" data-screen="' + si + '" aria-labelledby="aic-eu-s' + si + '" hidden>' +
+      '<span class="aic-eyebrow" data-stepnum="' + si + '"></span>' +
+      '<h2 class="aic-h2" id="aic-eu-s' + si + '">' + esc(s.title) + '</h2>' +
+      '<p class="aic-note">' + esc(s.intro) + '</p>' +
+      s.qs.map(renderQ).join('') +
+      '<div class="aic-nav"><button type="button" class="aic-btn aic-btn-ghost" data-nav="back">&larr; Back</button><span class="aic-nav-hint" data-hint="' + si + '"></span><button type="button" class="aic-btn aic-btn-primary" data-nav="next" disabled>Next &rarr;</button></div>' +
+      '</section>';
+  }
+
+  var INTRO = '<section class="aic-screen aic-fade" data-screen="intro" aria-labelledby="aic-eu-h1">' +
+    '<span class="aic-eyebrow">EU AI Act · for companies and public bodies</span>' +
+    '<h1 class="aic-h1" id="aic-eu-h1">What risk tier is your AI system under the EU AI Act?</h1>' +
+    '<p class="aic-lede">Answer a few questions about how your AI system is used. We\'ll classify it as prohibited, high-risk, limited-risk (transparency duties) or minimal-risk, then hand you the obligations and a readiness checklist.</p>' +
+    '<div class="aic-grid2" style="margin-top:22px">' +
+      '<div class="aic-card"><span class="aic-eyebrow">How it works</span><p style="margin-top:6px">Seven short steps, in the order the Act works through them: scope, banned practices, regulated products, high-risk uses, the high-risk exception, transparency, and general-purpose AI models. One system at a time.</p></div>' +
+      '<div class="aic-card"><span class="aic-eyebrow">What it isn\'t</span><p style="margin-top:6px">Legal advice. It simplifies the legal text, including the changes made in July 2026. For anything high-risk, confirm the result with a lawyer.</p></div>' +
+    '</div>' +
+    '<div class="aic-actions" style="margin-top:20px"><button type="button" class="aic-btn aic-btn-primary" id="aic-eu-start">Check my AI system</button><span class="aic-small">About 4 minutes</span></div>' +
+    '<p class="aic-privacy">' + LOCK_SVG + '<span>Everything runs in your browser. No data leaves your device.</span></p>' +
+    '</section>';
+
+  ROOT.innerHTML = '<div class="aic-col">' + INTRO + STEPS.map(stepHtml).join('') +
+    '<div class="aic-progresswrap aic-noprint" hidden><div class="aic-progress" role="progressbar" aria-label="Steps completed" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div></div>' +
+    '<section class="aic-screen" data-screen="results" hidden></section></div>';
+  $$('[role="radiogroup"]').forEach(rovingTabs);
+
+  /* ---------- Flow ---------- */
+  function visibleSteps() { return STEPS.map(function (s, i) { return i; }).filter(function (i) { return !STEPS[i].when || STEPS[i].when(); }); }
+  function qVisible(q) { return !q.when || q.when(); }
+  function stepDone(si) {
+    return STEPS[si].qs.filter(qVisible).every(function (q) { return q.type === 'multi' ? (A[q.id] && A[q.id].length) : A[q.id] != null; });
+  }
+  function refresh(si) {
+    var scr = $('[data-screen="' + si + '"]');
+    STEPS[si].qs.forEach(function (q) { $('[data-qwrap="' + q.id + '"]', scr).hidden = !qVisible(q); });
+    $('[data-nav="next"]', scr).disabled = !stepDone(si);
+    var vis = visibleSteps(), pos = vis.indexOf(si);
+    var last = pos === vis.length - 1;
+    $('[data-nav="next"]', scr).innerHTML = last ? 'See my result' : 'Next &rarr;';
+    $('[data-hint="' + si + '"]', scr).textContent = stepDone(si) ? '' : 'Answer to continue';
+    $('[data-stepnum="' + si + '"]', scr).textContent = 'Step ' + (pos + 1) + ' of ' + vis.length;
+  }
+  function show(id) {
+    $$('.aic-screen').forEach(function (s) { s.hidden = s.getAttribute('data-screen') !== String(id); });
+    $('.aic-progresswrap').hidden = (id === 'intro' || id === 'results');
+    stepIndex = id;
+    if (typeof id === 'number') {
+      refresh(id);
+      var vis = visibleSteps(), pct = Math.round(vis.indexOf(id) / vis.length * 100);
+      var bar = $('.aic-progress'); bar.setAttribute('aria-valuenow', pct); bar.firstChild.style.width = pct + '%';
+    }
+    if (id === 'results') renderResults();
+    scrollToEl(ROOT);
+    focusHeading($('h1,h2', $('[data-screen="' + id + '"]')));
+  }
+
+  function select(opt) {
+    var qid = opt.getAttribute('data-q'), v = opt.getAttribute('data-v');
+    var group = opt.closest('.aic-opts');
+    if (opt.getAttribute('role') === 'checkbox') {
+      var cur = (A[qid] || []).slice(), on = cur.indexOf(v) > -1;
+      var exclusive = (v === 'none' || v === 'unsure');
+      if (on) cur.splice(cur.indexOf(v), 1);
+      else if (exclusive) cur = [v];
+      else { cur = cur.filter(function (x) { return x !== 'none' && x !== 'unsure'; }); cur.push(v); }
+      A[qid] = cur;
+      $$('[role="checkbox"]', group).forEach(function (o) { o.setAttribute('aria-checked', cur.indexOf(o.getAttribute('data-v')) > -1 ? 'true' : 'false'); });
+    } else {
+      A[qid] = v;
+      $$('[role="radio"]', group).forEach(function (o) { o.setAttribute('aria-checked', o === opt ? 'true' : 'false'); });
+      rovingTabs(group);
+    }
+    /* clear answers to questions that became hidden */
+    if (qid === 'a1' && v !== 'yes') clearQ('a1b');
+    if (qid === 'prof' && v !== 'no') clearQ('role6');
+    if (qid === 'a3' && !anyReal('a3')) { clearQ('prof'); clearQ('role6'); }
+    if (typeof stepIndex === 'number') refresh(stepIndex);
+  }
+  function clearQ(id) {
+    delete A[id];
+    $$('[data-q="' + id + '"]').forEach(function (o) { o.setAttribute('aria-checked', 'false'); });
+    var g = $('[data-qwrap="' + id + '"] [role="radiogroup"]'); if (g) rovingTabs(g);
+  }
+
+  ROOT.addEventListener('click', function (e) {
+    var opt = e.target.closest('.aic-opt[data-q]');
+    if (opt) { select(opt); return; }
+    if (e.target.closest('#aic-eu-start')) {
+      if (!started) { started = true; emit('tool_started', {}); }
+      show(0); return;
+    }
+    var nav = e.target.closest('[data-nav]');
+    if (nav) {
+      var vis = visibleSteps(), pos = vis.indexOf(stepIndex);
+      if (nav.getAttribute('data-nav') === 'back') show(pos <= 0 ? 'intro' : vis[pos - 1]);
+      else if (stepDone(stepIndex)) show(pos === vis.length - 1 ? 'results' : vis[pos + 1]);
+      return;
+    }
+    if (e.target.closest('[data-act="print"]')) { window.print(); return; }
+    if (e.target.closest('[data-act="restart"]')) {
+      A = {}; started = false;
+      $$('.aic-opt[data-q]').forEach(function (o) { o.setAttribute('aria-checked', 'false'); });
+      $$('[role="radiogroup"]').forEach(rovingTabs);
+      show('intro'); return;
+    }
+  });
+  ROOT.addEventListener('change', function (e) {
+    if (e.target.matches('.aic-eu-chk input')) updateChecklistCount();
+  });
+  /* keyboard: arrows for radios; space/enter already work on buttons */
+  radioKeys(ROOT, function (o) { if (o.getAttribute('data-q')) select(o); });
+
+  /* ---------- Classification ---------- */
+  function classify() {
+    var r = { scope: 'in', scopeNotes: [], tier: 'minimal', why: [], unsure: [], high1: false, high3: [], transp: [], gpai: A.g };
+    if (has('excl', 'mil')) { r.scope = 'out'; r.scopeNotes.push('Systems used exclusively for military, defense or national security purposes are excluded (Article 2(3)). If the same system is also used for civilian or law-enforcement purposes, it is in scope for those uses.'); }
+    if (has('excl', 'rd')) { r.scope = 'out'; r.scopeNotes.push('AI systems developed and put into service solely for scientific research and development are excluded (Article 2(6)).'); }
+    if (has('excl', 'prem')) r.scopeNotes.push('Research, testing and development before a system is placed on the market or put into service is excluded, except testing in real-world conditions (Article 2(8)). The result below shows the tier the system will have once it goes live.');
+    if (has('excl', 'personal')) r.scopeNotes.push('Deployer duties do not apply to people using AI purely for personal, non-professional activity (Article 2(10)). Provider duties still apply to whoever offers the system.');
+    if (A.eu === 'none') { r.scope = 'out'; r.scopeNotes.push('With no connection to the EU market or to people in the EU, the Act is unlikely to apply. That changes if you place the system on the EU market, or if its output is used in the EU.'); }
+    if (A.eu === 'unsure') r.unsure.push('Whether the system or its output reaches the EU. The Act can apply to organizations outside the EU (Article 2(1)).');
+    if (A.eu === 'out') r.scopeNotes.push('Providers outside the EU that place high-risk systems or general-purpose AI models on the EU market must appoint an authorized representative in the EU (Articles 22 and 54).');
+    if (A.role === 'unsure') r.unsure.push('Your role. If you put your own name or trademark on a system, or substantially modify a high-risk system, you can become its provider (Article 25).');
+
+    var p = (A.p || []).filter(function (v) { return v !== 'none' && v !== 'unsure'; });
+    if (has('p', 'unsure')) r.unsure.push('Whether one of the prohibited practices applies. Read Article 5 and the Commission\'s guidelines on prohibited practices (February 2025) before going further.');
+    if (p.length) { r.tier = 'prohibited'; r.why = p.map(function (v) { return optLabel('p', v); }); }
+
+    if (A.a1 === 'yes' && A.a1b === 'yes') r.high1 = true;
+    if (A.a1 === 'yes' && A.a1b === 'unsure') { r.high1 = true; r.unsure.push('Whether your product needs a third-party conformity assessment. If it does not, the Article 6(1) route to high-risk does not apply.'); }
+    if (A.a1 === 'unsure') r.unsure.push('Whether the system is a product, or safety component of a product, under the EU product-safety laws in Annex I.');
+
+    r.high3 = (A.a3 || []).filter(function (v) { return v !== 'none'; });
+    var exempt = false;
+    if (r.high3.length) {
+      if (A.prof === 'unsure') r.unsure.push('Whether the system profiles people. If it does, the Article 6(3) exception cannot apply.');
+      if (A.prof === 'no' && ['narrow', 'improve', 'pattern', 'prep'].indexOf(A.role6) > -1) exempt = true;
+      if (A.role6 === 'unsure') r.unsure.push('Whether the system only plays a limited role (Article 6(3)). Until that is documented, treat it as high-risk.');
+    }
+
+    if (r.tier !== 'prohibited') {
+      if (r.high1 || (r.high3.length && !exempt)) {
+        r.tier = 'high';
+        if (r.high1) r.why.push('It is a product, or safety component of a product, covered by EU product-safety law that needs third-party conformity assessment (Article 6(1), Annex I).');
+        r.high3.forEach(function (v) { r.why.push('Annex III use: ' + optLabel('a3', v) + '.'); });
+        if (r.high3.length && A.prof === 'yes') r.why.push('It profiles people, so the Article 6(3) exception cannot apply.');
+      } else if (r.high3.length && exempt) {
+        r.tier = 'exempt';
+        r.high3.forEach(function (v) { r.why.push('Annex III use: ' + optLabel('a3', v) + '.'); });
+        r.why.push('You said it does not profile people and its role is: ' + optLabel('role6', A.role6).toLowerCase() + '.');
+      }
+    }
+    r.transp = (A.t || []).filter(function (v) { return v !== 'none'; });
+    if (r.tier === 'minimal' && r.transp.length) {
+      r.tier = 'limited';
+      r.why = r.transp.map(function (v) { return optLabel('t', v) + '.'; });
+    }
+    if (r.tier === 'minimal') r.why.push('None of the prohibited practices, high-risk routes or transparency triggers you were asked about apply.');
+    if (A.g === 'unsure') r.unsure.push('Whether you are a general-purpose AI model provider. If you only use or fine-tune someone else\'s model for your own system, you usually are not, but a substantial modification can change that.');
+    return r;
+  }
+
+  var TIERS = {
+    prohibited: { label: 'Prohibited practice', tone: 'bad', short: 'Banned in the EU under Article 5',
+      desc: 'What you described matches a practice banned by Article 5. Most bans have applied since 2 February 2025; the bans on AI that generates non-consensual intimate material or child sexual abuse material apply from 2 December 2026. Prohibited practices carry the highest fines in the Act: up to €35 million or 7% of worldwide annual turnover, whichever is higher. Some bans have narrow exceptions (for example emotion recognition for medical or safety reasons), so get legal advice before deciding anything else.' },
+    high: { label: 'High-risk', tone: 'warn', short: 'Full high-risk requirements apply',
+      desc: 'High-risk systems are allowed, but they come with the Act\'s heaviest requirements: risk management, data governance, documentation, logging, human oversight, accuracy and security, conformity assessment, and registration. They apply from 2 December 2027 for Annex III uses and from 2 August 2028 for AI in products under Annex I. Who does what depends on your role.' },
+    exempt: { label: 'High-risk area, exception may apply', tone: 'blue', short: 'Possibly not high-risk under Article 6(3)',
+      desc: 'The system is used in an Annex III area, but from your answers it may fall under the Article 6(3) exception: it does not profile people and only plays a limited role. That is not automatic. The provider must document the assessment before the system goes on the market and register it in the EU database, and a regulator can disagree.' },
+    limited: { label: 'Limited risk: transparency duties', tone: 'blue', short: 'Article 50 transparency duties apply',
+      desc: 'The system is not high-risk, but people must be told they are dealing with AI, or that content is AI-generated or manipulated. These duties sit in Article 50 and have applied since 2 August 2026. Providers of generative systems already on the market before then have until 2 December 2026 to add machine-readable marking.' },
+    minimal: { label: 'Minimal risk', tone: 'good', short: 'No specific AI Act requirements beyond AI literacy',
+      desc: 'Most AI systems fall here, such as spam filters, recommendation tools or internal drafting assistants. The AI Act adds no specific requirements for the system itself, apart from the AI literacy duty that applies to every provider and deployer. Other law (data protection, consumer, product liability, sector rules) still applies, and voluntary codes of conduct are encouraged.' }
+  };
+
+  var TRANSP = {
+    chat: { who: 'Provider', t: 'Design the system so people are informed they are interacting with AI, unless that is obvious to a reasonably well-informed person (Article 50(1)).' },
+    synth: { who: 'Provider', t: 'Mark synthetic audio, image, video or text outputs in a machine-readable format so they are detectable as AI-generated, using technically feasible, effective and robust solutions (Article 50(2)). Light assistive editing that does not substantially change the input is excepted. Systems already on the market before 2 August 2026 have until 2 December 2026 (Article 111(4)).' },
+    emo: { who: 'Deployer', t: 'Inform the people exposed to an emotion recognition or biometric categorization system that it is operating, and process personal data in line with the GDPR (Article 50(3)). Emotion recognition is also an Annex III high-risk use, and banned in workplaces and education.' },
+    deepfake: { who: 'Deployer', t: 'Disclose that deepfake content has been artificially generated or manipulated (Article 50(4)). For evidently artistic, creative, satirical or fictional work, the duty is limited to disclosing it in a way that does not spoil the work.' },
+    pubtext: { who: 'Deployer', t: 'Disclose that text published to inform the public on matters of public interest was AI-generated or manipulated, unless it has gone through human review or editorial control and someone holds editorial responsibility (Article 50(4)).' }
+  };
+
+  function roleIs(x) { return A.role === x || (A.role === 'both' && (x === 'provider' || x === 'deployer')) || (A.role === 'unsure' && (x === 'provider' || x === 'deployer')); }
+  var isPublic = function () { return A.org === 'pub' || A.org === 'pubsvc'; };
+
+  function highObligations() {
+    var blocks = [];
+    if (roleIs('provider')) blocks.push({ title: 'As provider', items: [
+      'Risk management system across the whole lifecycle (Article 9)',
+      'Data governance: training, validation and test data that are relevant, representative and examined for bias (Article 10)',
+      'Technical documentation before the system goes on the market; SMEs and small mid-cap companies may use a simplified form (Article 11, Annex IV)',
+      'Automatic logging of events built into the system (Article 12)',
+      'Instructions for use and transparency to deployers (Article 13)',
+      'Designed for effective human oversight, including the ability to stop the system (Article 14)',
+      'Appropriate accuracy, robustness and cybersecurity (Article 15)',
+      'Quality management system (Article 17)',
+      'Conformity assessment, EU declaration of conformity and CE marking (Articles 43, 47, 48)',
+      'Registration in the EU database before placing on the market (Article 49)',
+      'Post-market monitoring, corrective action and serious-incident reporting (Articles 20, 72, 73)'
+    ] });
+    if (roleIs('deployer')) {
+      var d = [
+        'Use the system according to the provider\'s instructions for use (Article 26(1))',
+        'Assign human oversight to people with the competence, training, authority and support to do it (Article 26(2))',
+        'Make sure input data under your control is relevant and sufficiently representative (Article 26(4))',
+        'Monitor operation; if you see a risk, inform the provider and authority and suspend use; report serious incidents (Articles 26(5), 73)',
+        'Keep automatically generated logs under your control for at least six months (Article 26(6))',
+        'Inform workers and their representatives before using a high-risk system at work (Article 26(7))',
+        'Inform people when a high-risk system makes or helps make decisions about them (Article 26(11)); they may have a right to an explanation (Article 86)',
+        'Use the provider\'s information to carry out a data protection impact assessment where required (Article 26(9))'
+      ];
+      if (isPublic()) {
+        d.push('Carry out a fundamental rights impact assessment before first use and notify the market surveillance authority of the results; you can reuse parts of your data protection impact assessment (Article 27)');
+        if (A.org === 'pub') d.push('As a public authority, register your use in the EU database, and do not use a high-risk system that is not registered there (Articles 26(8), 49)');
+      } else if (has('a3', 'svc_credit') || has('a3', 'svc_insur')) {
+        d.push('Credit-scoring and life or health insurance deployers must carry out a fundamental rights impact assessment before first use (Article 27)');
+      }
+      blocks.push({ title: 'As deployer', items: d });
+    }
+    if (A.role === 'importer') blocks.push({ title: 'As importer or distributor', items: [
+      'Check that the provider has done the conformity assessment, drawn up documentation and affixed CE marking before you make the system available (Articles 23, 24)',
+      'Do not place the system on the market if you have reason to think it does not comply; inform the provider and authorities of risks',
+      'Keep your contact details on the system or its packaging, and keep copies of the documentation (importers: 10 years)',
+      'Be aware that rebranding or substantially modifying a high-risk system can make you its provider (Article 25)'
+    ] });
+    return blocks;
+  }
+
+  function timelineHtml() {
+    var rows = [
+      ['1 Aug 2024', 'The AI Act entered into force.'],
+      ['2 Feb 2025', 'Prohibited practices (Article 5) and AI literacy (Article 4) apply.'],
+      ['2 Aug 2025', 'Rules for general-purpose AI models, governance and penalties apply.'],
+      ['27 Jul 2026', 'The amending Regulation (EU) 2026/1744, the "Digital Omnibus on AI", entered into force.'],
+      ['2 Aug 2026', 'Article 50 transparency duties and the remaining general rules apply.'],
+      ['2 Dec 2026', 'New bans on AI that generates non-consensual intimate material or child sexual abuse material. Deadline for machine-readable marking (Article 50(2)) by generative systems already on the market before 2 Aug 2026.'],
+      ['2 Aug 2027', 'General-purpose AI models placed on the market before 2 Aug 2025 must comply.'],
+      ['2 Dec 2027', 'High-risk requirements for Annex III uses (Article 6(2)).'],
+      ['2 Aug 2028', 'High-risk requirements for AI in products under Annex I (Article 6(1)).']
+    ];
+    return '<ol class="aic-eu-time">' + rows.map(function (r) { return '<li><b>' + r[0] + '</b><span>' + r[1] + '</span></li>'; }).join('') + '</ol>' +
+      '<p class="aic-note aic-warn" style="margin-top:12px"><strong>The high-risk dates moved in 2026.</strong> These are the dates of the AI Act as amended by Regulation (EU) 2026/1744, which pushed the high-risk rules back from August 2026 and 2027. Check the official consolidated text on EUR-Lex before relying on any date.</p>' +
+      (isPublic() ? '<p class="aic-small" style="margin-top:10px">For high-risk systems already on the market before the high-risk rules apply (2 December 2027 for Annex III, 2 August 2028 for Annex I), the Act applies only after a significant design change, except that providers and deployers of systems intended for use by public authorities must comply by 2 August 2030 (Article 111(2)).</p>' : '');
+  }
+
+  function checklist(r) {
+    var c = [];
+    c.push('Record this system in your AI inventory with its owner, purpose, users and this classification, dated, with the reasons');
+    c.push('Take measures to build AI literacy among staff who operate or use the system, and keep a record (Article 4)');
+    if (r.unsure.length) c.push('Resolve the open questions listed above, then re-run this check');
+    if (r.tier === 'prohibited') {
+      c.push('Pause any further development, procurement or rollout of this use');
+      c.push('Get legal advice on whether a narrow exception applies, in writing');
+      c.push('If no exception applies, withdraw the system or redesign the use so it no longer matches the banned practice');
+      c.push('Check whether personal data already collected (for example biometric data) must be deleted under the GDPR');
+    } else if (r.tier === 'high') {
+      c.push('Plan to be compliant by ' + (r.high3.length && r.high1 ? '2 December 2027 for the Annex III use and 2 August 2028 for the Annex I product' : r.high1 ? '2 August 2028, when the high-risk rules for Annex I products apply' : '2 December 2027, when the high-risk rules for Annex III uses apply'));
+      if (roleIs('provider')) {
+        c.push('Set up a risk management system and a quality management system');
+        c.push('Draw up the technical documentation (Annex IV) and instructions for use');
+        c.push('Plan the conformity assessment route and registration in the EU database');
+        c.push('Set up post-market monitoring and a serious-incident reporting procedure');
+      }
+      if (roleIs('deployer')) {
+        c.push('Get the provider\'s instructions for use and confirm the system is CE-marked and registered');
+        c.push('Name the people responsible for human oversight; train them and give them authority to override or stop the system');
+        c.push('Confirm logs are kept for at least six months and can be retrieved');
+        c.push('Tell workers (and their representatives) and affected people as required');
+        if (isPublic()) c.push('Complete the fundamental rights impact assessment before first use');
+        c.push('Write an incident route: who suspends use, who informs the provider and the authority');
+      }
+      if (A.role === 'importer') c.push('Verify conformity assessment, CE marking and documentation before resale');
+    } else if (r.tier === 'exempt') {
+      c.push('Document why the Article 6(3) exception applies (provider), before placing the system on the market');
+      c.push('Register the system in the EU database as required by Article 49(2) (provider)');
+      c.push('As deployer, ask the provider for its Article 6(3) assessment and keep a copy');
+      c.push('Re-check if the use changes, especially if the system starts to profile people or shape decisions');
+    }
+    if (r.transp.length) {
+      r.transp.forEach(function (t) {
+        var map = { chat: 'Add a clear "you are talking to an AI system" notice at the start of interactions', synth: 'Confirm generated content is marked in a machine-readable way (ask your vendor if you use a third-party model); systems on the market before 2 August 2026 must do this by 2 December 2026', emo: 'Inform people exposed to emotion recognition or biometric categorization', deepfake: 'Label deepfake content as artificially generated or manipulated', pubtext: 'Label AI-generated public-interest text, or document the human editorial review' };
+        c.push(map[t]);
+      });
+    }
+    if (r.tier === 'minimal') {
+      c.push('Check other law that still applies: data protection, consumer protection, sector rules');
+      c.push('Re-run this check if the use changes, especially if it starts to affect decisions about people');
+    }
+    if (A.g === 'yes' || A.g === 'sys') c.push('Prepare the general-purpose AI model documentation, copyright policy and public training-content summary (Article 53)');
+    if (A.g === 'sys') c.push('Notify the Commission, and set up model evaluations, adversarial testing, incident reporting and cybersecurity (Articles 52, 55)');
+    c.push('Check the official consolidated text (as amended by Regulation (EU) 2026/1744) before relying on this result');
+    return c;
+  }
+
+  function gpaiHtml() {
+    if (A.g === 'yes' || A.g === 'sys') {
+      return '<div class="aic-card" style="margin-top:14px"><span class="aic-eyebrow">Separate note: general-purpose AI model obligations</span>' +
+        '<p style="margin-top:8px">As a provider of a general-purpose AI model you have model-level duties, separate from the tier of any system built on it. They have applied since 2 August 2025 (models already on the market before then have until 2 August 2027):</p>' +
+        '<ul class="aic-list"><li>Technical documentation for the AI Office and national authorities, and information for downstream providers who build on the model (Article 53, Annexes XI and XII)</li><li>A policy to comply with EU copyright law, including text-and-data-mining opt-outs</li><li>A publicly available, sufficiently detailed summary of the content used for training, following the Commission\'s template</li><li>If you are outside the EU: an authorized representative in the EU (Article 54)</li></ul>' +
+        (A.g === 'sys' ? '<p style="margin-top:10px"><b>Systemic risk.</b> A model is presumed to have systemic risk when its cumulative training compute exceeds 10^25 floating-point operations (Article 51). You must notify the Commission and also: evaluate the model, including adversarial testing; assess and mitigate systemic risks; track and report serious incidents; and ensure adequate cybersecurity (Article 55).</p>' : '<p class="aic-small" style="margin-top:10px">Some documentation duties are lighter for models released under a free and open-source license, unless the model has systemic risk.</p>') +
+        '<p class="aic-small" style="margin-top:10px">The General-Purpose AI Code of Practice (published July 2025) is a voluntary way to show compliance.</p></div>';
+    }
+    return '<div class="aic-card" style="margin-top:14px"><span class="aic-eyebrow">Separate note: general-purpose AI models</span><p style="margin-top:8px">Model-level duties (Articles 53 to 55) sit with the companies that provide general-purpose AI models. If you build on someone else\'s model, those duties are theirs; your duties follow from the tier of your own system, above. A substantial modification of a model, such as very large-scale fine-tuning, can make you a model provider for that modification; see the Commission\'s guidelines on general-purpose AI models (July 2025).</p></div>';
+  }
+
+  function renderResults() {
+    var r = classify();
+    var T = TIERS[r.tier];
+    var out = r.scope === 'out';
+    var label = out ? 'Likely outside the AI Act' : T.label;
+    var info = { label: label + (out ? ' (otherwise: ' + T.label + ')' : ''), lead_type: 'tool_result' };
+    var html = '<div class="aic-fade">' +
+      '<span class="aic-eyebrow">Where your system stands</span>' +
+      '<h2 class="aic-h2" id="aic-eu-rh">' + esc(label) + '</h2>';
+
+    if (out) html += '<div class="aic-note" style="margin-bottom:14px"><strong>Scope.</strong> ' + r.scopeNotes.map(esc).join(' ') + ' If the system ever comes into scope, it would sit in the tier shown below.</div>';
+
+    html += '<div class="aic-card aic-eu-tier aic-eu-' + r.tier + '">' +
+      '<div class="aic-eu-ladder" aria-hidden="true">' + ['prohibited', 'high', 'limited', 'minimal'].map(function (t) {
+        var on = t === r.tier || (r.tier === 'exempt' && t === 'high');
+        return '<span class="' + (on ? 'aic-on' : '') + '">' + { prohibited: 'Prohibited', high: 'High-risk', limited: 'Limited', minimal: 'Minimal' }[t] + '</span>';
+      }).join('') + '</div>' +
+      '<div style="margin-top:14px"><span class="aic-tag aic-t-' + T.tone + '">' + esc(T.short) + '</span></div>' +
+      '<p style="margin-top:10px">' + esc(T.desc) + '</p>' +
+      (r.why.length ? '<p class="aic-small" style="margin-top:12px"><b>Why:</b></p><ul class="aic-list aic-small">' + r.why.map(function (w) { return '<li>' + esc(w) + '</li>'; }).join('') + '</ul>' : '') +
+      (r.tier === 'high' && r.transp.length ? '<p class="aic-small" style="margin-top:10px">Transparency duties also apply on top of the high-risk requirements; see below.</p>' : '') +
+      '</div>';
+
+    if (!out && r.scopeNotes.length) html += '<div class="aic-note" style="margin-top:14px"><strong>Scope notes.</strong> ' + r.scopeNotes.map(esc).join(' ') + '</div>';
+    if (r.unsure.length) html += '<div class="aic-note aic-warn" style="margin-top:14px"><strong>Open questions that could change this result:</strong><ul class="aic-list">' + r.unsure.map(function (u) { return '<li>' + esc(u) + '</li>'; }).join('') + '</ul></div>';
+
+    html += '<div class="aic-card" style="margin-top:14px"><span class="aic-eyebrow">Applies to every provider and deployer</span><h3 class="aic-h3" style="margin-top:6px">AI literacy (Article 4)</h3><p>Providers and deployers must take measures to support the AI literacy of staff and others who operate or use AI on their behalf, taking into account their knowledge, experience and training, the context and the people affected. The duty has applied since 2 February 2025. The July 2026 amendment softened it: you no longer have to guarantee a particular level for each person, and the Commission and Member States must help, especially smaller companies. It applies whatever the tier, minimal risk included. Keep a record of what you did.</p></div>';
+
+    html += '<div style="margin-top:26px"><span class="aic-eyebrow">Main obligations</span><h3 class="aic-h2" style="font-size:26px">What this tier asks of you</h3>';
+    if (r.tier === 'high') {
+      html += highObligations().map(function (b) { return '<div class="aic-card" style="margin-top:12px"><h4 class="aic-h3">' + esc(b.title) + '</h4><ul class="aic-list">' + b.items.map(function (i) { return '<li>' + esc(i) + '</li>'; }).join('') + '</ul></div>'; }).join('');
+      html += '<p class="aic-small" style="margin-top:10px">Fines for breaching high-risk obligations can reach €15 million or 3% of worldwide annual turnover, whichever is higher; for SMEs, start-ups and small mid-cap companies, whichever is lower (Article 99).</p>';
+    } else if (r.tier === 'prohibited') {
+      html += '<div class="aic-card" style="margin-top:12px"><ul class="aic-list"><li>The practice may not be placed on the market, put into service or used in the EU (Article 5).</li><li>This applies to providers and deployers alike.</li><li>The Commission has published guidelines on prohibited practices (February 2025) that explain the conditions and exceptions in detail.</li><li>The two bans added in 2026, on non-consensual intimate material and child sexual abuse material, apply from 2 December 2026.</li></ul></div>';
+    } else if (r.tier === 'exempt') {
+      html += '<div class="aic-card" style="margin-top:12px"><ul class="aic-list"><li>Provider: document the assessment that the system is not high-risk before placing it on the market, and give it to authorities on request (Article 6(4)).</li><li>Provider: register the system in the EU database (Article 49(2)). The 2026 amendment shortened what the registration asks for.</li><li>Deployer: keep the provider\'s assessment, and re-check if you use the system differently from what it describes.</li><li>Check the Commission\'s guidelines and examples on high-risk classification (Article 6(5)).</li></ul></div>';
+    } else if (r.tier === 'minimal') {
+      html += '<div class="aic-card" style="margin-top:12px"><ul class="aic-list"><li>No specific AI Act requirements for the system itself, other than AI literacy above.</li><li>Voluntary codes of conduct are encouraged (Article 95).</li><li>Data protection, consumer, product-liability, employment and sector law still apply.</li><li>If the use changes, especially toward decisions about people, re-check the tier.</li></ul></div>';
+    }
+    if (r.transp.length) {
+      html += '<div class="aic-card" style="margin-top:12px"><h4 class="aic-h3">Transparency duties (Article 50)</h4><ul class="aic-list">' +
+        r.transp.map(function (t) { return '<li><b>' + TRANSP[t].who + ':</b> ' + esc(TRANSP[t].t) + '</li>'; }).join('') + '</ul>' +
+        '<p class="aic-small" style="margin-top:10px">Information must be given clearly, at the latest at the first interaction or exposure. The Commission has been preparing a code of practice on marking and labeling AI-generated content; check where it stands.</p></div>';
+    }
+    html += '</div>';
+
+    html += gpaiHtml();
+
+    html += '<div class="aic-card" style="margin-top:14px"><span class="aic-eyebrow">When obligations apply</span>' + '<div style="margin-top:10px">' + timelineHtml() + '</div></div>';
+
+    var items = checklist(r);
+    html += '<div style="margin-top:26px"><span class="aic-eyebrow">Readiness checklist</span><h3 class="aic-h2" style="font-size:26px">What to have ready</h3><p class="aic-soft">Tick what\'s done. Ticks stay on this page only, so print it to keep a record.</p>' +
+      '<div class="aic-card" style="margin-top:12px"><p class="aic-small" id="aic-eu-count" aria-live="polite"></p><ul class="aic-eu-chk">' +
+      items.map(function (t, i) { return '<li><label><input type="checkbox" id="aic-eu-c' + i + '"><span>' + esc(t) + '</span></label></li>'; }).join('') + '</ul></div></div>';
+
+    var heavy = r.tier === 'prohibited' || r.tier === 'high' || r.tier === 'exempt' || r.unsure.length > 0 || A.g === 'yes' || A.g === 'sys';
+    var reason = r.tier === 'prohibited' ? 'A banned practice needs a fast, careful decision. A member who supports AI Act compliance can help you assess exceptions with your lawyers and plan a redesign or exit.'
+      : r.tier === 'high' ? 'High-risk duties touch documentation, oversight, logging and contracts at once. A member who supports AI Act compliance can help you plan the work and get your team ready.'
+      : r.tier === 'exempt' ? 'The Article 6(3) exception only holds if it is properly documented. A member can help you write and test that assessment.'
+      : r.unsure.length ? 'Your result has open questions. A member who supports AI Act compliance can help you settle them before you rely on this tier.'
+      : 'Model-level duties are specialized. A member who supports AI Act compliance can help you scope them.';
+    var step = r.tier === 'prohibited' ? 'Share this result with your legal team today and pause rollout until they have reviewed it.'
+      : r.tier === 'high' ? 'Print this page, attach it to the system\'s record, and book an hour with the system owner and your legal or compliance lead to assign each obligation.'
+      : r.tier === 'minimal' ? 'Record the classification and the date in your AI inventory, then repeat this check for your next system.'
+      : 'Print this page, attach it to the system\'s record, and assign an owner to each checklist item.';
+
+    html += '<div class="aic-next" style="margin-top:26px">' +
+      '<div class="aic-card"><span class="aic-eyebrow">Do this first</span><p>' + esc(step) + '</p><button type="button" class="aic-btn aic-noprint" data-act="print">Print or save as PDF</button></div>' +
+      (heavy ? '<div class="aic-card aic-solution"><span class="aic-eyebrow">If you want help</span><h3 class="aic-h3">Get matched to compliance support</h3><p class="aic-soft">' + esc(reason) + '</p><a class="aic-btn aic-btn-primary aic-noprint" data-aic-cta="get_matched" data-aic-url="matchUrl" target="_blank" rel="noopener">Get matched to someone</a></div>'
+        : '<div class="aic-card aic-solution"><span class="aic-eyebrow">If you want help</span><h3 class="aic-h3">' + (r.tier === 'limited' ? 'Get matched to compliance support' : 'You probably don\'t need compliance help for this one') + '</h3><p class="aic-soft">' + (r.tier === 'limited' ? 'Transparency duties are usually manageable in-house. If you run several AI systems, a member who supports AI Act compliance can help you check them all and set up disclosure once.' : 'For a minimal-risk system, the useful investment is AI literacy for the people using it, which the Act requires anyway. Members run short, practical courses.') + '</p>' +
+          (r.tier === 'limited' ? '<a class="aic-btn aic-btn-primary aic-noprint" data-aic-cta="get_matched" data-aic-url="matchUrl" target="_blank" rel="noopener">Get matched to someone</a>' : '<a class="aic-btn aic-btn-primary aic-noprint" data-aic-cta="learn_with_member" data-aic-url="coursesUrl" target="_blank" rel="noopener">Learn with a member</a>') + '</div>') +
+      '</div>' +
+      '<div class="aic-handoff aic-noprint"><a data-aic-cta="email_results" data-aic-url="resultsFormUrl" target="_blank" rel="noopener">Email me my results</a><a data-aic-cta="newsletter" data-aic-url="newsletterUrl" target="_blank" rel="noopener">Newsletter: keep up without keeping up with everything</a><button type="button" class="aic-linkbtn" data-act="restart">Check another system</button></div>';
+
+    html += '<div class="aic-note aic-warn" style="margin-top:22px"><strong>Guidance, not legal advice.</strong> This simplifies the AI Act (Regulation (EU) 2024/1689) as amended by Regulation (EU) 2026/1744; check the official consolidated text. It doesn\'t cover every condition, exception or national rule. Take legal advice before relying on a result, especially a prohibited or high-risk one.</div>' +
+      '<p class="aic-sources" style="margin-top:12px">Sources: Regulation (EU) 2024/1689, Articles 2, 4, 5, 6, 9–17, 22–27, 43, 47–55, 72, 73, 86, 95, 99, 111, 113 and Annexes I and III, as amended by Regulation (EU) 2026/1744 of 8 July 2026 (Official Journal, 24 July 2026); European Commission guidelines on prohibited practices (February 2025) and on general-purpose AI models (July 2025); General-Purpose AI Code of Practice (July 2025). As of November 2026.</p>';
+    html += '</div>';
+    var host = $('[data-screen="results"]');
+    host.setAttribute('aria-labelledby', 'aic-eu-rh');
+    host.innerHTML = html;
+    wireCtas(host, info);
+    updateChecklistCount();
+    emit('tool_completed', { assessment_result: info.label });
+    emit('result_viewed', { assessment_result: info.label });
+  }
+  function updateChecklistCount() {
+    var boxes = $$('.aic-eu-chk input'), n = boxes.filter(function (b) { return b.checked; }).length;
+    var el = $('#aic-eu-count'); if (el) el.textContent = n + ' of ' + boxes.length + ' done';
+  }
+
+})();
+</script>
+<!-- ===== AIC:END ===== -->
+</body>
+</html>
+
+</body></html>

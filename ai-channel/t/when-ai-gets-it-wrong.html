@@ -1,0 +1,635 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>when-ai-gets-it-wrong</title><style>html,body{margin:0;background:#F7F8FA}@media (prefers-color-scheme:dark){html,body{background:#F7F8FA}}</style></head><body>
+<!--
+TITLE: What should you do when AI gets it wrong at work?
+FILE: when-ai-gets-it-wrong.html   SLUG: when-ai-gets-it-wrong   TYPE: guide (backlog item)   ~2001 words incl. sources, with table of contents
+AUDIENCE: Business owners, managers, HR & team leads, executives ("Who is accountable when AI gets something wrong?",
+  "Does my team know when not to trust AI?"). Also useful to any individual who uses AI at work.
+
+WHAT IT COVERS: The short answer; whose mistake it is (tribunal and court decisions); the six ways AI answers go wrong;
+  red flags for catching it; checking matched to stakes (low / medium / high); the first hour after a wrong answer got out
+  (stop, scope, fix and tell, record, change the step); setting up accountability (owners, automation bias, vendors);
+  a printable two-minute checking routine for teams; what you can do (individual + team); member route (coursesUrl).
+  Distinct from ai-hallucinations.html (the why); cross-linked both ways.
+
+SOURCES CHECKED (on the web, 4 Nov 2026):
+  Moffatt v. Air Canada, 2024 BCCRT 149 (Feb 2024): 'separate legal entity' argument rejected; CA$650.88 damages plus
+    interest and fees (about CA$812 total) - via McCarthy Tetrault summary and multiple law-firm write-ups.
+  Mata v. Avianca (S.D.N.Y., 22 Jun 2023): US$5,000 sanction - Bloomberg Law.
+  Ayinde v Haringey / Al-Haroun v Qatar National Bank [2025] EWHC 1383 (Admin), 6 Jun 2025: 18 of 45 authorities
+    did not exist; solicitor not absolved by relying on client's AI research - Bristows summary of the judgment.
+  Deloitte Australia partial refund on A$440,000 DEWR report (Oct 2025) - The Register.
+  Damien Charlotin, AI Hallucination Cases database: 2,262 decisions as of 4 Nov 2026 (live figure; update when re-checked).
+  HBR / BetterUp Labs + Stanford Social Media Lab workslop survey (Sep 2025): 40%.
+  EU AI Act Art. 14(4)(b) automation bias; Lee et al. CHI 2025; Sharma et al. on sycophancy (arXiv 2310.13548).
+
+WHAT CHANGED VS AIDOOMSDAYGUIDE.COM: No dedicated page existed. The old site touched this only in one line of
+  /work/how-to-use-ai-safely-in-a-small-business/ ("human review remains important..."). This guide adds the
+  accountability case law, a stakes-matched checking method, a first-hour correction routine and a printable team card.
+
+HOW TO EMBED IN WORDPRESS:
+  Option A - Custom HTML block: paste everything between AIC:START and AIC:END. Scoped CSS (.aic-article, aic- classes),
+    JS in an IIFE, no network requests or storage. The "Print the card" button prints only the routine card; inside a
+    WordPress page the theme header may also print, the iframe option prints cleanly.
+  Option B - iframe: <iframe src="/path/when-ai-gets-it-wrong.html" title="What should you do when AI gets it wrong at work?" style="width:100%;min-height:2600px;border:0" loading="lazy"></iframe>
+
+CONFIG (window.AICHANNEL_CONFIG): coursesUrl (member route used here), matchUrl, newsletterUrl, contentBaseUrl,
+  exposureCheckUrl (link to the Business AI Exposure Check; empty falls back to contentBaseUrl + business-ai-exposure-check.html).
+  CTA links get lead_type, audience, source_page, source_content_or_tool, cta_clicked + utm_*. Events: content_viewed,
+  cta_clicked, related_clicked, print_clicked.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What should you do when AI gets it wrong at work? | AI Channel</title>
+<meta name="description" content="A practical guide to wrong AI answers at work: how to catch them, check them, correct them, who is accountable, and a two-minute checking routine your team will actually use.">
+<!-- AI Channel design A: tool design system v2 (visual layer only; no behaviour changes) -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style id="aic-theme">
+/* ---------- tokens ---------- */
+:root,html{color-scheme:light!important;
+ --pine:#2859c7!important;--pine-deep:#1945ac!important;--accent:#2859c7!important;--accent-deep:#1945ac!important;--primary:#2859c7!important;--blue:#2859c7!important;--blue-d:#1945ac!important;
+ --paper:#ffffff!important;--bg:#ffffff!important;--white:#fff!important;--card:#fff!important;--ink:#14213d!important;--ink-soft:#3f4a5c!important;--ink-mute:#5b6577!important;--muted:#3f4a5c!important;
+ --line:#d9e2f0!important;--sage:#eef3fc!important;--amber-soft:#fbf3e4!important;--accent-wash:#eef3fc!important;--blue-wash:#eef3fc!important;--sky:#eef3fc!important;--pale:#f4f7fc!important;--warm:#f4f7fc!important;
+ --serif:"Newsreader",Georgia,serif!important;--sans:"Inter",system-ui,sans-serif!important;--mono:"IBM Plex Mono",ui-monospace,monospace!important}
+html body .aic-tool,html body .aic-article{
+ --aic-paper:#ffffff!important;--aic-white:#ffffff!important;--aic-ink:#14213d!important;--aic-soft:#46526a!important;--aic-line:#d9e2f0!important;--aic-sage:#eef3fc!important;
+ --aic-blue:#2859c7!important;--aic-blue-deep:#1945ac!important;--aic-blue-soft:#eef3fc!important;--aic-on-blue:#ffffff!important;--aic-focus:#9fbcff!important;
+ --aic-grey:#46526a!important;--aic-grey-soft:#f4f7fc!important;
+ --aic-radius:16px!important;--aic-radius-sm:12px!important;--aic-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important;
+ color-scheme:light!important;background:#fff!important;color:#14213d!important;
+ font-family:"Inter",system-ui,sans-serif!important;-webkit-font-smoothing:antialiased}
+html,body{background:#fff!important}
+html body .aic-tool{padding:56px 0 96px!important}
+html body .aic-article{padding:0 0 112px!important}
+html body .aic-tool .aic-col,html body .aic-article .aic-col{max-width:860px!important}
+@media(min-width:600px){html body .aic-tool .aic-col,html body .aic-article .aic-col{padding-inline:32px!important}}
+
+/* ---------- type ---------- */
+html body .aic-tool .aic-h1,html body .aic-article h1,body h1{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important;line-height:1.02!important;font-size:clamp(38px,5.4vw,62px)!important;color:#14213d}
+html body .aic-tool .aic-h2,html body .aic-article h2,body h2{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important;line-height:1.1!important}
+html body .aic-article h2{font-size:clamp(28px,3.6vw,38px)!important;margin-top:72px!important}
+html body .aic-tool .aic-h2{font-size:clamp(26px,3.4vw,36px)!important}
+html body .aic-tool .aic-h3,html body .aic-article h3,body h3{font-family:"Newsreader",Georgia,serif!important;font-weight:550!important;letter-spacing:-.01em!important;font-size:22px!important;line-height:1.2!important}
+body h4,body h5,body h6{font-family:"Inter",system-ui,sans-serif!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow,html body .aic-tool .aic-qnum,html body .aic-tool .aic-nav-hint,.aic-mono{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;letter-spacing:.06em!important;text-transform:uppercase;font-size:12px!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow{color:#2859c7!important;display:flex!important;align-items:center;gap:12px}
+html body .aic-tool .aic-eyebrow::before,html body .aic-article .aic-head .aic-eyebrow::before{content:"";width:28px;height:1px;background:#2859c7;flex:none}
+html body .aic-tool .aic-lede,html body .aic-article .aic-lede,html body .aic-article .aic-dek{font-size:20px!important;line-height:1.55!important;color:#3f4a5c!important;max-width:60ch}
+html body .aic-tool .aic-soft,html body .aic-tool .aic-small{color:#46526a!important}
+html body .aic-tool .aic-small{font-size:14px!important}
+html body .aic-article{font-size:18.5px!important;line-height:1.72!important}
+html body .aic-article p+p{margin-top:22px!important}
+html body .aic-article .aic-head{padding:72px 0 40px!important;border-bottom:1px solid #d9e2f0;margin-bottom:48px}
+html body .aic-article .aic-meta,html body .aic-article .aic-head p:not(.aic-lede):not(.aic-dek){font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px!important;letter-spacing:.03em;color:#5b6577!important}
+html body .aic-tool a,html body .aic-article a{color:#2859c7}
+
+/* ---------- panels ---------- */
+html body .aic-tool .aic-card,html body .aic-article .aic-card{background:#fff!important;border:1px solid #d9e2f0!important;border-radius:16px!important;box-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important}
+@media(min-width:600px){html body .aic-tool .aic-card{padding:36px 40px!important}html body .aic-article .aic-card{padding:32px 36px!important}}
+html body .aic-tool .aic-stack>*+*{margin-top:20px!important}
+html body .aic-tool .aic-grid2,html body .aic-article .aic-grid{gap:16px!important}
+/* the short answer: a framed figure, like the site's tool previews */
+html body .aic-article .aic-short{background:#fff!important;border:1px solid #d9e2f0!important;box-shadow:0 0 0 10px #eef3fc,0 0 0 11px #d9e2f0!important;margin:12px 11px 56px!important;border-radius:12px!important;border-left:1px solid #d9e2f0!important}
+html body .aic-article .aic-short .aic-eyebrow,html body .aic-article .aic-short>:first-child{color:#2859c7!important}
+/* notes and callouts */
+html body .aic-tool .aic-note,html body .aic-article .aic-note,html body .aic-article .aic-callout{background:#f4f7fc!important;border-left:3px solid #2859c7!important;border-radius:0 12px 12px 0!important;padding:18px 22px!important;font-size:15.5px!important;color:#14213d!important}
+html body .aic-tool .aic-note.aic-warn{background:#fdf7ec!important;border-left-color:#a46207!important}
+html body .aic-tool .aic-note.aic-bad{background:#fdf0ee!important;border-left-color:#b42318!important}
+html body .aic-tool .aic-note.aic-good{background:#eef8f1!important;border-left-color:#2f7a4e!important}
+/* calls to action become navy bands */
+html body .aic-tool .aic-cta,html body .aic-article .aic-cta,html body .aic-tool .aic-dark,html body .aic-article .aic-dark{--aic-ink:#ffffff!important;--aic-soft:#c9d6ee!important;--aic-white:#13264a!important;--aic-line:#2a3f6a!important;--aic-blue:#9fbcff!important;--aic-blue-soft:#1d3563!important;--aic-on-blue:#13264a!important;
+ background:#13264a!important;color:#fff!important;border-color:#13264a!important;box-shadow:none!important}
+html body .aic-tool .aic-cta *:not(.aic-btn):not(.aic-btn *),html body .aic-article .aic-cta *:not(.aic-btn):not(.aic-btn *){color:inherit}
+html body .aic-tool .aic-cta .aic-btn-primary,html body .aic-article .aic-cta .aic-btn-primary{background:#fff!important;color:#13264a!important;border-color:#fff!important}
+html body .aic-tool .aic-cta a:not(.aic-btn),html body .aic-article .aic-cta a:not(.aic-btn){color:#9fbcff!important}
+
+/* ---------- questions and answer options ---------- */
+html body .aic-tool .aic-q{margin-top:28px!important}
+html body .aic-tool .aic-qnum{color:#2859c7!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;font-size:clamp(22px,2.6vw,27px)!important;line-height:1.22!important;letter-spacing:-.01em!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qhint{font-size:15px!important;color:#46526a!important;margin-bottom:18px!important}
+html body .aic-tool .aic-opts{gap:10px!important;margin-top:18px!important}
+html body .aic-tool .aic-opt,html body .aic-tool .aic-pick,html body .aic-tool .aic-check{background:#fff!important;border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:16px 18px!important;font-size:16px!important;gap:14px!important;transition:border-color .15s,box-shadow .15s,background-color .15s,transform .15s!important}
+html body .aic-tool .aic-opt:hover,html body .aic-tool .aic-pick:hover,html body .aic-tool .aic-check:hover{border-color:#2859c7!important;box-shadow:0 6px 18px rgba(40,89,199,.10)!important;transform:translateY(-1px)}
+html body .aic-tool .aic-opt[aria-checked="true"],html body .aic-tool .aic-opt[aria-pressed="true"],html body .aic-tool .aic-pick:has(input:checked),html body .aic-tool .aic-check:has(input:checked),html body .aic-tool .aic-opt:has(input:checked){border-color:#2859c7!important;background:#f4f7fc!important;box-shadow:0 0 0 3px #dbe6fb!important}
+html body .aic-tool .aic-dot{width:22px!important;height:22px!important;border:2px solid #9aa8c0!important}
+html body .aic-tool .aic-dot::after{inset:4px!important;background:#2859c7!important}
+html body .aic-tool .aic-opt[aria-checked="true"] .aic-dot{border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-size:14px!important;color:#46526a!important;margin-top:4px!important}
+html body .aic-tool .aic-opt.aic-opt-unsure{background:transparent!important;border-style:dashed!important}
+html body .aic-tool input[type=text],html body .aic-tool input[type=search],html body .aic-tool input[type=email],html body .aic-tool textarea,html body .aic-tool select,html body .aic-tool .aic-input{border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:14px 16px!important;background:#fff!important;font-size:16px!important}
+html body .aic-tool input:focus,html body .aic-tool textarea:focus,html body .aic-tool select:focus{border-color:#2859c7!important;outline:none!important;box-shadow:0 0 0 3px #dbe6fb!important}
+
+/* ---------- controls ---------- */
+html body .aic-tool .aic-btn,html body .aic-article .aic-btn{min-height:50px!important;padding:14px 24px!important;font-weight:600!important;font-size:15px!important;border-radius:999px!important;border:1.5px solid #c9d6ee!important;box-shadow:none!important}
+html body .aic-tool .aic-btn:hover,html body .aic-article .aic-btn:hover{border-color:#2859c7!important}
+html body .aic-tool .aic-btn-primary,html body .aic-article .aic-btn-primary{background:#2859c7!important;border-color:#2859c7!important;color:#fff!important}
+html body .aic-tool .aic-btn-primary:hover,html body .aic-article .aic-btn-primary:hover{background:#1945ac!important;border-color:#1945ac!important}
+html body .aic-tool .aic-btn-ghost{border-color:transparent!important;text-decoration:underline;text-underline-offset:4px;color:#3f4a5c!important}
+html body .aic-tool .aic-btn[disabled]{opacity:.4!important}
+html body .aic-tool .aic-nav{margin-top:36px!important;padding-top:24px!important;border-top:1px solid #d9e2f0!important}
+html body .aic-tool .aic-actions{gap:12px!important}
+html body .aic-tool .aic-seg{border:1.5px solid #d9e2f0!important;padding:4px!important}
+html body .aic-tool .aic-seg button{font-weight:600!important;color:#3f4a5c!important}
+html body .aic-tool .aic-seg button[aria-pressed="true"],html body .aic-tool .aic-seg button[aria-checked="true"]{background:#13264a!important;color:#fff!important}
+html body .aic-tool .aic-progress{height:4px!important;background:#e3eaf6!important;margin:20px 0 8px!important}
+html body .aic-tool .aic-progress span,html body .aic-tool .aic-progress i{background:#2859c7!important}
+html body .aic-tool .aic-chip,html body .aic-tool .aic-pill{border:1.5px solid #d9e2f0!important;background:#fff!important;font-weight:600!important;border-radius:999px!important}
+html body .aic-tool .aic-chip[aria-pressed="true"],html body .aic-tool .aic-chip.aic-on,html body .aic-tool .aic-pill.aic-on{background:#eef3fc!important;border-color:#2859c7!important;color:#1945ac!important}
+html body .aic-tool .aic-tag,html body .aic-article .aic-tag{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;padding:5px 11px!important}
+html body .aic-tool .aic-privacy{font-size:14px!important;color:#46526a!important;margin-top:20px!important}
+
+/* ---------- results ---------- */
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-stat b,html body .aic-tool .aic-stat strong,html body .aic-tool .aic-display{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important}
+html body .aic-tool .aic-bar{height:8px!important;background:#e3eaf6!important}
+html body .aic-tool .aic-bar-row{padding:14px 0!important;border-bottom-color:#e3eaf6!important}
+html body .aic-tool .aic-bar-label{font-weight:600!important}
+html body .aic-tool table,html body .aic-article table{border-collapse:collapse}
+html body .aic-tool th,html body .aic-article th{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;text-transform:uppercase;color:#2859c7!important;background:#f4f7fc!important}
+html body .aic-tool td,html body .aic-article td{border-color:#e3eaf6!important}
+html body .aic-article .aic-sources,html body .aic-tool .aic-sources{font-size:14px!important;color:#46526a!important;border-top:1px solid #d9e2f0;padding-top:32px!important;margin-top:72px!important}
+html body .aic-article .aic-related,html body .aic-article .aic-deeper{margin-top:72px!important}
+
+/* ---------- pages outside the shared system ---------- */
+body:not(:has(.aic-tool)):not(:has(.aic-article)) h1,body:not(:has(.aic-tool)):not(:has(.aic-article)) h2,body:not(:has(.aic-tool)):not(:has(.aic-article)) h3{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important}
+html,body{font-family:"Inter",system-ui,sans-serif}
+input[type=range],input[type=checkbox],input[type=radio]{accent-color:#2859c7!important}
+:focus-visible{outline-color:#2859c7!important}
+[tabindex="-1"]:focus,h1:focus,h2:focus,h3:focus{outline:none!important;box-shadow:none!important}
+
+/* ================= v3: product-grade tool shell ================= */
+html,body{background:#f4f7fc!important}
+html body .aic-tool{background:#f4f7fc!important}
+html body .aic-tool .aic-col{max-width:980px!important}
+html body .aic-tool .aic-h1{font-size:clamp(40px,5vw,62px)!important;max-width:20ch}
+html body .aic-tool .aic-grid2>.aic-card{box-shadow:none!important;background:#fff!important;border-radius:14px!important}
+html body .aic-tool.aic-in-q .aic-h1{font-size:22px!important;line-height:1.2!important;max-width:none;margin:6px 0 20px!important;font-weight:500!important}
+html body .aic-tool.aic-in-q .aic-lede,html body .aic-tool.aic-in-q > .aic-col > .aic-privacy,html body .aic-tool.aic-in-q .aic-col > * > .aic-privacy{display:none!important}
+html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:56px 64px 44px!important;border:0!important;border-radius:24px!important;box-shadow:0 1px 0 rgba(19,38,74,.05),0 30px 70px rgba(19,38,74,.10)!important;min-height:460px}
+@media(max-width:700px){html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:32px 22px 28px!important;border-radius:18px!important;min-height:0}}
+html body .aic-tool .aic-progress{height:3px!important;background:#e3eaf6!important;border-radius:0!important;margin:14px 0 36px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-size:clamp(26px,3.2vw,38px)!important;line-height:1.12!important;letter-spacing:-.02em!important;margin-bottom:12px!important;max-width:28ch}
+html body .aic-tool .aic-qhint{font-size:16px!important;margin-bottom:24px!important}
+html body .aic-tool .aic-opts{counter-reset:aicopt;gap:12px!important}
+html body .aic-tool .aic-opt{counter-increment:aicopt;align-items:center!important;min-height:64px;padding:16px 20px!important;font-size:17px!important;font-weight:500;border-radius:14px!important}
+html body .aic-tool .aic-opt .aic-dot{display:none!important}
+html body .aic-tool .aic-opt::before{content:counter(aicopt,upper-alpha);flex:none;width:30px;height:30px;display:grid;place-items:center;border:1.5px solid #c9d6ee;border-radius:8px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;font-weight:500;color:#2859c7;background:#fff;transition:all .15s}
+html body .aic-tool .aic-opt:hover::before{border-color:#2859c7}
+html body .aic-tool .aic-opt[aria-checked="true"]::before{background:#2859c7;border-color:#2859c7;color:#fff;content:"\2713"}
+html body .aic-tool .aic-opt[aria-checked="true"]{background:#eef3fc!important;box-shadow:0 0 0 2px #2859c7!important;border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-weight:400}
+html body .aic-tool .aic-nav{border-top:0!important;margin-top:40px!important;padding-top:0!important}
+html body .aic-tool .aic-nav .aic-btn-primary{min-width:150px}
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-display{font-size:clamp(56px,8vw,96px)!important;line-height:.95!important;color:#14213d}
+
+/* ================= v4: legibility ================= */
+html body .aic-tool{font-size:17px!important;line-height:1.6!important}
+html body .aic-tool,html body .aic-article{--aic-soft:#334055!important}
+html body .aic-tool .aic-small,html body .aic-tool .aic-opt-sub,html body .aic-tool .aic-privacy,html body .aic-tool .aic-nav-hint{font-size:15px!important;color:#334055!important}
+html body .aic-tool p,html body .aic-tool li{color:#1d2a44}
+html body .aic-tool .aic-lede{font-size:20px!important;color:#2a364d!important}
+html body .aic-tool .aic-note{font-size:16.5px!important}
+html body .aic-tool .aic-opt{font-size:18px!important;color:#14213d!important}
+html body .aic-tool .aic-qhint{font-size:17px!important;color:#334055!important}
+html body .aic-tool .aic-eyebrow,html body .aic-tool .aic-qnum,.aic-mono{font-size:12.5px!important;color:#2859c7!important;letter-spacing:.05em!important}
+html body .aic-tool .aic-tag{font-size:12.5px!important}
+html body .aic-tool th,html body .aic-article th{font-size:12.5px!important}
+html body .aic-tool td{font-size:16px}
+html body .aic-article{color:#14213d!important}
+html body .aic-article p,html body .aic-article li{color:#1d2a44}
+</style>
+<script>
+(function(){
+  function hsl(c){var m=c&&c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/);if(!m)return null;var r=m[1]/255,g=m[2]/255,b=m[3]/255,a=m[4]===undefined?1:+m[4];
+    var mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn,s=d?d/(1-Math.abs(2*l-1)):0,h=0;
+    if(d){h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;if(h<0)h+=360}return {h:h,s:s,l:l,a:a}}
+  function blue(c){var x=hsl(c);return x&&x.a>0.05&&x.s>0.3&&x.l>0.28&&x.l<0.95&&x.h>=205&&x.h<=240?x:null}
+  function N(x,dark,light){return x.a<0.95?"rgba(40,89,199,"+Math.min(x.a,0.12).toFixed(3)+")":(x.l>0.82?light:dark)}
+  function fix(el){var c0=getComputedStyle(el),bg=hsl(c0.backgroundColor),fg=hsl(c0.color);if(bg&&fg&&bg.a>0.9&&bg.l<0.6&&bg.s>0.3&&bg.h>=205&&bg.h<=240&&fg.l<0.6)el.style.setProperty("color","#ffffff","important");
+    if(el.closest(".aic-cta,.aic-dark")||el.matches(".aic-opt,.aic-pick,.aic-check,.aic-btn,.aic-chip,.aic-pill,.aic-seg button,.aic-card,.aic-note"))return;var cs=getComputedStyle(el),x;
+    if((x=blue(cs.color)))el.style.setProperty("color",x.l>0.75?"#eef3fc":"#2859c7","important");
+    if((x=blue(cs.backgroundColor)))el.style.setProperty("background-color",N(x,"#2859c7",x.l>0.9?"#eef3fc":"#d6e2f8"),"important");
+    if(el instanceof SVGElement){if((x=blue(cs.fill)))el.style.setProperty("fill",N(x,"#2859c7","#eef3fc"),"important");if((x=blue(cs.stroke)))el.style.setProperty("stroke",N(x,"#2859c7","#d6e2f8"),"important")}
+    if(cs.textTransform==="uppercase"&&parseFloat(cs.fontSize)<=13.5&&!el.closest("button")&&!el.classList.contains("aic-mono"))el.classList.add("aic-mono");}
+  var t;function mode(){document.querySelectorAll(".aic-tool").forEach(function(r){var q=[].some.call(r.querySelectorAll(".aic-progress,.aic-qtext,.aic-q-text"),function(e){return e.offsetParent!==null});if(q!==r.classList.contains("aic-in-q"))r.classList.toggle("aic-in-q",q)})}
+  function run(){clearTimeout(t);t=setTimeout(function(){mode();document.querySelectorAll("body *").forEach(fix)},30)}
+  document.addEventListener("DOMContentLoaded",function(){run();new MutationObserver(run).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class","aria-pressed","aria-checked","data-state"]});
+    document.addEventListener("change",run,true);document.addEventListener("click",run,true);});
+})();
+</script>
+</head>
+<body style="margin:0;background:#F7F8FA">
+<!-- ===== AIC:START — for a WordPress Custom HTML block, paste everything from here to AIC:END ===== -->
+<style>
+/* ===== AI Channel article base (scoped to .aic-article) ===== */
+.aic-article{
+  --aic-paper:#F7F8FA; --aic-white:#FFFFFF; --aic-ink:#162033; --aic-soft:#667085; --aic-body:#2A3447; --aic-line:#DEE3EA; --aic-sage:#EEF1F6;
+  --aic-blue:#315EFB; --aic-blue-deep:#2448C9; --aic-blue-soft:#EEF3FF; --aic-on-blue:#FFFFFF;
+  --aic-amber:#A46207; --aic-amber-soft:#FBF3E4; --aic-green:#2F7A4E; --aic-green-soft:#E9F5EE;
+  --aic-red:#B42318; --aic-red-soft:#FDEDEB;
+  --aic-radius:18px; --aic-radius-sm:12px; --aic-shadow:0 10px 28px rgba(21,32,51,.055);
+  --aic-measure:68ch;
+  display:block; background:var(--aic-paper); color:var(--aic-ink);
+  font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size:18px; line-height:1.7; padding:32px 0 64px; -webkit-text-size-adjust:100%; text-align:left;
+}
+@media (prefers-color-scheme:dark){
+  .aic-article{
+    --aic-paper:#101B2D; --aic-white:#162033; --aic-ink:#F2F4F8; --aic-soft:#A6B3C7; --aic-body:#D9DFEA; --aic-line:#2A3850; --aic-sage:#1E2A40;
+    --aic-blue:#7A97FF; --aic-blue-deep:#9BB2FF; --aic-blue-soft:#1F2B45; --aic-on-blue:#0B1426;
+    --aic-amber:#E0A34A; --aic-amber-soft:#2D2617; --aic-green:#6FC592; --aic-green-soft:#15302A;
+    --aic-red:#F97066; --aic-red-soft:#3A1E22; --aic-shadow:none; color-scheme:dark;
+  }
+}
+.aic-article *,.aic-article *::before,.aic-article *::after{box-sizing:border-box}
+.aic-article h1,.aic-article h2,.aic-article h3,.aic-article h4,.aic-article p,.aic-article ul,.aic-article ol,.aic-article li,.aic-article figure,.aic-article dl,.aic-article dd,.aic-article dt{margin:0;padding:0}
+.aic-article ul,.aic-article ol{list-style:none}
+.aic-article button{font:inherit;color:inherit}
+.aic-article a{color:var(--aic-blue);font-weight:650;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+.aic-article a:hover{color:var(--aic-blue-deep);text-decoration-thickness:2px}
+.aic-article :focus-visible{outline:3px solid #9DB2FF;outline-offset:2px;border-radius:6px}
+.aic-article [hidden]{display:none!important}
+.aic-article .aic-col{max-width:760px;margin:0 auto;padding-inline:16px}
+@media (min-width:600px){.aic-article .aic-col{padding-inline:24px}}
+.aic-article .aic-eyebrow{display:block;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--aic-blue);line-height:1.4}
+.aic-article .aic-h1{font-size:clamp(32px,6.6vw,52px);line-height:1.05;font-weight:800;letter-spacing:-.035em;margin:12px 0 14px;color:var(--aic-ink);overflow-wrap:break-word}
+.aic-article .aic-dek{font-size:clamp(18px,2.6vw,21px);line-height:1.5;color:var(--aic-soft);max-width:var(--aic-measure)}
+.aic-article .aic-meta{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:16px;font-size:14px;color:var(--aic-soft);line-height:1.5}
+.aic-article .aic-meta span+span::before{content:"";display:inline-block;width:4px;height:4px;border-radius:50%;background:var(--aic-line);margin-right:16px;vertical-align:middle}
+.aic-article .aic-answer{margin:28px 0 8px;padding:22px 22px 22px 24px;background:var(--aic-white);border:1px solid var(--aic-line);border-left:5px solid var(--aic-blue);border-radius:var(--aic-radius);box-shadow:var(--aic-shadow)}
+.aic-article .aic-answer p{font-size:19px;line-height:1.65;color:var(--aic-ink);max-width:var(--aic-measure)}
+.aic-article .aic-answer p+p{margin-top:10px}
+.aic-article .aic-answer .aic-eyebrow{margin-bottom:8px}
+.aic-article .aic-toc{margin:28px 0 8px;padding:18px 20px;border:1px solid var(--aic-line);border-radius:var(--aic-radius-sm);background:var(--aic-sage)}
+.aic-article .aic-toc ol{counter-reset:aic-toc;display:grid;gap:4px;margin-top:8px}
+.aic-article .aic-toc li{counter-increment:aic-toc;font-size:16px;line-height:1.45;padding-left:28px;position:relative}
+.aic-article .aic-toc li::before{content:counter(aic-toc);position:absolute;left:0;top:1px;font-size:12px;font-weight:800;color:var(--aic-blue);width:20px;text-align:right}
+.aic-article .aic-toc a{font-weight:600;text-decoration:none}
+.aic-article .aic-toc a:hover{text-decoration:underline}
+.aic-article .aic-section{margin-top:48px;scroll-margin-top:24px}
+.aic-article .aic-h2{font-size:clamp(25px,4.4vw,33px);line-height:1.12;font-weight:800;letter-spacing:-.03em;margin:6px 0 14px;color:var(--aic-ink)}
+.aic-article .aic-h3{font-size:20px;line-height:1.3;font-weight:800;letter-spacing:-.02em;margin:26px 0 8px;color:var(--aic-ink)}
+.aic-article .aic-prose>p,.aic-article .aic-section>p{color:var(--aic-body);max-width:var(--aic-measure)}
+.aic-article .aic-section>p+p{margin-top:16px}
+.aic-article .aic-section>p+.aic-h3{margin-top:30px}
+.aic-article .aic-section>.aic-bullets+p,.aic-article .aic-section>.aic-steps+p,.aic-article .aic-section>.aic-checks+p,.aic-article .aic-section>.aic-rows+p,.aic-article .aic-section>.aic-callout+p{margin-top:18px}
+.aic-article .aic-blurb{font-size:17px;color:var(--aic-soft);margin:-6px 0 16px;max-width:var(--aic-measure)}
+.aic-article strong{font-weight:750;color:var(--aic-ink)}
+.aic-article sup.aic-ref{font-size:.62em;line-height:0;vertical-align:super;margin-left:1px;white-space:nowrap}
+.aic-article sup.aic-ref a{font-weight:700;text-decoration:none;padding:0 1px}
+.aic-article .aic-bullets{margin:16px 0 0;display:grid;gap:10px;max-width:var(--aic-measure)}
+.aic-article .aic-bullets li{position:relative;padding-left:22px;color:var(--aic-body)}
+.aic-article .aic-bullets li::before{content:"";position:absolute;left:4px;top:.72em;width:7px;height:7px;border-radius:50%;background:var(--aic-blue)}
+.aic-article .aic-steps{margin:18px 0 0;counter-reset:aic-step;display:grid;gap:12px;max-width:var(--aic-measure)}
+.aic-article .aic-steps>li{counter-increment:aic-step;position:relative;padding:16px 18px 16px 58px;background:var(--aic-white);border:1px solid var(--aic-line);border-radius:var(--aic-radius-sm);color:var(--aic-body)}
+.aic-article .aic-steps>li::before{content:counter(aic-step);position:absolute;left:16px;top:15px;width:28px;height:28px;border-radius:50%;background:var(--aic-blue-soft);color:var(--aic-blue);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;line-height:1}
+.aic-article .aic-steps strong{display:block;margin-bottom:2px}
+.aic-article .aic-grid{display:grid;gap:12px;margin-top:18px}
+@media (min-width:640px){.aic-article .aic-grid-2{grid-template-columns:1fr 1fr}.aic-article .aic-grid-3{grid-template-columns:1fr 1fr 1fr}}
+.aic-article .aic-card{background:var(--aic-white);border:1px solid var(--aic-line);border-radius:var(--aic-radius);padding:18px 20px;box-shadow:var(--aic-shadow);min-width:0}
+.aic-article .aic-card p,.aic-article .aic-card li{font-size:16px;line-height:1.6;color:var(--aic-body)}
+.aic-article .aic-card p+p{margin-top:8px}
+.aic-article .aic-card .aic-h3{margin:4px 0 6px;font-size:18px}
+.aic-article .aic-card .aic-bullets{margin-top:8px;gap:6px}
+.aic-article .aic-tag{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;padding:3px 9px;border-radius:999px;background:var(--aic-blue-soft);color:var(--aic-blue);line-height:1.5}
+.aic-article .aic-tag-green{background:var(--aic-green-soft);color:var(--aic-green)}
+.aic-article .aic-tag-amber{background:var(--aic-amber-soft);color:var(--aic-amber)}
+.aic-article .aic-tag-red{background:var(--aic-red-soft);color:var(--aic-red)}
+.aic-article .aic-card-green{border-top:4px solid var(--aic-green)}
+.aic-article .aic-card-amber{border-top:4px solid var(--aic-amber)}
+.aic-article .aic-card-red{border-top:4px solid var(--aic-red)}
+.aic-article .aic-card-blue{border-top:4px solid var(--aic-blue)}
+.aic-article .aic-callout{margin-top:20px;padding:16px 18px;border-radius:var(--aic-radius-sm);background:var(--aic-amber-soft);border:1px solid transparent;max-width:var(--aic-measure)}
+.aic-article .aic-callout p{font-size:16.5px;line-height:1.6;color:var(--aic-ink)}
+.aic-article .aic-callout p+p{margin-top:8px}
+.aic-article .aic-callout-blue{background:var(--aic-blue-soft)}
+.aic-article .aic-help{margin-top:22px;padding:20px 22px;border-radius:var(--aic-radius);background:var(--aic-green-soft);border:1px solid transparent}
+.aic-article .aic-help .aic-h3{margin-top:2px}
+.aic-article .aic-help p,.aic-article .aic-help li{font-size:16.5px;line-height:1.6;color:var(--aic-ink)}
+.aic-article .aic-help ul{display:grid;gap:6px;margin-top:10px}
+.aic-article .aic-help li{padding-left:20px;position:relative}
+.aic-article .aic-help li::before{content:"";position:absolute;left:3px;top:.62em;width:7px;height:7px;border-radius:50%;background:var(--aic-green)}
+.aic-article .aic-rows{margin-top:18px;border:1px solid var(--aic-line);border-radius:var(--aic-radius);overflow:hidden;background:var(--aic-white)}
+.aic-article .aic-row{display:grid;gap:4px 18px;padding:14px 18px;border-top:1px solid var(--aic-line)}
+.aic-article .aic-row:first-child{border-top:0}
+@media (min-width:640px){.aic-article .aic-row{grid-template-columns:minmax(150px,30%) 1fr}}
+.aic-article .aic-row dt{font-weight:800;font-size:16px;line-height:1.45;color:var(--aic-ink)}
+.aic-article .aic-row dd{font-size:16px;line-height:1.6;color:var(--aic-body)}
+.aic-article .aic-row dt .aic-tag{margin-bottom:4px}
+.aic-article .aic-checks{margin-top:14px;display:grid;gap:10px;max-width:var(--aic-measure)}
+.aic-article .aic-checks li{position:relative;padding-left:32px;color:var(--aic-body)}
+.aic-article .aic-checks li::before{content:"";position:absolute;left:0;top:.28em;width:20px;height:20px;border-radius:6px;border:2px solid var(--aic-line);background:var(--aic-white)}
+.aic-article .aic-actions{display:grid;gap:14px;margin-top:18px}
+@media (min-width:700px){.aic-article .aic-actions{grid-template-columns:1fr 1fr}}
+.aic-article .aic-actions .aic-card ul{display:grid;gap:14px;margin-top:12px}
+.aic-article .aic-actions .aic-card li strong{display:block;font-size:16.5px;margin-bottom:2px}
+.aic-article .aic-printcard{margin-top:20px;background:var(--aic-white);border:2px dashed #B8C7FF;border-radius:var(--aic-radius);padding:22px 22px 18px}
+.aic-article .aic-printcard .aic-h3{margin-top:4px;font-size:21px}
+.aic-article .aic-printcard dl{margin-top:10px}
+.aic-article .aic-printcard .aic-pc-row{padding:10px 0;border-top:1px solid var(--aic-line)}
+.aic-article .aic-printcard .aic-pc-row:first-child{border-top:0}
+.aic-article .aic-printcard dt{font-weight:800;font-size:15px;color:var(--aic-ink);line-height:1.4}
+.aic-article .aic-printcard dd{font-size:15.5px;line-height:1.6;color:var(--aic-body);margin-top:2px}
+.aic-article .aic-blank{display:inline-block;min-width:9em;border-bottom:1.5px solid var(--aic-soft);height:1.1em;vertical-align:baseline}
+.aic-article .aic-printbar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-top:14px;font-size:14px;color:var(--aic-soft)}
+.aic-article .aic-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 20px;min-height:44px;border-radius:999px;border:1px solid var(--aic-line);background:var(--aic-white);color:var(--aic-ink);font-weight:750;font-size:15px;cursor:pointer;text-decoration:none;line-height:1.2}
+.aic-article .aic-btn:hover{border-color:#B8C7FF;text-decoration:none;color:var(--aic-ink)}
+.aic-article .aic-btn-primary{background:var(--aic-blue);border-color:var(--aic-blue);color:var(--aic-on-blue)}
+.aic-article .aic-btn-primary:hover{background:var(--aic-blue-deep);border-color:var(--aic-blue-deep);color:var(--aic-on-blue)}
+.aic-article .aic-cta{margin-top:48px;padding:24px;border-radius:var(--aic-radius);border:1px solid #C7D3FF;background:linear-gradient(180deg,var(--aic-blue-soft),var(--aic-white) 75%)}
+.aic-article .aic-cta .aic-h2{margin-top:6px;font-size:clamp(23px,4vw,29px)}
+.aic-article .aic-cta p{color:var(--aic-body);max-width:var(--aic-measure);font-size:17px}
+.aic-article .aic-cta .aic-btn{margin-top:14px}
+.aic-article .aic-cta .aic-small{margin-top:12px;font-size:14.5px;color:var(--aic-soft)}
+.aic-article .aic-related{margin-top:40px}
+.aic-article .aic-related ul{display:grid;gap:10px;margin-top:12px}
+@media (min-width:640px){.aic-article .aic-related ul{grid-template-columns:1fr 1fr}}
+.aic-article .aic-related li a{display:block;height:100%;padding:14px 16px;background:var(--aic-white);border:1px solid var(--aic-line);border-radius:var(--aic-radius-sm);text-decoration:none;color:var(--aic-ink);font-weight:750;font-size:16px;line-height:1.4}
+.aic-article .aic-related li a span{display:block;font-weight:500;font-size:14.5px;color:var(--aic-soft);margin-top:3px}
+.aic-article .aic-related li a:hover{border-color:#B8C7FF}
+.aic-article .aic-sources{margin-top:44px;padding-top:24px;border-top:1px solid var(--aic-line)}
+.aic-article .aic-sources ol{margin-top:12px;display:grid;gap:10px;counter-reset:aic-src}
+.aic-article .aic-sources li{counter-increment:aic-src;position:relative;padding-left:34px;font-size:14.5px;line-height:1.55;color:var(--aic-body);overflow-wrap:anywhere;scroll-margin-top:24px}
+.aic-article .aic-sources li::before{content:counter(aic-src) ".";position:absolute;left:0;top:0;width:26px;text-align:right;font-weight:800;color:var(--aic-soft)}
+.aic-article .aic-sources li:target{background:var(--aic-blue-soft);border-radius:8px}
+.aic-article .aic-sources a{font-weight:600}
+.aic-article .aic-small{font-size:14.5px;color:var(--aic-soft);line-height:1.55}
+.aic-article .aic-fineprint{margin-top:18px;font-size:14px;color:var(--aic-soft);max-width:var(--aic-measure)}
+@media (prefers-reduced-motion:no-preference){.aic-article .aic-btn,.aic-article .aic-related li a{transition:background .15s,border-color .15s}}
+@media print{
+  .aic-article{background:#fff;color:#000;padding:0;font-size:11.5pt;line-height:1.5}
+  .aic-article .aic-toc,.aic-article .aic-cta,.aic-article .aic-related,.aic-article .aic-printbar{display:none!important}
+  .aic-article .aic-card,.aic-article .aic-answer,.aic-article .aic-steps>li,.aic-article .aic-rows,.aic-article .aic-printcard{box-shadow:none;break-inside:avoid}
+  .aic-article a{color:#000}
+  .aic-article.aic-printing-card .aic-col>*:not(.aic-has-card),.aic-article.aic-printing-card .aic-has-card>*:not(.aic-printcard){display:none!important}
+  .aic-article.aic-printing-card .aic-has-card{margin:0}
+  .aic-article.aic-printing-card .aic-printcard{border:1.5px solid #000;margin:0}
+}
+</style>
+<article class="aic-article" id="aic-when-ai-gets-it-wrong" lang="en">
+<div class="aic-col">
+<header>
+  <span class="aic-eyebrow">Guide · When AI gets it wrong</span>
+  <h1 class="aic-h1">What should you do when AI gets it wrong at work?</h1>
+  <p class="aic-dek">Catching it, checking it, fixing it, and who's accountable. Plus a two-minute checking routine your team will actually use.</p>
+  <p class="aic-meta"><span>About 10 minutes</span><span>Last checked November 2026</span></p>
+</header>
+
+<section class="aic-answer" aria-labelledby="aic-when-ai-gets-it-wrong-answer">
+  <span class="aic-eyebrow" id="aic-when-ai-gets-it-wrong-answer">The short answer</span>
+  <p>Treat it like any other mistake with your name on it: stop it spreading, fix it, tell the people it reached, and change the step that let it through.</p>
+  <p>The AI isn't accountable. The person or business that used its output is, and courts and tribunals have said so plainly. The cheapest fix comes before anything goes out: a short checking routine matched to how much the output matters.</p>
+</section>
+
+<nav class="aic-toc" aria-label="On this page">
+  <span class="aic-eyebrow">On this page</span>
+  <ol>
+    <li><a href="#aic-when-ai-gets-it-wrong-whose">Whose mistake is it?</a></li>
+    <li><a href="#aic-when-ai-gets-it-wrong-ways">The six ways AI answers go wrong</a></li>
+    <li><a href="#aic-when-ai-gets-it-wrong-catch">Catching it: the red flags</a></li>
+    <li><a href="#aic-when-ai-gets-it-wrong-check">Checking it: match the check to the stakes</a></li>
+    <li><a href="#aic-when-ai-gets-it-wrong-fix">It already went out: the first hour</a></li>
+    <li><a href="#aic-when-ai-gets-it-wrong-own">Who's accountable, and how to set it up</a></li>
+    <li><a href="#aic-when-ai-gets-it-wrong-routine">The two-minute check (printable)</a></li>
+    <li><a href="#aic-when-ai-gets-it-wrong-do">What you can do</a></li>
+  </ol>
+</nav>
+
+<section class="aic-section" id="aic-when-ai-gets-it-wrong-whose" aria-labelledby="aic-when-ai-gets-it-wrong-whose-h">
+  <span class="aic-eyebrow">1 · Accountability</span>
+  <h2 class="aic-h2" id="aic-when-ai-gets-it-wrong-whose-h">Whose mistake is it?</h2>
+  <p class="aic-blurb">"The AI wrote it" has been tried as a defense. It hasn't worked.</p>
+  <p>When Air Canada's website chatbot told a grieving customer he could claim a bereavement discount after flying, which wasn't the airline's policy, the airline argued in front of a Canadian tribunal that the chatbot was "a separate legal entity that is responsible for its own actions." The tribunal called that "a remarkable submission" and held the airline responsible for everything on its website, chatbot included. It ordered the airline to pay the difference in fare plus interest and fees, about CA$812 in all.<sup class="aic-ref"><a href="#aic-when-ai-gets-it-wrong-s1" aria-label="Source 1">1</a></sup> The money was small. The principle wasn't: what your bot says, your business said.</p>
+  <p>Courts have taken the same line with professionals. In New York in 2023, two lawyers and their firm were fined US$5,000 for filing a brief that cited cases ChatGPT had invented.<sup class="aic-ref"><a href="#aic-when-ai-gets-it-wrong-s2" aria-label="Source 2">2</a></sup> In June 2025, England's High Court dealt with a case where 18 of 45 cited authorities didn't exist; the client had generated them with AI tools, and the court held that relying on the client's research didn't absolve the solicitor.<sup class="aic-ref"><a href="#aic-when-ai-gets-it-wrong-s3" aria-label="Source 3">3</a></sup> One researcher's database of court decisions involving AI-made-up content had passed 2,262 cases by November 2026.<sup class="aic-ref"><a href="#aic-when-ai-gets-it-wrong-s4" aria-label="Source 4">4</a></sup> And in October 2025, Deloitte agreed to partially refund the Australian government for a A$440,000 report that contained references to studies that didn't exist and a made-up quote from a court judgment.<sup class="aic-ref"><a href="#aic-when-ai-gets-it-wrong-s5" aria-label="Source 5">5</a></sup></p>
+  <p>The pattern is consistent: <strong>the tool doesn't carry the responsibility; the person who sent the work does, and so does the organization behind them.</strong></p>
+</section>
+
+<section class="aic-section" id="aic-when-ai-gets-it-wrong-ways" aria-labelledby="aic-when-ai-gets-it-wrong-ways-h">
+  <span class="aic-eyebrow">2 · Know what you're looking for</span>
+  <h2 class="aic-h2" id="aic-when-ai-gets-it-wrong-ways-h">The six ways AI answers go wrong</h2>
+  <p>"Hallucination" gets the headlines, but it's one of several. Knowing which kind you're dealing with tells you how to check. (For the why, read <a href="ai-hallucinations.html" data-aic-slug="ai-hallucinations">why AI sounds so confident when it's wrong</a>.)</p>
+  <dl class="aic-rows">
+    <div class="aic-row"><dt>Made up</dt><dd>A citation, quote, statistic, policy or person that doesn't exist, delivered in the same calm tone as everything else.</dd></div>
+    <div class="aic-row"><dt>Out of date</dt><dd>True once. Prices, rules, product features, who holds which job.</dd></div>
+    <div class="aic-row"><dt>Misread</dt><dd>It had the right document and still got it wrong: a dropped "not," a figure from the wrong row, a summary that flips the conclusion.</dd></div>
+    <div class="aic-row"><dt>Miscounted</dt><dd>Totals, percentages, dates and unit conversions. Fluent text around a wrong number.</dd></div>
+    <div class="aic-row"><dt>Wrong question</dt><dd>A good answer to a question you didn't quite ask, or one built on a false premise you slipped into the prompt.</dd></div>
+    <div class="aic-row"><dt>Telling you what you want</dt><dd>AI assistants tend to agree with the person asking. Research on this "sycophancy" found it's a general behavior of today's assistants, partly because people rate agreeable answers higher.<sup class="aic-ref"><a href="#aic-when-ai-gets-it-wrong-s6" aria-label="Source 6">6</a></sup> Push back and it may change a right answer to a wrong one.</dd></div>
+  </dl>
+</section>
+
+<section class="aic-section" id="aic-when-ai-gets-it-wrong-catch" aria-labelledby="aic-when-ai-gets-it-wrong-catch-h">
+  <span class="aic-eyebrow">3 · Catching it</span>
+  <h2 class="aic-h2" id="aic-when-ai-gets-it-wrong-catch-h">Catching it: the red flags</h2>
+  <p>The hard part is that wrong answers don't look wrong. A survey of 319 knowledge workers found that the more people trusted AI, the less critical thinking they reported putting in.<sup class="aic-ref"><a href="#aic-when-ai-gets-it-wrong-s7" aria-label="Source 7">7</a></sup> So build the habit around signals, not gut feeling. Slow down when you see:</p>
+  <ul class="aic-checks">
+    <li><strong>Very specific details you didn't supply.</strong> An exact figure, a page number, a named study, a direct quote.</li>
+    <li><strong>A name, case or source you've never heard of</strong>, in a field you know reasonably well.</li>
+    <li><strong>No source, or a source that doesn't say it.</strong> Open the link. Find the sentence.</li>
+    <li><strong>A confident answer to something nobody could know</strong>, such as an internal figure, a private person's details or next year's price.</li>
+    <li><strong>It agreed with you a little too easily</strong>, especially after you pushed back.</li>
+    <li><strong>It changes when you ask again.</strong> Ask the same thing in a fresh chat. If the details move, none of them are safe.</li>
+  </ul>
+</section>
+
+<section class="aic-section" id="aic-when-ai-gets-it-wrong-check" aria-labelledby="aic-when-ai-gets-it-wrong-check-h">
+  <span class="aic-eyebrow">4 · Checking it</span>
+  <h2 class="aic-h2" id="aic-when-ai-gets-it-wrong-check-h">Checking it: match the check to the stakes</h2>
+  <p>Checking everything to the same standard is how checking stops happening. Ask one question first: <strong>who sees this, and what happens if it's wrong?</strong></p>
+  <div class="aic-grid aic-grid-3">
+    <div class="aic-card aic-card-green"><span class="aic-tag aic-tag-green">Low stakes</span><h3 class="aic-h3">Only you, easy to undo</h3><p>Brainstorms, rough notes, rewording your own text.</p><p><strong>Check:</strong> read it properly. Does it make sense?</p></div>
+    <div class="aic-card aic-card-amber"><span class="aic-tag aic-tag-amber">Medium stakes</span><h3 class="aic-h3">Colleagues or a customer</h3><p>Client emails, internal reports, summaries people will act on.</p><p><strong>Check:</strong> every fact, figure, name and quote against a source you opened yourself.</p></div>
+    <div class="aic-card aic-card-red"><span class="aic-tag aic-tag-red">High stakes</span><h3 class="aic-h3">Money, law, health, the public</h3><p>Payments, contracts, legal or medical content, regulators, anything that can't be undone.</p><p><strong>Check:</strong> medium checks plus a second person. AI can draft; a person decides.</p></div>
+  </div>
+  <h3 class="aic-h3">Four ways to check that actually work</h3>
+  <ul class="aic-bullets">
+    <li><strong>Go to the source.</strong> Open the document, law, price list or record and find the exact line. A link the AI gives you is a lead, not proof.</li>
+    <li><strong>Redo the numbers.</strong> Recalculate totals and percentages in a spreadsheet or calculator. It takes a minute.</li>
+    <li><strong>Ask fresh, or ask another tool.</strong> Disagreement is a useful warning. Agreement isn't proof; tools often share the same blind spots.</li>
+    <li><strong>Ask someone who knows.</strong> Two minutes with the colleague who owns the subject beats twenty minutes of searching.</li>
+  </ul>
+</section>
+
+<section class="aic-section" id="aic-when-ai-gets-it-wrong-fix" aria-labelledby="aic-when-ai-gets-it-wrong-fix-h">
+  <span class="aic-eyebrow">5 · Correcting it</span>
+  <h2 class="aic-h2" id="aic-when-ai-gets-it-wrong-fix-h">It already went out: the first hour</h2>
+  <p class="aic-blurb">Fast and plain beats perfect and late.</p>
+  <ol class="aic-steps">
+    <li><strong>Stop it spreading.</strong> Unsend if you can, take the page down, pause the automation or chatbot answer, and tell anyone about to act on it.</li>
+    <li><strong>Find everywhere it went.</strong> Who received it? Was it copied into a template, a knowledge base, a proposal or a help-center article? AI errors travel well.</li>
+    <li><strong>Fix it and say so plainly.</strong> "The figure in yesterday's email was wrong. The correct figure is X. Sorry for the confusion." Don't blame the tool; it reads as dodging.</li>
+    <li><strong>Put it right for anyone affected.</strong> If a customer relied on what your chatbot or email told them, deal with it as you would any promise your business made. That's the Air Canada lesson.</li>
+    <li><strong>Write down what happened.</strong> What was wrong, how it was found, which check would have caught it. Three lines is enough.</li>
+    <li><strong>Change the step, not just the sentence.</strong> Add the check that was missing, for that whole kind of task. Fixing one email fixes one email.</li>
+  </ol>
+  <div class="aic-callout">
+    <p><strong>When it's bigger than an email.</strong> If the error involved personal data, a regulated decision, a contract or a large payment, bring in whoever handles legal, data protection or finance for you, today. Obligations vary by country and sector, and some have deadlines.</p>
+  </div>
+</section>
+
+<section class="aic-section" id="aic-when-ai-gets-it-wrong-own" aria-labelledby="aic-when-ai-gets-it-wrong-own-h">
+  <span class="aic-eyebrow">6 · Set it up</span>
+  <h2 class="aic-h2" id="aic-when-ai-gets-it-wrong-own-h">Who's accountable, and how to set it up</h2>
+  <p>Answering "who's accountable when AI gets something wrong?" after the fact is uncomfortable. Answer it now, while nothing's wrong.</p>
+  <dl class="aic-rows">
+    <div class="aic-row"><dt>The sender owns the output</dt><dd>Whoever sends, publishes or acts on AI work is responsible for it, exactly as if they'd written it. Say this out loud, once, to everyone.</dd></div>
+    <div class="aic-row"><dt>Every AI use has an owner</dt><dd>The customer chatbot, the meeting summaries, the proposal drafts: each has one named person who decides how it's checked and gets told when it goes wrong.</dd></div>
+    <div class="aic-row"><dt>Managers own the routine</dt><dd>If people are told to "use AI more" without being shown how to check it, the errors belong partly to whoever set the target.</dd></div>
+    <div class="aic-row"><dt>"Human in the loop" means a real check</dt><dd>People rubber-stamp output they see all day. The EU AI Act names this "automation bias" and requires people overseeing high-risk systems to be made aware of it.<sup class="aic-ref"><a href="#aic-when-ai-gets-it-wrong-s8" aria-label="Source 8">8</a></sup> The same is true of any team: a reviewer with no time or authority to say no isn't a check.</dd></div>
+    <div class="aic-row"><dt>Vendors won't carry it for you</dt><dd>Read what the contract says about accuracy before you rely on it. Expect it to say the output is yours to check.</dd></div>
+  </dl>
+</section>
+
+<section class="aic-section" id="aic-when-ai-gets-it-wrong-routine" aria-labelledby="aic-when-ai-gets-it-wrong-routine-h">
+  <span class="aic-eyebrow">7 · For teams</span>
+  <h2 class="aic-h2" id="aic-when-ai-gets-it-wrong-routine-h">The two-minute check</h2>
+  <p>A checking routine only works if people use it on a busy Tuesday. This one fits on a card. It matters more than it sounds: in a 2025 survey of US desk workers, 40% said they'd received AI-generated work in the past month that looked finished but wasn't, leaving someone else to fix it.<sup class="aic-ref"><a href="#aic-when-ai-gets-it-wrong-s9" aria-label="Source 9">9</a></sup></p>
+  <div class="aic-printcard" role="region" aria-labelledby="aic-when-ai-gets-it-wrong-card-h">
+    <span class="aic-eyebrow">Team card</span>
+    <h3 class="aic-h3" id="aic-when-ai-gets-it-wrong-card-h">Before AI work leaves your hands: the two-minute check</h3>
+    <dl>
+      <div class="aic-pc-row"><dt>1. Who sees this, and what if it's wrong?</dt><dd>Only me → read it properly. Colleague or customer → steps 2–5. Money, law, health, public → steps 2–6.</dd></div>
+      <div class="aic-pc-row"><dt>2. Circle the checkable bits</dt><dd>Every fact, figure, name, date, quote and link.</dd></div>
+      <div class="aic-pc-row"><dt>3. Check each one against a source you opened</dt><dd>Find the actual line. Redo the sums.</dd></div>
+      <div class="aic-pc-row"><dt>4. Read it as the person receiving it</dt><dd>Does it answer what they asked? Would you sign it?</dd></div>
+      <div class="aic-pc-row"><dt>5. Say AI helped, if it did</dt><dd>"First draft with AI; figures checked by me."</dd></div>
+      <div class="aic-pc-row"><dt>6. High stakes: second pair of eyes</dt><dd>AI can draft. A person decides.</dd></div>
+      <div class="aic-pc-row"><dt>If one gets through</dt><dd>Stop it, fix it, tell people, write three lines, change the step. Tell <span class="aic-blank" aria-label="blank: name"></span></dd></div>
+    </dl>
+  </div>
+  <div class="aic-printbar"><button type="button" class="aic-btn" data-aic-print="card">Print the card</button><span>Prints the card only. Pin it up, or paste it into your team's AI rules.</span></div>
+  <h3 class="aic-h3">Keep it alive: the wrong answer of the month</h3>
+  <p>Once a month, someone shares one real wrong AI answer from your own work: what it said, how it was caught, what the check was. Nothing teaches checking faster than a confident mistake in your own field, and it makes catching errors something people get credit for, not something they hide.</p>
+</section>
+
+<section class="aic-section" id="aic-when-ai-gets-it-wrong-do" aria-labelledby="aic-when-ai-gets-it-wrong-do-h">
+  <span class="aic-eyebrow">8 · Actions</span>
+  <h2 class="aic-h2" id="aic-when-ai-gets-it-wrong-do-h">What you can do</h2>
+  <div class="aic-actions">
+    <div class="aic-card">
+      <span class="aic-tag">For you</span>
+      <ul>
+        <li><strong>Circle before you send.</strong> On your next AI-assisted piece, circle every fact, figure, name and quote and check each one. Time it. Most people find it's under five minutes.</li>
+        <li><strong>Run the fresh-chat test.</strong> When an answer matters, ask again in a new conversation. If the details move, check all of them.</li>
+        <li><strong>Hold your ground.</strong> When you push back and the AI instantly agrees, treat that as a reason to check, not as confirmation.</li>
+      </ul>
+    </div>
+    <div class="aic-card">
+      <span class="aic-tag">For your team</span>
+      <ul>
+        <li><strong>Draw the "human decides" line.</strong> List the actions that can't be undone: money moving, records deleted, offers made, anything sent to a regulator. AI can draft; a person decides.</li>
+        <li><strong>Name an owner for each AI use.</strong> One person per chatbot, workflow or recurring task.</li>
+        <li><strong>Pin up the two-minute check.</strong> Then start the wrong answer of the month at your next team meeting.</li>
+        <li><strong>See how exposed you are.</strong> The <a href="business-ai-exposure-check.html" data-aic-cfg="exposureCheckUrl" data-aic-fallback="business-ai-exposure-check">Business AI Exposure Check</a> has a whole section on who checks the work.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<aside class="aic-cta" aria-labelledby="aic-when-ai-gets-it-wrong-cta-h">
+  <span class="aic-eyebrow">Need more than an answer?</span>
+  <h2 class="aic-h2" id="aic-when-ai-gets-it-wrong-cta-h">Teach your team to check AI in their own work</h2>
+  <p>Members run hands-on sessions built on your team's real tasks: where AI goes wrong in your field, how to check it fast, and the routine to keep doing it.</p>
+  <a class="aic-btn aic-btn-primary" href="#" data-aic-cta="coursesUrl">Learn with a member</a>
+  <p class="aic-small">Training with independent members of the Leading Learning Partners Association.</p>
+</aside>
+
+<nav class="aic-related" aria-labelledby="aic-when-ai-gets-it-wrong-rel-h">
+  <span class="aic-eyebrow" id="aic-when-ai-gets-it-wrong-rel-h">Related</span>
+  <ul>
+    <li><a href="ai-hallucinations.html" data-aic-slug="ai-hallucinations">Why does AI sound so confident when it's wrong?<span>What hallucinations are and why they happen</span></a></li>
+    <li><a href="small-business-ai-safety.html" data-aic-slug="small-business-ai-safety">Practical AI safety for sole traders and small teams<span>Data, accounts, checking and scams on one page</span></a></li>
+    <li><a href="does-your-organization-have-the-controls-to-govern-ai.html" data-aic-slug="does-your-organization-have-the-controls-to-govern-ai">Does your organization have the controls to govern the AI it uses?<span>Ownership, approvals, logging and escalation</span></a></li>
+    <li><a href="healthy-ai-use.html" data-aic-slug="healthy-ai-use">Am I leaning on AI too much?<span>Habits, boundaries and team norms</span></a></li>
+    <li><a href="can-ai-lie.html" data-aic-slug="can-ai-lie">Can AI lie?<span>Mistakes, made-up answers and deception</span></a></li>
+  </ul>
+</nav>
+
+<section class="aic-sources" aria-labelledby="aic-when-ai-gets-it-wrong-src-h">
+  <span class="aic-eyebrow" id="aic-when-ai-gets-it-wrong-src-h">Sources</span>
+  <p class="aic-small" style="margin-top:6px">Last checked November 2026. Case summaries are general information, not legal advice.</p>
+  <ol class="aic-src-list">
+    <li id="aic-when-ai-gets-it-wrong-s1"><em>Moffatt v. Air Canada</em>, 2024 BCCRT 149. Civil Resolution Tribunal of British Columbia, February 2024. <a href="https://decisions.civilresolutionbc.ca/crt/crtd/en/525448/1/document.do" rel="noopener">civilresolutionbc.ca</a>. Summary: McCarthy Tétrault, "Moffatt v. Air Canada: A Misrepresentation by an AI Chatbot," 19 February 2024. <a href="https://www.mccarthy.ca/en/insights/blogs/techlex/moffatt-v-air-canada-misrepresentation-ai-chatbot" rel="noopener">mccarthy.ca</a></li>
+    <li id="aic-when-ai-gets-it-wrong-s2"><em>Mata v. Avianca, Inc.</em>, No. 22-cv-1461 (S.D.N.Y.), sanctions order of 22 June 2023. Reported by Bloomberg Law, "Phony ChatGPT Brief Leads to $5,000 Fine for NY Lawyers," June 2023. <a href="https://news.bloomberglaw.com/esg/chatgpt-phony-legal-filing-case-gets-lawyers-a-5-000-fine" rel="noopener">news.bloomberglaw.com</a></li>
+    <li id="aic-when-ai-gets-it-wrong-s3"><em>R (Ayinde) v London Borough of Haringey</em> and <em>Al-Haroun v Qatar National Bank</em> [2025] EWHC 1383 (Admin). Divisional Court of the High Court of England and Wales, 6 June 2025. <a href="https://www.judiciary.uk/judgments/ayinde-v-london-borough-of-haringey-and-al-haroun-v-qatar-national-bank/" rel="noopener">judiciary.uk</a>. Summary: Bristows, "Divisional Court delivers stark warning on AI use," 23 June 2025. <a href="https://inquisitiveminds.bristows.com/post/102kpmf/divisional-court-delivers-stark-warning-on-ai-use" rel="noopener">bristows.com</a></li>
+    <li id="aic-when-ai-gets-it-wrong-s4">Charlotin, D. "AI Hallucination Cases" database (live). 2,262 decisions listed as of 4 November 2026. <a href="https://www.damiencharlotin.com/hallucinations/" rel="noopener">damiencharlotin.com/hallucinations</a></li>
+    <li id="aic-when-ai-gets-it-wrong-s5">The Register. "Deloitte refunds Aussie gov after AI fabrications slip into $440K welfare report." 6 October 2025. <a href="https://www.theregister.com/2025/10/06/deloitte_ai_report_australia/" rel="noopener">theregister.com</a></li>
+    <li id="aic-when-ai-gets-it-wrong-s6">Sharma, M. et al. "Towards Understanding Sycophancy in Language Models." Anthropic. arXiv 2310.13548, October 2023 (revised May 2025). <a href="https://arxiv.org/abs/2310.13548" rel="noopener">arxiv.org/abs/2310.13548</a></li>
+    <li id="aic-when-ai-gets-it-wrong-s7">Lee, H.-P. et al. "The Impact of Generative AI on Critical Thinking." CHI 2025. Microsoft Research and Carnegie Mellon University. <a href="https://www.microsoft.com/en-us/research/publication/the-impact-of-generative-ai-on-critical-thinking-self-reported-reductions-in-cognitive-effort-and-confidence-effects-from-a-survey-of-knowledge-workers/" rel="noopener">microsoft.com/en-us/research</a></li>
+    <li id="aic-when-ai-gets-it-wrong-s8">Regulation (EU) 2024/1689 (EU AI Act), Article 14 "Human oversight," paragraph 4(b) on automation bias. <a href="https://artificialintelligenceact.eu/article/14/" rel="noopener">artificialintelligenceact.eu/article/14</a></li>
+    <li id="aic-when-ai-gets-it-wrong-s9">Niederhoffer, K. et al. "AI-Generated 'Workslop' Is Destroying Productivity." Harvard Business Review, 22 September 2025. <a href="https://hbr.org/2025/09/ai-generated-workslop-is-destroying-productivity" rel="noopener">hbr.org</a>. Survey: BetterUp Labs with the Stanford Social Media Lab, September 2025. <a href="https://www.betterup.com/blog/hidden-costs-workslop" rel="noopener">betterup.com</a></li>
+  </ol>
+</section>
+</div>
+</article>
+<script>
+window.AICHANNEL_CONFIG = Object.assign({
+  coursesUrl: "#",             // "Learn with a member" (Central AI course schedule)
+  matchUrl: "#",               // "Get matched to someone" (advisory/consulting form)
+  newsletterUrl: "#",          // newsletter opt-in
+  contentBaseUrl: "",          // prefix for sibling pieces: contentBaseUrl + slug + ".html"
+  exposureCheckUrl: ""         // Business AI Exposure Check page; empty = contentBaseUrl + business-ai-exposure-check.html
+}, window.AICHANNEL_CONFIG || {});
+(function () {
+  'use strict';
+  var ROOT = document.getElementById('aic-when-ai-gets-it-wrong');
+  if (!ROOT) return;
+  var CFG = window.AICHANNEL_CONFIG;
+  var SLUG = 'when-ai-gets-it-wrong';
+  var base = CFG.contentBaseUrl || '';
+  function each(sel, fn) { Array.prototype.forEach.call(ROOT.querySelectorAll(sel), fn); }
+  function utm() {
+    var o = {};
+    try { new URLSearchParams(window.location.search).forEach(function (v, k) { if (/^utm_/i.test(k)) o[k] = v; }); } catch (e) {}
+    return o;
+  }
+  function emit(name, extra) {
+    var d = { event: name, source_content_or_tool: SLUG, content_type: 'guide', audience: 'business;hr-team-leads;executives' };
+    for (var k in extra) if (Object.prototype.hasOwnProperty.call(extra, k)) d[k] = extra[k];
+    try { window.dispatchEvent(new CustomEvent('aichannel:event', { detail: d })); } catch (e) {}
+    try { if (window.parent && window.parent !== window) window.parent.postMessage(Object.assign({ type: 'aichannel:event' }, d), '*'); } catch (e) {}
+  }
+  function withParams(url, cta) {
+    if (!url || url === '#') return url || '#';
+    var p = { lead_type: cta === 'matchUrl' ? 'advisory' : (cta === 'coursesUrl' ? 'training' : 'newsletter'),
+              audience: 'business;hr-team-leads;executives', source_page: window.location.href, source_content_or_tool: SLUG, cta_clicked: cta };
+    var u = utm(); for (var k in u) p[k] = u[k];
+    var q = Object.keys(p).map(function (k) { return encodeURIComponent(k) + '=' + encodeURIComponent(p[k]); }).join('&');
+    return url + (url.indexOf('?') > -1 ? '&' : '?') + q;
+  }
+  each('a[data-aic-slug]', function (a) { a.href = base + a.getAttribute('data-aic-slug') + '.html'; });
+  each('a[data-aic-cfg]', function (a) {
+    var v = CFG[a.getAttribute('data-aic-cfg')];
+    a.href = (v && v !== '#') ? v : base + a.getAttribute('data-aic-fallback') + '.html';
+  });
+  each('a[data-aic-cta]', function (a) {
+    var key = a.getAttribute('data-aic-cta');
+    a.href = withParams(CFG[key], key);
+    a.addEventListener('click', function () { emit('cta_clicked', { cta_clicked: key, cta_label: a.textContent.trim() }); });
+  });
+  each('a[data-aic-slug], a[data-aic-cfg]', function (a) {
+    a.addEventListener('click', function () { emit('related_clicked', { target: a.getAttribute('data-aic-slug') || a.getAttribute('data-aic-cfg') }); });
+  });
+  each('[data-aic-print]', function (b) {
+    b.addEventListener('click', function () {
+      var card = b.getAttribute('data-aic-print') === 'card';
+      var sec = b.closest('.aic-section');
+      if (card && sec) { sec.classList.add('aic-has-card'); ROOT.classList.add('aic-printing-card'); }
+      emit('print_clicked', { what: card ? 'card' : 'page' });
+      try { window.print(); } catch (e) {}
+      if (card) setTimeout(function () { ROOT.classList.remove('aic-printing-card'); }, 400);
+    });
+  });
+  try { window.addEventListener('afterprint', function () { ROOT.classList.remove('aic-printing-card'); }); } catch (e) {}
+  emit('content_viewed', {});
+})();
+</script>
+<!-- ===== AIC:END ===== -->
+</body>
+</html>
+
+</body></html>

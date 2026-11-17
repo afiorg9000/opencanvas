@@ -1,0 +1,917 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>p-doom-scenario-explorer</title><style>html,body{margin:0;background:#F7F8FA}@media (prefers-color-scheme:dark){html,body{background:#F7F8FA}}</style></head><body>
+<!--
+TOOL: Is AI actually dangerous? Test the assumptions yourself.  (p(doom) scenario explorer)
+FILE: p-doom-scenario-explorer.html   (slug: p-doom-scenario-explorer)   TYPE: tool (explainer + interactive)
+TITLE: reader's question, per the owner's note (replaces the earlier "Why do experts disagree about AI risk?" /
+  "Could AI go badly wrong?"). Leads with her glossary answer verbatim: "Yes in small ways already (scams, fakes,
+  bad advice). Whether it becomes dangerous in big ways is a real, unresolved argument among serious people."
+AUDIENCE: Everyone (For You), plus Educators ("How do I teach when experts disagree about the future?"),
+  Technical teams and Government. Business readers get a "for a business or team" action column.
+
+STRUCTURE: (1) short answer; (2) What's already happening (evidence: scams, fakes, bad advice, leaks);
+  (3) What serious people argue about (the 2026 International AI Safety Report's statement of the split, early
+  warning signs, the CAIS statement, the 2,778-researcher survey median; "words you'll hear": alignment, p(doom));
+  (4) the explorer: four sliders with the strongest case each way (arrival; getting AI to do what we want; institutions
+  catch it; recovery), illustrative presets, a toy product with the multiplication shown; "Compare with what experts
+  say" reveals a log-scale strip of eight named/survey estimates with your number, a table version, a sensitivity
+  panel (which assumption moves your number most), and the limits of the toy; (5) What to do either way: five
+  no-regrets moves for you and four for a business or team, plus a mental-health signpost; (6) next step (article
+  ai-extinction-risk-p-doom) and one member route (coursesUrl), Email me my results, newsletter. "Not a forecast"
+  appears exactly twice (toy flag, footer).
+
+SOURCES (every named estimate and survey figure checked 4 Nov 2026):
+  - International AI Safety Report 2026, Extended Summary for Policymakers (3 Feb 2026): loss-of-control
+    disagreement; "early signs ... but not at levels that would enable loss of control"; disabling simulated oversight
+    "at all costs"; situational awareness and reward hacking; 12 companies' frontier safety frameworks in 2025; most
+    initiatives voluntary; ~5x compute per year; evaluation gap; competitive pressure; cloned-voice family scams;
+    listeners mistook AI voices for real 80% of the time.
+  - FBI IC3 2025 Internet Crime Report: 22,364 AI-related complaints, $893,346,472 adjusted losses.
+  - Grace et al., arXiv 2401.02843 / JAIR 2025: 2,778 researchers; median 5% (mean 9%) extremely bad outcomes;
+    38-51% gave >=10% to extinction-level outcomes; 10% by 2027, 50% by 2047.
+  - CAIS Statement on AI Risk (aistatement.com): wording and signatories Hinton, Bengio, Altman, Hassabis, Amodei.
+  - Hinton 10-20% within 30 years (BBC Radio 4, reported by The Guardian 27 Dec 2024).
+  - Amodei 25% "really, really badly" (Axios, 17 Sep 2025).
+  - Christiano, "My views on doom" (27 Apr 2023): 22% takeover; 46% irreversibly messed up within 10 years.
+  - Ord, The Precipice (2020): ~1 in 10 unaligned AI, ~1 in 6 all causes, each "a factor of 3 higher or lower".
+  - Wikipedia "P(doom)" compilation for LeCun <0.01% (2024), Bengio ~20% (ABC, Jul 2023), Yudkowsky >95%.
+  CHANGED vs the earlier build (removed/explore-the-ai-risk-debate.html): Christiano shown as 22-46% (his own
+  breakdown) rather than ~46% alone; Bengio and Amodei added; IASR 2026 added as the primary statement of the
+  disagreement and evidence; Metaculus figure dropped (not needed; live number).
+
+WHAT CHANGED vs aidoomsdayguide.com/tools/pdoom-scenario-explorer/: the original was three unlabeled sliders
+  multiplied together with no context, no expert comparison and generic tips. This version answers the reader's
+  question first, separates evidence from argument, explains each assumption with both sides, shows the published
+  range and the survey, shows sensitivity and the model's limits, and ends with concrete actions for people and
+  teams. Reader's-question title, no "doomsday" branding, no ads.
+
+PRIVACY: in-browser only; slider values in sessionStorage for this tab (try/catch). No network requests.
+
+HOW TO EMBED IN WORDPRESS: (a) Custom HTML block: paste everything between "BEGIN AI CHANNEL TOOL" and "END AI
+  CHANNEL TOOL". (b) iframe: <iframe src="/tools/p-doom-scenario-explorer.html" title="Is AI actually dangerous?"
+  style="width:100%;min-height:3600px;border:0" loading="lazy"></iframe>
+
+CONFIG URLS (window.AICHANNEL_CONFIG): resultsFormUrl, coursesUrl, newsletterUrl, contentBaseUrl (prefix for the
+  article ai-extinction-risk-p-doom.html); matchUrl unused here. CTA query fields: lead_type, audience (individual),
+  source_page, source_content_or_tool, cta_clicked, assessment_name, assessment_result (toy band: Below 1% / 1 to 10%
+  / 10 to 50% / Above 50%), score (toy %), utm_*. Events: tool_started (first slider or compare), tool_completed and
+  result_viewed (compare), cta_clicked.
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Is AI actually dangerous? Test the assumptions yourself</title>
+<meta name="description" content="The plain answer first, then set four assumptions and see how a toy estimate of worst-case AI risk moves, compared with what named experts and a survey of 2,778 AI researchers say.">
+<!-- AI Channel design A: tool design system v2 (visual layer only; no behaviour changes) -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style id="aic-theme">
+/* ---------- tokens ---------- */
+:root,html{color-scheme:light!important;
+ --pine:#2859c7!important;--pine-deep:#1945ac!important;--accent:#2859c7!important;--accent-deep:#1945ac!important;--primary:#2859c7!important;--blue:#2859c7!important;--blue-d:#1945ac!important;
+ --paper:#ffffff!important;--bg:#ffffff!important;--white:#fff!important;--card:#fff!important;--ink:#14213d!important;--ink-soft:#3f4a5c!important;--ink-mute:#5b6577!important;--muted:#3f4a5c!important;
+ --line:#d9e2f0!important;--sage:#eef3fc!important;--amber-soft:#fbf3e4!important;--accent-wash:#eef3fc!important;--blue-wash:#eef3fc!important;--sky:#eef3fc!important;--pale:#f4f7fc!important;--warm:#f4f7fc!important;
+ --serif:"Newsreader",Georgia,serif!important;--sans:"Inter",system-ui,sans-serif!important;--mono:"IBM Plex Mono",ui-monospace,monospace!important}
+html body .aic-tool,html body .aic-article{
+ --aic-paper:#ffffff!important;--aic-white:#ffffff!important;--aic-ink:#14213d!important;--aic-soft:#46526a!important;--aic-line:#d9e2f0!important;--aic-sage:#eef3fc!important;
+ --aic-blue:#2859c7!important;--aic-blue-deep:#1945ac!important;--aic-blue-soft:#eef3fc!important;--aic-on-blue:#ffffff!important;--aic-focus:#9fbcff!important;
+ --aic-grey:#46526a!important;--aic-grey-soft:#f4f7fc!important;
+ --aic-radius:16px!important;--aic-radius-sm:12px!important;--aic-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important;
+ color-scheme:light!important;background:#fff!important;color:#14213d!important;
+ font-family:"Inter",system-ui,sans-serif!important;-webkit-font-smoothing:antialiased}
+html,body{background:#fff!important}
+html body .aic-tool{padding:56px 0 96px!important}
+html body .aic-article{padding:0 0 112px!important}
+html body .aic-tool .aic-col,html body .aic-article .aic-col{max-width:860px!important}
+@media(min-width:600px){html body .aic-tool .aic-col,html body .aic-article .aic-col{padding-inline:32px!important}}
+
+/* ---------- type ---------- */
+html body .aic-tool .aic-h1,html body .aic-article h1,body h1{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important;line-height:1.02!important;font-size:clamp(38px,5.4vw,62px)!important;color:#14213d}
+html body .aic-tool .aic-h2,html body .aic-article h2,body h2{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important;line-height:1.1!important}
+html body .aic-article h2{font-size:clamp(28px,3.6vw,38px)!important;margin-top:72px!important}
+html body .aic-tool .aic-h2{font-size:clamp(26px,3.4vw,36px)!important}
+html body .aic-tool .aic-h3,html body .aic-article h3,body h3{font-family:"Newsreader",Georgia,serif!important;font-weight:550!important;letter-spacing:-.01em!important;font-size:22px!important;line-height:1.2!important}
+body h4,body h5,body h6{font-family:"Inter",system-ui,sans-serif!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow,html body .aic-tool .aic-qnum,html body .aic-tool .aic-nav-hint,.aic-mono{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;letter-spacing:.06em!important;text-transform:uppercase;font-size:12px!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow{color:#2859c7!important;display:flex!important;align-items:center;gap:12px}
+html body .aic-tool .aic-eyebrow::before,html body .aic-article .aic-head .aic-eyebrow::before{content:"";width:28px;height:1px;background:#2859c7;flex:none}
+html body .aic-tool .aic-lede,html body .aic-article .aic-lede,html body .aic-article .aic-dek{font-size:20px!important;line-height:1.55!important;color:#3f4a5c!important;max-width:60ch}
+html body .aic-tool .aic-soft,html body .aic-tool .aic-small{color:#46526a!important}
+html body .aic-tool .aic-small{font-size:14px!important}
+html body .aic-article{font-size:18.5px!important;line-height:1.72!important}
+html body .aic-article p+p{margin-top:22px!important}
+html body .aic-article .aic-head{padding:72px 0 40px!important;border-bottom:1px solid #d9e2f0;margin-bottom:48px}
+html body .aic-article .aic-meta,html body .aic-article .aic-head p:not(.aic-lede):not(.aic-dek){font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px!important;letter-spacing:.03em;color:#5b6577!important}
+html body .aic-tool a,html body .aic-article a{color:#2859c7}
+
+/* ---------- panels ---------- */
+html body .aic-tool .aic-card,html body .aic-article .aic-card{background:#fff!important;border:1px solid #d9e2f0!important;border-radius:16px!important;box-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important}
+@media(min-width:600px){html body .aic-tool .aic-card{padding:36px 40px!important}html body .aic-article .aic-card{padding:32px 36px!important}}
+html body .aic-tool .aic-stack>*+*{margin-top:20px!important}
+html body .aic-tool .aic-grid2,html body .aic-article .aic-grid{gap:16px!important}
+/* the short answer: a framed figure, like the site's tool previews */
+html body .aic-article .aic-short{background:#fff!important;border:1px solid #d9e2f0!important;box-shadow:0 0 0 10px #eef3fc,0 0 0 11px #d9e2f0!important;margin:12px 11px 56px!important;border-radius:12px!important;border-left:1px solid #d9e2f0!important}
+html body .aic-article .aic-short .aic-eyebrow,html body .aic-article .aic-short>:first-child{color:#2859c7!important}
+/* notes and callouts */
+html body .aic-tool .aic-note,html body .aic-article .aic-note,html body .aic-article .aic-callout{background:#f4f7fc!important;border-left:3px solid #2859c7!important;border-radius:0 12px 12px 0!important;padding:18px 22px!important;font-size:15.5px!important;color:#14213d!important}
+html body .aic-tool .aic-note.aic-warn{background:#fdf7ec!important;border-left-color:#a46207!important}
+html body .aic-tool .aic-note.aic-bad{background:#fdf0ee!important;border-left-color:#b42318!important}
+html body .aic-tool .aic-note.aic-good{background:#eef8f1!important;border-left-color:#2f7a4e!important}
+/* calls to action become navy bands */
+html body .aic-tool .aic-cta,html body .aic-article .aic-cta,html body .aic-tool .aic-dark,html body .aic-article .aic-dark{--aic-ink:#ffffff!important;--aic-soft:#c9d6ee!important;--aic-white:#13264a!important;--aic-line:#2a3f6a!important;--aic-blue:#9fbcff!important;--aic-blue-soft:#1d3563!important;--aic-on-blue:#13264a!important;
+ background:#13264a!important;color:#fff!important;border-color:#13264a!important;box-shadow:none!important}
+html body .aic-tool .aic-cta *:not(.aic-btn):not(.aic-btn *),html body .aic-article .aic-cta *:not(.aic-btn):not(.aic-btn *){color:inherit}
+html body .aic-tool .aic-cta .aic-btn-primary,html body .aic-article .aic-cta .aic-btn-primary{background:#fff!important;color:#13264a!important;border-color:#fff!important}
+html body .aic-tool .aic-cta a:not(.aic-btn),html body .aic-article .aic-cta a:not(.aic-btn){color:#9fbcff!important}
+
+/* ---------- questions and answer options ---------- */
+html body .aic-tool .aic-q{margin-top:28px!important}
+html body .aic-tool .aic-qnum{color:#2859c7!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;font-size:clamp(22px,2.6vw,27px)!important;line-height:1.22!important;letter-spacing:-.01em!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qhint{font-size:15px!important;color:#46526a!important;margin-bottom:18px!important}
+html body .aic-tool .aic-opts{gap:10px!important;margin-top:18px!important}
+html body .aic-tool .aic-opt,html body .aic-tool .aic-pick,html body .aic-tool .aic-check{background:#fff!important;border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:16px 18px!important;font-size:16px!important;gap:14px!important;transition:border-color .15s,box-shadow .15s,background-color .15s,transform .15s!important}
+html body .aic-tool .aic-opt:hover,html body .aic-tool .aic-pick:hover,html body .aic-tool .aic-check:hover{border-color:#2859c7!important;box-shadow:0 6px 18px rgba(40,89,199,.10)!important;transform:translateY(-1px)}
+html body .aic-tool .aic-opt[aria-checked="true"],html body .aic-tool .aic-opt[aria-pressed="true"],html body .aic-tool .aic-pick:has(input:checked),html body .aic-tool .aic-check:has(input:checked),html body .aic-tool .aic-opt:has(input:checked){border-color:#2859c7!important;background:#f4f7fc!important;box-shadow:0 0 0 3px #dbe6fb!important}
+html body .aic-tool .aic-dot{width:22px!important;height:22px!important;border:2px solid #9aa8c0!important}
+html body .aic-tool .aic-dot::after{inset:4px!important;background:#2859c7!important}
+html body .aic-tool .aic-opt[aria-checked="true"] .aic-dot{border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-size:14px!important;color:#46526a!important;margin-top:4px!important}
+html body .aic-tool .aic-opt.aic-opt-unsure{background:transparent!important;border-style:dashed!important}
+html body .aic-tool input[type=text],html body .aic-tool input[type=search],html body .aic-tool input[type=email],html body .aic-tool textarea,html body .aic-tool select,html body .aic-tool .aic-input{border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:14px 16px!important;background:#fff!important;font-size:16px!important}
+html body .aic-tool input:focus,html body .aic-tool textarea:focus,html body .aic-tool select:focus{border-color:#2859c7!important;outline:none!important;box-shadow:0 0 0 3px #dbe6fb!important}
+
+/* ---------- controls ---------- */
+html body .aic-tool .aic-btn,html body .aic-article .aic-btn{min-height:50px!important;padding:14px 24px!important;font-weight:600!important;font-size:15px!important;border-radius:999px!important;border:1.5px solid #c9d6ee!important;box-shadow:none!important}
+html body .aic-tool .aic-btn:hover,html body .aic-article .aic-btn:hover{border-color:#2859c7!important}
+html body .aic-tool .aic-btn-primary,html body .aic-article .aic-btn-primary{background:#2859c7!important;border-color:#2859c7!important;color:#fff!important}
+html body .aic-tool .aic-btn-primary:hover,html body .aic-article .aic-btn-primary:hover{background:#1945ac!important;border-color:#1945ac!important}
+html body .aic-tool .aic-btn-ghost{border-color:transparent!important;text-decoration:underline;text-underline-offset:4px;color:#3f4a5c!important}
+html body .aic-tool .aic-btn[disabled]{opacity:.4!important}
+html body .aic-tool .aic-nav{margin-top:36px!important;padding-top:24px!important;border-top:1px solid #d9e2f0!important}
+html body .aic-tool .aic-actions{gap:12px!important}
+html body .aic-tool .aic-seg{border:1.5px solid #d9e2f0!important;padding:4px!important}
+html body .aic-tool .aic-seg button{font-weight:600!important;color:#3f4a5c!important}
+html body .aic-tool .aic-seg button[aria-pressed="true"],html body .aic-tool .aic-seg button[aria-checked="true"]{background:#13264a!important;color:#fff!important}
+html body .aic-tool .aic-progress{height:4px!important;background:#e3eaf6!important;margin:20px 0 8px!important}
+html body .aic-tool .aic-progress span,html body .aic-tool .aic-progress i{background:#2859c7!important}
+html body .aic-tool .aic-chip,html body .aic-tool .aic-pill{border:1.5px solid #d9e2f0!important;background:#fff!important;font-weight:600!important;border-radius:999px!important}
+html body .aic-tool .aic-chip[aria-pressed="true"],html body .aic-tool .aic-chip.aic-on,html body .aic-tool .aic-pill.aic-on{background:#eef3fc!important;border-color:#2859c7!important;color:#1945ac!important}
+html body .aic-tool .aic-tag,html body .aic-article .aic-tag{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;padding:5px 11px!important}
+html body .aic-tool .aic-privacy{font-size:14px!important;color:#46526a!important;margin-top:20px!important}
+
+/* ---------- results ---------- */
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-stat b,html body .aic-tool .aic-stat strong,html body .aic-tool .aic-display{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important}
+html body .aic-tool .aic-bar{height:8px!important;background:#e3eaf6!important}
+html body .aic-tool .aic-bar-row{padding:14px 0!important;border-bottom-color:#e3eaf6!important}
+html body .aic-tool .aic-bar-label{font-weight:600!important}
+html body .aic-tool table,html body .aic-article table{border-collapse:collapse}
+html body .aic-tool th,html body .aic-article th{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;text-transform:uppercase;color:#2859c7!important;background:#f4f7fc!important}
+html body .aic-tool td,html body .aic-article td{border-color:#e3eaf6!important}
+html body .aic-article .aic-sources,html body .aic-tool .aic-sources{font-size:14px!important;color:#46526a!important;border-top:1px solid #d9e2f0;padding-top:32px!important;margin-top:72px!important}
+html body .aic-article .aic-related,html body .aic-article .aic-deeper{margin-top:72px!important}
+
+/* ---------- pages outside the shared system ---------- */
+body:not(:has(.aic-tool)):not(:has(.aic-article)) h1,body:not(:has(.aic-tool)):not(:has(.aic-article)) h2,body:not(:has(.aic-tool)):not(:has(.aic-article)) h3{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important}
+html,body{font-family:"Inter",system-ui,sans-serif}
+input[type=range],input[type=checkbox],input[type=radio]{accent-color:#2859c7!important}
+:focus-visible{outline-color:#2859c7!important}
+[tabindex="-1"]:focus,h1:focus,h2:focus,h3:focus{outline:none!important;box-shadow:none!important}
+
+/* ================= v3: product-grade tool shell ================= */
+html,body{background:#f4f7fc!important}
+html body .aic-tool{background:#f4f7fc!important}
+html body .aic-tool .aic-col{max-width:980px!important}
+html body .aic-tool .aic-h1{font-size:clamp(40px,5vw,62px)!important;max-width:20ch}
+html body .aic-tool .aic-grid2>.aic-card{box-shadow:none!important;background:#fff!important;border-radius:14px!important}
+html body .aic-tool.aic-in-q .aic-h1{font-size:22px!important;line-height:1.2!important;max-width:none;margin:6px 0 20px!important;font-weight:500!important}
+html body .aic-tool.aic-in-q .aic-lede,html body .aic-tool.aic-in-q > .aic-col > .aic-privacy,html body .aic-tool.aic-in-q .aic-col > * > .aic-privacy{display:none!important}
+html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:56px 64px 44px!important;border:0!important;border-radius:24px!important;box-shadow:0 1px 0 rgba(19,38,74,.05),0 30px 70px rgba(19,38,74,.10)!important;min-height:460px}
+@media(max-width:700px){html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:32px 22px 28px!important;border-radius:18px!important;min-height:0}}
+html body .aic-tool .aic-progress{height:3px!important;background:#e3eaf6!important;border-radius:0!important;margin:14px 0 36px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-size:clamp(26px,3.2vw,38px)!important;line-height:1.12!important;letter-spacing:-.02em!important;margin-bottom:12px!important;max-width:28ch}
+html body .aic-tool .aic-qhint{font-size:16px!important;margin-bottom:24px!important}
+html body .aic-tool .aic-opts{counter-reset:aicopt;gap:12px!important}
+html body .aic-tool .aic-opt{counter-increment:aicopt;align-items:center!important;min-height:64px;padding:16px 20px!important;font-size:17px!important;font-weight:500;border-radius:14px!important}
+html body .aic-tool .aic-opt .aic-dot{display:none!important}
+html body .aic-tool .aic-opt::before{content:counter(aicopt,upper-alpha);flex:none;width:30px;height:30px;display:grid;place-items:center;border:1.5px solid #c9d6ee;border-radius:8px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;font-weight:500;color:#2859c7;background:#fff;transition:all .15s}
+html body .aic-tool .aic-opt:hover::before{border-color:#2859c7}
+html body .aic-tool .aic-opt[aria-checked="true"]::before{background:#2859c7;border-color:#2859c7;color:#fff;content:"\2713"}
+html body .aic-tool .aic-opt[aria-checked="true"]{background:#eef3fc!important;box-shadow:0 0 0 2px #2859c7!important;border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-weight:400}
+html body .aic-tool .aic-nav{border-top:0!important;margin-top:40px!important;padding-top:0!important}
+html body .aic-tool .aic-nav .aic-btn-primary{min-width:150px}
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-display{font-size:clamp(56px,8vw,96px)!important;line-height:.95!important;color:#14213d}
+
+/* ================= v4: legibility ================= */
+html body .aic-tool{font-size:17px!important;line-height:1.6!important}
+html body .aic-tool,html body .aic-article{--aic-soft:#334055!important}
+html body .aic-tool .aic-small,html body .aic-tool .aic-opt-sub,html body .aic-tool .aic-privacy,html body .aic-tool .aic-nav-hint{font-size:15px!important;color:#334055!important}
+html body .aic-tool p,html body .aic-tool li{color:#1d2a44}
+html body .aic-tool .aic-lede{font-size:20px!important;color:#2a364d!important}
+html body .aic-tool .aic-note{font-size:16.5px!important}
+html body .aic-tool .aic-opt{font-size:18px!important;color:#14213d!important}
+html body .aic-tool .aic-qhint{font-size:17px!important;color:#334055!important}
+html body .aic-tool .aic-eyebrow,html body .aic-tool .aic-qnum,.aic-mono{font-size:12.5px!important;color:#2859c7!important;letter-spacing:.05em!important}
+html body .aic-tool .aic-tag{font-size:12.5px!important}
+html body .aic-tool th,html body .aic-article th{font-size:12.5px!important}
+html body .aic-tool td{font-size:16px}
+html body .aic-article{color:#14213d!important}
+html body .aic-article p,html body .aic-article li{color:#1d2a44}
+</style>
+<script>
+(function(){
+  function hsl(c){var m=c&&c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/);if(!m)return null;var r=m[1]/255,g=m[2]/255,b=m[3]/255,a=m[4]===undefined?1:+m[4];
+    var mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn,s=d?d/(1-Math.abs(2*l-1)):0,h=0;
+    if(d){h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;if(h<0)h+=360}return {h:h,s:s,l:l,a:a}}
+  function blue(c){var x=hsl(c);return x&&x.a>0.05&&x.s>0.3&&x.l>0.28&&x.l<0.95&&x.h>=205&&x.h<=240?x:null}
+  function N(x,dark,light){return x.a<0.95?"rgba(40,89,199,"+Math.min(x.a,0.12).toFixed(3)+")":(x.l>0.82?light:dark)}
+  function fix(el){var c0=getComputedStyle(el),bg=hsl(c0.backgroundColor),fg=hsl(c0.color);if(bg&&fg&&bg.a>0.9&&bg.l<0.6&&bg.s>0.3&&bg.h>=205&&bg.h<=240&&fg.l<0.6)el.style.setProperty("color","#ffffff","important");
+    if(el.closest(".aic-cta,.aic-dark")||el.matches(".aic-opt,.aic-pick,.aic-check,.aic-btn,.aic-chip,.aic-pill,.aic-seg button,.aic-card,.aic-note"))return;var cs=getComputedStyle(el),x;
+    if((x=blue(cs.color)))el.style.setProperty("color",x.l>0.75?"#eef3fc":"#2859c7","important");
+    if((x=blue(cs.backgroundColor)))el.style.setProperty("background-color",N(x,"#2859c7",x.l>0.9?"#eef3fc":"#d6e2f8"),"important");
+    if(el instanceof SVGElement){if((x=blue(cs.fill)))el.style.setProperty("fill",N(x,"#2859c7","#eef3fc"),"important");if((x=blue(cs.stroke)))el.style.setProperty("stroke",N(x,"#2859c7","#d6e2f8"),"important")}
+    if(cs.textTransform==="uppercase"&&parseFloat(cs.fontSize)<=13.5&&!el.closest("button")&&!el.classList.contains("aic-mono"))el.classList.add("aic-mono");}
+  var t;function mode(){document.querySelectorAll(".aic-tool").forEach(function(r){var q=[].some.call(r.querySelectorAll(".aic-progress,.aic-qtext,.aic-q-text"),function(e){return e.offsetParent!==null});if(q!==r.classList.contains("aic-in-q"))r.classList.toggle("aic-in-q",q)})}
+  function run(){clearTimeout(t);t=setTimeout(function(){mode();document.querySelectorAll("body *").forEach(fix)},30)}
+  document.addEventListener("DOMContentLoaded",function(){run();new MutationObserver(run).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class","aria-pressed","aria-checked","data-state"]});
+    document.addEventListener("change",run,true);document.addEventListener("click",run,true);});
+})();
+</script>
+</head>
+<body style="margin:0;background:#F7F8FA">
+<!-- ===== BEGIN AI CHANNEL TOOL: copy from here to END into a WordPress Custom HTML block ===== -->
+<div class="aic-tool" id="aic-p-doom-scenario-explorer" data-theme="light">
+<style>
+.aic-tool{--aic-paper:#F7F8FA;--aic-card:#FFFFFF;--aic-ink:#162033;--aic-soft:#667085;--aic-line:#DEE3EA;--aic-sage:#EEF1F6;--aic-blue:#315EFB;--aic-blue-deep:#2448C9;--aic-blue-wash:#EEF3FF;--aic-amber:#A46207;--aic-amber-wash:#FBF4E8;--aic-green:#2F7A4E;--aic-green-wash:#EAF5EE;--aic-violet:#6D5BD0;--aic-radius:18px;--aic-radius-sm:12px;--aic-shadow:0 10px 28px rgba(21,32,51,.055);--aic-focus:#B8C7FF;
+  display:block;background:var(--aic-paper);color:var(--aic-ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.55;padding:28px 0 56px;-webkit-text-size-adjust:100%;text-align:left}
+@media (prefers-color-scheme:dark){.aic-tool:not([data-theme="light"]){--aic-paper:#101B2D;--aic-card:#162033;--aic-ink:#F2F4F8;--aic-soft:#A6B3C7;--aic-line:#2A3850;--aic-sage:#1E2A40;--aic-blue:#7A97FF;--aic-blue-deep:#9BB2FF;--aic-blue-wash:#1F2B45;--aic-amber:#E0A34A;--aic-amber-wash:#2B2618;--aic-green:#6FC592;--aic-green-wash:#16301F;--aic-violet:#A99CF0;--aic-shadow:none;--aic-focus:#4A63B8;color-scheme:dark}}
+.aic-tool[data-theme="dark"]{--aic-paper:#101B2D;--aic-card:#162033;--aic-ink:#F2F4F8;--aic-soft:#A6B3C7;--aic-line:#2A3850;--aic-sage:#1E2A40;--aic-blue:#7A97FF;--aic-blue-deep:#9BB2FF;--aic-blue-wash:#1F2B45;--aic-amber:#E0A34A;--aic-amber-wash:#2B2618;--aic-green:#6FC592;--aic-green-wash:#16301F;--aic-violet:#A99CF0;--aic-shadow:none;--aic-focus:#4A63B8;color-scheme:dark}
+.aic-tool *,.aic-tool *::before,.aic-tool *::after{box-sizing:border-box}
+.aic-tool h1,.aic-tool h2,.aic-tool h3,.aic-tool h4,.aic-tool p,.aic-tool ul,.aic-tool ol,.aic-tool figure,.aic-tool fieldset,.aic-tool legend{margin:0;padding:0}
+.aic-tool fieldset{border:0;min-width:0}
+.aic-tool ul,.aic-tool ol{padding-left:1.2em}
+.aic-tool button{font-family:inherit}
+.aic-tool a{color:var(--aic-blue);font-weight:700;text-decoration:none}
+.aic-tool a:hover{text-decoration:underline}
+.aic-tool a:focus-visible,.aic-tool button:focus-visible,.aic-tool input:focus-visible+.aic-opt-box,.aic-tool [tabindex]:focus-visible,.aic-tool summary:focus-visible{outline:3px solid var(--aic-focus);outline-offset:2px;border-radius:10px}
+.aic-tool [tabindex="-1"]:focus{outline:none}
+.aic-col{max-width:760px;margin:0 auto;padding-inline:clamp(16px,4vw,24px)}
+.aic-sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0;padding:0;margin:-1px}
+.aic-eyebrow{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--aic-blue);margin-bottom:10px}
+.aic-display{font-weight:800;letter-spacing:-.035em;line-height:1.06}
+.aic-h1{font-size:clamp(32px,6.4vw,50px);margin-bottom:16px}
+.aic-h2{font-size:clamp(24px,4.2vw,32px);font-weight:800;letter-spacing:-.03em;line-height:1.12;margin-bottom:10px}
+.aic-h3{font-size:18px;font-weight:800;letter-spacing:-.02em;line-height:1.25;margin-bottom:6px}
+.aic-lede{font-size:clamp(17px,2.3vw,19px);color:var(--aic-soft);max-width:640px}
+.aic-soft{color:var(--aic-soft)}
+.aic-small{font-size:13.5px}
+.aic-num{font-variant-numeric:tabular-nums}
+.aic-card{background:var(--aic-card);border:1px solid var(--aic-line);border-radius:var(--aic-radius);box-shadow:var(--aic-shadow);padding:clamp(18px,4vw,28px)}
+.aic-stack>*+*{margin-top:16px}
+.aic-gap{margin-top:28px}
+.aic-grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:620px){.aic-grid2{grid-template-columns:1fr}}
+.aic-meta{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 22px}
+.aic-pill{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--aic-soft);background:var(--aic-card);border:1px solid var(--aic-line);border-radius:999px;padding:6px 11px}
+.aic-tag{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:5px 9px;background:var(--aic-blue-wash);color:var(--aic-blue)}
+.aic-tag.is-amber{background:var(--aic-amber-wash);color:var(--aic-amber)}
+.aic-tag.is-green{background:var(--aic-green-wash);color:var(--aic-green)}
+.aic-tag.is-grey{background:var(--aic-sage);color:var(--aic-soft)}
+.aic-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:12px 20px;font-size:15.5px;font-weight:750;border-radius:999px;border:1px solid transparent;cursor:pointer;text-decoration:none!important;line-height:1.2;text-align:center}
+.aic-btn-primary{background:var(--aic-blue);color:#fff!important;box-shadow:0 6px 16px rgba(49,94,251,.16)}
+.aic-btn-primary:hover{background:var(--aic-blue-deep)}
+.aic-tool[data-theme="dark"] .aic-btn-primary{color:#0B1424!important}
+@media (prefers-color-scheme:dark){.aic-tool:not([data-theme="light"]) .aic-btn-primary{color:#0B1424!important}}
+.aic-btn-secondary{background:var(--aic-card);color:var(--aic-ink)!important;border-color:var(--aic-line)}
+.aic-btn-secondary:hover{border-color:var(--aic-blue);color:var(--aic-blue)!important}
+.aic-btn-link{background:none;border:0;color:var(--aic-soft);font-weight:700;font-size:14px;text-decoration:underline!important;padding:8px 4px;min-height:0;cursor:pointer}
+.aic-btn[disabled],.aic-btn[aria-disabled="true"]{opacity:.45;cursor:not-allowed;box-shadow:none}
+.aic-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.aic-row.is-between{justify-content:space-between}
+.aic-progress{height:6px;background:var(--aic-sage);border-radius:999px;overflow:hidden;margin:6px 0 22px}
+.aic-progress>span{display:block;height:100%;width:0;background:var(--aic-blue);border-radius:999px;transition:width .35s ease}
+.aic-qhead{display:flex;justify-content:space-between;gap:10px;align-items:baseline;font-size:13px;font-weight:700;color:var(--aic-soft)}
+.aic-qtext{font-size:clamp(19px,2.8vw,22px);font-weight:800;letter-spacing:-.02em;line-height:1.3;margin:4px 0 18px}
+.aic-opts{display:grid;gap:10px}
+.aic-opt{position:relative;display:block;cursor:pointer}
+.aic-opt input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.aic-opt-box{display:flex;gap:12px;align-items:flex-start;padding:13px 15px;border:1px solid var(--aic-line);border-radius:var(--aic-radius-sm);background:var(--aic-card);font-size:15.5px;line-height:1.45;transition:border-color .15s,background .15s,box-shadow .15s}
+.aic-opt:hover .aic-opt-box{border-color:#AFC0FF}
+.aic-opt-dot{flex:none;width:18px;height:18px;margin-top:2px;border-radius:50%;border:2px solid #B4BDCC;position:relative}
+.aic-opt-dot::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--aic-blue);transform:scale(0);transition:transform .15s}
+.aic-opt input:checked+.aic-opt-box{border-color:var(--aic-blue);box-shadow:0 0 0 3px var(--aic-blue-wash)}
+.aic-opt input:checked+.aic-opt-box .aic-opt-dot{border-color:var(--aic-blue)}
+.aic-opt input:checked+.aic-opt-box .aic-opt-dot::after{transform:scale(1)}
+.aic-opt input:disabled+.aic-opt-box{cursor:default}
+.aic-opt.is-correct input+.aic-opt-box{border-color:var(--aic-green);background:var(--aic-green-wash);box-shadow:none}
+.aic-opt.is-wrong input+.aic-opt-box{border-color:var(--aic-amber);background:var(--aic-amber-wash);box-shadow:none}
+.aic-opt-mark{display:block;font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-top:4px}
+.aic-opt-mark:empty{display:none}
+.aic-opt.is-correct input+.aic-opt-box .aic-opt-dot{border-color:var(--aic-green)}
+.aic-opt.is-wrong input+.aic-opt-box .aic-opt-dot{border-color:var(--aic-amber)}
+.aic-opt.is-wrong input+.aic-opt-box .aic-opt-dot::after{background:var(--aic-amber)}
+.aic-opt.is-correct .aic-opt-mark{color:var(--aic-green)}
+.aic-opt.is-wrong .aic-opt-mark{color:var(--aic-amber)}
+.aic-note{background:var(--aic-blue-wash);border-left:3px solid var(--aic-blue);border-radius:0 var(--aic-radius-sm) var(--aic-radius-sm) 0;padding:14px 16px;font-size:15px}
+.aic-note.is-amber{background:var(--aic-amber-wash);border-left-color:var(--aic-amber)}
+.aic-note.is-green{background:var(--aic-green-wash);border-left-color:var(--aic-green)}
+.aic-reveal{margin-top:18px;padding-top:18px;border-top:1px solid var(--aic-line)}
+.aic-verdict{font-weight:800;font-size:17px;letter-spacing:-.01em;margin-bottom:8px}
+.aic-verdict.is-right{color:var(--aic-green)}
+.aic-verdict.is-wrong{color:var(--aic-amber)}
+.aic-reveal p+p{margin-top:10px}
+.aic-src{margin-top:14px;font-size:14px;color:var(--aic-soft)}
+.aic-src a{overflow-wrap:anywhere}
+.aic-src li{margin-top:4px}
+.aic-nav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:22px;flex-wrap:wrap}
+.aic-bar-row{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr) 56px;gap:12px;align-items:center;padding:11px 0;border-top:1px solid var(--aic-line)}
+.aic-bar-row:first-child{border-top:0}
+@media (max-width:560px){.aic-bar-row{grid-template-columns:minmax(0,1fr) 56px}.aic-bar-row .aic-bar-label{grid-column:1/-1}}
+.aic-bar-label{font-weight:700;font-size:14.5px}
+.aic-bar{display:block;height:10px;background:var(--aic-sage);border-radius:999px;overflow:hidden}
+.aic-bar>span{display:block;height:100%;border-radius:999px;background:var(--aic-blue);transition:width .8s ease}
+.aic-bar>span.is-low{background:var(--aic-amber)}
+.aic-bar>span.is-high{background:var(--aic-green)}
+.aic-bar-pct{font-weight:800;font-size:14px;text-align:right;font-variant-numeric:tabular-nums}
+.aic-score{display:grid;grid-template-columns:auto minmax(0,1fr);gap:24px;align-items:center}
+@media (max-width:560px){.aic-score{grid-template-columns:1fr;gap:14px}}
+.aic-score-num{font-size:clamp(52px,11vw,76px);font-weight:800;letter-spacing:-.05em;line-height:1;font-variant-numeric:tabular-nums}
+.aic-score-num small{font-size:.32em;letter-spacing:0;color:var(--aic-soft);font-weight:700;margin-left:4px}
+.aic-list{display:grid;gap:12px;padding:0!important;list-style:none}
+.aic-item{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:start}
+.aic-item-n{width:30px;height:30px;border-radius:50%;background:var(--aic-blue-wash);color:var(--aic-blue);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center}
+.aic-item p{font-size:15px;color:var(--aic-soft)}
+.aic-dark{background:#162033;color:#E7ECF5;border-radius:var(--aic-radius);padding:clamp(20px,4.5vw,32px)}
+.aic-dark .aic-eyebrow{color:#9BB2FF}
+.aic-dark a{color:#B8C7FF}
+.aic-dark .aic-soft,.aic-dark p{color:#C9D2E1}
+.aic-dark .aic-h2,.aic-dark .aic-h3{color:#fff}
+.aic-dark .aic-btn-primary{background:#fff;color:#162033!important;box-shadow:none}
+.aic-dark .aic-btn-primary:hover{background:#E3E9FF}
+.aic-dark .aic-btn-secondary{background:transparent;color:#fff!important;border-color:#3A4A66}
+.aic-dark .aic-btn-secondary:hover{border-color:#B8C7FF;color:#B8C7FF!important}
+.aic-step{display:grid;gap:6px;padding:16px 0;border-top:1px solid #2E3C57}
+.aic-step:first-of-type{border-top:0;padding-top:4px}
+.aic-step .aic-row{margin-top:8px}
+.aic-keep{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;margin-top:16px;font-size:14px}
+.aic-keep a,.aic-keep button{font-size:14px}
+.aic-noregret li{margin-top:6px;font-size:15px}
+.aic-tool details{border-top:1px solid var(--aic-line)}
+.aic-tool details:last-child{border-bottom:1px solid var(--aic-line)}
+.aic-tool summary{cursor:pointer;list-style:none;padding:14px 0;font-weight:800;display:flex;justify-content:space-between;gap:12px;align-items:center}
+.aic-tool summary::-webkit-details-marker{display:none}
+.aic-tool summary::after{content:"+";color:var(--aic-soft);font-weight:800;font-size:18px}
+.aic-tool details[open] summary::after{content:"\2013"}
+.aic-details-body{padding:0 0 16px;font-size:15px;color:var(--aic-soft)}
+.aic-details-body p+p{margin-top:8px}
+.aic-foot{margin-top:28px;font-size:13px;color:var(--aic-soft);line-height:1.6}
+.aic-foot p+p{margin-top:6px}
+.aic-screen[hidden]{display:none!important}
+.aic-fade{animation:aicFade .3s ease both}
+@keyframes aicFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.aic-tool *,.aic-tool *::before,.aic-tool *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media print{
+  .aic-tool{background:#fff!important;color:#000;padding:0;font-size:11pt}
+  .aic-tool .aic-noprint{display:none!important}
+  .aic-tool .aic-card{box-shadow:none;border:1px solid #bbb;break-inside:avoid}
+  .aic-tool .aic-dark{background:#fff!important;color:#000!important;border:1px solid #bbb}
+  .aic-tool .aic-dark *{color:#000!important}
+  .aic-tool details{display:block}
+  .aic-tool details>*{display:block}
+  .aic-tool a{color:#000;text-decoration:underline}
+  .aic-tool .aic-bar>span,.aic-tool .aic-tag,.aic-tool svg{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+/* ---- extras shared by the four resilience / risk tools ---- */
+.aic-tool{--aic-red:#B42318;--aic-red-wash:#FDEDEB}
+.aic-tool[data-theme="dark"]{--aic-red:#F97066;--aic-red-wash:#3A1E22}
+@media (prefers-color-scheme:dark){.aic-tool:not([data-theme="light"]){--aic-red:#F97066;--aic-red-wash:#3A1E22}}
+.aic-tag.is-red{background:var(--aic-red-wash);color:var(--aic-red)}
+.aic-note.is-red{background:var(--aic-red-wash);border-left-color:var(--aic-red)}
+.aic-seg{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.aic-seg label{position:relative;cursor:pointer;display:inline-flex}
+.aic-seg input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.aic-seg span{display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:7px 13px;border:1px solid var(--aic-line);border-radius:999px;background:var(--aic-card);font-size:14px;font-weight:700;color:var(--aic-soft);line-height:1.25;transition:background .15s,border-color .15s,color .15s}
+.aic-seg label:hover span{border-color:#AFC0FF;color:var(--aic-ink)}
+.aic-seg input:checked+span{background:var(--aic-blue);border-color:var(--aic-blue);color:#fff}
+.aic-tool[data-theme="dark"] .aic-seg input:checked+span{color:#0B1424}
+.aic-seg input:focus-visible+span{outline:3px solid var(--aic-focus);outline-offset:2px}
+.aic-seg.is-chips input[type=checkbox]+span::before{content:"";width:14px;height:14px;border-radius:4px;border:2px solid #B4BDCC;flex:none}
+.aic-seg.is-chips input[type=checkbox]:checked+span::before{border-color:#fff;background:#fff;box-shadow:inset 0 0 0 2px var(--aic-blue)}
+.aic-seg-legend{font-size:13px;font-weight:800;color:var(--aic-soft);letter-spacing:.01em}
+.aic-edition{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:18px}
+.aic-edition .aic-seg{margin-top:0}
+.aic-chipgrid{display:grid;gap:8px;grid-template-columns:1fr}
+@media (min-width:620px){.aic-chipgrid{grid-template-columns:1fr 1fr}}
+.aic-pick{position:relative;display:block;cursor:pointer}
+.aic-pick input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.aic-pick-box{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1px solid var(--aic-line);border-radius:var(--aic-radius-sm);background:var(--aic-card);height:100%}
+.aic-pick:hover .aic-pick-box{border-color:#AFC0FF}
+.aic-pick-check{flex:none;width:20px;height:20px;border-radius:6px;border:2px solid #B4BDCC;margin-top:1px;display:flex;align-items:center;justify-content:center}
+.aic-pick input:checked+.aic-pick-box{border-color:var(--aic-blue);box-shadow:0 0 0 3px var(--aic-blue-wash)}
+.aic-pick input:checked+.aic-pick-box .aic-pick-check{background:var(--aic-blue);border-color:var(--aic-blue)}
+.aic-pick input:checked+.aic-pick-box .aic-pick-check::after{content:"";width:9px;height:5px;border-left:2.5px solid #fff;border-bottom:2.5px solid #fff;transform:rotate(-45deg) translate(1px,-1px)}
+.aic-pick input:focus-visible+.aic-pick-box{outline:3px solid var(--aic-focus);outline-offset:2px}
+.aic-pick-t{font-weight:800;font-size:15.5px;line-height:1.3;display:block}
+.aic-pick-h{font-size:13.5px;color:var(--aic-soft);display:block;margin-top:2px}
+.aic-rows>*+*{border-top:1px solid var(--aic-line)}
+.aic-rowq{padding:16px 0}
+.aic-rowq:first-child{padding-top:4px}
+.aic-rowq-t{font-weight:800;font-size:16.5px;letter-spacing:-.01em}
+.aic-rowq-h{font-size:13.5px;color:var(--aic-soft)}
+.aic-rowq fieldset{margin-top:10px}
+.aic-table{width:100%;border-collapse:collapse;font-size:14.5px}
+.aic-table th{text-align:left;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--aic-soft);font-weight:800;padding:8px 8px 8px 0;border-bottom:1px solid var(--aic-line);vertical-align:bottom}
+.aic-table td{padding:10px 8px 10px 0;border-bottom:1px solid var(--aic-line);vertical-align:top}
+.aic-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.aic-fix{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:start;padding:16px 0;border-top:1px solid var(--aic-line)}
+.aic-fix:first-child{border-top:0;padding-top:4px}
+.aic-fix p{font-size:15px;color:var(--aic-soft);margin-top:4px}
+.aic-fix .aic-tag{margin-bottom:6px}
+.aic-line{display:inline-block;min-width:9em;border-bottom:1px solid var(--aic-soft);height:1.1em;vertical-align:baseline}
+.aic-input{width:100%;padding:10px 12px;border:1px solid var(--aic-line);border-radius:10px;background:var(--aic-card);color:var(--aic-ink);font:inherit;font-size:15px}
+.aic-input:focus{outline:3px solid var(--aic-focus);outline-offset:0;border-color:var(--aic-blue)}
+.aic-field{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:800;color:var(--aic-soft)}
+.aic-fields{display:grid;gap:10px;grid-template-columns:1fr}
+@media (min-width:620px){.aic-fields{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.aic-printonly{display:none}
+@media print{
+  .aic-tool .aic-printonly{display:block!important}
+  .aic-tool .aic-screen[hidden]{display:none!important}
+  .aic-tool .aic-seg span,.aic-tool .aic-note,.aic-tool .aic-tag{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .aic-tool .aic-input{border:0;border-bottom:1px solid #999;border-radius:0;padding:2px 0}
+  .aic-tool .aic-pagebreak{break-before:page}
+  .aic-tool .aic-table tr{break-inside:avoid}
+}
+
+.aic-pd-answer{border-color:#C7D3FF;background:linear-gradient(180deg,var(--aic-blue-wash),var(--aic-card) 75%)}
+.aic-pd-big{font-size:clamp(21px,3.4vw,27px);font-weight:800;letter-spacing:-.025em;line-height:1.28}
+.aic-pd-step{padding:18px 0;border-top:1px solid var(--aic-line)}
+.aic-pd-step:first-child{border-top:0;padding-top:2px}
+.aic-pd-stephead{display:flex;justify-content:space-between;align-items:baseline;gap:14px}
+.aic-pd-o{font-size:22px;font-weight:800;color:var(--aic-blue);min-width:3.2em;text-align:right}
+.aic-pd-range{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:999px;background:var(--aic-sage);margin:14px 0 12px;cursor:pointer}
+.aic-pd-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:24px;height:24px;border-radius:50%;background:var(--aic-blue);border:3px solid #fff;box-shadow:0 2px 6px rgba(21,32,51,.25)}
+.aic-pd-range::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--aic-blue);border:3px solid #fff;box-shadow:0 2px 6px rgba(21,32,51,.25)}
+.aic-pd-range:focus-visible{outline:3px solid var(--aic-focus);outline-offset:4px}
+.aic-pd-argue{display:grid;gap:8px;grid-template-columns:1fr}
+@media (min-width:640px){.aic-pd-argue{grid-template-columns:1fr 1fr}}
+.aic-pd-argue p{font-size:13.5px;color:var(--aic-soft);background:var(--aic-paper);border-radius:12px;padding:10px 12px;margin:0}
+.aic-pd-argue strong{color:var(--aic-ink)}
+.aic-pd-flag{display:inline-flex;align-items:center;background:var(--aic-amber-wash);color:var(--aic-amber);font-weight:800;font-size:12px;letter-spacing:.04em;text-transform:uppercase;padding:6px 10px;border-radius:999px}
+.aic-pd-num{font-size:clamp(44px,9vw,64px);font-weight:800;letter-spacing:-.045em;line-height:1;margin-top:6px}
+.aic-pd-chain{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:13.5px;font-weight:700;margin-top:14px}
+.aic-pd-box{display:inline-flex;flex-direction:column;align-items:center;background:var(--aic-paper);border:1px solid var(--aic-line);border-radius:10px;padding:5px 9px;font-variant-numeric:tabular-nums;line-height:1.2}
+.aic-pd-box small{font-size:10.5px;font-weight:700;color:var(--aic-soft);text-transform:uppercase;letter-spacing:.04em}
+.aic-pd-box.is-total{background:var(--aic-amber-wash);border-color:transparent;color:var(--aic-amber)}
+.aic-pd-sens{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--aic-line);font-size:14.5px}
+.aic-pd-sens:first-child{border-top:0}
+@media (max-width:520px){.aic-pd-sens{grid-template-columns:1fr}}
+.aic-pd-sensbar{height:10px;border-radius:999px;background:var(--aic-amber)}
+.aic-pd-ul,.aic-pd-ol{display:grid;gap:10px;margin-top:10px;font-size:15px}
+.aic-pd-ul li,.aic-pd-ol li{color:var(--aic-soft)}
+.aic-pd-ul strong,.aic-pd-ol strong{color:var(--aic-ink)}
+#aic-pd-strip svg{display:block;max-width:100%}
+
+</style>
+<div class="aic-col">
+  <header>
+    <p class="aic-eyebrow">AI risk, plainly · as of November 2026</p>
+    <h1 class="aic-display aic-h1" id="aic-pd-h1">Is AI actually dangerous? Test the assumptions yourself.</h1>
+  </header>
+
+  <section class="aic-card aic-pd-answer" aria-labelledby="aic-pd-short">
+    <p class="aic-eyebrow" id="aic-pd-short">The short answer</p>
+    <p class="aic-pd-big">Yes in small ways already (scams, fakes, bad advice). Whether it becomes dangerous in big ways is a real, unresolved argument among serious people.</p>
+    <p class="aic-soft" style="margin-top:12px">The everyday dangers are real now and manageable with habits and rules. The big question turns on a handful of assumptions nobody can check yet. Below: what&rsquo;s already happening, what&rsquo;s argued about, a way to set those assumptions yourself, and what to do either way.</p>
+    <div class="aic-meta" style="margin-bottom:0"><span class="aic-pill">About 5 minutes</span><span class="aic-pill">No email, nothing stored</span></div>
+  </section>
+
+  <section class="aic-gap" aria-labelledby="aic-pd-now">
+    <p class="aic-eyebrow">What&rsquo;s already happening</p>
+    <h2 class="aic-h2" id="aic-pd-now">The small dangers are here</h2>
+    <div class="aic-grid2" style="margin-top:12px">
+      <div class="aic-card"><h3 class="aic-h3">Scams</h3><p class="aic-soft" style="font-size:15px">Scammers have used cloned voices to pose as family members and talk people into sending money. In 2025 the FBI&rsquo;s internet crime center received more than 22,000 complaints that mentioned AI, with reported losses over $893 million.</p></div>
+      <div class="aic-card"><h3 class="aic-h3">Fakes</h3><p class="aic-soft" style="font-size:15px">Fake voices, images and video are getting harder to spot. In one study cited by the 2026 International AI Safety Report, listeners mistook AI-generated voices for real speakers 80% of the time.</p></div>
+      <div class="aic-card"><h3 class="aic-h3">Bad advice</h3><p class="aic-soft" style="font-size:15px">AI tools are confidently wrong some of the time: invented sources, wrong figures, made-up policy. The harm comes when nobody checks before it reaches a customer, a patient or a court.</p></div>
+      <div class="aic-card"><h3 class="aic-h3">Leaks</h3><p class="aic-soft" style="font-size:15px">People paste private data into tools whose terms let the provider keep it. ItIt&rsquo;s the most common real AI incident in small organizations, and a page of rules prevents most of it.rsquo;s one of the most common AI incidents at work, and a page of rules prevents most of it.</p></div>
+    </div>
+  </section>
+
+  <section class="aic-gap" aria-labelledby="aic-pd-big">
+    <p class="aic-eyebrow">What serious people argue about</p>
+    <h2 class="aic-h2" id="aic-pd-big">The big question is genuinely open</h2>
+    <div class="aic-card aic-stack" style="margin-top:12px">
+      <p>The worry isn&rsquo;t today&rsquo;s chatbots. It&rsquo;s what comes next: AI that can do almost any job as well as a skilled human, and possibly AI improving AI, so progress snowballs. If systems like that don&rsquo;t reliably do what we actually want, and we can&rsquo;t correct or stop them, the result could be a worst-case outcome: humanity losing control of its future.</p>
+      <p>The 2026 International AI Safety Report, written by more than 100 experts and chaired by Yoshua Bengio, states the split plainly: some AI researchers and company leaders believe loss of control is a serious possibility, with consequences potentially including human extinction; others consider such scenarios implausible. The disagreement, it says, comes from different assumptions about what future AI will be able to do, how it will behave and how it will be deployed.</p>
+      <p>The same report finds early warning signs, not the abilities that would allow loss of control. In lab tests, models told to reach a goal &ldquo;at all costs&rdquo; have disabled simulated oversight and then given false explanations, and it&rsquo;s increasingly common for models to notice when they&rsquo;re being tested.</p>
+      <p>In May 2023 Geoffrey Hinton, Yoshua Bengio and the heads of OpenAI, Google DeepMind and Anthropic signed a one-sentence statement: &ldquo;Mitigating the risk of extinction from AI should be a global priority alongside other societal-scale risks such as pandemics and nuclear war.&rdquo; Other leading researchers, such as Yann LeCun, think the risk is negligible. In a survey of 2,778 AI researchers, the median answer put a 5% chance on extremely bad outcomes such as human extinction.</p>
+      <p class="aic-note"><strong>Words you&rsquo;ll hear.</strong> &ldquo;Making sure AI does what we actually want&rdquo; is called <em>alignment</em>. Someone&rsquo;s estimated chance of a worst-case outcome is nicknamed <em>p(doom)</em>. It&rsquo;s a personal judgment about something that has never happened, not a measurement.</p>
+    </div>
+  </section>
+
+  <section class="aic-gap" aria-labelledby="aic-pd-build">
+    <p class="aic-eyebrow">Test the assumptions</p>
+    <h2 class="aic-h2" id="aic-pd-build">Set four assumptions, see what follows</h2>
+    <p class="aic-soft" style="max-width:66ch">One simple way to break the argument down. Each slider is a chance you choose, with the strongest case on each side underneath. Nobody knows the right answers, including the experts.</p>
+    <div class="aic-row aic-noprint" style="margin-top:14px" role="group" aria-label="Start from an illustrative set of assumptions">
+      <span class="aic-small aic-soft">Or start from:</span>
+      <button type="button" class="aic-btn aic-btn-secondary aic-pd-preset" data-preset="low">Low concern</button>
+      <button type="button" class="aic-btn aic-btn-secondary aic-pd-preset" data-preset="mid">Middle</button>
+      <button type="button" class="aic-btn aic-btn-secondary aic-pd-preset" data-preset="high">High concern</button>
+    </div>
+    <p class="aic-small aic-soft" style="margin-top:6px">The presets are made up for illustration. They aren&rsquo;t anyone&rsquo;s real view.</p>
+    <div class="aic-card" style="margin-top:14px" id="aic-pd-sliders"></div>
+  </section>
+
+  <section class="aic-card aic-gap" aria-labelledby="aic-pd-toy">
+    <span class="aic-pd-flag">Educational toy · not a forecast</span>
+    <h2 class="aic-h2" id="aic-pd-toy" style="margin-top:12px">Your toy estimate of a worst-case outcome</h2>
+    <p class="aic-pd-num aic-num" id="aic-pd-out" aria-live="polite"></p>
+    <div class="aic-pd-chain" id="aic-pd-chain" aria-hidden="true"></div>
+    <p class="aic-small aic-soft" style="margin-top:12px">The toy multiplies four chances: very capable AI arrives &times; we <em>don&rsquo;t</em> get it to reliably do what we want &times; institutions <em>don&rsquo;t</em> catch it &times; we <em>don&rsquo;t</em> recover. It&rsquo;s only as good as your four guesses.</p>
+    <div class="aic-row aic-noprint" style="margin-top:16px"><button type="button" class="aic-btn aic-btn-primary" id="aic-pd-compare">Compare with what experts say</button></div>
+  </section>
+
+  <div id="aic-pd-result" hidden>
+    <section class="aic-card aic-gap aic-fade" aria-labelledby="aic-pd-cmp">
+      <p class="aic-eyebrow">How your number compares</p>
+      <h2 class="aic-h2" id="aic-pd-cmp" tabindex="-1">Named estimates run from under 0.01% to over 95%</h2>
+      <p class="aic-small aic-soft">Each gridline is ten times the one before. The estimates were given between 2020 and 2025 and don&rsquo;t measure quite the same thing: time frames and definitions of &ldquo;catastrophe&rdquo; vary. Read them as a map of the disagreement, not a scoreboard.</p>
+      <div id="aic-pd-strip" style="margin-top:12px"></div>
+      <p class="aic-small aic-soft" style="margin-top:10px">In the same survey of 2,778 researchers, between 38% and 51% gave at least a 10% chance to outcomes as bad as human extinction, depending on how the question was asked. Toby Ord, whose 1-in-10 figure is above, says each of his estimates could easily be three times higher or lower.</p>
+    </section>
+
+    <section class="aic-card aic-gap" aria-labelledby="aic-pd-sens">
+      <p class="aic-eyebrow">Sensitivity</p>
+      <h2 class="aic-h2" id="aic-pd-sens">Which of your assumptions matters most?</h2>
+      <p class="aic-small aic-soft">How far your number moves when each assumption shifts 10 points in the more worrying direction.</p>
+      <div id="aic-pd-sensrows" style="margin-top:12px"></div>
+      <p id="aic-pd-sensnote" style="margin-top:12px;font-size:15px"></p>
+    </section>
+
+    <section class="aic-card aic-gap" aria-labelledby="aic-pd-miss">
+      <p class="aic-eyebrow">The limits of the toy</p>
+      <h2 class="aic-h2" id="aic-pd-miss">What this leaves out</h2>
+      <ul class="aic-pd-ul">
+        <li><strong>The steps aren&rsquo;t independent.</strong> If AI arrives very fast, getting it to do what we want and coordinating around it probably both get harder at once. Multiplying separate guesses hides that.</li>
+        <li><strong>How you slice it changes the answer.</strong> Break the argument into more steps and the product tends to shrink; use fewer and it tends to grow. Critics on both sides make this point.</li>
+        <li><strong>Other paths to harm.</strong> Deliberate misuse, power concentrating in a few hands, or people slowly handing decisions to AI don&rsquo;t need AI to go rogue at all.</li>
+        <li><strong>Evidence, estimate or speculation.</strong> The survey figures are evidence about what researchers believe. Named numbers are estimates. Detailed stories of doom or utopia are speculation. None of them measures the future.</li>
+      </ul>
+    </section>
+  </div>
+
+  <section class="aic-gap" aria-labelledby="aic-pd-do">
+    <p class="aic-eyebrow">Whatever your number</p>
+    <h2 class="aic-h2" id="aic-pd-do">What to do either way</h2>
+    <p class="aic-soft" style="max-width:66ch">Each of these is a no-regrets move: worth doing whether your number is 0.1% or 50%, and even if AI progress stalls tomorrow.</p>
+    <div class="aic-grid2" style="margin-top:14px">
+      <div class="aic-card">
+        <h3 class="aic-h3">For you</h3>
+        <ol class="aic-pd-ol">
+          <li><strong>Agree a family code word.</strong> It beats a cloned voice in seconds.</li>
+          <li><strong>Get fluent with the tools.</strong> People who use AI know what it can and can&rsquo;t do, and argue about risk more clearly.</li>
+          <li><strong>Build some financial runway.</strong> Savings and flexible commitments help in every version of the future where work changes fast. General information, not financial advice.</li>
+          <li><strong>Check dramatic claims, in either direction.</strong> Read one optimist and one worrier, not ten headlines.</li>
+          <li><strong>Be an informed citizen.</strong> Rules on testing, transparency and accountability are being written now. Tell your representatives what you think.</li>
+        </ol>
+      </div>
+      <div class="aic-card">
+        <h3 class="aic-h3">For a business or team</h3>
+        <ol class="aic-pd-ol">
+          <li><strong>Write the one-page rule.</strong> What never goes into an AI tool, and which accounts to use.</li>
+          <li><strong>Agree the call-back rule.</strong> Urgent payment requests and new bank details get checked on a number you already had.</li>
+          <li><strong>Draw the &ldquo;human decides&rdquo; line.</strong> AI can draft; a person decides anything that moves money, makes an offer or can&rsquo;t be undone.</li>
+          <li><strong>Teach the team to check the output.</strong> Show one confident, wrong AI answer from your own field. Nothing teaches verification faster.</li>
+        </ol>
+      </div>
+    </div>
+    <p class="aic-note is-green" style="margin-top:14px">If this leaves you anxious, that&rsquo;s a normal reaction to a big, uncertain subject. Step away, talk it through with someone you trust, and if the worry is affecting your sleep or daily life, speak to a doctor or a mental-health professional.</p>
+  </section>
+
+  <div class="aic-gap" id="aic-pd-handoff"></div>
+
+  <div class="aic-foot">
+    <p>An educational explorer, not a forecast. Named estimates and survey figures as their authors stated them (2020&ndash;2025), compiled and checked November 2026. People revise their numbers; check before quoting.</p>
+    <details><summary>Sources</summary><div class="aic-details-body"><ol class="aic-src">
+      <li>International AI Safety Report 2026, Extended Summary for Policymakers, 3 February 2026 (loss of control, early warning signs, testing, cloned-voice scams, voice study). <a href="https://internationalaisafetyreport.org/publication/2026-report-extended-summary-policymakers" target="_blank" rel="noopener">internationalaisafetyreport.org</a></li>
+      <li>FBI Internet Crime Complaint Center, 2025 Internet Crime Report (22,364 AI-related complaints; $893,346,472 adjusted losses). <a href="https://www.ic3.gov/AnnualReport/Reports/2025_IC3Report.pdf" target="_blank" rel="noopener">ic3.gov</a></li>
+      <li>Grace et al., &ldquo;Thousands of AI Authors on the Future of AI&rdquo; (2,778 researchers, fielded October 2023; JAIR 2025): median 5% (mean 9%) for extremely bad outcomes; 38&ndash;51% gave at least 10% to outcomes as bad as extinction; 10% chance machines outperform humans at every task by 2027, 50% by 2047. <a href="https://arxiv.org/abs/2401.02843" target="_blank" rel="noopener">arXiv 2401.02843</a> &middot; <a href="https://jair.org/index.php/jair/article/view/19087" target="_blank" rel="noopener">JAIR</a></li>
+      <li>Center for AI Safety, Statement on AI Risk (May 2023) and signatories. <a href="https://aistatement.com/" target="_blank" rel="noopener">aistatement.com</a></li>
+      <li>Geoffrey Hinton: 10&ndash;20% chance AI wipes out humanity within 30 years, BBC Radio 4 Today, reported by The Guardian, 27 December 2024. <a href="https://www.theguardian.com/technology/2024/dec/27/godfather-of-ai-raises-odds-of-the-technology-wiping-out-humanity-over-next-30-years" target="_blank" rel="noopener">theguardian.com</a></li>
+      <li>Dario Amodei: 25% chance things go &ldquo;really, really badly&rdquo;, Axios AI+ DC Summit, 17 September 2025. <a href="https://www.axios.com/2025/09/17/anthropic-dario-amodei-p-doom-25-percent" target="_blank" rel="noopener">axios.com</a></li>
+      <li>Paul Christiano, &ldquo;My views on doom&rdquo;, 27 April 2023 (22% AI takeover; 46% humanity irreversibly messes up its future within 10 years of powerful AI). <a href="https://www.lesswrong.com/posts/xWMqsvHapP3nwdSW8/my-views-on-doom" target="_blank" rel="noopener">lesswrong.com</a></li>
+      <li>Toby Ord, The Precipice (2020): about 1 in 10 for unaligned AI this century, about 1 in 6 from all causes; each estimate could be three times higher or lower. <a href="https://theprecipice.com/" target="_blank" rel="noopener">theprecipice.com</a></li>
+      <li>Yann LeCun (&lt;0.01%, 2024), Yoshua Bengio (about 20%, ABC Background Briefing, July 2023) and Eliezer Yudkowsky (&gt;95%), as compiled on Wikipedia&rsquo;s P(doom) page. <a href="https://en.wikipedia.org/wiki/P(doom)" target="_blank" rel="noopener">wikipedia.org</a></li>
+    </ol></div></details>
+  </div>
+</div>
+
+<script>
+window.AICHANNEL_CONFIG = Object.assign({
+  resultsFormUrl: "#",      // "Email me my results" form (WordPress form page)
+  coursesUrl: "#",          // "Learn with a member" (Central AI course schedule)
+  matchUrl: "#",            // "Get matched to someone" (advisory/consulting form)
+  newsletterUrl: "#",       // separate newsletter opt-in
+  contentBaseUrl: ""        // prefix for links to sibling AI Channel pieces by slug, e.g. "/tools/" ("" = same folder)
+}, window.AICHANNEL_CONFIG || {});
+(function () {
+  'use strict';
+  var TOOL = { slug: 'p-doom-scenario-explorer', rootId: 'aic-p-doom-scenario-explorer', audience: 'individual', name: 'Is AI actually dangerous? p(doom) scenario explorer' };
+  /* ---------- Shared helpers (same in every AI Channel tool) ---------- */
+  var CFG = window.AICHANNEL_CONFIG;
+  var root = document.getElementById(TOOL.rootId);
+  if (!root) return;
+  var REDUCE = false;
+  try { REDUCE = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  var IN_FRAME = false;
+  try { IN_FRAME = window.self !== window.top; } catch (e) { IN_FRAME = true; }
+
+  function $(sel, el) { return (el || root).querySelector(sel); }
+  function $all(sel, el) { return Array.prototype.slice.call((el || root).querySelectorAll(sel)); }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function utmParams() {
+    var out = {};
+    try {
+      var p = new URLSearchParams(window.location.search);
+      p.forEach(function (v, k) { if (/^utm_/i.test(k)) out[k] = v; });
+    } catch (e) {}
+    return out;
+  }
+  function emit(name, extra) {
+    var detail = Object.assign({
+      event: name,
+      audience: TOOL.audience,
+      source_content_or_tool: TOOL.slug,
+      assessment_name: TOOL.name
+    }, extra || {});
+    try { window.dispatchEvent(new CustomEvent('aichannel:event', { detail: detail })); } catch (e) {}
+    try { if (window.parent) window.parent.postMessage(Object.assign({ type: 'aichannel:event' }, detail), '*'); } catch (e) {}
+  }
+  var LEAD_TYPES = { email_results: 'results_email', learn_with_member: 'training', get_matched: 'advisory', newsletter: 'newsletter' };
+  function handoffUrl(base, cta, result) {
+    if (!base || base === '#') return '#';
+    var f = Object.assign({
+      lead_type: LEAD_TYPES[cta] || 'other',
+      audience: TOOL.audience,
+      source_page: window.location.href,
+      source_content_or_tool: TOOL.slug,
+      cta_clicked: cta,
+      assessment_name: TOOL.name,
+      assessment_result: result && result.label,
+      score: result && result.score
+    }, utmParams());
+    var q = Object.keys(f).filter(function (k) { return f[k] !== undefined && f[k] !== null && f[k] !== ''; })
+      .map(function (k) { return encodeURIComponent(k) + '=' + encodeURIComponent(f[k]); }).join('&');
+    var hash = '', i = base.indexOf('#');
+    if (i > -1) { hash = base.slice(i); base = base.slice(0, i); }
+    return base + (base.indexOf('?') > -1 ? '&' : '?') + q + hash;
+  }
+  /* Wire a CTA link. getResult() returns {label, score} at click time. */
+  function wireCta(a, cta, cfgKey, getResult) {
+    if (!a) return;
+    function refresh() { a.href = handoffUrl(CFG[cfgKey], cta, getResult ? getResult() : null); }
+    refresh();
+    if (IN_FRAME) { a.target = '_blank'; a.rel = 'noopener'; }
+    a.addEventListener('click', function (ev) {
+      refresh();
+      var r = getResult ? getResult() : {};
+      emit('cta_clicked', { cta_clicked: cta, assessment_result: r && r.label, score: r && r.score });
+      if (a.getAttribute('href') === '#') ev.preventDefault();
+    });
+  }
+  function scrollToRoot() {
+    try {
+      var top = root.getBoundingClientRect().top;
+      if (top < 0 || top > window.innerHeight * 0.5) {
+        window.scrollTo({ top: window.pageYOffset + top - 12, behavior: REDUCE ? 'auto' : 'smooth' });
+      }
+    } catch (e) {}
+  }
+  function focusHeading(el) {
+    if (!el) return;
+    el.setAttribute('tabindex', '-1');
+    try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
+  }
+  function show(screen) {
+    $all('.aic-screen').forEach(function (s) { s.hidden = s !== screen; });
+    screen.classList.remove('aic-fade'); void screen.offsetWidth; screen.classList.add('aic-fade');
+    scrollToRoot();
+    focusHeading(screen.querySelector('[data-focus]') || screen.querySelector('h1,h2'));
+  }
+  function store(key, val) { try { sessionStorage.setItem(TOOL.slug + ':' + key, JSON.stringify(val)); } catch (e) {} }
+  function load(key) { try { var v = sessionStorage.getItem(TOOL.slug + ':' + key); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
+  function clearStore() { try { Object.keys(sessionStorage).forEach(function (k) { if (k.indexOf(TOOL.slug + ':') === 0) sessionStorage.removeItem(k); }); } catch (e) {} }
+  function contentUrl(slug) { return (CFG.contentBaseUrl || '') + slug + '.html'; }
+  var started = false;
+  function startOnce(extra) { if (started) return; started = true; emit('tool_started', extra || {}); }
+
+  /* Result hand-off: one next step, one member route, then email + newsletter. o = {
+     next:{title, body, href, label, newTab}, sol:{kind:'courses'|'match', title, body}, getResult } */
+  function renderHandoff(host, o) {
+    var solCta = o.sol.kind === 'match' ? 'get_matched' : 'learn_with_member';
+    var solKey = o.sol.kind === 'match' ? 'matchUrl' : 'coursesUrl';
+    var solLabel = o.sol.kind === 'match' ? 'Get matched to someone' : 'Learn with a member';
+    host.innerHTML =
+      '<div class="aic-grid2 aic-noprint">' +
+        '<div class="aic-card"><p class="aic-eyebrow">What to do next</p><h3 class="aic-h3">' + esc(o.next.title) + '</h3>' +
+          '<p class="aic-soft" style="font-size:15px">' + esc(o.next.body) + '</p>' +
+          '<div class="aic-row" style="margin-top:14px"><a class="aic-btn aic-btn-secondary" data-aic-next href="' + esc(o.next.href) + '">' + esc(o.next.label) + '</a></div></div>' +
+        '<div class="aic-card" style="border-color:#C7D3FF"><p class="aic-eyebrow">Need more than an answer?</p><h3 class="aic-h3">' + esc(o.sol.title) + '</h3>' +
+          '<p class="aic-soft" style="font-size:15px">' + esc(o.sol.body) + '</p>' +
+          '<div class="aic-row" style="margin-top:14px"><a class="aic-btn aic-btn-primary" data-aic-sol href="#">' + solLabel + '</a></div></div>' +
+      '</div>' +
+      '<div class="aic-keep aic-noprint">' +
+        '<a href="#" data-aic-email>Email me my results</a>' +
+        '<span class="aic-soft">Optional. It opens a short form and doesn’t sign you up to anything.</span>' +
+      '</div>' +
+      '<p class="aic-keep aic-noprint aic-soft" style="margin-top:8px">Keep up without keeping up with everything. <a href="#" data-aic-news>Get the newsletter</a></p>';
+    wireCta($('[data-aic-sol]', host), solCta, solKey, o.getResult);
+    wireCta($('[data-aic-email]', host), 'email_results', 'resultsFormUrl', o.getResult);
+    var news = $('[data-aic-news]', host);
+    news.href = CFG.newsletterUrl || '#';
+    if (IN_FRAME) { news.target = '_blank'; news.rel = 'noopener'; }
+    news.addEventListener('click', function (ev) { var r = o.getResult(); emit('cta_clicked', { cta_clicked: 'newsletter', assessment_result: r.label, score: r.score }); if (news.getAttribute('href') === '#') ev.preventDefault(); });
+    var nx = $('[data-aic-next]', host);
+    if (IN_FRAME) { nx.target = '_top'; }
+    nx.addEventListener('click', function () { var r = o.getResult(); emit('cta_clicked', { cta_clicked: 'next_step', next_step: o.next.label, assessment_result: r.label, score: r.score }); });
+  }
+  function radioQ(name, text, opts, sel, hint) {
+    return '<fieldset class="aic-q" style="margin-top:22px"><legend class="aic-qtext" style="font-size:18px;margin-bottom:12px">' + text + '</legend>' +
+      (hint ? '<p class="aic-small aic-soft" style="margin:-6px 0 12px">' + hint + '</p>' : '') +
+      '<div class="aic-opts">' + opts.map(function (o, i) {
+        return '<label class="aic-opt"><input type="radio" name="' + name + '" value="' + i + '"' + (String(sel) === String(i) ? ' checked' : '') + '><span class="aic-opt-box"><span class="aic-opt-dot" aria-hidden="true"></span><span>' + esc(o[0]) + '</span></span></label>';
+      }).join('') + '</div></fieldset>';
+  }
+  function segQ(name, legend, opts, sel) {
+    return '<fieldset><legend class="aic-seg-legend">' + esc(legend) + '</legend><div class="aic-seg">' + opts.map(function (o, i) {
+      return '<label><input type="radio" name="' + name + '" value="' + i + '"' + (String(sel) === String(i) ? ' checked' : '') + '><span>' + esc(o) + '</span></label>';
+    }).join('') + '</div></fieldset>';
+  }
+  var LOCK_SVG = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true" style="flex:none;margin-top:3px"><rect x="2" y="6" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M4.5 6V4.5a2.5 2.5 0 015 0V6" stroke="currentColor" stroke-width="1.5"/></svg>';
+
+  /* ================= Is AI actually dangerous? (p(doom) explorer) ================= */
+  var STEPS = [
+    { t: 'AI that can do almost any job as well as a skilled human arrives this century', d: 'Your chance that it’s built before 2100.', v: 70,
+      hi: 'In a survey of 2,778 AI researchers, the median answer gave a 50% chance that machines outperform humans at every task by 2047, and 10% by 2027. The computing power used to train leading models has been growing about fivefold a year.',
+      lo: 'Predictions of human-level AI have been wrong before. Today’s systems still fail in basic ways, and progress could slow on data, chips, money or energy: experts disagree on whether current trends can continue.' },
+    { t: 'We get it to reliably do what we actually want, in time', d: 'If it arrives: your chance that “making sure AI does what we want” is solved before it matters.', v: 75,
+      hi: 'Today’s systems are mostly helpful, safety research is growing, and in 2025 twelve AI companies published or updated safety frameworks describing how they’ll manage risk as models get more capable.',
+      lo: 'Models increasingly find loopholes that score well on tests without doing the intended job, and increasingly notice when they’re being tested. That makes problems harder to catch before release.' },
+    { t: 'If not, testing, rules and cooperation catch it in time', d: 'If that isn’t solved: your chance that companies, regulators and governments spot the problem and contain it.', v: 60,
+      hi: 'Governments have set up AI safety and security institutes, the EU AI Act is phasing in, and some developers have “if-then” commitments: if a model shows a dangerous ability, specific safeguards kick in.',
+      lo: 'Competition rewards speed and can squeeze testing; results from pre-release tests don’t reliably predict real-world behavior; most commitments are voluntary; and coordination between countries has been slow on other global risks.' },
+    { t: 'If something goes seriously wrong, we recover', d: 'Your chance that a serious AI failure is a painful lesson rather than a permanent one.', v: 60,
+      hi: 'Most disasters in history were recoverable. Early, limited failures could trigger much stronger rules before systems become more capable.',
+      lo: 'A system far more capable than us might not give a second chance, and some researchers argue control could be lost gradually, without one obvious moment to react.' }
+  ];
+  var NAMES = ['very capable AI arriving', 'getting it to do what we want', 'institutions catching it', 'recovery'];
+  var PRESETS = { low: [50, 95, 80, 80], mid: [70, 75, 60, 60], high: [90, 30, 30, 30] };
+  var EST = [
+    { who: 'Yann LeCun', lo: 0.0001, lt: true, label: '<0.01%', note: 'Turing Award-winning AI researcher; calls the risk negligible (as reported, 2024)' },
+    { who: 'Median surveyed AI researcher', lo: 0.05, label: '5%', note: 'Extremely bad outcomes such as human extinction (2,778 researchers, fielded Oct 2023)' },
+    { who: 'Toby Ord', lo: 0.10, label: '~10%', note: 'Existential catastrophe from unaligned AI this century (The Precipice, 2020)' },
+    { who: 'Geoffrey Hinton', lo: 0.10, hi: 0.20, label: '10–20%', note: 'AI wiping out humanity within 30 years (BBC Radio 4, Dec 2024)' },
+    { who: 'Yoshua Bengio', lo: 0.20, label: '~20%', note: 'That it “turns out catastrophic” (ABC, July 2023)' },
+    { who: 'Dario Amodei', lo: 0.25, label: '25%', note: 'That things go “really, really badly” (Anthropic CEO, Sept 2025)' },
+    { who: 'Paul Christiano', lo: 0.22, hi: 0.46, label: '22–46%', note: '22% AI takeover; 46% humanity irreversibly messes up its future within 10 years of powerful AI (2023)' },
+    { who: 'Eliezer Yudkowsky', lo: 0.95, gt: true, label: '>95%', note: 'Co-author of If Anyone Builds It, Everyone Dies (2025)' }
+  ];
+
+  $('#aic-pd-sliders').innerHTML = STEPS.map(function (s, i) {
+    var n = i + 1;
+    return '<div class="aic-pd-step"><div class="aic-pd-stephead"><label class="aic-h3" for="aic-pd-s' + n + '">' + n + '. ' + esc(s.t) + '</label><output class="aic-pd-o aic-num" for="aic-pd-s' + n + '" id="aic-pd-o' + n + '"></output></div>' +
+      '<p class="aic-small aic-soft">' + esc(s.d) + '</p>' +
+      '<input class="aic-pd-range" type="range" id="aic-pd-s' + n + '" min="1" max="99" value="' + s.v + '" aria-describedby="aic-pd-d' + n + '">' +
+      '<div class="aic-pd-argue" id="aic-pd-d' + n + '"><p><strong>Why higher:</strong> ' + esc(s.hi) + '</p><p><strong>Why lower:</strong> ' + esc(s.lo) + '</p></div></div>';
+  }).join('');
+  var sliders = [1, 2, 3, 4].map(function (i) { return $('#aic-pd-s' + i); });
+  var saved = load('sliders');
+  if (saved && saved.length === 4) sliders.forEach(function (s, i) { s.value = saved[i]; });
+  var completed = false;
+
+  function vals() { return sliders.map(function (s) { return parseInt(s.value, 10) / 100; }); }
+  function factors(v) { return [v[0], 1 - v[1], 1 - v[2], 1 - v[3]]; }
+  function toy(v) { return factors(v).reduce(function (a, b) { return a * b; }, 1); }
+  function fmtP(p) {
+    if (p < 0.0001) return '<0.01%';
+    if (p < 0.001) return (p * 100).toFixed(2) + '%';
+    if (p < 0.1) return (p * 100).toFixed(1) + '%';
+    return Math.round(p * 100) + '%';
+  }
+  function band(p) { return p < 0.01 ? 'Below 1%' : p < 0.1 ? '1 to 10%' : p < 0.5 ? '10 to 50%' : 'Above 50%'; }
+  function getResult() { var p = toy(vals()); return { label: band(p), score: Math.round(p * 1000) / 10 }; }
+
+  function update(fromUser) {
+    var v = vals(), p = toy(v), f = factors(v);
+    v.forEach(function (x, i) { $('#aic-pd-o' + (i + 1)).textContent = Math.round(x * 100) + '%'; });
+    $('#aic-pd-out').textContent = fmtP(p);
+    var lbl = ['arrives', 'not solved', 'not caught', 'no recovery'];
+    $('#aic-pd-chain').innerHTML = f.map(function (x, i) { return '<span class="aic-pd-box">' + Math.round(x * 100) + '%<small>' + lbl[i] + '</small></span>'; }).join('<span>×</span>') + '<span>=</span><span class="aic-pd-box is-total">' + fmtP(p) + '</span>';
+    if (fromUser) { startOnce({ via: 'slider' }); store('sliders', sliders.map(function (s) { return s.value; })); }
+    if (completed) renderResult(false);
+  }
+  sliders.forEach(function (s) { s.addEventListener('input', function () { update(true); }); });
+  $all('[data-preset]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var p = PRESETS[b.getAttribute('data-preset')];
+      sliders.forEach(function (s, i) { s.value = p[i]; });
+      update(true);
+    });
+  });
+
+  function strip(p) {
+    var host = $('#aic-pd-strip');
+    var W = Math.max(300, host.clientWidth || 640), narrow = W < 560;
+    var labelW = narrow ? 0 : 200, rowH = narrow ? 46 : 34, top = 8;
+    var rows = EST.concat([{ who: 'Your toy number', lo: Math.max(0.0001, p), label: fmtP(p), note: 'From your four assumptions', you: true }]);
+    var H = top + rows.length * rowH + 30, x0 = labelW + 10, x1 = W - 16;
+    function sx(v) { var lv = Math.log10(Math.max(0.0001, Math.min(1, v))); return x0 + (lv + 4) / 4 * (x1 - x0); }
+    var s = ['<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" height="' + H + '" role="img" aria-labelledby="aic-pd-svgt"><title id="aic-pd-svgt">Named estimates of an AI catastrophe on a log scale from 0.01% to 100%, with your toy number at ' + esc(fmtP(p)) + '. The same list is in the table below.</title>'];
+    [[0.0001, '0.01%'], [0.001, '0.1%'], [0.01, '1%'], [0.1, '10%'], [1, '100%']].forEach(function (t, i) {
+      var x = sx(t[0]);
+      s.push('<line x1="' + x + '" x2="' + x + '" y1="' + top + '" y2="' + (H - 22) + '" stroke="#DEE3EA" stroke-dasharray="2 4"/>');
+      s.push('<text x="' + x + '" y="' + (H - 6) + '" font-size="11" font-weight="700" fill="#667085" text-anchor="' + (i === 0 ? 'start' : i === 4 ? 'end' : 'middle') + '">' + t[1] + '</text>');
+    });
+    rows.forEach(function (r, i) {
+      var y = top + i * rowH + (narrow ? 32 : rowH / 2);
+      if (narrow) s.push('<text x="' + x0 + '" y="' + (y - 14) + '" font-size="12" font-weight="' + (r.you ? 800 : 700) + '" fill="#162033">' + esc(r.who) + ' <tspan fill="#667085" font-weight="600">' + esc(r.label) + '</tspan></text>');
+      else s.push('<text x="' + labelW + '" y="' + (y + 4) + '" text-anchor="end" font-size="12.5" font-weight="' + (r.you ? 800 : 650) + '" fill="#162033">' + esc(r.who) + '</text>');
+      s.push('<line x1="' + x0 + '" x2="' + x1 + '" y1="' + y + '" y2="' + y + '" stroke="#EEF1F6" stroke-width="1"/>');
+      var col = r.you ? '#C2410C' : '#315EFB';
+      if (r.hi) s.push('<line x1="' + sx(r.lo) + '" x2="' + sx(r.hi) + '" y1="' + y + '" y2="' + y + '" stroke="' + col + '" stroke-width="9" stroke-linecap="round"><title>' + esc(r.who + ': ' + r.label + '. ' + r.note) + '</title></line>');
+      else s.push('<circle cx="' + sx(r.lo) + '" cy="' + y + '" r="' + (r.you ? 8 : 6.5) + '" fill="' + col + '" stroke="#fff" stroke-width="2"><title>' + esc(r.who + ': ' + r.label + '. ' + r.note) + '</title></circle>');
+      if (r.lt) s.push('<text x="' + (sx(r.lo) + 12) + '" y="' + (y + 4) + '" font-size="11" font-weight="800" fill="#667085">← or lower</text>');
+      if (r.gt) s.push('<text x="' + (sx(r.lo) - 12) + '" y="' + (y + 4) + '" text-anchor="end" font-size="11" font-weight="800" fill="#667085">or higher →</text>');
+      if (!narrow && !r.lt && !r.gt) {
+        var lx = (r.hi ? sx(r.hi) : sx(r.lo)) + 12, anchor = 'start';
+        if (lx > x1 - 40) { lx = sx(r.lo) - 12; anchor = 'end'; }
+        s.push('<text x="' + lx + '" y="' + (y + 4) + '" text-anchor="' + anchor + '" font-size="11.5" font-weight="700" fill="#667085">' + esc(r.label) + '</text>');
+      }
+    });
+    s.push('</svg>');
+    var tbl = '<details style="margin-top:8px"><summary>See the estimates as a table</summary><div class="aic-details-body aic-scroll"><table class="aic-table"><thead><tr><th scope="col">Who</th><th scope="col">Estimate</th><th scope="col">What it refers to</th></tr></thead><tbody>' +
+      rows.map(function (r) { return '<tr><td>' + esc(r.who) + '</td><td class="aic-num" style="white-space:nowrap">' + esc(r.label) + '</td><td>' + esc(r.note) + '</td></tr>'; }).join('') + '</tbody></table></div></details>';
+    host.innerHTML = s.join('') + tbl;
+  }
+
+  function sensitivity(v) {
+    var base = toy(v), out = [];
+    var labels = ['Very capable AI arrives (+10 points)', 'We get it to do what we want (−10 points)', 'Institutions catch it (−10 points)', 'We recover (−10 points)'];
+    for (var i = 0; i < 4; i++) {
+      var w = v.slice();
+      w[i] = i === 0 ? Math.min(0.99, w[i] + 0.1) : Math.max(0.01, w[i] - 0.1);
+      out.push({ i: i, label: labels[i], to: toy(w), delta: toy(w) - base });
+    }
+    var max = Math.max.apply(null, out.map(function (o) { return o.delta; })) || 1;
+    $('#aic-pd-sensrows').innerHTML = out.map(function (o) {
+      return '<div class="aic-pd-sens"><div><strong>' + esc(o.label) + '</strong><br><span class="aic-soft aic-small">' + fmtP(base) + ' → ' + fmtP(o.to) + '</span></div><div aria-hidden="true"><div class="aic-pd-sensbar" style="width:' + Math.max(2, o.delta / max * 100) + '%"></div></div></div>';
+    }).join('');
+    var topS = out.slice().sort(function (a, b) { return b.delta - a.delta; })[0];
+    var ratio = base > 0 ? topS.to / base : 1;
+    $('#aic-pd-sensnote').innerHTML = '<strong>Your number is most sensitive to ' + esc(NAMES[topS.i]) + '.</strong> A 10-point shift there multiplies it by about ' + (Math.round(ratio * 10) / 10) + '. Multiply several uncertain guesses together and modest disagreements on each become huge disagreements in the answer. Experts rarely argue about the arithmetic. They argue about the inputs.';
+  }
+
+  function renderResult(fresh) {
+    var v = vals(), p = toy(v);
+    strip(p); sensitivity(v);
+    if (fresh) {
+      var r = getResult();
+      emit('tool_completed', { assessment_result: r.label, score: r.score });
+      emit('result_viewed', { assessment_result: r.label, score: r.score });
+    }
+  }
+  renderHandoff($('#aic-pd-handoff'), {
+    next: { title: 'Read the longer answer', body: 'Where the numbers come from, why they differ so much, and how to read a p(doom) figure when you see one in a headline.', href: contentUrl('ai-extinction-risk-p-doom'), label: 'AI extinction risk and p(doom), explained' },
+    sol: { kind: 'courses', title: 'Help your team understand AI risk without the hype', body: 'The everyday risks are the ones a team can act on this month: scams, leaks, confident wrong answers. A short course with a member covers how AI fails in practice, how to check it, and how to talk about the big questions calmly.' },
+    getResult: getResult
+  });
+
+  $('#aic-pd-compare').addEventListener('click', function () {
+    startOnce({ via: 'compare' });
+    $('#aic-pd-result').hidden = false;
+    completed = true;
+    renderResult(true);
+    var h = $('#aic-pd-cmp');
+    try { h.scrollIntoView({ behavior: REDUCE ? 'auto' : 'smooth', block: 'start' }); } catch (e) {}
+    try { h.focus({ preventScroll: true }); } catch (e) { h.focus(); }
+  });
+  var rt;
+  window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { if (completed) strip(toy(vals())); }, 150); });
+  update(false);
+
+})();
+</script>
+</div>
+<!-- ===== END AI CHANNEL TOOL ===== -->
+</body>
+</html>
+
+</body></html>

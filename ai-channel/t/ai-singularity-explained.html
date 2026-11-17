@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ai-singularity-explained</title><style>html,body{margin:0;background:#F7F8FA}@media (prefers-color-scheme:dark){html,body{background:#F7F8FA}}</style></head><body>
+<!--
+TITLE: What is the AI singularity?
+DESCRIPTION: The AI singularity explained without the mysticism: AI improving AI so progress snowballs, where the idea comes from, what is actually measured, and why serious people disagree.
+TYPE: article
+FILE: ai-singularity-explained.html
+AUDIENCE: Priority 1: executives, business owners, HR/L&D leads planning for change. Priority 2: individuals, educators, government.
+
+WHAT IT COVERS: The short answer (AI improving AI, so progress snowballs; a hypothesis, not a date); the three-step idea
+  with a loop diagram and its brakes (vocabulary ladder rung 4 first, then "recursive self-improvement",
+  "intelligence explosion", "singularity"); history (I. J. Good 1965, Vinge 1993 and his 30-year deadline, Kurzweil's
+  2045); what is measured (METR task-length doubling ~7 months; METR's 16-hour ceiling; METR's developer trials, 2025
+  and 2026); the argument (Forethought vs Epoch AI); timelines as ranges (2,778-researcher survey; Metaculus; Erdil);
+  the fork (AI 2027's race and slowdown endings); actions for individuals and organizations.
+
+SOURCES CHECKED (all on 4 November 2026):
+  1 Vinge 1993 essay (quote verified; includes Good 1965 quote)
+  2 Science Friday interview with Kurzweil, 14 Jun 2024 ("I'm sticking with that prediction" re 2045, verified)
+  3 METR, arXiv 2503.14499 (doubling ~7 months since 2019; may have accelerated in 2024)
+  4 METR time-horizons page (last updated 8 Sep 2026; "Measurements above 16 hrs are unreliable"; no longer updated)
+  5 METR RCT, 10 Jul 2025 (19% slower; believed 20% faster)
+  6 METR update, 24 Feb 2026 ("likely" more sped up now; data "unreliable")
+  7 MacAskill & Moorhouse, Forethought, 11 Mar 2025 (quote verified)
+  8 Erdil, Epoch AI, 26 Apr 2025 (~20-year median to automating remote work)
+  9 Grace et al., arXiv 2401.02843 / JAIR 2025 (10% 2027, 50% 2047, 13 years earlier)
+  10 Metaculus Q5121 (live; median Aug 2032 in a March 2026 snapshot, so "early 2030s"; re-check before publishing)
+  11 AI 2027 (3 Apr 2025) and the authors' later updates (medians lengthened, e.g. Lifland ~2030; Dec 2025 model
+     shifted full coding automation 3–5 years later; further revision Q1 2026)
+
+AI SAFETY FIELD SOURCES ADDED (verified on the web, 4 November 2026; numbers are the page's current numbering,
+  the list above keeps first-build numbering; the page's Sources list is authoritative and in citation order):
+  1 AISafety.info answers 8IHO (singularity "used inconsistently"), 6306, NM3Q; Stampy, How Can I Help
+  9 Forethought, Eth & Davidson, Will AI R&D Automation Cause a Software Intelligence Explosion? (26 Mar 2025)
+  11 Epoch AI, Trends in AI (training compute ~5x/year since 2020; page updated 5 Feb 2026)
+  12 now also credits AI Impacts and links its survey wiki page
+  "Go deeper" block added (further reading from the AI safety field). US-spelling pass done.
+
+WHAT CHANGED VS aidoomsdayguide.com (/takeover/ai-singularity-explained/, reviewed 20 Aug 2026):
+  The old page had a good one-line definition but the rest was the shared takeover template ("access, persistence"),
+  which doesn't apply to the singularity, plus unrelated sources. The new version explains the mechanism in plain
+  words with a diagram, gives the history with verified quotes, shows what is actually measured and its limits,
+  sets out both sides by named researchers, gives timelines as a range, uses the AI 2027 fork, and ends with
+  trigger-based actions and an AI Channel next step.
+
+HOW TO EMBED IN WORDPRESS:
+  Option A — Custom HTML block: paste everything between AIC:START and AIC:END (style + article + script). CSS is
+    scoped to .aic-article, every class is prefixed aic-, JS is a small IIFE, no network requests, no storage.
+  Option B — iframe: <iframe src="/path/ai-singularity-explained.html" title="What is the AI singularity?"
+    style="width:100%;min-height:3800px;border:0" loading="lazy"></iframe>
+
+CONFIG (window.AICHANNEL_CONFIG):
+  coursesUrl     — "Learn with a member" (member route used on this page)
+  matchUrl, newsletterUrl — not used on this page; kept for consistency
+  contentBaseUrl — prefix for sibling links, built as contentBaseUrl + slug + ".html" (default "")
+  Member links get lead_type, audience, source_page, source_content_or_tool, cta_clicked and utm_* query params.
+  Clicks fire 'aichannel:event' (CustomEvent + parent.postMessage) with event "cta_clicked".
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What is the AI singularity?</title>
+<meta name="description" content="The AI singularity explained without the mysticism: AI improving AI so progress snowballs, where the idea comes from, what is actually measured, and why serious people disagree.">
+<!-- AI Channel design A: tool design system v2 (visual layer only; no behaviour changes) -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style id="aic-theme">
+/* ---------- tokens ---------- */
+:root,html{color-scheme:light!important;
+ --pine:#2859c7!important;--pine-deep:#1945ac!important;--accent:#2859c7!important;--accent-deep:#1945ac!important;--primary:#2859c7!important;--blue:#2859c7!important;--blue-d:#1945ac!important;
+ --paper:#ffffff!important;--bg:#ffffff!important;--white:#fff!important;--card:#fff!important;--ink:#14213d!important;--ink-soft:#3f4a5c!important;--ink-mute:#5b6577!important;--muted:#3f4a5c!important;
+ --line:#d9e2f0!important;--sage:#eef3fc!important;--amber-soft:#fbf3e4!important;--accent-wash:#eef3fc!important;--blue-wash:#eef3fc!important;--sky:#eef3fc!important;--pale:#f4f7fc!important;--warm:#f4f7fc!important;
+ --serif:"Newsreader",Georgia,serif!important;--sans:"Inter",system-ui,sans-serif!important;--mono:"IBM Plex Mono",ui-monospace,monospace!important}
+html body .aic-tool,html body .aic-article{
+ --aic-paper:#ffffff!important;--aic-white:#ffffff!important;--aic-ink:#14213d!important;--aic-soft:#46526a!important;--aic-line:#d9e2f0!important;--aic-sage:#eef3fc!important;
+ --aic-blue:#2859c7!important;--aic-blue-deep:#1945ac!important;--aic-blue-soft:#eef3fc!important;--aic-on-blue:#ffffff!important;--aic-focus:#9fbcff!important;
+ --aic-grey:#46526a!important;--aic-grey-soft:#f4f7fc!important;
+ --aic-radius:16px!important;--aic-radius-sm:12px!important;--aic-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important;
+ color-scheme:light!important;background:#fff!important;color:#14213d!important;
+ font-family:"Inter",system-ui,sans-serif!important;-webkit-font-smoothing:antialiased}
+html,body{background:#fff!important}
+html body .aic-tool{padding:56px 0 96px!important}
+html body .aic-article{padding:0 0 112px!important}
+html body .aic-tool .aic-col,html body .aic-article .aic-col{max-width:860px!important}
+@media(min-width:600px){html body .aic-tool .aic-col,html body .aic-article .aic-col{padding-inline:32px!important}}
+
+/* ---------- type ---------- */
+html body .aic-tool .aic-h1,html body .aic-article h1,body h1{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important;line-height:1.02!important;font-size:clamp(38px,5.4vw,62px)!important;color:#14213d}
+html body .aic-tool .aic-h2,html body .aic-article h2,body h2{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important;line-height:1.1!important}
+html body .aic-article h2{font-size:clamp(28px,3.6vw,38px)!important;margin-top:72px!important}
+html body .aic-tool .aic-h2{font-size:clamp(26px,3.4vw,36px)!important}
+html body .aic-tool .aic-h3,html body .aic-article h3,body h3{font-family:"Newsreader",Georgia,serif!important;font-weight:550!important;letter-spacing:-.01em!important;font-size:22px!important;line-height:1.2!important}
+body h4,body h5,body h6{font-family:"Inter",system-ui,sans-serif!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow,html body .aic-tool .aic-qnum,html body .aic-tool .aic-nav-hint,.aic-mono{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;letter-spacing:.06em!important;text-transform:uppercase;font-size:12px!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow{color:#2859c7!important;display:flex!important;align-items:center;gap:12px}
+html body .aic-tool .aic-eyebrow::before,html body .aic-article .aic-head .aic-eyebrow::before{content:"";width:28px;height:1px;background:#2859c7;flex:none}
+html body .aic-tool .aic-lede,html body .aic-article .aic-lede,html body .aic-article .aic-dek{font-size:20px!important;line-height:1.55!important;color:#3f4a5c!important;max-width:60ch}
+html body .aic-tool .aic-soft,html body .aic-tool .aic-small{color:#46526a!important}
+html body .aic-tool .aic-small{font-size:14px!important}
+html body .aic-article{font-size:18.5px!important;line-height:1.72!important}
+html body .aic-article p+p{margin-top:22px!important}
+html body .aic-article .aic-head{padding:72px 0 40px!important;border-bottom:1px solid #d9e2f0;margin-bottom:48px}
+html body .aic-article .aic-meta,html body .aic-article .aic-head p:not(.aic-lede):not(.aic-dek){font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px!important;letter-spacing:.03em;color:#5b6577!important}
+html body .aic-tool a,html body .aic-article a{color:#2859c7}
+
+/* ---------- panels ---------- */
+html body .aic-tool .aic-card,html body .aic-article .aic-card{background:#fff!important;border:1px solid #d9e2f0!important;border-radius:16px!important;box-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important}
+@media(min-width:600px){html body .aic-tool .aic-card{padding:36px 40px!important}html body .aic-article .aic-card{padding:32px 36px!important}}
+html body .aic-tool .aic-stack>*+*{margin-top:20px!important}
+html body .aic-tool .aic-grid2,html body .aic-article .aic-grid{gap:16px!important}
+/* the short answer: a framed figure, like the site's tool previews */
+html body .aic-article .aic-short{background:#fff!important;border:1px solid #d9e2f0!important;box-shadow:0 0 0 10px #eef3fc,0 0 0 11px #d9e2f0!important;margin:12px 11px 56px!important;border-radius:12px!important;border-left:1px solid #d9e2f0!important}
+html body .aic-article .aic-short .aic-eyebrow,html body .aic-article .aic-short>:first-child{color:#2859c7!important}
+/* notes and callouts */
+html body .aic-tool .aic-note,html body .aic-article .aic-note,html body .aic-article .aic-callout{background:#f4f7fc!important;border-left:3px solid #2859c7!important;border-radius:0 12px 12px 0!important;padding:18px 22px!important;font-size:15.5px!important;color:#14213d!important}
+html body .aic-tool .aic-note.aic-warn{background:#fdf7ec!important;border-left-color:#a46207!important}
+html body .aic-tool .aic-note.aic-bad{background:#fdf0ee!important;border-left-color:#b42318!important}
+html body .aic-tool .aic-note.aic-good{background:#eef8f1!important;border-left-color:#2f7a4e!important}
+/* calls to action become navy bands */
+html body .aic-tool .aic-cta,html body .aic-article .aic-cta,html body .aic-tool .aic-dark,html body .aic-article .aic-dark{--aic-ink:#ffffff!important;--aic-soft:#c9d6ee!important;--aic-white:#13264a!important;--aic-line:#2a3f6a!important;--aic-blue:#9fbcff!important;--aic-blue-soft:#1d3563!important;--aic-on-blue:#13264a!important;
+ background:#13264a!important;color:#fff!important;border-color:#13264a!important;box-shadow:none!important}
+html body .aic-tool .aic-cta *:not(.aic-btn):not(.aic-btn *),html body .aic-article .aic-cta *:not(.aic-btn):not(.aic-btn *){color:inherit}
+html body .aic-tool .aic-cta .aic-btn-primary,html body .aic-article .aic-cta .aic-btn-primary{background:#fff!important;color:#13264a!important;border-color:#fff!important}
+html body .aic-tool .aic-cta a:not(.aic-btn),html body .aic-article .aic-cta a:not(.aic-btn){color:#9fbcff!important}
+
+/* ---------- questions and answer options ---------- */
+html body .aic-tool .aic-q{margin-top:28px!important}
+html body .aic-tool .aic-qnum{color:#2859c7!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;font-size:clamp(22px,2.6vw,27px)!important;line-height:1.22!important;letter-spacing:-.01em!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qhint{font-size:15px!important;color:#46526a!important;margin-bottom:18px!important}
+html body .aic-tool .aic-opts{gap:10px!important;margin-top:18px!important}
+html body .aic-tool .aic-opt,html body .aic-tool .aic-pick,html body .aic-tool .aic-check{background:#fff!important;border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:16px 18px!important;font-size:16px!important;gap:14px!important;transition:border-color .15s,box-shadow .15s,background-color .15s,transform .15s!important}
+html body .aic-tool .aic-opt:hover,html body .aic-tool .aic-pick:hover,html body .aic-tool .aic-check:hover{border-color:#2859c7!important;box-shadow:0 6px 18px rgba(40,89,199,.10)!important;transform:translateY(-1px)}
+html body .aic-tool .aic-opt[aria-checked="true"],html body .aic-tool .aic-opt[aria-pressed="true"],html body .aic-tool .aic-pick:has(input:checked),html body .aic-tool .aic-check:has(input:checked),html body .aic-tool .aic-opt:has(input:checked){border-color:#2859c7!important;background:#f4f7fc!important;box-shadow:0 0 0 3px #dbe6fb!important}
+html body .aic-tool .aic-dot{width:22px!important;height:22px!important;border:2px solid #9aa8c0!important}
+html body .aic-tool .aic-dot::after{inset:4px!important;background:#2859c7!important}
+html body .aic-tool .aic-opt[aria-checked="true"] .aic-dot{border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-size:14px!important;color:#46526a!important;margin-top:4px!important}
+html body .aic-tool .aic-opt.aic-opt-unsure{background:transparent!important;border-style:dashed!important}
+html body .aic-tool input[type=text],html body .aic-tool input[type=search],html body .aic-tool input[type=email],html body .aic-tool textarea,html body .aic-tool select,html body .aic-tool .aic-input{border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:14px 16px!important;background:#fff!important;font-size:16px!important}
+html body .aic-tool input:focus,html body .aic-tool textarea:focus,html body .aic-tool select:focus{border-color:#2859c7!important;outline:none!important;box-shadow:0 0 0 3px #dbe6fb!important}
+
+/* ---------- controls ---------- */
+html body .aic-tool .aic-btn,html body .aic-article .aic-btn{min-height:50px!important;padding:14px 24px!important;font-weight:600!important;font-size:15px!important;border-radius:999px!important;border:1.5px solid #c9d6ee!important;box-shadow:none!important}
+html body .aic-tool .aic-btn:hover,html body .aic-article .aic-btn:hover{border-color:#2859c7!important}
+html body .aic-tool .aic-btn-primary,html body .aic-article .aic-btn-primary{background:#2859c7!important;border-color:#2859c7!important;color:#fff!important}
+html body .aic-tool .aic-btn-primary:hover,html body .aic-article .aic-btn-primary:hover{background:#1945ac!important;border-color:#1945ac!important}
+html body .aic-tool .aic-btn-ghost{border-color:transparent!important;text-decoration:underline;text-underline-offset:4px;color:#3f4a5c!important}
+html body .aic-tool .aic-btn[disabled]{opacity:.4!important}
+html body .aic-tool .aic-nav{margin-top:36px!important;padding-top:24px!important;border-top:1px solid #d9e2f0!important}
+html body .aic-tool .aic-actions{gap:12px!important}
+html body .aic-tool .aic-seg{border:1.5px solid #d9e2f0!important;padding:4px!important}
+html body .aic-tool .aic-seg button{font-weight:600!important;color:#3f4a5c!important}
+html body .aic-tool .aic-seg button[aria-pressed="true"],html body .aic-tool .aic-seg button[aria-checked="true"]{background:#13264a!important;color:#fff!important}
+html body .aic-tool .aic-progress{height:4px!important;background:#e3eaf6!important;margin:20px 0 8px!important}
+html body .aic-tool .aic-progress span,html body .aic-tool .aic-progress i{background:#2859c7!important}
+html body .aic-tool .aic-chip,html body .aic-tool .aic-pill{border:1.5px solid #d9e2f0!important;background:#fff!important;font-weight:600!important;border-radius:999px!important}
+html body .aic-tool .aic-chip[aria-pressed="true"],html body .aic-tool .aic-chip.aic-on,html body .aic-tool .aic-pill.aic-on{background:#eef3fc!important;border-color:#2859c7!important;color:#1945ac!important}
+html body .aic-tool .aic-tag,html body .aic-article .aic-tag{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;padding:5px 11px!important}
+html body .aic-tool .aic-privacy{font-size:14px!important;color:#46526a!important;margin-top:20px!important}
+
+/* ---------- results ---------- */
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-stat b,html body .aic-tool .aic-stat strong,html body .aic-tool .aic-display{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important}
+html body .aic-tool .aic-bar{height:8px!important;background:#e3eaf6!important}
+html body .aic-tool .aic-bar-row{padding:14px 0!important;border-bottom-color:#e3eaf6!important}
+html body .aic-tool .aic-bar-label{font-weight:600!important}
+html body .aic-tool table,html body .aic-article table{border-collapse:collapse}
+html body .aic-tool th,html body .aic-article th{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;text-transform:uppercase;color:#2859c7!important;background:#f4f7fc!important}
+html body .aic-tool td,html body .aic-article td{border-color:#e3eaf6!important}
+html body .aic-article .aic-sources,html body .aic-tool .aic-sources{font-size:14px!important;color:#46526a!important;border-top:1px solid #d9e2f0;padding-top:32px!important;margin-top:72px!important}
+html body .aic-article .aic-related,html body .aic-article .aic-deeper{margin-top:72px!important}
+
+/* ---------- pages outside the shared system ---------- */
+body:not(:has(.aic-tool)):not(:has(.aic-article)) h1,body:not(:has(.aic-tool)):not(:has(.aic-article)) h2,body:not(:has(.aic-tool)):not(:has(.aic-article)) h3{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important}
+html,body{font-family:"Inter",system-ui,sans-serif}
+input[type=range],input[type=checkbox],input[type=radio]{accent-color:#2859c7!important}
+:focus-visible{outline-color:#2859c7!important}
+[tabindex="-1"]:focus,h1:focus,h2:focus,h3:focus{outline:none!important;box-shadow:none!important}
+
+/* ================= v3: product-grade tool shell ================= */
+html,body{background:#f4f7fc!important}
+html body .aic-tool{background:#f4f7fc!important}
+html body .aic-tool .aic-col{max-width:980px!important}
+html body .aic-tool .aic-h1{font-size:clamp(40px,5vw,62px)!important;max-width:20ch}
+html body .aic-tool .aic-grid2>.aic-card{box-shadow:none!important;background:#fff!important;border-radius:14px!important}
+html body .aic-tool.aic-in-q .aic-h1{font-size:22px!important;line-height:1.2!important;max-width:none;margin:6px 0 20px!important;font-weight:500!important}
+html body .aic-tool.aic-in-q .aic-lede,html body .aic-tool.aic-in-q > .aic-col > .aic-privacy,html body .aic-tool.aic-in-q .aic-col > * > .aic-privacy{display:none!important}
+html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:56px 64px 44px!important;border:0!important;border-radius:24px!important;box-shadow:0 1px 0 rgba(19,38,74,.05),0 30px 70px rgba(19,38,74,.10)!important;min-height:460px}
+@media(max-width:700px){html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:32px 22px 28px!important;border-radius:18px!important;min-height:0}}
+html body .aic-tool .aic-progress{height:3px!important;background:#e3eaf6!important;border-radius:0!important;margin:14px 0 36px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-size:clamp(26px,3.2vw,38px)!important;line-height:1.12!important;letter-spacing:-.02em!important;margin-bottom:12px!important;max-width:28ch}
+html body .aic-tool .aic-qhint{font-size:16px!important;margin-bottom:24px!important}
+html body .aic-tool .aic-opts{counter-reset:aicopt;gap:12px!important}
+html body .aic-tool .aic-opt{counter-increment:aicopt;align-items:center!important;min-height:64px;padding:16px 20px!important;font-size:17px!important;font-weight:500;border-radius:14px!important}
+html body .aic-tool .aic-opt .aic-dot{display:none!important}
+html body .aic-tool .aic-opt::before{content:counter(aicopt,upper-alpha);flex:none;width:30px;height:30px;display:grid;place-items:center;border:1.5px solid #c9d6ee;border-radius:8px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;font-weight:500;color:#2859c7;background:#fff;transition:all .15s}
+html body .aic-tool .aic-opt:hover::before{border-color:#2859c7}
+html body .aic-tool .aic-opt[aria-checked="true"]::before{background:#2859c7;border-color:#2859c7;color:#fff;content:"\2713"}
+html body .aic-tool .aic-opt[aria-checked="true"]{background:#eef3fc!important;box-shadow:0 0 0 2px #2859c7!important;border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-weight:400}
+html body .aic-tool .aic-nav{border-top:0!important;margin-top:40px!important;padding-top:0!important}
+html body .aic-tool .aic-nav .aic-btn-primary{min-width:150px}
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-display{font-size:clamp(56px,8vw,96px)!important;line-height:.95!important;color:#14213d}
+
+/* ================= v4: legibility ================= */
+html body .aic-tool{font-size:17px!important;line-height:1.6!important}
+html body .aic-tool,html body .aic-article{--aic-soft:#334055!important}
+html body .aic-tool .aic-small,html body .aic-tool .aic-opt-sub,html body .aic-tool .aic-privacy,html body .aic-tool .aic-nav-hint{font-size:15px!important;color:#334055!important}
+html body .aic-tool p,html body .aic-tool li{color:#1d2a44}
+html body .aic-tool .aic-lede{font-size:20px!important;color:#2a364d!important}
+html body .aic-tool .aic-note{font-size:16.5px!important}
+html body .aic-tool .aic-opt{font-size:18px!important;color:#14213d!important}
+html body .aic-tool .aic-qhint{font-size:17px!important;color:#334055!important}
+html body .aic-tool .aic-eyebrow,html body .aic-tool .aic-qnum,.aic-mono{font-size:12.5px!important;color:#2859c7!important;letter-spacing:.05em!important}
+html body .aic-tool .aic-tag{font-size:12.5px!important}
+html body .aic-tool th,html body .aic-article th{font-size:12.5px!important}
+html body .aic-tool td{font-size:16px}
+html body .aic-article{color:#14213d!important}
+html body .aic-article p,html body .aic-article li{color:#1d2a44}
+</style>
+<script>
+(function(){
+  function hsl(c){var m=c&&c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/);if(!m)return null;var r=m[1]/255,g=m[2]/255,b=m[3]/255,a=m[4]===undefined?1:+m[4];
+    var mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn,s=d?d/(1-Math.abs(2*l-1)):0,h=0;
+    if(d){h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;if(h<0)h+=360}return {h:h,s:s,l:l,a:a}}
+  function blue(c){var x=hsl(c);return x&&x.a>0.05&&x.s>0.3&&x.l>0.28&&x.l<0.95&&x.h>=205&&x.h<=240?x:null}
+  function N(x,dark,light){return x.a<0.95?"rgba(40,89,199,"+Math.min(x.a,0.12).toFixed(3)+")":(x.l>0.82?light:dark)}
+  function fix(el){var c0=getComputedStyle(el),bg=hsl(c0.backgroundColor),fg=hsl(c0.color);if(bg&&fg&&bg.a>0.9&&bg.l<0.6&&bg.s>0.3&&bg.h>=205&&bg.h<=240&&fg.l<0.6)el.style.setProperty("color","#ffffff","important");
+    if(el.closest(".aic-cta,.aic-dark")||el.matches(".aic-opt,.aic-pick,.aic-check,.aic-btn,.aic-chip,.aic-pill,.aic-seg button,.aic-card,.aic-note"))return;var cs=getComputedStyle(el),x;
+    if((x=blue(cs.color)))el.style.setProperty("color",x.l>0.75?"#eef3fc":"#2859c7","important");
+    if((x=blue(cs.backgroundColor)))el.style.setProperty("background-color",N(x,"#2859c7",x.l>0.9?"#eef3fc":"#d6e2f8"),"important");
+    if(el instanceof SVGElement){if((x=blue(cs.fill)))el.style.setProperty("fill",N(x,"#2859c7","#eef3fc"),"important");if((x=blue(cs.stroke)))el.style.setProperty("stroke",N(x,"#2859c7","#d6e2f8"),"important")}
+    if(cs.textTransform==="uppercase"&&parseFloat(cs.fontSize)<=13.5&&!el.closest("button")&&!el.classList.contains("aic-mono"))el.classList.add("aic-mono");}
+  var t;function mode(){document.querySelectorAll(".aic-tool").forEach(function(r){var q=[].some.call(r.querySelectorAll(".aic-progress,.aic-qtext,.aic-q-text"),function(e){return e.offsetParent!==null});if(q!==r.classList.contains("aic-in-q"))r.classList.toggle("aic-in-q",q)})}
+  function run(){clearTimeout(t);t=setTimeout(function(){mode();document.querySelectorAll("body *").forEach(fix)},30)}
+  document.addEventListener("DOMContentLoaded",function(){run();new MutationObserver(run).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class","aria-pressed","aria-checked","data-state"]});
+    document.addEventListener("change",run,true);document.addEventListener("click",run,true);});
+})();
+</script>
+</head>
+<body style="margin:0;background:#F7F8FA">
+<!-- ===== AIC:START — for a WordPress Custom HTML block, paste everything from here to AIC:END ===== -->
+<style>
+/* ===== AI Channel article base (scoped to .aic-article) ===== */
+.aic-article{
+  --aic-paper:#F7F8FA; --aic-white:#FFFFFF; --aic-ink:#162033; --aic-soft:#667085; --aic-line:#DEE3EA; --aic-sage:#EEF1F6;
+  --aic-blue:#315EFB; --aic-blue-deep:#2448C9; --aic-blue-soft:#EEF3FF; --aic-on-blue:#FFFFFF;
+  --aic-amber:#A46207; --aic-amber-soft:#FBF3E4; --aic-green:#2F7A4E; --aic-green-soft:#E9F5EE;
+  --aic-red:#B42318; --aic-red-soft:#FDEDEB; --aic-violet:#6D5BD0; --aic-violet-soft:#F1EFFC;
+  --aic-radius:18px; --aic-radius-sm:12px; --aic-shadow:0 10px 28px rgba(21,32,51,.055);
+  --aic-measure:68ch;
+  display:block; background:var(--aic-paper); color:var(--aic-ink);
+  font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size:18px; line-height:1.68; padding:36px 0 64px; -webkit-text-size-adjust:100%; text-align:left;
+}
+@media (prefers-color-scheme:dark){
+  .aic-article{
+    --aic-paper:#101B2D; --aic-white:#162033; --aic-ink:#F2F4F8; --aic-soft:#A6B3C7; --aic-line:#2A3850; --aic-sage:#1E2A40;
+    --aic-blue:#7A97FF; --aic-blue-deep:#9BB2FF; --aic-blue-soft:#1F2B45; --aic-on-blue:#0B1426;
+    --aic-amber:#E0A34A; --aic-amber-soft:#2D2617; --aic-green:#6FC592; --aic-green-soft:#15302A;
+    --aic-red:#F97066; --aic-red-soft:#3A1E22; --aic-violet:#A99CF0; --aic-violet-soft:#25223F; --aic-shadow:none; color-scheme:dark;
+  }
+}
+.aic-article *,.aic-article *::before,.aic-article *::after{box-sizing:border-box}
+.aic-article h1,.aic-article h2,.aic-article h3,.aic-article p,.aic-article ul,.aic-article ol,.aic-article li,.aic-article figure,.aic-article blockquote,.aic-article table{margin:0;padding:0}
+.aic-article ul,.aic-article ol{list-style:none}
+.aic-article a{color:var(--aic-blue);font-weight:650;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+.aic-article a:hover{color:var(--aic-blue-deep);text-decoration-thickness:2px}
+.aic-article :focus-visible{outline:3px solid #9DB2FF;outline-offset:2px;border-radius:6px}
+.aic-article .aic-col{max-width:calc(var(--aic-measure) + 48px);margin:0 auto;padding-inline:16px}
+@media (min-width:600px){.aic-article .aic-col{padding-inline:24px}}
+
+/* Header */
+.aic-article .aic-eyebrow{display:block;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--aic-blue);line-height:1.4}
+.aic-article .aic-h1{font-size:clamp(34px,7vw,54px);line-height:1.04;font-weight:800;letter-spacing:-.035em;margin:12px 0 14px}
+.aic-article .aic-dek{font-size:20px;line-height:1.5;color:var(--aic-soft);max-width:var(--aic-measure)}
+.aic-article .aic-meta{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:16px;font-size:13.5px;color:var(--aic-soft);font-weight:600}
+.aic-article .aic-meta span+span::before{content:"·";margin-right:14px;color:var(--aic-line)}
+
+/* Short answer */
+.aic-article .aic-answer{margin:28px 0 8px;background:var(--aic-white);border:1px solid var(--aic-line);border-left:5px solid var(--aic-blue);border-radius:var(--aic-radius);box-shadow:var(--aic-shadow);padding:22px 22px 22px 22px}
+@media (min-width:600px){.aic-article .aic-answer{padding:26px 30px}}
+.aic-article .aic-answer p{font-size:19px;line-height:1.6;margin-top:8px}
+.aic-article .aic-answer p:first-of-type{font-weight:700}
+
+/* Body */
+.aic-article .aic-body>*+*{margin-top:18px}
+.aic-article .aic-h2{font-size:clamp(25px,4.6vw,33px);line-height:1.15;font-weight:800;letter-spacing:-.03em;margin-top:52px!important;scroll-margin-top:80px}
+.aic-article .aic-h3{font-size:20px;line-height:1.3;font-weight:800;letter-spacing:-.015em;margin-top:30px!important}
+.aic-article .aic-body p{max-width:var(--aic-measure)}
+.aic-article .aic-body sup{font-size:12px;line-height:0;vertical-align:super;margin-left:1px}
+.aic-article .aic-body sup a{text-decoration:none;font-weight:800;padding:0 1px}
+.aic-article .aic-lead-in{font-weight:750}
+.aic-article .aic-bullets{max-width:var(--aic-measure)}
+.aic-article .aic-bullets li{position:relative;padding-left:22px;margin-top:10px}
+.aic-article .aic-bullets li::before{content:"";position:absolute;left:4px;top:.72em;width:7px;height:7px;border-radius:50%;background:var(--aic-blue)}
+.aic-article .aic-quote{border-left:3px solid var(--aic-line);padding:4px 0 4px 18px;font-size:19px;line-height:1.55;max-width:var(--aic-measure)}
+.aic-article .aic-quote cite{display:block;font-style:normal;font-size:14px;color:var(--aic-soft);margin-top:6px;font-weight:600}
+
+/* Evidence tags */
+.aic-article .aic-tag{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:999px;vertical-align:2px;margin-right:8px;line-height:1.5;white-space:nowrap}
+.aic-article .aic-tag-evidence{background:var(--aic-green-soft);color:var(--aic-green)}
+.aic-article .aic-tag-estimate{background:var(--aic-blue-soft);color:var(--aic-blue)}
+.aic-article .aic-tag-disputed{background:var(--aic-amber-soft);color:var(--aic-amber)}
+.aic-article .aic-tag-speculation{background:var(--aic-violet-soft);color:var(--aic-violet)}
+.aic-article .aic-tag-movie{background:var(--aic-sage);color:var(--aic-soft)}
+.aic-article .aic-key{display:flex;flex-wrap:wrap;gap:8px 4px;font-size:14px;color:var(--aic-soft);max-width:var(--aic-measure)}
+.aic-article .aic-key .aic-tag{margin-right:0}
+
+/* Cards and callouts */
+.aic-article .aic-card{background:var(--aic-white);border:1px solid var(--aic-line);border-radius:var(--aic-radius);box-shadow:var(--aic-shadow);padding:20px}
+@media (min-width:600px){.aic-article .aic-card{padding:24px 26px}}
+.aic-article .aic-note{background:var(--aic-sage);border-radius:var(--aic-radius-sm);padding:16px 18px;font-size:16px;line-height:1.6;max-width:var(--aic-measure)}
+.aic-article .aic-note strong{font-weight:800}
+.aic-article .aic-figure{margin-top:26px!important}
+.aic-article .aic-figcap{font-size:14px;color:var(--aic-soft);line-height:1.55;margin-top:10px;max-width:var(--aic-measure)}
+
+/* Chain (takeover) */
+.aic-article .aic-chain{display:grid;grid-template-columns:1fr;gap:10px;counter-reset:aicchain}
+@media (min-width:720px){.aic-article .aic-chain{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.aic-article .aic-link{position:relative;background:var(--aic-white);border:1px solid var(--aic-line);border-radius:14px;padding:14px 16px;font-size:15px;line-height:1.5}
+.aic-article .aic-link b{display:block;font-size:16.5px;letter-spacing:-.01em;margin-bottom:4px}
+.aic-article .aic-link .aic-tag{margin:8px 0 0;white-space:normal}
+.aic-article .aic-link-n{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:var(--aic-blue-soft);color:var(--aic-blue);font-weight:800;font-size:13px;margin-bottom:8px}
+
+/* Table-like status rows (scenarios) */
+.aic-article .aic-rows{border:1px solid var(--aic-line);border-radius:var(--aic-radius);overflow:hidden;background:var(--aic-white)}
+.aic-article .aic-row{display:grid;grid-template-columns:1fr;gap:6px;padding:16px 18px;border-top:1px solid var(--aic-line);font-size:15.5px;line-height:1.55}
+.aic-article .aic-row:first-child{border-top:0}
+@media (min-width:720px){.aic-article .aic-row{grid-template-columns:200px 1fr 130px;gap:18px;align-items:start}}
+.aic-article .aic-row-h{font-weight:800;font-size:16.5px;letter-spacing:-.01em;line-height:1.35}
+.aic-article .aic-row-s{text-align:left}
+@media (min-width:720px){.aic-article .aic-row-s{text-align:right}}
+.aic-article .aic-row-s .aic-tag{margin:0}
+
+/* Range chart (p(doom)) */
+.aic-article .aic-range{background:var(--aic-white);border:1px solid var(--aic-line);border-radius:var(--aic-radius);padding:18px 16px 14px;box-shadow:var(--aic-shadow)}
+@media (min-width:600px){.aic-article .aic-range{padding:22px 24px 16px}}
+.aic-article .aic-range-row{display:grid;grid-template-columns:1fr;gap:4px;padding:10px 0;border-top:1px solid var(--aic-line)}
+.aic-article .aic-range-row:first-of-type{border-top:0}
+@media (min-width:640px){.aic-article .aic-range-row{grid-template-columns:230px 1fr;gap:16px;align-items:center}}
+.aic-article .aic-range-who{font-size:14.5px;line-height:1.4}
+.aic-article .aic-range-who b{display:block;font-size:15px}
+.aic-article .aic-range-who span{color:var(--aic-soft);font-size:13px}
+.aic-article .aic-track{position:relative;height:30px;border-radius:999px;background:var(--aic-sage)}
+.aic-article .aic-dot{position:absolute;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--aic-blue);border:2px solid var(--aic-white)}
+.aic-article .aic-bar{position:absolute;top:50%;height:10px;margin-top:-5px;border-radius:999px;background:var(--aic-blue);opacity:.85}
+.aic-article .aic-val{position:absolute;top:50%;transform:translateY(-50%);font-size:12.5px;font-weight:800;white-space:nowrap;color:var(--aic-ink)}
+.aic-article .aic-axis{position:relative;height:22px;margin-top:6px;font-size:12px;color:var(--aic-soft);font-weight:700}
+@media (min-width:640px){.aic-article .aic-axis{margin-left:246px}}
+.aic-article .aic-axis span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.aic-article .aic-axis span:first-child{transform:none}
+.aic-article .aic-axis span:last-child{transform:translateX(-100%)}
+
+/* Loop SVG */
+.aic-article .aic-svg{display:block;width:100%;height:auto;max-width:520px;margin:0 auto}
+.aic-article .aic-svg .aic-s-node{fill:var(--aic-blue-soft);stroke:var(--aic-blue);stroke-width:2}
+.aic-article .aic-svg .aic-s-arrow{fill:none;stroke:var(--aic-blue);stroke-width:2.5}
+.aic-article .aic-svg .aic-s-head{fill:var(--aic-blue)}
+.aic-article .aic-svg .aic-s-brake{fill:var(--aic-amber-soft);stroke:var(--aic-amber);stroke-width:1.5}
+.aic-article .aic-svg text{fill:var(--aic-ink);font-family:inherit;font-size:18px;font-weight:700}
+.aic-article .aic-svg .aic-s-small{font-size:15px;font-weight:600;fill:var(--aic-soft)}
+.aic-article .aic-svg .aic-s-amber{fill:var(--aic-amber);font-size:14px;letter-spacing:.06em;font-weight:800}
+
+/* Checklist */
+.aic-article .aic-check{counter-reset:aicq;max-width:var(--aic-measure)}
+.aic-article .aic-check li{counter-increment:aicq;position:relative;padding:12px 0 12px 44px;border-top:1px solid var(--aic-line)}
+.aic-article .aic-check li:first-child{border-top:0}
+.aic-article .aic-check li::before{content:counter(aicq);position:absolute;left:0;top:12px;width:30px;height:30px;border-radius:50%;background:var(--aic-blue-soft);color:var(--aic-blue);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center}
+.aic-article .aic-check b{font-weight:800}
+
+/* Actions */
+.aic-article .aic-actions-grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:22px!important}
+@media (min-width:760px){.aic-article .aic-actions-grid{grid-template-columns:1fr 1fr}}
+.aic-article .aic-actions-grid h3{font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--aic-blue);margin-bottom:6px}
+.aic-article .aic-act{padding:12px 0;border-top:1px solid var(--aic-line);font-size:16px;line-height:1.55}
+.aic-article .aic-act:first-of-type{border-top:0}
+.aic-article .aic-act b{display:block;font-size:17px;letter-spacing:-.01em;margin-bottom:2px}
+.aic-article .aic-noregrets{font-size:15.5px;color:var(--aic-soft);max-width:var(--aic-measure)}
+
+/* CTA */
+.aic-article .aic-cta{margin-top:44px!important;background:var(--aic-blue-soft);border-radius:var(--aic-radius);padding:22px}
+@media (min-width:600px){.aic-article .aic-cta{padding:26px 30px}}
+.aic-article .aic-cta h2{font-size:24px;line-height:1.2;font-weight:800;letter-spacing:-.025em;margin-bottom:8px}
+.aic-article .aic-cta p{font-size:17px;max-width:var(--aic-measure)}
+.aic-article .aic-btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;align-items:center}
+.aic-article .aic-btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 20px;min-height:46px;border-radius:999px;border:1px solid var(--aic-line);background:var(--aic-white);color:var(--aic-ink);font-weight:750;font-size:15px;line-height:1.2;text-decoration:none}
+.aic-article .aic-btn:hover{border-color:#B8C7FF;text-decoration:none;color:var(--aic-ink)}
+.aic-article .aic-btn-primary{background:var(--aic-blue);border-color:var(--aic-blue);color:var(--aic-on-blue)}
+.aic-article .aic-btn-primary:hover{background:var(--aic-blue-deep);border-color:var(--aic-blue-deep);color:var(--aic-on-blue)}
+.aic-article .aic-small{font-size:14px;color:var(--aic-soft);line-height:1.55}
+
+/* Related */
+.aic-article .aic-related{display:grid;grid-template-columns:1fr;gap:10px;margin-top:16px!important}
+@media (min-width:640px){.aic-article .aic-related{grid-template-columns:1fr 1fr}}
+.aic-article .aic-related a{display:block;background:var(--aic-white);border:1px solid var(--aic-line);border-radius:14px;padding:14px 16px;text-decoration:none;color:var(--aic-ink);font-weight:750;font-size:16px;line-height:1.35}
+.aic-article .aic-related a span{display:block;font-weight:500;font-size:14px;color:var(--aic-soft);margin-top:3px}
+.aic-article .aic-related a:hover{border-color:#B8C7FF;color:var(--aic-ink)}
+/* Go deeper: further reading from the AI safety field */
+.aic-article .aic-deeper-intro{margin-top:12px!important;color:var(--aic-soft);font-size:16px;max-width:var(--aic-measure)}
+.aic-article .aic-deeper{margin-top:14px!important;max-width:var(--aic-measure);border-left:3px solid var(--aic-blue);padding-left:16px!important}
+.aic-article .aic-deeper li{margin-top:12px;font-size:16.5px;line-height:1.55;overflow-wrap:anywhere}
+.aic-article .aic-deeper li:first-child{margin-top:0}
+.aic-article .aic-deeper .aic-deeper-by{display:block;font-size:14px;color:var(--aic-soft)}
+
+/* Sources */
+.aic-article .aic-sources{counter-reset:aicsrc;font-size:14.5px;line-height:1.55;color:var(--aic-soft);margin-top:14px!important}
+.aic-article .aic-sources li{counter-increment:aicsrc;position:relative;padding:8px 0 8px 34px;border-top:1px solid var(--aic-line);overflow-wrap:anywhere}
+.aic-article .aic-sources li:first-child{border-top:0}
+.aic-article .aic-sources li::before{content:counter(aicsrc) ".";position:absolute;left:0;top:8px;font-weight:800;color:var(--aic-ink)}
+.aic-article .aic-sources li:target{background:var(--aic-blue-soft);border-radius:8px}
+.aic-article .aic-sources a{font-weight:600}
+.aic-article .aic-foot{margin-top:22px!important;font-size:14px;color:var(--aic-soft);max-width:var(--aic-measure)}
+
+@media (prefers-reduced-motion:reduce){.aic-article *{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+@media print{
+  .aic-article{background:#fff;color:#000;padding:0;font-size:12pt}
+  .aic-article .aic-cta,.aic-article .aic-related{display:none}
+  .aic-article .aic-card,.aic-article .aic-answer,.aic-article .aic-range{box-shadow:none}
+  .aic-article a{color:#000}
+  .aic-article .aic-sources a::after{content:" " attr(href);font-weight:400}
+}
+</style>
+<article class="aic-article" id="aic-ai-singularity-explained" data-aic-slug-self="ai-singularity-explained">
+<div class="aic-col" data-aic-audience="general">
+  <header>
+    <span class="aic-eyebrow">AI risk, in plain words</span>
+    <h1 class="aic-h1">What is the AI singularity?</h1>
+    <p class="aic-dek">The idea explained without the mysticism: where it comes from, what is actually being measured, and why serious people disagree about whether it happens at all.</p>
+    <p class="aic-meta"><span>Article</span><span>About 8 minutes</span><span>Last checked November 2026</span></p>
+  </header>
+
+  <section class="aic-answer" aria-labelledby="aic-sing-short">
+    <span class="aic-eyebrow" id="aic-sing-short">The short answer</span>
+    <p>It's the idea that once AI can help build better AI, progress snowballs.</p>
+    <p>Each generation builds the next one faster, until change outruns our ability to forecast it or adapt to it. It's a hypothesis, not an event on a calendar. The first part of the loop is starting to be measured. Whether it runs away or hits the limits of chips, power and real-world testing is a genuine, open argument, and the honest answer to "when?" is a range of decades, not a date.</p>
+  </section>
+
+  <div class="aic-body">
+    <h2 class="aic-h2" id="aic-sing-idea">The idea in three steps</h2>
+    <p>Today's AI tools are like very capable assistants: great at some tasks, hopeless at others. Companies are openly trying to build the next step, AI that can do most tasks a person can do at a computer. One of those tasks is AI research itself. That's the whole argument:</p>
+    <figure class="aic-figure">
+      <svg class="aic-svg" viewBox="0 0 420 356" role="img" aria-labelledby="aic-sing-loop-t aic-sing-loop-d">
+        <title id="aic-sing-loop-t">The snowball loop</title>
+        <desc id="aic-sing-loop-d">AI helps do AI research, which produces better AI, which does research faster, which loops back. Brakes on the loop: chips, power, data, and experiments that take real time.</desc>
+        <defs><marker id="aic-sing-ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="aic-s-head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+        <rect class="aic-s-node" x="110" y="10" width="200" height="64" rx="16"/>
+        <text x="210" y="37" text-anchor="middle">AI helps with</text><text x="210" y="59" text-anchor="middle">AI research</text>
+        <rect class="aic-s-node" x="232" y="188" width="180" height="64" rx="16"/>
+        <text x="322" y="215" text-anchor="middle">Better AI</text><text x="322" y="237" text-anchor="middle" class="aic-s-small">more capable models</text>
+        <rect class="aic-s-node" x="8" y="188" width="180" height="64" rx="16"/>
+        <text x="98" y="215" text-anchor="middle">Research</text><text x="98" y="237" text-anchor="middle" class="aic-s-small">goes faster</text>
+        <path class="aic-s-arrow" d="M316 62 C 350 90, 340 140, 330 182" marker-end="url(#aic-sing-ah)"/>
+        <path class="aic-s-arrow" d="M226 220 L 196 220" marker-end="url(#aic-sing-ah)"/>
+        <path class="aic-s-arrow" d="M90 182 C 80 140, 70 90, 104 62" marker-end="url(#aic-sing-ah)"/>
+        <rect class="aic-s-brake" x="20" y="276" width="380" height="72" rx="12"/>
+        <text x="210" y="302" text-anchor="middle" class="aic-s-amber">THE BRAKES</text>
+        <text x="210" y="328" text-anchor="middle" class="aic-s-small">chips · power · data · real-time experiments</text>
+      </svg>
+      <figcaption class="aic-figcap">The loop that "singularity" refers to, and the limits that might keep it from running away.</figcaption>
+    </figure>
+    <p>Insiders call this loop "recursive self-improvement" or an "intelligence explosion." The "singularity" is the point where, if the loop runs fast enough, the future stops being predictable from where we stand. It doesn't mean infinite intelligence. A feedback loop can speed things up a great deal and still level off.</p>
+    <p>The word itself is falling out of use. AISafety.info, a project founded by the AI safety educator Rob Miles, notes that "singularity" has been used inconsistently and that safety researchers now mostly talk about "takeoff speed": how fast AI goes from roughly human level to far beyond it.<sup><a href="#aic-sing-s1" aria-label="Source 1">1</a></sup></p>
+
+    <h2 class="aic-h2" id="aic-sing-history">Where the idea comes from</h2>
+    <p>It's older than ChatGPT by about sixty years. In 1965 the statistician I. J. Good wrote that "the first ultraintelligent machine is the last invention that man need ever make." In 1993 the mathematician and novelist Vernor Vinge gave it a deadline:</p>
+    <blockquote class="aic-quote">"Within thirty years, we will have the technological means to create superhuman intelligence. Shortly after, the human era will be ended."<cite>Vernor Vinge, "The Coming Technological Singularity," 1993<sup><a href="#aic-sing-s2" aria-label="Source 2">2</a></sup></cite></blockquote>
+    <p>Thirty years from 1993 was 2023. The date passed; the argument didn't. Ray Kurzweil, the best-known forecaster of the idea, has said since 2005 that it arrives around 2045, and in 2024 told an interviewer, "I'm sticking with that prediction."<sup><a href="#aic-sing-s3" aria-label="Source 3">3</a></sup> Dates come and go. That's a reason to watch the mechanism, not the calendar.</p>
+
+    <h2 class="aic-h2" id="aic-sing-measured">What is actually being measured</h2>
+    <p><span class="aic-tag aic-tag-evidence">Evidence</span>Researchers at METR, a nonprofit that tests AI systems, measure how long a task AI agents can complete, judged by how long the same task takes a skilled person. Across six years, that length doubled roughly every seven months, and the trend may have sped up in 2024.<sup><a href="#aic-sing-s4" aria-label="Source 4">4</a></sup> By 2026 METR said its own task set could no longer reliably measure anything above about 16 hours: the measuring stick had started to run out.<sup><a href="#aic-sing-s5" aria-label="Source 5">5</a></sup> The catch: these are mostly self-contained software and research tasks with clear right answers, not the messy work most jobs involve.</p>
+    <p><span class="aic-tag aic-tag-evidence">Evidence</span>Is AI already speeding up the people who build AI? Harder to say than you'd think. In a 2025 trial, experienced software developers using AI tools took 19% longer on real tasks, while believing they'd been 20% faster.<sup><a href="#aic-sing-s6" aria-label="Source 6">6</a></sup> METR's 2026 follow-up concluded developers are "likely" sped up now, but couldn't measure by how much, partly because many developers refused to work without AI for the study.<sup><a href="#aic-sing-s7" aria-label="Source 7">7</a></sup> Even the people inside the loop misjudge its speed.</p>
+
+    <h2 class="aic-h2" id="aic-sing-debate">The argument: snowball or slow burn?</h2>
+    <p><span class="aic-tag aic-tag-disputed">Disputed</span><span class="aic-lead-in">The case for a snowball.</span> William MacAskill and Fin Moorhouse, researchers at Forethought, argue that AI able to do research "could drive a century of technological progress over just a few years." Their main point isn't the technology. It's that many hard, lasting decisions (new weapons, concentrated power, how to govern all this) would arrive faster than our institutions are built to handle.<sup><a href="#aic-sing-s8" aria-label="Source 8">8</a></sup> A companion Forethought paper by Daniel Eth and Tom Davidson takes on the obvious objection, that chips can't be built fast enough. Their answer is that better software alone, on the same hardware, could keep the loop going for a while.<sup><a href="#aic-sing-s9" aria-label="Source 9">9</a></sup></p>
+    <p><span class="aic-tag aic-tag-disputed">Disputed</span><span class="aic-lead-in">The case for a slow burn.</span> Ege Erdil of Epoch AI argues that AI research is held back by computing power and data for experiments, not just by thinking time, so smarter AI alone can't make the loop run away. His central estimate is about 20 years until AI can do most remote work.<sup><a href="#aic-sing-s10" aria-label="Source 10">10</a></sup> Chips have to be built, data centers powered, and experiments run in real time. Epoch AI's own data show how much today's progress leans on that input: the computing power used to train leading language models has grown about five times a year since 2020 (as of February 2026).<sup><a href="#aic-sing-s11" aria-label="Source 11">11</a></sup></p>
+    <p><span class="aic-tag aic-tag-estimate">Estimate</span><span class="aic-lead-in">When?</span> Treat every date as a bet.</p>
+    <ul class="aic-bullets">
+      <li>A survey of 2,778 AI researchers, run by AI Impacts in late 2023, gave a 10% chance that machines outperform humans at every task by 2027 and a 50% chance by 2047. That 50% date had moved 13 years earlier in a single year.<sup><a href="#aic-sing-s12" aria-label="Source 12">12</a></sup></li>
+      <li>Forecasters on Metaculus have centered their date for general AI in the early 2030s (live forecast; it moves).<sup><a href="#aic-sing-s13" aria-label="Source 13">13</a></sup></li>
+      <li>Erdil's multi-decade view sits at the slower end; some people inside AI labs say 2030 or sooner.</li>
+    </ul>
+
+    <h2 class="aic-h2" id="aic-sing-fork">The fork: a choice, not a date</h2>
+    <p>In 2025 a team led by former OpenAI researcher Daniel Kokotajlo published AI 2027, a detailed story of AI improving AI. Its unusual feature is that it has two endings from the same starting point. In one, a race between the US and China pushes everyone to cut corners. In the other, people slow down at a key moment and things go much better.<sup><a href="#aic-sing-s14" aria-label="Source 14">14</a></sup> The authors have since pushed some of their own estimates later and revised their model more than once, which is the right way to treat a forecast.</p>
+    <p>The point of the two endings is the useful part. Whether or not the loop arrives on their schedule, how it goes depends on choices people make before it does: testing, rules, and whether competitors agree to pause when it matters.</p>
+
+    <h2 class="aic-h2" id="aic-sing-do">What you can do</h2>
+    <p>You don't need to know whether the singularity is coming to make good decisions about it. Plan for a range.</p>
+    <div class="aic-actions-grid">
+      <div class="aic-card">
+        <h3>For you</h3>
+        <div class="aic-act"><b>Pick a trigger, not a date.</b>Decide what you'd have to see to change your plans ("AI does my hardest weekly task well") and check twice a year.</div>
+        <div class="aic-act"><b>Run the one-task test.</b>List your ten most common tasks. Try a good AI tool on one of them with a clock running. Repeat every few months; that's your personal trend line.</div>
+        <div class="aic-act"><b>Build runway and skills that travel.</b>Savings, judgment, working with people and learning fast are worth having in the fast scenario and the slow one.</div>
+        <div class="aic-act"><b>Ask the questions you'd be embarrassed to ask.</b>AISafety.info's <a href="https://aisafety.info/chat/">Stampy chatbot</a> answers questions about AI safety and links its sources; it's a prototype, so check them. Its <a href="https://aisafety.info/questions/NM3Q/Intro-to-AI-safety">Intro to AI safety</a> explains why some researchers think the fast version would be dangerous, and <a href="https://aisafety.info/how-can-i-help">How Can I Help</a> lists ways to get involved.<sup><a href="#aic-sing-s1" aria-label="Source 1">1</a></sup></div>
+      </div>
+      <div class="aic-card">
+        <h3>For your organization</h3>
+        <div class="aic-act"><b>Plan on the trend, not the snapshot.</b>When you decide what not to automate, assume tools will handle longer tasks next year than this year, and check that assumption on a schedule.</div>
+        <div class="aic-act"><b>Write the if-then rule.</b>"If a competitor halves its delivery time with AI, we trial the same tools within a month." One page, two triggers, reviewed twice a year.</div>
+        <div class="aic-act"><b>Practice deciding faster.</b>If change speeds up, slow approval cycles become the bottleneck. A tabletop exercise and pre-agreed thresholds help either way.</div>
+      </div>
+    </div>
+    <p class="aic-noregrets">Each of these is a no-regrets move: worth doing even if AI progress stalls tomorrow.</p>
+
+    <section class="aic-cta" aria-labelledby="aic-sing-cta">
+      <h2 id="aic-sing-cta">Need more than an answer?</h2>
+      <p>If your team needs to understand what AI can do now, and how to keep checking as it changes, a member course gives you the working basics without the hype.</p>
+      <div class="aic-btns">
+        <a class="aic-btn aic-btn-primary" data-aic-cfg="coursesUrl" data-aic-cta="learn_with_member" href="#">Learn with a member</a>
+        <a class="aic-btn" data-aic-slug="how-ready-are-you-for-the-ai-shift" data-aic-cta="tool_readiness" href="how-ready-are-you-for-the-ai-shift.html">How ready are you?</a>
+      </div>
+    </section>
+
+    <h2 class="aic-h2" id="aic-sing-deeper">Go deeper</h2>
+    <p class="aic-deeper-intro">From the AI safety field, if you want the full argument.</p>
+    <ul class="aic-deeper">
+      <li><a href="https://www.forethought.org/research/preparing-for-the-intelligence-explosion">Preparing for the Intelligence Explosion</a><span class="aic-deeper-by">William MacAskill &amp; Fin Moorhouse, Forethought, March 2025</span>The best case for why speed, not robots, is the real problem, and what to decide before it arrives.<sup><a href="#aic-sing-s8" aria-label="Source 8">8</a></sup></li>
+      <li><a href="https://ai-2027.com/">AI 2027</a><span class="aic-deeper-by">Daniel Kokotajlo and colleagues, April 2025</span>The snowball told as a month-by-month story, with both endings. Read it as a scenario, not a prediction.<sup><a href="#aic-sing-s14" aria-label="Source 14">14</a></sup></li>
+      <li><a href="https://metr.org/time-horizons">Time horizons</a><span class="aic-deeper-by">METR, last updated September 2026</span>The closest thing to a measured speedometer for the first part of the loop.<sup><a href="#aic-sing-s5" aria-label="Source 5">5</a></sup></li>
+      <li><a href="https://epoch.ai/trends">Trends in AI</a><span class="aic-deeper-by">Epoch AI, updated February 2026</span>The brakes in numbers: chips, power, compute and money, kept up to date.<sup><a href="#aic-sing-s11" aria-label="Source 11">11</a></sup></li>
+      <li><a href="https://aisafety.info/questions/8IHO/">What are the differences between a singularity, an intelligence explosion, and a hard takeoff?</a><span class="aic-deeper-by">AISafety.info, updated November 2026</span>Untangles singularity, intelligence explosion and "takeoff," the words you will meet in further reading.<sup><a href="#aic-sing-s1" aria-label="Source 1">1</a></sup></li>
+    </ul>
+
+    <h2 class="aic-h2" id="aic-sing-related">Related</h2>
+    <div class="aic-related">
+      <a data-aic-slug="ai-extinction-risk-p-doom" href="ai-extinction-risk-p-doom.html">Could AI wipe out humanity?<span>What p(doom) means, and why the number isn't a fact.</span></a>
+      <a data-aic-slug="can-ai-take-over-the-world" href="can-ai-take-over-the-world.html">Can AI take over the world?<span>A chain of steps, not a single moment.</span></a>
+      <a data-aic-slug="ai-apocalypse-scenarios" href="ai-apocalypse-scenarios.html">What would an AI apocalypse actually look like?<span>What's realistic and what's movie plot.</span></a>
+      <a data-aic-slug="ai-and-jobs-explained" href="ai-and-jobs-explained.html">Which jobs will AI replace?<span>How to think about the debate, and what to do about it.</span></a>
+    </div>
+
+    <h2 class="aic-h2" id="aic-sing-sources">Sources</h2>
+    <ol class="aic-sources">
+      <li id="aic-sing-s1">AISafety.info, a project founded by Rob Miles and maintained by specialists and volunteers. Answers used: "What are the differences between a singularity, an intelligence explosion, and a hard takeoff?" (updated November 2026), <a href="https://aisafety.info/questions/8IHO/">aisafety.info/questions/8IHO</a>; "What is an intelligence explosion?" (updated November 2026), <a href="https://aisafety.info/questions/6306/">aisafety.info/questions/6306</a>; "Intro to AI safety" (updated November 2026), <a href="https://aisafety.info/questions/NM3Q/Intro-to-AI-safety">aisafety.info/questions/NM3Q</a>; reader routes: Stampy chatbot, <a href="https://aisafety.info/chat/">aisafety.info/chat</a> (an early prototype; it asks readers to check its sources); "How Can I Help?", <a href="https://aisafety.info/how-can-i-help">aisafety.info/how-can-i-help</a>. All checked 4 November 2026.</li>
+      <li id="aic-sing-s2">Vernor Vinge, "The Coming Technological Singularity: How to Survive in the Post-Human Era." 1993 (includes I. J. Good, "Speculations Concerning the First Ultraintelligent Machine," Advances in Computers vol. 6, 1965). <a href="https://edoras.sdsu.edu/~vinge/misc/singularity.html">edoras.sdsu.edu</a></li>
+      <li id="aic-sing-s3">Science Friday, "'The Singularity is Nearer,' Says Futurist Ray Kurzweil" (interview). 14 June 2024. <a href="https://www.sciencefriday.com/segments/ray-kurzweil-the-singularity-is-nearer-book/">sciencefriday.com</a></li>
+      <li id="aic-sing-s4">Kwa, West et al. (METR), "Measuring AI Ability to Complete Long Software Tasks." March 2025 (v4, July 2026). <a href="https://arxiv.org/abs/2503.14499">arxiv.org/abs/2503.14499</a></li>
+      <li id="aic-sing-s5">METR, "Time horizons" page (as of its last update, 8 September 2026; no longer actively updated). <a href="https://metr.org/time-horizons">metr.org/time-horizons</a></li>
+      <li id="aic-sing-s6">METR, "Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity." 10 July 2025. <a href="https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/">metr.org</a></li>
+      <li id="aic-sing-s7">METR, update on the developer productivity study. 24 February 2026. <a href="https://metr.org/blog/2026-02-24-uplift-update/">metr.org</a></li>
+      <li id="aic-sing-s8">William MacAskill &amp; Fin Moorhouse, "Preparing for the Intelligence Explosion." Forethought, 11 March 2025. <a href="https://www.forethought.org/research/preparing-for-the-intelligence-explosion">forethought.org</a></li>
+      <li id="aic-sing-s9">Daniel Eth &amp; Tom Davidson, "Will AI R&amp;D Automation Cause a Software Intelligence Explosion?" Forethought, 26 March 2025. <a href="https://www.forethought.org/research/will-ai-r-and-d-automation-cause-a-software-intelligence-explosion">forethought.org</a></li>
+      <li id="aic-sing-s10">Ege Erdil, "The case for multi-decade AI timelines." Epoch AI, 26 April 2025. <a href="https://epochai.substack.com/p/the-case-for-multi-decade-ai-timelines">epochai.substack.com</a></li>
+      <li id="aic-sing-s11">Epoch AI, "Trends in AI" (training compute for frontier language models growing about 5× per year since 2020; page updated 5 February 2026). <a href="https://epoch.ai/trends">epoch.ai/trends</a></li>
+      <li id="aic-sing-s12">Grace et al., "Thousands of AI Authors on the Future of AI." Survey fielded October 2023; Journal of Artificial Intelligence Research 84 (2025). <a href="https://arxiv.org/abs/2401.02843">arxiv.org/abs/2401.02843</a>; AI Impacts, "2023 Expert Survey on Progress in AI" (survey page): <a href="https://wiki.aiimpacts.org/ai_timelines/predictions_of_human-level_ai_timelines/ai_timeline_surveys/2023_expert_survey_on_progress_in_ai">wiki.aiimpacts.org</a></li>
+      <li id="aic-sing-s13">Metaculus, "Date of Artificial General Intelligence" (question 5121). Live community forecast; early 2030s as of a March 2026 snapshot. <a href="https://www.metaculus.com/questions/5121/date-of-artificial-general-intelligence/">metaculus.com</a></li>
+      <li id="aic-sing-s14">Kokotajlo, Alexander, Larsen, Lifland &amp; Dean, "AI 2027." 3 April 2025, with later timeline updates on the same site. <a href="https://ai-2027.com/">ai-2027.com</a></li>
+    </ol>
+    <p class="aic-foot">This article explains ideas; it doesn't take a side on when powerful AI arrives. Forecasts move, so check the linked sources for today's numbers. All sources last checked November 2026.</p>
+  </div>
+</div>
+</article>
+<script>
+window.AICHANNEL_CONFIG = Object.assign({
+  coursesUrl: "#",      // "Learn with a member" (Central AI course schedule)
+  matchUrl: "#",        // "Get matched to someone" (advisory/consulting form)
+  newsletterUrl: "#",   // separate newsletter opt-in
+  contentBaseUrl: ""    // prefix for sibling pieces: contentBaseUrl + slug + ".html"
+}, window.AICHANNEL_CONFIG || {});
+(function () {
+  'use strict';
+  var SLUG = 'ai-singularity-explained';
+  var root = document.getElementById('aic-' + SLUG);
+  if (!root) return;
+  var cfg = window.AICHANNEL_CONFIG || {};
+
+  // Sibling pieces: contentBaseUrl + slug + ".html"
+  Array.prototype.forEach.call(root.querySelectorAll('[data-aic-slug]'), function (a) {
+    a.setAttribute('href', (cfg.contentBaseUrl || '') + a.getAttribute('data-aic-slug') + '.html');
+  });
+
+  // Member routes and newsletter
+  function withParams(url, cta) {
+    if (!url || url === '#') return url || '#';
+    var p = new URLSearchParams();
+    p.set('lead_type', cta === 'newsletter' ? 'newsletter' : 'article');
+    var audEl = root.querySelector('[data-aic-audience]');
+    p.set('audience', (audEl && audEl.getAttribute('data-aic-audience')) || 'general');
+    p.set('source_page', location.href);
+    p.set('source_content_or_tool', SLUG);
+    p.set('cta_clicked', cta);
+    try {
+      new URLSearchParams(location.search).forEach(function (v, k) { if (k.indexOf('utm_') === 0) p.set(k, v); });
+    } catch (e) {}
+    return url + (url.indexOf('?') > -1 ? '&' : '?') + p.toString();
+  }
+  Array.prototype.forEach.call(root.querySelectorAll('[data-aic-cfg]'), function (a) {
+    var key = a.getAttribute('data-aic-cfg');
+    a.setAttribute('href', withParams(cfg[key], a.getAttribute('data-aic-cta') || key));
+  });
+
+  // Tracking: CustomEvent + postMessage (no direct analytics calls)
+  function emit(name, extra) {
+    var detail = { event: name, source_content_or_tool: SLUG, source_page: location.href };
+    for (var k in extra) detail[k] = extra[k];
+    try { window.dispatchEvent(new CustomEvent('aichannel:event', { detail: detail })); } catch (e) {}
+    try { if (window.parent && window.parent !== window) window.parent.postMessage(Object.assign({ type: 'aichannel:event' }, detail), '*'); } catch (e) {}
+  }
+  root.addEventListener('click', function (ev) {
+    var a = ev.target.closest ? ev.target.closest('a[data-aic-cta]') : null;
+    if (a && root.contains(a)) emit('cta_clicked', { cta_clicked: a.getAttribute('data-aic-cta') });
+  });
+})();
+</script>
+<!-- ===== AIC:END ===== -->
+</body>
+</html>
+
+</body></html>

@@ -1,0 +1,1015 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>which-ai-skills-does-your-team-actually-need</title><style>html,body{margin:0;background:#F7F8FA}@media (prefers-color-scheme:dark){html,body{background:#F7F8FA}}</style></head><body>
+<!--
+  Written in house voice from the start, 4 Nov 2026.
+  TOOL: Which AI Skills Does Your Team Actually Need?
+  Slug: which-ai-skills-does-your-team-actually-need
+  Audience: HR, L&D and team leads (Priority 1: the people who buy training for their teams).
+  Companion to: which-parts-of-your-teams-work-could-ai-change-first (linked from the result as
+  "See which tasks change first").
+
+  WHAT IT DOES
+  The team lead adds the roles on their team (pick from 22 common roles or type one, with the kind of
+  work and whether it handles personal or confidential data) and headcount, then answers six plain
+  questions: how the team uses AI today, what's allowed, whether someone would catch a wrong figure,
+  whether a tool is being bought, what worries them, and whether they operate in the EU.
+  The result is a skills plan across six skills: using AI tools well on real tasks; checking outputs and
+  knowing when not to trust AI; data and privacy judgment; writing the team's AI rule; redesigning a
+  workflow; evaluating AI tools and vendors. Each is marked Everyone / Some people / One or two people,
+  put in the order to build them, given a first session (one-task test, lunch-hour show-and-tell, etc.),
+  and shown by role in a table. Skills the team doesn't need now are marked "You don't need this yet"
+  (or "You have this already"). Everything runs in the browser. Nothing is stored or sent unless the
+  user clicks a link.
+
+  LOGIC (rule-based, editorial; not a validated diagnostic)
+  - Coverage per skill and per role comes from the answers and each role's kind of work (see roleCells()).
+  - Order comes from a priority number per skill (see priorities()): e.g. no written rule puts the rule
+    first; "probably not" on catching a wrong figure puts checking first; worries add weight.
+  - Workflow redesign is "not yet" when nobody uses AI; vendor evaluation is "not yet" when nothing is
+    being bought and vendors aren't a worry; the rule is "you have this" when a written rule exists.
+
+  FACTS AND SOURCES (checked 4 Nov 2026)
+  - EU AI Act (Regulation (EU) 2024/1689) Article 4, AI literacy: applies from 2 February 2025. Amended by
+    Regulation (EU) 2026/1744 (the "Digital Omnibus" on AI; in force late July 2026): providers and
+    deployers "shall take measures to support the development of AI literacy"; the duty "does not require
+    providers or deployers to guarantee any specific level of AI literacy". Checked at
+    https://artificialintelligenceact.eu/article/4/ and ki-campus.org (28 Jul 2026) on 4 Nov 2026.
+    EUR-Lex did not render for checking; confirm the OJ text before quoting it further.
+  - WEF Future of Jobs Report 2025 (published 7 Jan 2025): skills gaps are the biggest barrier to business
+    transformation, cited by 63% of employers. weforum.org press release, checked via search 4 Nov 2026.
+  - No other figures are used. TO UPDATE: edit the EU note in buildNotes() and the sources list.
+
+  EMBED IN WORDPRESS
+  Option A (Custom HTML block): paste everything between "AIC:BEGIN" and "AIC:END" below.
+  Option B (iframe): upload this file and embed it, e.g.
+    <iframe src="/tools/which-ai-skills-does-your-team-actually-need.html" style="width:100%;border:0;min-height:1400px" title="Which AI skills does your team actually need?"></iframe>
+  Set window.AICHANNEL_CONFIG before the tool (or edit the config block at the top of the script):
+    resultsFormUrl  "Email me my results" form page (receives lead_type, audience=hr, source_page,
+                    source_content_or_tool, cta_clicked, assessment_name, assessment_result, utm_*)
+    coursesUrl      "Learn with a member" (team AI training / course schedule)
+    matchUrl        "Get matched to someone" (advisory: tool choice, workflow redesign)
+    newsletterUrl   separate newsletter opt-in (never auto-subscribed)
+    contentBaseUrl  prefix for sibling tools, built as contentBaseUrl + slug + ".html" (default "")
+    linkTarget      optional; "_top" when embedded in an iframe so links open the full page
+  EVENTS: window "aichannel:event" CustomEvent + parent.postMessage({type:"aichannel:event", ...}) for
+  tool_started, tool_completed, result_viewed, cta_clicked. No analytics calls are made by the tool.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Which AI skills does your team actually need? | AI Channel</title>
+<meta name="description" content="Add the roles on your team and answer six plain questions. Get a skills plan by role: who needs what, in what order, and what you don't need yet. About five minutes, no email required.">
+<!-- AI Channel design A: tool design system v2 (visual layer only; no behaviour changes) -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style id="aic-theme">
+/* ---------- tokens ---------- */
+:root,html{color-scheme:light!important;
+ --pine:#2859c7!important;--pine-deep:#1945ac!important;--accent:#2859c7!important;--accent-deep:#1945ac!important;--primary:#2859c7!important;--blue:#2859c7!important;--blue-d:#1945ac!important;
+ --paper:#ffffff!important;--bg:#ffffff!important;--white:#fff!important;--card:#fff!important;--ink:#14213d!important;--ink-soft:#3f4a5c!important;--ink-mute:#5b6577!important;--muted:#3f4a5c!important;
+ --line:#d9e2f0!important;--sage:#eef3fc!important;--amber-soft:#fbf3e4!important;--accent-wash:#eef3fc!important;--blue-wash:#eef3fc!important;--sky:#eef3fc!important;--pale:#f4f7fc!important;--warm:#f4f7fc!important;
+ --serif:"Newsreader",Georgia,serif!important;--sans:"Inter",system-ui,sans-serif!important;--mono:"IBM Plex Mono",ui-monospace,monospace!important}
+html body .aic-tool,html body .aic-article{
+ --aic-paper:#ffffff!important;--aic-white:#ffffff!important;--aic-ink:#14213d!important;--aic-soft:#46526a!important;--aic-line:#d9e2f0!important;--aic-sage:#eef3fc!important;
+ --aic-blue:#2859c7!important;--aic-blue-deep:#1945ac!important;--aic-blue-soft:#eef3fc!important;--aic-on-blue:#ffffff!important;--aic-focus:#9fbcff!important;
+ --aic-grey:#46526a!important;--aic-grey-soft:#f4f7fc!important;
+ --aic-radius:16px!important;--aic-radius-sm:12px!important;--aic-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important;
+ color-scheme:light!important;background:#fff!important;color:#14213d!important;
+ font-family:"Inter",system-ui,sans-serif!important;-webkit-font-smoothing:antialiased}
+html,body{background:#fff!important}
+html body .aic-tool{padding:56px 0 96px!important}
+html body .aic-article{padding:0 0 112px!important}
+html body .aic-tool .aic-col,html body .aic-article .aic-col{max-width:860px!important}
+@media(min-width:600px){html body .aic-tool .aic-col,html body .aic-article .aic-col{padding-inline:32px!important}}
+
+/* ---------- type ---------- */
+html body .aic-tool .aic-h1,html body .aic-article h1,body h1{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important;line-height:1.02!important;font-size:clamp(38px,5.4vw,62px)!important;color:#14213d}
+html body .aic-tool .aic-h2,html body .aic-article h2,body h2{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important;line-height:1.1!important}
+html body .aic-article h2{font-size:clamp(28px,3.6vw,38px)!important;margin-top:72px!important}
+html body .aic-tool .aic-h2{font-size:clamp(26px,3.4vw,36px)!important}
+html body .aic-tool .aic-h3,html body .aic-article h3,body h3{font-family:"Newsreader",Georgia,serif!important;font-weight:550!important;letter-spacing:-.01em!important;font-size:22px!important;line-height:1.2!important}
+body h4,body h5,body h6{font-family:"Inter",system-ui,sans-serif!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow,html body .aic-tool .aic-qnum,html body .aic-tool .aic-nav-hint,.aic-mono{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;letter-spacing:.06em!important;text-transform:uppercase;font-size:12px!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow{color:#2859c7!important;display:flex!important;align-items:center;gap:12px}
+html body .aic-tool .aic-eyebrow::before,html body .aic-article .aic-head .aic-eyebrow::before{content:"";width:28px;height:1px;background:#2859c7;flex:none}
+html body .aic-tool .aic-lede,html body .aic-article .aic-lede,html body .aic-article .aic-dek{font-size:20px!important;line-height:1.55!important;color:#3f4a5c!important;max-width:60ch}
+html body .aic-tool .aic-soft,html body .aic-tool .aic-small{color:#46526a!important}
+html body .aic-tool .aic-small{font-size:14px!important}
+html body .aic-article{font-size:18.5px!important;line-height:1.72!important}
+html body .aic-article p+p{margin-top:22px!important}
+html body .aic-article .aic-head{padding:72px 0 40px!important;border-bottom:1px solid #d9e2f0;margin-bottom:48px}
+html body .aic-article .aic-meta,html body .aic-article .aic-head p:not(.aic-lede):not(.aic-dek){font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px!important;letter-spacing:.03em;color:#5b6577!important}
+html body .aic-tool a,html body .aic-article a{color:#2859c7}
+
+/* ---------- panels ---------- */
+html body .aic-tool .aic-card,html body .aic-article .aic-card{background:#fff!important;border:1px solid #d9e2f0!important;border-radius:16px!important;box-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important}
+@media(min-width:600px){html body .aic-tool .aic-card{padding:36px 40px!important}html body .aic-article .aic-card{padding:32px 36px!important}}
+html body .aic-tool .aic-stack>*+*{margin-top:20px!important}
+html body .aic-tool .aic-grid2,html body .aic-article .aic-grid{gap:16px!important}
+/* the short answer: a framed figure, like the site's tool previews */
+html body .aic-article .aic-short{background:#fff!important;border:1px solid #d9e2f0!important;box-shadow:0 0 0 10px #eef3fc,0 0 0 11px #d9e2f0!important;margin:12px 11px 56px!important;border-radius:12px!important;border-left:1px solid #d9e2f0!important}
+html body .aic-article .aic-short .aic-eyebrow,html body .aic-article .aic-short>:first-child{color:#2859c7!important}
+/* notes and callouts */
+html body .aic-tool .aic-note,html body .aic-article .aic-note,html body .aic-article .aic-callout{background:#f4f7fc!important;border-left:3px solid #2859c7!important;border-radius:0 12px 12px 0!important;padding:18px 22px!important;font-size:15.5px!important;color:#14213d!important}
+html body .aic-tool .aic-note.aic-warn{background:#fdf7ec!important;border-left-color:#a46207!important}
+html body .aic-tool .aic-note.aic-bad{background:#fdf0ee!important;border-left-color:#b42318!important}
+html body .aic-tool .aic-note.aic-good{background:#eef8f1!important;border-left-color:#2f7a4e!important}
+/* calls to action become navy bands */
+html body .aic-tool .aic-cta,html body .aic-article .aic-cta,html body .aic-tool .aic-dark,html body .aic-article .aic-dark{--aic-ink:#ffffff!important;--aic-soft:#c9d6ee!important;--aic-white:#13264a!important;--aic-line:#2a3f6a!important;--aic-blue:#9fbcff!important;--aic-blue-soft:#1d3563!important;--aic-on-blue:#13264a!important;
+ background:#13264a!important;color:#fff!important;border-color:#13264a!important;box-shadow:none!important}
+html body .aic-tool .aic-cta *:not(.aic-btn):not(.aic-btn *),html body .aic-article .aic-cta *:not(.aic-btn):not(.aic-btn *){color:inherit}
+html body .aic-tool .aic-cta .aic-btn-primary,html body .aic-article .aic-cta .aic-btn-primary{background:#fff!important;color:#13264a!important;border-color:#fff!important}
+html body .aic-tool .aic-cta a:not(.aic-btn),html body .aic-article .aic-cta a:not(.aic-btn){color:#9fbcff!important}
+
+/* ---------- questions and answer options ---------- */
+html body .aic-tool .aic-q{margin-top:28px!important}
+html body .aic-tool .aic-qnum{color:#2859c7!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;font-size:clamp(22px,2.6vw,27px)!important;line-height:1.22!important;letter-spacing:-.01em!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qhint{font-size:15px!important;color:#46526a!important;margin-bottom:18px!important}
+html body .aic-tool .aic-opts{gap:10px!important;margin-top:18px!important}
+html body .aic-tool .aic-opt,html body .aic-tool .aic-pick,html body .aic-tool .aic-check{background:#fff!important;border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:16px 18px!important;font-size:16px!important;gap:14px!important;transition:border-color .15s,box-shadow .15s,background-color .15s,transform .15s!important}
+html body .aic-tool .aic-opt:hover,html body .aic-tool .aic-pick:hover,html body .aic-tool .aic-check:hover{border-color:#2859c7!important;box-shadow:0 6px 18px rgba(40,89,199,.10)!important;transform:translateY(-1px)}
+html body .aic-tool .aic-opt[aria-checked="true"],html body .aic-tool .aic-opt[aria-pressed="true"],html body .aic-tool .aic-pick:has(input:checked),html body .aic-tool .aic-check:has(input:checked),html body .aic-tool .aic-opt:has(input:checked){border-color:#2859c7!important;background:#f4f7fc!important;box-shadow:0 0 0 3px #dbe6fb!important}
+html body .aic-tool .aic-dot{width:22px!important;height:22px!important;border:2px solid #9aa8c0!important}
+html body .aic-tool .aic-dot::after{inset:4px!important;background:#2859c7!important}
+html body .aic-tool .aic-opt[aria-checked="true"] .aic-dot{border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-size:14px!important;color:#46526a!important;margin-top:4px!important}
+html body .aic-tool .aic-opt.aic-opt-unsure{background:transparent!important;border-style:dashed!important}
+html body .aic-tool input[type=text],html body .aic-tool input[type=search],html body .aic-tool input[type=email],html body .aic-tool textarea,html body .aic-tool select,html body .aic-tool .aic-input{border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:14px 16px!important;background:#fff!important;font-size:16px!important}
+html body .aic-tool input:focus,html body .aic-tool textarea:focus,html body .aic-tool select:focus{border-color:#2859c7!important;outline:none!important;box-shadow:0 0 0 3px #dbe6fb!important}
+
+/* ---------- controls ---------- */
+html body .aic-tool .aic-btn,html body .aic-article .aic-btn{min-height:50px!important;padding:14px 24px!important;font-weight:600!important;font-size:15px!important;border-radius:999px!important;border:1.5px solid #c9d6ee!important;box-shadow:none!important}
+html body .aic-tool .aic-btn:hover,html body .aic-article .aic-btn:hover{border-color:#2859c7!important}
+html body .aic-tool .aic-btn-primary,html body .aic-article .aic-btn-primary{background:#2859c7!important;border-color:#2859c7!important;color:#fff!important}
+html body .aic-tool .aic-btn-primary:hover,html body .aic-article .aic-btn-primary:hover{background:#1945ac!important;border-color:#1945ac!important}
+html body .aic-tool .aic-btn-ghost{border-color:transparent!important;text-decoration:underline;text-underline-offset:4px;color:#3f4a5c!important}
+html body .aic-tool .aic-btn[disabled]{opacity:.4!important}
+html body .aic-tool .aic-nav{margin-top:36px!important;padding-top:24px!important;border-top:1px solid #d9e2f0!important}
+html body .aic-tool .aic-actions{gap:12px!important}
+html body .aic-tool .aic-seg{border:1.5px solid #d9e2f0!important;padding:4px!important}
+html body .aic-tool .aic-seg button{font-weight:600!important;color:#3f4a5c!important}
+html body .aic-tool .aic-seg button[aria-pressed="true"],html body .aic-tool .aic-seg button[aria-checked="true"]{background:#13264a!important;color:#fff!important}
+html body .aic-tool .aic-progress{height:4px!important;background:#e3eaf6!important;margin:20px 0 8px!important}
+html body .aic-tool .aic-progress span,html body .aic-tool .aic-progress i{background:#2859c7!important}
+html body .aic-tool .aic-chip,html body .aic-tool .aic-pill{border:1.5px solid #d9e2f0!important;background:#fff!important;font-weight:600!important;border-radius:999px!important}
+html body .aic-tool .aic-chip[aria-pressed="true"],html body .aic-tool .aic-chip.aic-on,html body .aic-tool .aic-pill.aic-on{background:#eef3fc!important;border-color:#2859c7!important;color:#1945ac!important}
+html body .aic-tool .aic-tag,html body .aic-article .aic-tag{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;padding:5px 11px!important}
+html body .aic-tool .aic-privacy{font-size:14px!important;color:#46526a!important;margin-top:20px!important}
+
+/* ---------- results ---------- */
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-stat b,html body .aic-tool .aic-stat strong,html body .aic-tool .aic-display{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important}
+html body .aic-tool .aic-bar{height:8px!important;background:#e3eaf6!important}
+html body .aic-tool .aic-bar-row{padding:14px 0!important;border-bottom-color:#e3eaf6!important}
+html body .aic-tool .aic-bar-label{font-weight:600!important}
+html body .aic-tool table,html body .aic-article table{border-collapse:collapse}
+html body .aic-tool th,html body .aic-article th{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;text-transform:uppercase;color:#2859c7!important;background:#f4f7fc!important}
+html body .aic-tool td,html body .aic-article td{border-color:#e3eaf6!important}
+html body .aic-article .aic-sources,html body .aic-tool .aic-sources{font-size:14px!important;color:#46526a!important;border-top:1px solid #d9e2f0;padding-top:32px!important;margin-top:72px!important}
+html body .aic-article .aic-related,html body .aic-article .aic-deeper{margin-top:72px!important}
+
+/* ---------- pages outside the shared system ---------- */
+body:not(:has(.aic-tool)):not(:has(.aic-article)) h1,body:not(:has(.aic-tool)):not(:has(.aic-article)) h2,body:not(:has(.aic-tool)):not(:has(.aic-article)) h3{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important}
+html,body{font-family:"Inter",system-ui,sans-serif}
+input[type=range],input[type=checkbox],input[type=radio]{accent-color:#2859c7!important}
+:focus-visible{outline-color:#2859c7!important}
+[tabindex="-1"]:focus,h1:focus,h2:focus,h3:focus{outline:none!important;box-shadow:none!important}
+
+/* ================= v3: product-grade tool shell ================= */
+html,body{background:#f4f7fc!important}
+html body .aic-tool{background:#f4f7fc!important}
+html body .aic-tool .aic-col{max-width:980px!important}
+html body .aic-tool .aic-h1{font-size:clamp(40px,5vw,62px)!important;max-width:20ch}
+html body .aic-tool .aic-grid2>.aic-card{box-shadow:none!important;background:#fff!important;border-radius:14px!important}
+html body .aic-tool.aic-in-q .aic-h1{font-size:22px!important;line-height:1.2!important;max-width:none;margin:6px 0 20px!important;font-weight:500!important}
+html body .aic-tool.aic-in-q .aic-lede,html body .aic-tool.aic-in-q > .aic-col > .aic-privacy,html body .aic-tool.aic-in-q .aic-col > * > .aic-privacy{display:none!important}
+html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:56px 64px 44px!important;border:0!important;border-radius:24px!important;box-shadow:0 1px 0 rgba(19,38,74,.05),0 30px 70px rgba(19,38,74,.10)!important;min-height:460px}
+@media(max-width:700px){html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:32px 22px 28px!important;border-radius:18px!important;min-height:0}}
+html body .aic-tool .aic-progress{height:3px!important;background:#e3eaf6!important;border-radius:0!important;margin:14px 0 36px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-size:clamp(26px,3.2vw,38px)!important;line-height:1.12!important;letter-spacing:-.02em!important;margin-bottom:12px!important;max-width:28ch}
+html body .aic-tool .aic-qhint{font-size:16px!important;margin-bottom:24px!important}
+html body .aic-tool .aic-opts{counter-reset:aicopt;gap:12px!important}
+html body .aic-tool .aic-opt{counter-increment:aicopt;align-items:center!important;min-height:64px;padding:16px 20px!important;font-size:17px!important;font-weight:500;border-radius:14px!important}
+html body .aic-tool .aic-opt .aic-dot{display:none!important}
+html body .aic-tool .aic-opt::before{content:counter(aicopt,upper-alpha);flex:none;width:30px;height:30px;display:grid;place-items:center;border:1.5px solid #c9d6ee;border-radius:8px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;font-weight:500;color:#2859c7;background:#fff;transition:all .15s}
+html body .aic-tool .aic-opt:hover::before{border-color:#2859c7}
+html body .aic-tool .aic-opt[aria-checked="true"]::before{background:#2859c7;border-color:#2859c7;color:#fff;content:"\2713"}
+html body .aic-tool .aic-opt[aria-checked="true"]{background:#eef3fc!important;box-shadow:0 0 0 2px #2859c7!important;border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-weight:400}
+html body .aic-tool .aic-nav{border-top:0!important;margin-top:40px!important;padding-top:0!important}
+html body .aic-tool .aic-nav .aic-btn-primary{min-width:150px}
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-display{font-size:clamp(56px,8vw,96px)!important;line-height:.95!important;color:#14213d}
+
+/* ================= v4: legibility ================= */
+html body .aic-tool{font-size:17px!important;line-height:1.6!important}
+html body .aic-tool,html body .aic-article{--aic-soft:#334055!important}
+html body .aic-tool .aic-small,html body .aic-tool .aic-opt-sub,html body .aic-tool .aic-privacy,html body .aic-tool .aic-nav-hint{font-size:15px!important;color:#334055!important}
+html body .aic-tool p,html body .aic-tool li{color:#1d2a44}
+html body .aic-tool .aic-lede{font-size:20px!important;color:#2a364d!important}
+html body .aic-tool .aic-note{font-size:16.5px!important}
+html body .aic-tool .aic-opt{font-size:18px!important;color:#14213d!important}
+html body .aic-tool .aic-qhint{font-size:17px!important;color:#334055!important}
+html body .aic-tool .aic-eyebrow,html body .aic-tool .aic-qnum,.aic-mono{font-size:12.5px!important;color:#2859c7!important;letter-spacing:.05em!important}
+html body .aic-tool .aic-tag{font-size:12.5px!important}
+html body .aic-tool th,html body .aic-article th{font-size:12.5px!important}
+html body .aic-tool td{font-size:16px}
+html body .aic-article{color:#14213d!important}
+html body .aic-article p,html body .aic-article li{color:#1d2a44}
+</style>
+<script>
+(function(){
+  function hsl(c){var m=c&&c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/);if(!m)return null;var r=m[1]/255,g=m[2]/255,b=m[3]/255,a=m[4]===undefined?1:+m[4];
+    var mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn,s=d?d/(1-Math.abs(2*l-1)):0,h=0;
+    if(d){h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;if(h<0)h+=360}return {h:h,s:s,l:l,a:a}}
+  function blue(c){var x=hsl(c);return x&&x.a>0.05&&x.s>0.3&&x.l>0.28&&x.l<0.95&&x.h>=205&&x.h<=240?x:null}
+  function N(x,dark,light){return x.a<0.95?"rgba(40,89,199,"+Math.min(x.a,0.12).toFixed(3)+")":(x.l>0.82?light:dark)}
+  function fix(el){var c0=getComputedStyle(el),bg=hsl(c0.backgroundColor),fg=hsl(c0.color);if(bg&&fg&&bg.a>0.9&&bg.l<0.6&&bg.s>0.3&&bg.h>=205&&bg.h<=240&&fg.l<0.6)el.style.setProperty("color","#ffffff","important");
+    if(el.closest(".aic-cta,.aic-dark")||el.matches(".aic-opt,.aic-pick,.aic-check,.aic-btn,.aic-chip,.aic-pill,.aic-seg button,.aic-card,.aic-note"))return;var cs=getComputedStyle(el),x;
+    if((x=blue(cs.color)))el.style.setProperty("color",x.l>0.75?"#eef3fc":"#2859c7","important");
+    if((x=blue(cs.backgroundColor)))el.style.setProperty("background-color",N(x,"#2859c7",x.l>0.9?"#eef3fc":"#d6e2f8"),"important");
+    if(el instanceof SVGElement){if((x=blue(cs.fill)))el.style.setProperty("fill",N(x,"#2859c7","#eef3fc"),"important");if((x=blue(cs.stroke)))el.style.setProperty("stroke",N(x,"#2859c7","#d6e2f8"),"important")}
+    if(cs.textTransform==="uppercase"&&parseFloat(cs.fontSize)<=13.5&&!el.closest("button")&&!el.classList.contains("aic-mono"))el.classList.add("aic-mono");}
+  var t;function mode(){document.querySelectorAll(".aic-tool").forEach(function(r){var q=[].some.call(r.querySelectorAll(".aic-progress,.aic-qtext,.aic-q-text"),function(e){return e.offsetParent!==null});if(q!==r.classList.contains("aic-in-q"))r.classList.toggle("aic-in-q",q)})}
+  function run(){clearTimeout(t);t=setTimeout(function(){mode();document.querySelectorAll("body *").forEach(fix)},30)}
+  document.addEventListener("DOMContentLoaded",function(){run();new MutationObserver(run).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class","aria-pressed","aria-checked","data-state"]});
+    document.addEventListener("change",run,true);document.addEventListener("click",run,true);});
+})();
+</script>
+</head>
+<body>
+<!-- AIC:BEGIN (paste from here into a WordPress Custom HTML block) -->
+<style>
+.aic-tool{
+  --aic-paper:#F7F8FA; --aic-white:#FFFFFF; --aic-ink:#162033; --aic-soft:#667085; --aic-line:#DEE3EA; --aic-sage:#EEF1F6;
+  --aic-blue:#315EFB; --aic-blue-deep:#2448C9; --aic-blue-soft:#EEF3FF; --aic-focus:#B8C7FF;
+  --aic-amber:#A46207; --aic-amber-soft:#FFF6E8; --aic-green:#2F7A4E; --aic-green-soft:#EEF8F1;
+  --aic-violet:#6D5BD0; --aic-violet-soft:#F2EFFF;
+  --aic-radius:18px; --aic-shadow:0 10px 28px rgba(21,32,51,.055);
+  background:var(--aic-paper); color:var(--aic-ink);
+  font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size:16px; line-height:1.55; -webkit-text-size-adjust:100%; text-align:left;
+  padding:0 0 56px; overflow-wrap:break-word; overflow-x:clip;
+}
+@media (prefers-color-scheme:dark){
+  .aic-tool:not([data-theme="light"]){
+    --aic-paper:#101B2D; --aic-white:#162033; --aic-ink:#F2F4F8; --aic-soft:#A6B3C7; --aic-line:#2A3850; --aic-sage:#1E2A40;
+    --aic-blue:#7A97FF; --aic-blue-deep:#9BB2FF; --aic-blue-soft:#1F2B45; --aic-focus:#7A97FF;
+    --aic-amber:#E0A34A; --aic-amber-soft:#2E2412; --aic-green:#6FC592; --aic-green-soft:#13301F;
+    --aic-violet:#A89BF0; --aic-violet-soft:#251F3D;
+    --aic-shadow:none; color-scheme:dark;
+  }
+}
+.aic-tool *,.aic-tool *::before,.aic-tool *::after{box-sizing:border-box}
+.aic-tool h1,.aic-tool h2,.aic-tool h3,.aic-tool h4,.aic-tool p,.aic-tool ul,.aic-tool ol{margin:0;padding:0}
+.aic-tool h1,.aic-tool h2,.aic-tool h3,.aic-tool h4{font-family:inherit;font-weight:800;letter-spacing:-.035em;line-height:1.1;color:var(--aic-ink)}
+.aic-tool h1{font-size:clamp(32px,6vw,50px);text-wrap:balance}
+.aic-tool h2{font-size:clamp(25px,4.4vw,34px);text-wrap:balance}
+.aic-tool h3{font-size:19px;letter-spacing:-.025em;line-height:1.25}
+.aic-tool p{line-height:1.6}
+.aic-tool ul,.aic-tool ol{padding-left:1.2em}
+.aic-tool li{margin:0 0 6px}
+.aic-tool a{color:var(--aic-blue);font-weight:700;text-decoration:none}
+.aic-tool a:hover{text-decoration:underline}
+.aic-tool button,.aic-tool input,.aic-tool select{font-family:inherit;font-size:15px;color:var(--aic-ink)}
+.aic-tool :focus-visible{outline:3px solid var(--aic-focus);outline-offset:2px;border-radius:8px}
+.aic-tool [hidden]{display:none!important}
+.aic-sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;padding:0;margin:-1px}
+.aic-col{max-width:780px;margin:0 auto;padding-inline:16px}
+@media (min-width:700px){.aic-col{padding-inline:24px}}
+.aic-top{border-bottom:1px solid var(--aic-line);background:var(--aic-white)}
+.aic-top .aic-col{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px;flex-wrap:wrap}
+.aic-eyebrow{font-size:12px;font-weight:800;letter-spacing:.08em;color:var(--aic-blue);text-transform:uppercase;line-height:1.4}
+.aic-soft{color:var(--aic-soft)}
+.aic-small{font-size:14px}
+.aic-card{background:var(--aic-white);border:1px solid var(--aic-line);border-radius:var(--aic-radius);box-shadow:var(--aic-shadow);padding:20px}
+@media (min-width:700px){.aic-card{padding:24px 26px}}
+.aic-stack>*+*{margin-top:16px}
+.aic-section{margin-top:40px}
+.aic-lede{font-size:18px;color:var(--aic-soft);margin-top:16px;max-width:62ch}
+.aic-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;font-size:15px;font-weight:750;line-height:1.2;border-radius:999px;cursor:pointer;border:1px solid transparent;text-decoration:none!important;min-height:44px;text-align:center}
+.aic-btn-primary{color:#fff;background:var(--aic-blue);box-shadow:0 6px 16px rgba(49,94,251,.14)}
+.aic-btn-primary:hover{background:var(--aic-blue-deep)}
+.aic-tool .aic-btn-primary,.aic-tool a.aic-btn-primary{color:#fff}
+@media (prefers-color-scheme:dark){.aic-tool:not([data-theme="light"]) .aic-btn-primary{color:#0B1424}}
+.aic-btn-ghost{background:var(--aic-white);color:var(--aic-ink);border-color:var(--aic-line)}
+.aic-btn-ghost:hover{border-color:var(--aic-focus);color:var(--aic-blue)}
+.aic-btn[disabled]{opacity:.45;cursor:not-allowed;box-shadow:none}
+.aic-link{background:none;border:0;padding:4px 2px;color:var(--aic-soft);font-size:13.5px;font-weight:650;cursor:pointer;text-decoration:underline}
+.aic-link:hover{color:var(--aic-blue)}
+.aic-chip{padding:9px 13px;font-size:13.5px;font-weight:700;background:var(--aic-white);border:1px solid var(--aic-line);border-radius:999px;cursor:pointer;line-height:1.25;text-align:left}
+.aic-chip:hover{border-color:var(--aic-focus);color:var(--aic-blue)}
+.aic-chip[aria-pressed="true"]{background:var(--aic-blue-soft);border-color:var(--aic-focus);color:var(--aic-blue)}
+.aic-chips{display:flex;flex-wrap:wrap;gap:8px}
+.aic-input{width:100%;padding:13px 16px;font-size:16px;border:1px solid var(--aic-line);border-radius:14px;background:var(--aic-white);color:var(--aic-ink)}
+.aic-input:focus{border-color:var(--aic-focus);outline:0;box-shadow:0 0 0 3px var(--aic-blue-soft)}
+.aic-select{padding:8px 10px;border:1px solid var(--aic-line);border-radius:10px;background:var(--aic-white);font-size:14px;font-weight:600;max-width:100%}
+.aic-tag{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:5px 9px;border-radius:999px;background:var(--aic-blue-soft);color:var(--aic-blue);white-space:nowrap}
+.aic-tag[data-c="all"]{background:var(--aic-blue-soft);color:var(--aic-blue)}
+.aic-tag[data-c="some"]{background:var(--aic-violet-soft);color:var(--aic-violet)}
+.aic-tag[data-c="one"]{background:var(--aic-amber-soft);color:var(--aic-amber)}
+.aic-tag[data-c="not"],.aic-tag[data-c="have"]{background:var(--aic-green-soft);color:var(--aic-green)}
+.aic-note{border-left:4px solid var(--aic-amber);background:var(--aic-amber-soft);padding:14px 16px;border-radius:0 12px 12px 0;font-size:14.5px}
+.aic-note.aic-note-blue{border-left-color:var(--aic-blue);background:var(--aic-blue-soft)}
+.aic-note.aic-note-green{border-left-color:var(--aic-green);background:var(--aic-green-soft)}
+.aic-note strong{display:block;margin-bottom:4px}
+.aic-tool .aic-steps{display:flex;gap:6px;list-style:none;padding:0;margin:0;font-size:12.5px;font-weight:750;color:var(--aic-soft);flex-wrap:wrap}
+.aic-steps li{margin:0;display:flex;align-items:center;gap:6px}
+.aic-steps li+li::before{content:"";width:14px;height:1px;background:var(--aic-line);display:inline-block}
+.aic-steps li[aria-current="step"]{color:var(--aic-blue)}
+.aic-progress{height:4px;background:var(--aic-sage)}
+.aic-progress i{display:block;height:100%;width:0;background:var(--aic-blue);transition:width .3s ease}
+.aic-q{margin-top:16px}
+.aic-q-num{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--aic-soft)}
+.aic-q-text{font-size:17.5px;font-weight:750;letter-spacing:-.015em;margin:6px 0 14px;line-height:1.4}
+.aic-q-text em{display:block;font-style:normal;font-weight:500;font-size:14.5px;color:var(--aic-soft);margin-top:6px;letter-spacing:0}
+.aic-opts{display:grid;gap:8px}
+.aic-opt{display:flex;align-items:flex-start;gap:12px;width:100%;padding:12px 14px;border:1px solid var(--aic-line);border-radius:14px;background:var(--aic-white);cursor:pointer;text-align:left;font-size:15px;line-height:1.4;min-height:44px}
+.aic-opt:hover{border-color:var(--aic-focus)}
+.aic-opt .aic-dot{flex:0 0 18px;height:18px;border-radius:50%;border:2px solid var(--aic-line);margin-top:1px;position:relative}
+.aic-opt[data-multi] .aic-dot{border-radius:5px}
+.aic-opt[aria-checked="true"]{border-color:var(--aic-blue);background:var(--aic-blue-soft)}
+.aic-opt[aria-checked="true"] .aic-dot{border-color:var(--aic-blue)}
+.aic-opt[aria-checked="true"] .aic-dot::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--aic-blue)}
+.aic-opt[data-multi][aria-checked="true"] .aic-dot::after{border-radius:2px}
+.aic-nav{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:24px;flex-wrap:wrap}
+.aic-nav-hint{font-size:13px;color:var(--aic-soft);font-weight:650}
+.aic-for{font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--aic-soft)}
+.aic-tool details{border-top:1px solid var(--aic-line)}
+.aic-tool details:last-of-type{border-bottom:1px solid var(--aic-line)}
+.aic-tool summary{cursor:pointer;padding:16px 0;font-weight:800;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px;letter-spacing:-.015em}
+.aic-tool summary::-webkit-details-marker{display:none}
+.aic-tool summary::after{content:"+";color:var(--aic-soft);font-weight:800;font-size:20px;line-height:1}
+.aic-tool details[open] summary::after{content:"\2013"}
+.aic-method{padding-bottom:16px}
+.aic-method p,.aic-method li{font-size:14.5px;color:var(--aic-soft);line-height:1.65}
+.aic-method p+p{margin-top:12px}
+.aic-method strong{color:var(--aic-ink)}
+.aic-cta{display:grid;gap:14px}
+@media (min-width:700px){.aic-cta{grid-template-columns:1fr 1fr}}
+.aic-cta .aic-card{display:flex;flex-direction:column;gap:10px}
+.aic-cta .aic-card .aic-btn{align-self:flex-start;margin-top:auto}
+.aic-cta-solution{border-color:var(--aic-focus)!important;background:var(--aic-blue-soft)!important}
+.aic-handoff{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-top:18px;font-size:14px}
+.aic-table{width:100%;border-collapse:collapse;font-size:13.5px}
+.aic-table th,.aic-table td{text-align:left;padding:9px 6px;border-bottom:1px solid var(--aic-line);vertical-align:top}
+.aic-table thead th{font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--aic-soft);font-weight:800;line-height:1.3}
+.aic-table tbody th{font-weight:750}
+.aic-table td{white-space:nowrap}
+.aic-tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.aic-cell{display:inline-block;font-size:12px;font-weight:800;padding:3px 8px;border-radius:999px}
+.aic-cell[data-c="all"]{background:var(--aic-blue-soft);color:var(--aic-blue)}
+.aic-cell[data-c="some"]{background:var(--aic-violet-soft);color:var(--aic-violet)}
+.aic-cell[data-c="one"]{background:var(--aic-amber-soft);color:var(--aic-amber)}
+.aic-cell[data-c="none"]{color:var(--aic-soft);font-weight:600}
+/* team builder */
+.aic-role{padding:0;overflow:hidden}
+.aic-role-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 14px;align-items:center;padding:14px 16px}
+.aic-role-name{font-weight:800;font-size:16.5px;letter-spacing:-.015em;padding:4px 6px;margin-left:-6px;border:1px solid transparent;border-radius:10px;background:transparent;width:100%;min-width:0}
+.aic-role-name:hover,.aic-role-name:focus{border-color:var(--aic-line);background:var(--aic-white)}
+.aic-count{display:inline-flex;align-items:center;border:1px solid var(--aic-line);border-radius:999px;overflow:hidden;background:var(--aic-white)}
+.aic-count button{width:38px;height:38px;border:0;background:none;font-size:18px;font-weight:700;cursor:pointer;color:var(--aic-ink)}
+.aic-count button:hover{background:var(--aic-blue-soft);color:var(--aic-blue)}
+.aic-count input{width:52px;height:38px;border:0;border-inline:1px solid var(--aic-line);text-align:center;font-weight:800;font-variant-numeric:tabular-nums;background:var(--aic-white);-moz-appearance:textfield}
+.aic-count input::-webkit-outer-spin-button,.aic-count input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.aic-role-tools{grid-column:1/-1;display:flex;gap:10px 16px;flex-wrap:wrap;align-items:center}
+.aic-check{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;font-weight:650;cursor:pointer}
+.aic-check input{width:18px;height:18px;accent-color:var(--aic-blue)}
+.aic-lbl{font-size:12px;font-weight:700;color:var(--aic-soft)}
+.aic-sticky{position:sticky;bottom:0;z-index:5;background:linear-gradient(to top,var(--aic-paper) 70%,transparent);padding:18px 0 14px;margin-top:8px}
+/* results */
+.aic-overview{list-style:none;padding:0;display:grid;gap:8px}
+@media (min-width:700px){.aic-overview{grid-template-columns:1fr 1fr}}
+.aic-overview li{margin:0;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--aic-line);border-radius:14px;background:var(--aic-white);font-weight:700;font-size:14.5px}
+.aic-skill{display:grid;grid-template-columns:34px minmax(0,1fr);gap:4px 14px}
+.aic-skill-n{width:30px;height:30px;border-radius:50%;background:var(--aic-blue);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:14px}
+@media (prefers-color-scheme:dark){.aic-tool:not([data-theme="light"]) .aic-skill-n{color:#0B1424}}
+.aic-skill-body>*+*{margin-top:10px}
+.aic-skill-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.aic-skill-body ul li{font-size:14.5px}
+.aic-session{border:1px dashed var(--aic-focus);border-radius:14px;padding:14px 16px;background:var(--aic-paper)}
+.aic-session h4{font-size:16px;letter-spacing:-.02em;margin-top:4px}
+.aic-session p{font-size:14.5px;margin-top:6px}
+@media (max-width:480px){.aic-skill{grid-template-columns:1fr}.aic-skill-n{margin-bottom:4px}}
+.aic-phase{margin-top:22px}
+.aic-phase:first-child{margin-top:0}
+.aic-phase>.aic-for{margin-bottom:10px}
+@media (prefers-reduced-motion:reduce){.aic-tool *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media print{
+  .aic-tool{background:#fff!important;color:#000;padding:0;font-size:12pt}
+  .aic-noprint,.aic-top,.aic-handoff,.aic-cta .aic-btn{display:none!important}
+  .aic-card,.aic-session{box-shadow:none;break-inside:avoid;border-color:#bbb}
+  .aic-tool details{border:0}
+  .aic-tool details>*:not(summary){display:block!important}
+  .aic-tool summary::after{content:""}
+  .aic-tag,.aic-cell,.aic-skill-n{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .aic-tool a{color:#000;text-decoration:underline}
+}
+</style>
+
+<div class="aic-tool" id="aic-which-ai-skills-does-your-team-actually-need" data-theme="auto">
+  <header class="aic-top">
+    <div class="aic-col">
+      <span class="aic-eyebrow">AI Channel · For HR &amp; Team Leads</span>
+      <ol class="aic-steps" aria-label="Progress">
+        <li data-step="team">1 Your team</li><li data-step="today">2 How you use AI today</li><li data-step="results">3 Your skills plan</li>
+      </ol>
+    </div>
+    <div class="aic-progress" aria-hidden="true"><i data-ref="progress"></i></div>
+  </header>
+
+  <!-- INTRO -->
+  <section class="aic-screen aic-col" data-screen="intro" aria-labelledby="aic-t-intro">
+    <div style="padding-top:40px">
+      <div class="aic-eyebrow">3 steps · ~5 minutes · no email required</div>
+      <h1 id="aic-t-intro" tabindex="-1" style="margin-top:12px">Which AI skills does your team actually need?</h1>
+      <p class="aic-lede">Probably fewer than the course catalogs suggest, and not the same ones for everybody. Add the roles on your team and answer six plain questions. You’ll get a skills plan by role: who needs what, in what order, and what you don’t need yet.</p>
+      <div class="aic-card" style="margin-top:28px">
+        <div class="aic-eyebrow">The six skills it plans for</div>
+        <ul style="margin-top:12px;list-style:none;padding:0" class="aic-stack">
+          <li><strong>Using AI tools well on real tasks.</strong> <span class="aic-soft">Your team’s actual work, not prompt tricks.</span></li>
+          <li><strong>Checking the output, and knowing when not to trust AI.</strong> <span class="aic-soft">Confident wrong answers, and what catches them.</span></li>
+          <li><strong>Data and privacy judgment.</strong> <span class="aic-soft">What never goes into an AI tool, and who decides.</span></li>
+          <li><strong>Writing the team’s AI rule.</strong> <span class="aic-soft">One page, for one or two people to own.</span></li>
+          <li><strong>Redesigning a workflow.</strong> <span class="aic-soft">Once people use the tools, change the work, not just the drafting.</span></li>
+          <li><strong>Evaluating AI tools and vendors.</strong> <span class="aic-soft">For whoever has to say yes to a purchase.</span></li>
+        </ul>
+      </div>
+      <p class="aic-soft aic-small" style="margin-top:18px">Each one comes back marked <strong>everyone</strong>, <strong>some people</strong> or <strong>one or two people</strong>, with a first session you can run without buying anything. Where the truth is “you don’t need this yet,” it says so.</p>
+      <div class="aic-nav">
+        <button type="button" class="aic-btn aic-btn-primary" data-act="start">Start the plan</button>
+        <span class="aic-nav-hint">Answers stay in your browser for this session only. Nothing is stored or sent.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEAM -->
+  <section class="aic-screen aic-col" data-screen="team" aria-labelledby="aic-t-team" hidden>
+    <div style="padding-top:32px">
+      <div class="aic-eyebrow">Step 1 of 3</div>
+      <h2 id="aic-t-team" tabindex="-1" style="margin-top:8px">Who’s on your team?</h2>
+      <p class="aic-soft" style="margin-top:10px">Add each role and how many people do it. Pick the closest one and rename it if you like, or type your own.</p>
+
+      <div class="aic-card" style="margin-top:20px">
+        <div class="aic-for" id="aic-common-l">Common roles: tap to add</div>
+        <div class="aic-chips" data-ref="common" role="group" aria-labelledby="aic-common-l" style="margin-top:10px"></div>
+        <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--aic-line)">
+          <label for="aic-custom" class="aic-for">Role not listed? Add your own</label>
+          <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+            <input id="aic-custom" class="aic-input" type="text" maxlength="60" placeholder="e.g. Claims handler" style="flex:1 1 200px">
+            <button type="button" class="aic-btn aic-btn-ghost" data-act="addCustom">Add role</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:28px;flex-wrap:wrap">
+        <h3>Your team <span class="aic-soft" data-ref="teamCount" style="font-weight:700"></span></h3>
+        <button type="button" class="aic-link" data-act="example">Try an example team</button>
+      </div>
+      <div data-ref="roles" class="aic-stack" style="margin-top:12px" aria-live="polite"></div>
+      <p data-ref="emptyTeam" class="aic-soft aic-small" style="margin-top:12px;padding:18px;border:1px dashed var(--aic-line);border-radius:14px;text-align:center">No roles yet. Tap a common role, type your own, or try the example team.</p>
+
+      <div class="aic-sticky">
+        <div class="aic-nav" style="margin-top:0">
+          <button type="button" class="aic-btn aic-btn-ghost" data-act="back" data-to="intro">← Back</button>
+          <span class="aic-nav-hint" data-ref="teamHint">Add at least one role</span>
+          <button type="button" class="aic-btn aic-btn-primary" data-act="toToday" disabled>Next →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TODAY -->
+  <section class="aic-screen aic-col" data-screen="today" aria-labelledby="aic-t-today" hidden>
+    <div style="padding-top:32px">
+      <div class="aic-eyebrow">Step 2 of 3</div>
+      <h2 id="aic-t-today" tabindex="-1" style="margin-top:8px">How does your team use AI today?</h2>
+      <p class="aic-soft" style="margin-top:10px">Six plain questions. Answer for the team as it is today, not as you’d like it to be.</p>
+      <div data-ref="questions"></div>
+      <div class="aic-nav">
+        <button type="button" class="aic-btn aic-btn-ghost" data-act="back" data-to="team">← Back</button>
+        <span class="aic-nav-hint" data-ref="qHint"></span>
+        <button type="button" class="aic-btn aic-btn-primary" data-act="toResults" disabled>See my skills plan</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="aic-screen aic-col" data-screen="results" aria-labelledby="aic-t-results" hidden>
+    <div data-ref="results" style="padding-top:32px"></div>
+  </section>
+</div>
+
+<script>
+/* ---- AI Channel config: the WordPress editor can change these (or set window.AICHANNEL_CONFIG before this script) ---- */
+window.AICHANNEL_CONFIG = Object.assign({
+  resultsFormUrl: "#",      // "Email me my results" form (WordPress form page)
+  coursesUrl: "#",          // "Learn with a member" (Central AI course schedule)
+  matchUrl: "#",            // "Get matched to someone" (advisory/consulting form)
+  newsletterUrl: "#",       // separate newsletter opt-in
+  contentBaseUrl: "",       // prefix for sibling tools: contentBaseUrl + slug + ".html"
+  linkTarget: "_self"       // optional: "_top" when the tool sits in an iframe
+}, window.AICHANNEL_CONFIG || {});
+
+(function () {
+  "use strict";
+  var ROOT = document.getElementById("aic-which-ai-skills-does-your-team-actually-need");
+  if (!ROOT) return;
+  var CFG = window.AICHANNEL_CONFIG;
+  var SLUG = "which-ai-skills-does-your-team-actually-need";
+  var AUDIENCE = "hr";
+  var TOOL_NAME = "Which AI Skills Does Your Team Actually Need?";
+  var COMPANION = "which-parts-of-your-teams-work-could-ai-change-first";
+
+  /* ---------------- Roles ---------------- */
+  /* Kinds of work. "comp" = mostly at a computer. */
+  var WORK = {
+    docs:   { label: "Writing and documents", comp: true,
+              use: ["First drafts of emails, letters and documents, then edited by a person", "Summaries of long threads, reports and meeting notes", "Rewriting the same content for a different reader"] },
+    data:   { label: "Numbers and data", comp: true,
+              use: ["Explaining a formula or building a first-pass analysis", "Cleaning and sorting messy lists", "Checking every figure against the source before it goes anywhere"] },
+    people: { label: "Customers and people", comp: true,
+              use: ["Drafting replies, then making them sound like you", "Summarizing a case or customer history before a call", "Preparing for a difficult conversation (not having it)"] },
+    tech:   { label: "Code and systems", comp: true,
+              use: ["Code suggestions and explanations of unfamiliar code", "Writing tests and documentation", "Reviewing everything before it ships, as you would a new colleague’s work"] },
+    coord:  { label: "Planning and coordination", comp: true,
+              use: ["Meeting notes, actions and status updates", "Turning messy notes into a plan or a timeline", "First drafts of briefs and proposals"] },
+    hands:  { label: "Hands-on work", comp: false,
+              use: ["Reports, logs and quotes after a job, by voice or phone", "Scheduling and paperwork around the work", "Knowing what a tool must never decide: safety, sign-off, anything irreversible"] }
+  };
+  /* [name, kind of work, handles personal or confidential data] */
+  var COMMON = [
+    ["Customer service representative", "people", true], ["Sales representative", "people", true], ["Account manager", "people", true],
+    ["HR specialist", "people", true], ["Recruiter", "people", true], ["Trainer or teacher", "people", false],
+    ["Marketing specialist", "docs", false], ["Writer or communications", "docs", false], ["Administrative assistant", "docs", true],
+    ["Paralegal or legal assistant", "docs", true], ["Designer", "docs", false],
+    ["Accountant", "data", true], ["Bookkeeper", "data", true], ["Data analyst", "data", true], ["Researcher or analyst", "data", false],
+    ["Software developer", "tech", false], ["IT support", "tech", true],
+    ["Project manager", "coord", false], ["Operations coordinator", "coord", false], ["Team manager or supervisor", "coord", true],
+    ["Nurse or care worker", "hands", true], ["Field technician", "hands", false]
+  ];
+  function findCommon(n) { for (var i = 0; i < COMMON.length; i++) if (COMMON[i][0] === n) return COMMON[i]; return null; }
+
+  /* ---------------- State (memory only) ---------------- */
+  var S = { screen: "intro", roles: [], answers: {}, worries: [], started: false, completed: false, nextId: 1 };
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function $(ref) { return ROOT.querySelector('[data-ref="' + ref + '"]'); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function sibling(slug) { return (CFG.contentBaseUrl || "") + slug + ".html"; }
+  function list(names) { return names.length < 2 ? names.join("") : names.slice(0, -1).join(", ") + " and " + names[names.length - 1]; }
+
+  /* ---------------- Hand-off and events ---------------- */
+  function emit(name, extra) {
+    var detail = { event: name, tool: SLUG, audience: AUDIENCE, assessment_name: TOOL_NAME };
+    for (var k in (extra || {})) detail[k] = extra[k];
+    try { window.dispatchEvent(new CustomEvent("aichannel:event", { detail: detail })); } catch (e) {}
+    try { var msg = { type: "aichannel:event" }; for (var j in detail) msg[j] = detail[j]; if (window.parent) window.parent.postMessage(msg, "*"); } catch (e) {}
+  }
+  function utmParams() {
+    var out = {};
+    try { new URLSearchParams(window.location.search).forEach(function (v, k) { if (/^utm_/i.test(k)) out[k] = v; }); } catch (e) {}
+    return out;
+  }
+  function isSet(u) { return u && u !== "#"; }
+  function buildUrl(base, fields) {
+    if (!isSet(base)) return "#";
+    try {
+      var u = new URL(base, window.location.href);
+      var all = Object.assign({}, fields, utmParams());
+      Object.keys(all).forEach(function (k) { if (all[k] !== undefined && all[k] !== null && all[k] !== "") u.searchParams.set(k, all[k]); });
+      return u.toString();
+    } catch (e) { return base; }
+  }
+  function leadFields(cta, leadType) {
+    var r = S.lastResult || {};
+    return { lead_type: leadType, audience: AUDIENCE, source_page: window.location.href, source_content_or_tool: SLUG,
+      cta_clicked: cta, assessment_name: TOOL_NAME, assessment_result: r.label || "" };
+  }
+
+  /* ---------------- Screens ---------------- */
+  var ORDER = ["intro", "team", "today", "results"];
+  function show(id, noFocus) {
+    S.screen = id;
+    ROOT.querySelectorAll(".aic-screen").forEach(function (s) { s.hidden = s.getAttribute("data-screen") !== id; });
+    ROOT.querySelectorAll(".aic-steps li").forEach(function (li) {
+      if (li.getAttribute("data-step") === id) li.setAttribute("aria-current", "step"); else li.removeAttribute("aria-current");
+    });
+    $("progress").style.width = [0, 25, 60, 100][ORDER.indexOf(id)] + "%";
+    if (id === "results") renderResults();
+    var top = ROOT.getBoundingClientRect().top + window.pageYOffset - 10;
+    if (window.pageYOffset > top) window.scrollTo({ top: top, behavior: reduced ? "auto" : "smooth" });
+    if (!noFocus) { var h = ROOT.querySelector('[data-screen="' + id + '"] h1, [data-screen="' + id + '"] h2'); if (h) { h.setAttribute("tabindex", "-1"); h.focus({ preventScroll: true }); } }
+  }
+
+  /* ---------------- Team builder ---------------- */
+  function renderCommon() {
+    $("common").innerHTML = COMMON.map(function (c) {
+      return '<button type="button" class="aic-chip" data-act="addCommon" data-name="' + esc(c[0]) + '">+ ' + esc(c[0]) + "</button>";
+    }).join("");
+  }
+  function addRole(name, work, sens, n) {
+    if (S.roles.length >= 12) { $("teamHint").textContent = "Up to 12 roles. Group similar roles together."; return null; }
+    var role = { id: S.nextId++, name: name, work: work, sens: !!sens, n: n || 1 };
+    S.roles.push(role);
+    renderRoles();
+    return role;
+  }
+  function workOptions(sel) { return Object.keys(WORK).map(function (k) { return '<option value="' + k + '"' + (k === sel ? " selected" : "") + ">" + WORK[k].label + "</option>"; }).join(""); }
+  function teamTotal() { return S.roles.reduce(function (s, r) { return s + r.n; }, 0); }
+  function renderRoles() {
+    var total = teamTotal();
+    $("emptyTeam").hidden = S.roles.length > 0;
+    $("teamCount").textContent = S.roles.length ? "· " + S.roles.length + (S.roles.length === 1 ? " role, " : " roles, ") + total + (total === 1 ? " person" : " people") : "";
+    ROOT.querySelector('[data-act="toToday"]').disabled = S.roles.length === 0;
+    $("teamHint").textContent = S.roles.length ? total + (total === 1 ? " person" : " people") + " in the plan" : "Add at least one role";
+    $("roles").innerHTML = S.roles.map(function (r) {
+      var id = "aic-r" + r.id;
+      return '<div class="aic-card aic-role" data-role="' + r.id + '"><div class="aic-role-head">' +
+        '<div style="min-width:0"><label class="aic-sr" for="' + id + '-name">Role name</label>' +
+        '<input id="' + id + '-name" class="aic-role-name" data-f="name" value="' + esc(r.name) + '" maxlength="60"></div>' +
+        '<div class="aic-count" role="group" aria-label="Number of people in ' + esc(r.name) + '"><button type="button" data-act="dec" aria-label="One fewer person">−</button>' +
+        '<input type="number" inputmode="numeric" min="1" max="999" data-f="n" value="' + r.n + '" aria-label="People in this role"><button type="button" data-act="inc" aria-label="One more person">+</button></div>' +
+        '<div class="aic-role-tools"><label class="aic-lbl" for="' + id + '-w">Mostly</label><select id="' + id + '-w" class="aic-select" data-f="work">' + workOptions(r.work) + "</select>" +
+        '<label class="aic-check"><input type="checkbox" data-f="sens"' + (r.sens ? " checked" : "") + "> Handles personal or confidential data</label>" +
+        '<button type="button" class="aic-link" data-act="removeRole" aria-label="Remove ' + esc(r.name) + '">Remove</button></div></div></div>';
+    }).join("");
+  }
+  function roleById(el) { var c = el.closest("[data-role]"); if (!c) return null; var id = +c.getAttribute("data-role"); for (var i = 0; i < S.roles.length; i++) if (S.roles[i].id === id) return S.roles[i]; return null; }
+
+  /* ---------------- Questions ---------------- */
+  var QUESTIONS = [
+    { id: "use", t: "How does your team use AI tools today?",
+      o: [["Not at all, as far as I know", "none"], ["A few people, on their own initiative", "some"], ["Approved tools, in daily use", "daily"], ["I’m not tracking this — I genuinely don’t know", "unknown"]] },
+    { id: "allowed", t: "If someone asked “Can I use an AI tool for this?”, what would they be told?",
+      o: [["Nobody’s said anything either way", "none"], ["“Be careful” — nothing written", "informal"], ["A written rule: approved tools and what never goes in", "written"], ["AI tools are blocked or banned", "blocked"]] },
+    { id: "trust", t: "If an AI tool put a wrong figure or a made-up source into a report, would someone on your team catch it before it went out?",
+      o: [["Probably not", 0], ["Depends who wrote it", 1], ["Yes, we check that kind of thing as a habit", 2]] },
+    { id: "buying", t: "Is your team choosing or buying an AI tool in the next six months?",
+      o: [["No, not that I know of", "no"], ["Maybe — people are asking for one", "maybe"], ["Yes, we’re comparing options or a vendor is pitching us", "yes"], ["We already bought one", "bought"]] },
+    { id: "worries", multi: true, t: "What worries you most?<em>Pick any that apply.</em>",
+      o: [["Wrong answers getting through to customers or decisions", "wrong"], ["Customer or personal data going into AI tools", "data"], ["People worried about their jobs", "jobs"], ["Paying for tools nobody uses", "sits"], ["Picking the wrong tool or vendor", "vendor"], ["Nobody has time to learn", "time"], ["Nothing in particular yet", "nothing"]] },
+    { id: "eu", t: "Does your organization operate in the EU, or have staff using AI there?<em>We only use this to tell you whether the EU AI Act’s AI-literacy duty probably applies.</em>",
+      o: [["Yes", "yes"], ["No", "no"], ["Not sure", "unsure"]] }
+  ];
+  function answered(q) { return q.multi ? S.worries.length > 0 : S.answers[q.id] != null; }
+  function renderQuestions() {
+    $("questions").innerHTML = QUESTIONS.map(function (q, qi) {
+      return '<div class="aic-card aic-q"><div class="aic-q-num">Question ' + (qi + 1) + " of " + QUESTIONS.length + '</div><div class="aic-q-text" id="aic-ql-' + q.id + '">' + q.t + "</div>" +
+        '<div class="aic-opts" role="' + (q.multi ? "group" : "radiogroup") + '" aria-labelledby="aic-ql-' + q.id + '">' +
+        q.o.map(function (o, oi) {
+          var on = q.multi ? S.worries.indexOf(o[1]) > -1 : S.answers[q.id] === oi;
+          var tab = q.multi ? 0 : (on || (S.answers[q.id] == null && oi === 0) ? 0 : -1);
+          return '<button type="button" class="aic-opt" role="' + (q.multi ? "checkbox" : "radio") + '" aria-checked="' + on + '" tabindex="' + tab + '" data-q="' + q.id + '" data-o="' + oi + '"' + (q.multi ? " data-multi" : "") + '><span class="aic-dot" aria-hidden="true"></span><span>' + esc(o[0]) + "</span></button>";
+        }).join("") + "</div></div>";
+    }).join("");
+    refreshQHint();
+  }
+  function refreshQHint() {
+    var n = QUESTIONS.filter(answered).length;
+    $("qHint").textContent = n === QUESTIONS.length ? "All answered" : n + " of " + QUESTIONS.length + " answered";
+    ROOT.querySelector('[data-act="toResults"]').disabled = n < QUESTIONS.length;
+  }
+  function selectOpt(btn) {
+    var qid = btn.getAttribute("data-q"), oi = +btn.getAttribute("data-o");
+    var q = QUESTIONS.filter(function (x) { return x.id === qid; })[0];
+    if (q.multi) {
+      var v = q.o[oi][1], i = S.worries.indexOf(v);
+      if (i > -1) S.worries.splice(i, 1);
+      else if (v === "nothing") S.worries = ["nothing"];
+      else { S.worries = S.worries.filter(function (w) { return w !== "nothing"; }); S.worries.push(v); }
+      btn.parentElement.querySelectorAll(".aic-opt").forEach(function (b) { b.setAttribute("aria-checked", String(S.worries.indexOf(q.o[+b.getAttribute("data-o")][1]) > -1)); });
+    } else {
+      btn.parentElement.querySelectorAll(".aic-opt").forEach(function (b) { b.setAttribute("aria-checked", "false"); b.tabIndex = -1; });
+      btn.setAttribute("aria-checked", "true"); btn.tabIndex = 0;
+      S.answers[qid] = oi;
+    }
+    refreshQHint();
+  }
+  function ans(id) { var q = QUESTIONS.filter(function (x) { return x.id === id; })[0]; return q.o[S.answers[id]][1]; }
+  function worry(w) { return S.worries.indexOf(w) > -1; }
+
+  /* ---------------- Plan logic ---------------- */
+  var SKILLS = {
+    use:      { title: "Using AI tools well on their own tasks", short: "using AI tools well" },
+    check:    { title: "Checking outputs, and knowing when not to trust AI", short: "checking outputs" },
+    data:     { title: "Data and privacy judgment", short: "data and privacy judgment" },
+    rule:     { title: "Writing the team’s AI rule", short: "the team AI rule" },
+    workflow: { title: "Redesigning a workflow around AI", short: "workflow redesign" },
+    vendor:   { title: "Evaluating AI tools and vendors", short: "evaluating tools and vendors" }
+  };
+  var SKILL_ORDER = ["use", "check", "data", "rule", "workflow", "vendor"];
+  var COVER = { all: "Everyone", some: "Some people", one: "One or two people", not: "You don’t need this yet", have: "You have this already" };
+  var CELL = { all: "All", some: "A few", one: "One", none: "—" };
+
+  function useLevel() { var u = ans("use"); return u === "unknown" ? "some" : u; }
+  function vendorNeeded() { var b = ans("buying"); return b !== "no" || worry("vendor"); }
+
+  /* Per-role cells: all / some / one / none. Also the "You (team lead)" row. */
+  function roleCells() {
+    var use = useLevel();
+    var comp = S.roles.filter(function (r) { return WORK[r.work].comp; }).sort(function (a, b) { return b.n - a.n; });
+    var biggest = comp[0] || S.roles.slice().sort(function (a, b) { return b.n - a.n; })[0];
+    var pilot = comp.slice(0, 2);
+    var rows = S.roles.map(function (r) {
+      var c = {}, isComp = WORK[r.work].comp;
+      if (use === "none") c.use = pilot.indexOf(r) > -1 ? "one" : "none";
+      else c.use = isComp ? "all" : "some";
+      c.check = "all";
+      c.data = r.sens || use === "daily" || worry("data") ? "all" : "some";
+      c.rule = "none";
+      if (use === "none") c.workflow = "none";
+      else if (use === "some") c.workflow = r === biggest ? "one" : "none";
+      else c.workflow = isComp ? "one" : "none";
+      c.vendor = vendorNeeded() && r === biggest ? "one" : "none";
+      return { name: r.name, n: r.n, cells: c };
+    });
+    var lead = { name: "You (team lead)", n: 1, lead: true, cells: {
+      use: "all", check: "all", data: "all",
+      rule: "one",
+      workflow: use === "none" ? "none" : "one",
+      vendor: vendorNeeded() ? "one" : "none" } };
+    return { rows: rows, lead: lead, biggest: biggest, pilot: pilot };
+  }
+  function coverage(k, rc) {
+    var use = useLevel();
+    if (k === "rule" && ans("allowed") === "written") return "have";
+    if (k === "workflow" && use === "none") return "not";
+    if (k === "vendor" && !vendorNeeded()) return "not";
+    if (k === "rule" || k === "vendor") return "one";
+    if (k === "workflow") return use === "daily" && rc.rows.filter(function (r) { return r.cells.workflow === "one"; }).length > 2 ? "some" : "one";
+    if (k === "use" && use === "none") return "some";
+    var N = teamTotal(), allN = 0;
+    rc.rows.forEach(function (r) { if (r.cells[k] === "all") allN += r.n; });
+    return allN >= N * 0.6 ? "all" : "some";
+  }
+  function priorities() {
+    var use = useLevel(), allowed = ans("allowed"), trust = ans("trust"), buying = ans("buying");
+    var p = {
+      rule: { none: 100, informal: 92, blocked: 88, written: 10 }[allowed],
+      check: [96, 76, 40][trust] + (worry("wrong") ? 10 : 0),
+      data: (S.roles.some(function (r) { return r.sens; }) ? 70 : 50) + (worry("data") ? 18 : 0),
+      use: { none: 72, some: 80, daily: 45 }[use] + (worry("sits") ? 12 : 0),
+      workflow: { none: 0, some: 30, daily: 62 }[use],
+      vendor: { no: 30, maybe: 38, yes: 66, bought: 42 }[buying] + (worry("vendor") ? 12 : 0)
+    };
+    return p;
+  }
+
+  /* Text per skill, tailored to the answers. Returns { why, looks: [], session: {title, who, how} } */
+  function skillText(k, rc, cov) {
+    var use = useLevel(), allowed = ans("allowed"), trust = ans("trust"), buying = ans("buying");
+    var names = function (cell) { return rc.rows.filter(function (r) { return r.cells[k] === cell; }).map(function (r) { return r.name; }); };
+    var t = {};
+    if (k === "use") {
+      var kinds = {}; S.roles.forEach(function (r) { kinds[r.work] = (kinds[r.work] || 0) + r.n; });
+      var topKinds = Object.keys(kinds).sort(function (a, b) { return kinds[b] - kinds[a]; }).slice(0, 2);
+      t.who = use === "none" ? "Start with two or three volunteers" + (rc.pilot.length ? " from roles like " + list(rc.pilot.map(function (r) { return r.name; })) : "") + ", then everyone." : (cov === "all" ? "Everyone on the team." : "Everyone at a computer: " + list(names("all")) + ". A short version for the rest.");
+      t.why = use === "none" ? "Nobody uses the tools yet, so start small and on real work. A few people who’ve tried it on their own tasks teach the rest better than any course."
+        : use === "some" ? "A few people already use AI on their own. The skill lives in their heads, and everyone else is guessing. Spread it on purpose."
+        : "The tools are approved and in daily use. The gap now is depth: using them on the right tasks, not just for the occasional email.";
+      if (worry("sits")) t.why += " Companies buy the AI tool, hand it to staff, and it just… sits there. Skills on real tasks are what fix that.";
+      t.looks = topKinds.map(function (w) { return "<strong>" + esc(WORK[w].label) + ":</strong> " + WORK[w].use.slice(0, 2).join("; ").toLowerCase(); });
+      t.session = use === "none"
+        ? { title: "Run the one-task test.", who: "Two or three volunteers · one week", how: "Each picks one task they do every week. They do it once with an approved AI tool, clock running, and once the usual way. Compare time and quality, then share what happened at the next team meeting." + (allowed === "none" || allowed === "blocked" ? " Do this after the rule is written, so people know which tool they may use." : "") }
+        : { title: "Run a lunch-hour show-and-tell.", who: "Whole team · one lunch hour", how: "Whoever uses AI most shows three things that work on real tasks, and one that didn’t. Everyone leaves with one task to try that week, and reports back at the next team meeting." };
+    }
+    if (k === "check") {
+      t.who = "Everyone, including people who don’t use AI themselves. They’ll still receive AI-written work from colleagues, vendors and search results.";
+      t.why = trust === 0 ? "You said a wrong figure would probably get through. That’s the gap to close first: AI tools are most convincing when they’re wrong, and the cost of an unchecked error lands on your team, not the tool."
+        : trust === 1 ? "Whether a mistake gets caught depends on who wrote it. Make the checking a team habit, not a personal one."
+        : "Your team already checks. Keep it that way as use grows, and write down what always gets a human check.";
+      t.looks = ["Checking every fact, figure, quote and source against the original", "Knowing what the tool can’t see: the customer’s history, last week’s decision, the unwritten rule", "Agreeing, per task, what always gets a human check before it goes out"];
+      t.session = { title: "Break it together.", who: "Whole team · 45 minutes", how: "Take one real task your team did last week. Have an AI tool do it. Then find the errors together: figures, names, sources, anything it couldn’t have known. Finish by agreeing, task by task, what always gets a human check. Nothing teaches this faster than catching the tool out on your own work." };
+    }
+    if (k === "data") {
+      var sens = S.roles.filter(function (r) { return r.sens; }).map(function (r) { return r.name; });
+      t.who = cov === "all" ? "Everyone" + (sens.length ? ", and in depth for " + list(sens) : "") + "." : "The roles that handle personal or confidential data" + (sens.length ? ": " + list(sens) : "") + ". A five-minute version for everyone else.";
+      t.why = (worry("data") ? "You named data going into AI tools as a worry. " : "") + (sens.length ? "Some of your roles handle personal or confidential data every day. " : "") +
+        "This is judgment, not a rule people memorize: knowing what’s fine to paste, what never goes in, and what to ask about first.";
+      t.looks = ["What never goes in: customer and personal data, health and HR information, financials, passwords, anything under NDA", "The difference between a business account whose data terms someone has read and a personal free one", "What to do if something went in that shouldn’t have: say so early, no blame"];
+      t.session = { title: "Sort the never-list.", who: (cov === "all" ? "Whole team" : "The roles that handle personal data") + " · 20 minutes in a team meeting", how: "Put ten real examples on cards: a customer email, a payroll file, a draft press release, a contract clause, a meeting summary. Sort them into “fine”, “never” and “ask first”. The disagreements are the point. What’s left becomes the never-list in your rule." };
+    }
+    if (k === "rule") {
+      t.who = "You, plus the one person on the team who uses AI most.";
+      t.why = allowed === "none" ? "Nobody has said what’s allowed, so everyone is guessing. Write the rule before you train anyone; training without a rule teaches people to use whatever tool is nearest."
+        : allowed === "informal" ? "“Be careful” isn’t a rule. People can’t follow what isn’t written, and new starters never hear it."
+        : allowed === "blocked" ? "A ban with nothing approved in its place often moves AI use onto personal phones and free accounts, where nobody can see it. Replace it with a rule people can follow."
+        : "You have a written rule. Re-read it against how the team actually works.";
+      t.looks = ["Approved tools, and on which accounts", "The never-list: what must never go in", "The checking rule: nothing AI-written reaches a customer, a decision about a person, or a public channel without a person reading it", "Who to ask, and a no-blame line for mistakes"];
+      t.session = { title: allowed === "blocked" ? "Replace the ban with a one-page rule." : "Write the one-page rule.", who: "You and one other person · one hour", how: "Fill in the four lines above for your team. Share it in your next team meeting, ask what it gets wrong, and fix it the same week. A first version this month beats a perfect one next year." };
+    }
+    if (k === "workflow") {
+      t.who = cov === "some" ? "One person per role group (" + list(names("one")) + "), with you." : "One person" + (rc.biggest ? " from " + rc.biggest.name : "") + ", with you.";
+      t.why = use === "some" ? "A few people use AI, mostly to speed up drafting. One redesigned workflow shows the rest of the team what changes when the work itself is reorganized."
+        : "AI is in daily use. The bigger gain now comes from changing how the work flows: what AI drafts, what a person approves, what stops being done at all.";
+      t.looks = ["Breaking a recurring task into steps and deciding which ones AI drafts", "Putting the human check where it catches the most", "Deciding together where the freed-up time goes, so it isn’t lost to more of the same"];
+      t.session = { title: "Map one weekly task, step by step.", who: (cov === "some" ? "One person per role group" : "One person") + " plus you · 90 minutes", how: "Pick a task the team repeats every week. Write each step on a sticky note. Mark which ones AI drafts, which a person checks, and which stay entirely with people. Run the new version for two weeks before changing anything else." };
+      t.link = { slug: COMPANION, text: "See which tasks change first" };
+    }
+    if (k === "vendor") {
+      t.who = "You, plus one person who’ll use the tool every day" + (rc.biggest ? " (from " + rc.biggest.name + ")" : "") + ".";
+      t.why = buying === "yes" ? "You’re comparing tools or a vendor is pitching you. Somebody needs to be able to tell a good demo from a good fit, and to ask where your data goes."
+        : buying === "maybe" ? "People are asking for a tool. Before anyone signs, one or two people need to know what to ask."
+        : buying === "bought" ? "You already bought one. The skill now is checking it’s used and worth keeping, before the renewal."
+        : "You named picking the wrong tool as a worry. One person who knows what to ask is enough for now.";
+      t.looks = ["Testing tools on your own real tasks, not the vendor’s examples", "Asking where your data goes, whether it trains their models, and how you’d leave", "Spotting when a vendor is overselling you"];
+      t.session = buying === "bought"
+        ? { title: "Check the tool you bought is being used.", who: "You · 30 minutes", how: "Ask who used it last week and for what. If it’s sitting there, the fix is usually a show-and-tell on real tasks, not another tool. Note what you’d need to see before renewing." }
+        : { title: "Run the same test on two tools.", who: "One or two people · two weeks", how: "Give two tools (or the vendor’s and the one you already have) the same three real tasks, using made-up or cleared data. Ask each vendor the three data questions above in writing. Decide on the results, not the demo." };
+      t.link = { slug: "ai-due-diligence-checklist", text: "Use the AI Due Diligence Checklist" };
+    }
+    return t;
+  }
+  function notYetText(k, cov) {
+    if (k === "workflow") return { why: "Redesigning workflows only makes sense once people use the tools on real tasks. Come back to it after the one-task test.", when: "Revisit when: a few people use AI every week." };
+    if (k === "vendor") return { why: "Nobody is buying a tool and vendors aren’t a worry. When someone asks for a new tool or a vendor calls, one person needs this, and the checklist covers most of it.", when: "Revisit when: anyone asks to buy something.", link: { slug: "ai-due-diligence-checklist", text: "AI Due Diligence Checklist" } };
+    if (k === "rule") return { why: "You have a written rule. Re-read it against how the team actually works twice a year, and after any new tool arrives.", when: "Revisit when: a new tool is approved, or someone asks a question the rule doesn’t answer." };
+    return { why: "", when: "" };
+  }
+
+  function stageLabel() { return { none: "Not using AI yet", some: "Informal use", daily: "Daily use" }[useLevel()]; }
+
+  /* ---------------- Results ---------------- */
+  function renderResults() {
+    var rc = roleCells(), pr = priorities(), cfg = CFG;
+    var items = SKILL_ORDER.map(function (k) { var cov = coverage(k, rc); return { k: k, cov: cov, p: pr[k] }; });
+    var now = items.filter(function (x) { return x.cov !== "not" && x.cov !== "have"; }).sort(function (a, b) { return b.p - a.p; });
+    var later = items.filter(function (x) { return x.cov === "not" || x.cov === "have"; });
+    var N = teamTotal();
+    var label = stageLabel() + " · first: " + SKILLS[now[0].k].short + " · " + now.length + " of 6 skills now";
+    S.lastResult = { label: label };
+    var html = "";
+
+    /* headline */
+    var lead = now[0], second = now[1];
+    var HEAD = { rule: "Write the team’s AI rule first", check: "Teach everyone to check AI output first",
+      use: lead.cov === "all" ? "Get everyone using AI well on real tasks first" : "Start with a few people using AI on real tasks",
+      data: "Start with data and privacy judgment", workflow: "Start by redesigning one workflow", vendor: "Get one or two people ready to evaluate the tool first" };
+    var head = HEAD[lead.k] + (second ? ", then " + SKILLS[second.k].short + (second.cov === "all" ? " for everyone" : "") : "") + ".";
+    html += '<div class="aic-eyebrow">Your team’s AI skills plan · ' + N + (N === 1 ? " person" : " people") + " · " + S.roles.length + (S.roles.length === 1 ? " role" : " roles") + "</div>" +
+      '<h2 id="aic-t-results" tabindex="-1" style="margin-top:10px">' + esc(head) + "</h2>" +
+      '<p class="aic-soft" style="margin-top:14px">Your team needs ' + (now.length === 6 ? "all six" : now.length + " of the six") + " skills now" +
+      "." + (later.length ? " " + list(later.map(function (x) { return SKILLS[x.k].short; })).replace(/^./, function (c) { return c.toUpperCase(); }) + " can" + (later.some(function (x) { return x.cov === "not"; }) ? " wait." : " stay as it is.") : "") +
+      " Most of it is short sessions on real work. Very little of it needs a course on day one.</p>";
+
+    /* overview */
+    html += '<div class="aic-section" style="margin-top:24px"><div class="aic-for">Who needs what</div><ul class="aic-overview" style="margin-top:10px">' +
+      SKILL_ORDER.map(function (k) { var x = items.filter(function (i) { return i.k === k; })[0]; return "<li><span>" + SKILLS[k].title + '</span><span class="aic-tag" data-c="' + x.cov + '">' + COVER[x.cov] + "</span></li>"; }).join("") + "</ul></div>";
+
+    /* ordered plan */
+    var phases = [["This month", now.slice(0, 2)], ["Next", now.slice(2, 4)], ["Later this quarter", now.slice(4)]];
+    var n = 0;
+    html += '<div class="aic-section"><div class="aic-eyebrow">Where to begin</div><h3 style="margin-top:8px">Build them in this order</h3><p class="aic-soft aic-small" style="margin-top:6px">Ordered from your answers. Each one starts with a session you can run yourself, this month, without buying anything.</p>' +
+      '<div style="margin-top:16px">' + phases.filter(function (ph) { return ph[1].length; }).map(function (ph) {
+        return '<div class="aic-phase"><div class="aic-for">' + ph[0] + '</div><div class="aic-stack">' + ph[1].map(function (x) {
+          n++;
+          var t = skillText(x.k, rc, x.cov);
+          return '<div class="aic-card aic-skill"><span class="aic-skill-n" aria-hidden="true">' + n + '</span><div class="aic-skill-body">' +
+            '<div class="aic-skill-meta"><span class="aic-tag" data-c="' + x.cov + '">' + COVER[x.cov] + "</span></div>" +
+            "<h3>" + SKILLS[x.k].title + "</h3>" +
+            '<p class="aic-small"><strong>Who:</strong> ' + esc(t.who) + "</p>" +
+            '<p class="aic-soft">' + esc(t.why) + "</p>" +
+            '<div class="aic-for">What it looks like for your team</div><ul>' + t.looks.map(function (l) { return "<li>" + (x.k === "use" ? l : esc(l)) + "</li>"; }).join("") + "</ul>" +
+            '<div class="aic-session"><div class="aic-for">A first session · ' + esc(t.session.who) + "</div><h4>" + esc(t.session.title) + "</h4><p>" + esc(t.session.how) + "</p></div>" +
+            (t.link ? '<p class="aic-small"><a href="' + esc(sibling(t.link.slug)) + '" data-sib="' + t.link.slug + '">' + esc(t.link.text) + " →</a></p>" : "") +
+            "</div></div>";
+        }).join("") + "</div></div>";
+      }).join("") + "</div></div>";
+
+    /* not yet */
+    if (later.length) {
+      html += '<div class="aic-section"><div class="aic-eyebrow" style="color:var(--aic-green)">Not needed right now</div><h3 style="margin-top:8px">What you can leave for later</h3><div class="aic-stack" style="margin-top:14px">' +
+        later.map(function (x) {
+          var t = notYetText(x.k, x.cov);
+          return '<div class="aic-card"><span class="aic-tag" data-c="' + x.cov + '">' + COVER[x.cov] + '</span><h3 style="margin-top:10px">' + SKILLS[x.k].title + '</h3><p class="aic-soft" style="margin-top:6px">' + esc(t.why) + '</p><p class="aic-small" style="margin-top:8px"><strong>' + esc(t.when) + "</strong></p>" +
+            (t.link ? '<p class="aic-small" style="margin-top:8px"><a href="' + esc(sibling(t.link.slug)) + '" data-sib="' + t.link.slug + '">' + esc(t.link.text) + " →</a></p>" : "") + "</div>";
+        }).join("") + "</div></div>";
+    }
+
+    /* by role */
+    var allRows = rc.rows.concat([rc.lead]);
+    html += '<div class="aic-section"><div class="aic-eyebrow">By role</div><h3 style="margin-top:8px">The plan, role by role</h3><p class="aic-soft aic-small" style="margin-top:6px">“All” means everyone in that role, “A few” means some of them, “One” means one person from it. Change a role’s kind of work in step 1 if this looks wrong.</p>' +
+      '<div class="aic-card" style="margin-top:14px;padding:12px 14px"><div class="aic-tablewrap" tabindex="0" role="region" aria-label="Skills by role"><table class="aic-table"><thead><tr><th scope="col">Role</th>' +
+      SKILL_ORDER.map(function (k) { return '<th scope="col">' + { use: "Using tools", check: "Checking", data: "Data", rule: "AI rule", workflow: "Workflow", vendor: "Vendors" }[k] + "</th>"; }).join("") + "</tr></thead><tbody>" +
+      allRows.map(function (r) {
+        return '<tr><th scope="row">' + esc(r.name) + (r.lead ? "" : ' <span class="aic-soft" style="font-weight:600">×' + r.n + "</span>") + "</th>" +
+          SKILL_ORDER.map(function (k) { var c = r.cells[k]; return '<td><span class="aic-cell" data-c="' + c + '">' + (r.lead && c === "one" ? "You" : CELL[c]) + "</span></td>"; }).join("") + "</tr>";
+      }).join("") + "</tbody></table></div></div></div>";
+
+    /* notes from worries and EU */
+    var notes = [];
+    if (worry("jobs")) notes.push('<div class="aic-note aic-note-blue"><strong>If people are worried about their jobs</strong>Say plainly what you know, what you don’t, and when you’ll say more. Don’t promise that no one’s job will change; no manager can. It’s usually some tasks that change, not whole jobs, and showing people which ones helps more than reassurance. <a href="' + esc(sibling(COMPANION)) + '" data-sib="' + COMPANION + '">See which tasks change first →</a> If someone is struggling, point them to your employee assistance program or a professional.</div>');
+    if (worry("time")) notes.push('<div class="aic-note aic-note-blue"><strong>If nobody has time to learn</strong>Every first session above fits in a lunch hour or a team meeting. Run one a month, on real work, and protect that time the way you’d protect any other training.</div>');
+    var eu = ans("eu");
+    if (eu !== "no") notes.push('<div class="aic-note"><strong>' + (eu === "yes" ? "Your EU AI-literacy duty" : "Check whether the EU AI-literacy duty applies") + "</strong>Since February 2025, Article 4 of the EU AI Act has required organizations that provide or use AI systems to take measures to support the AI literacy of staff dealing with them. Since July 2026 (Regulation (EU) 2026/1744) it no longer sets a level each person must reach. A plan like this one, plus a record of who did which session, is a sensible way to show those measures. Ask whoever handles compliance what it means for your team.</div>");
+    if (notes.length) html += '<div class="aic-section aic-stack">' + notes.join("") + "</div>";
+
+    /* next steps */
+    var trainK = now.filter(function (x) { return x.k !== "rule" && x.k !== "vendor"; }).concat([{ k: "check" }])[0].k;
+    var heavyHelp = ans("buying") === "yes" || (useLevel() === "daily" && coverage("workflow", rc) === "some");
+    var solution = heavyHelp ? {
+      cta: "get_matched", lead: "advisory", url: cfg.matchUrl, label: "Get matched to someone",
+      title: ans("buying") === "yes" ? "Get help choosing the tool" : "Get help redesigning the work",
+      reason: ans("buying") === "yes" ? "You’re comparing AI tools now. An LLPA member who works across vendors can test the options on your team’s real tasks and tell you if a vendor is overselling you."
+        : "Your team uses AI daily and the next gain is in how the work flows. An LLPA member can redesign one or two workflows with you and set up the tools around them.",
+      alt: { cta: "learn_with_member", lead: "training", url: cfg.coursesUrl, label: "Or find team AI training" }
+    } : {
+      cta: "learn_with_member", lead: "training", url: cfg.coursesUrl, label: "Learn with a member",
+      title: "Train the team on " + SKILLS[trainK].short,
+      reason: (trainK === now[0].k ? "Your first priority is " : "Once the rule is written, the first training priority is ") + SKILLS[trainK].short + (coverage(trainK, rc) === "all" ? " for everyone" : "") + ". A practical session from an LLPA member, built on your team’s real tasks, gets there faster than everyone figuring it out alone.",
+      alt: { cta: "get_matched", lead: "advisory", url: cfg.matchUrl, label: "Or get matched to someone for tool and workflow help" }
+    };
+    html += '<div class="aic-section"><div class="aic-eyebrow">What to do next</div><div class="aic-cta" style="margin-top:12px">' +
+      '<div class="aic-card"><div class="aic-for">Your next step</div><h3>See which tasks change first</h3><p class="aic-soft aic-small">This plan says who needs which skills. The companion map shows which of your team’s tasks AI could change first, so the first sessions land on the right work.</p><a class="aic-btn aic-btn-ghost" href="' + esc(sibling(COMPANION)) + '" data-sib="' + COMPANION + '">Map your team’s tasks</a></div>' +
+      '<div class="aic-card aic-cta-solution"><div class="aic-for">Need more than an answer?</div><h3>' + esc(solution.title) + '</h3><p class="aic-small" style="color:var(--aic-ink)">' + esc(solution.reason) + "</p>" +
+      '<a class="aic-btn aic-btn-primary" data-cta="' + solution.cta + '" data-lead="' + solution.lead + '" data-base="' + esc(solution.url) + '" href="#">' + solution.label + "</a>" +
+      '<a class="aic-small" style="margin-top:4px" data-cta="' + solution.alt.cta + '" data-lead="' + solution.alt.lead + '" data-base="' + esc(solution.alt.url) + '" href="#">' + solution.alt.label + "</a></div></div>" +
+      '<div class="aic-handoff"><a class="aic-btn aic-btn-ghost" data-cta="email_results" data-lead="results_email" data-base="' + esc(cfg.resultsFormUrl) + '" href="#">Email me my results</a>' +
+      '<button type="button" class="aic-link" data-act="print">Print or save as PDF</button>' +
+      '<span class="aic-soft">We’ll only email your results. The newsletter is separate: <a data-cta="newsletter" data-lead="newsletter" data-base="' + esc(cfg.newsletterUrl) + '" href="#">sign up here</a> if you want to keep up without keeping up with everything.</span></div></div>';
+
+    /* method + sources */
+    html += '<div class="aic-section"><details><summary>How the plan is worked out, and sources</summary><div class="aic-method">' +
+      "<p><strong>The six skills.</strong> A deliberately small set. Most teams don’t need a long competency framework to start; they need people who use the tools well on their own work, check what comes back, know what never goes in, and one or two people who own the rule, the workflow and the buying.</p>" +
+      "<p><strong>Who needs what.</strong> Checking is for everyone. Using the tools is for everyone at a computer once AI is in use, and for a few volunteers first if it isn’t. Data judgment is for everyone in roles you marked as handling personal or confidential data, and for everyone once AI is in daily use. The rule and vendor evaluation sit with you and one other person. Workflow redesign starts with one person and grows with use.</p>" +
+      "<p><strong>The order.</strong> Each skill gets a priority from your answers: no written rule puts the rule first; a wrong figure that would probably get through puts checking first; your worries add weight. It’s a rule of thumb from experience, not a measured diagnostic. Use it to start the conversation, then adjust.</p>" +
+      "<p><strong>Context.</strong> In the World Economic Forum’s Future of Jobs Report 2025, 63% of employers named skills gaps as the biggest barrier to transforming their business.</p>" +
+      "<p><strong>Sources.</strong> World Economic Forum, Future of Jobs Report 2025 (January 2025). EU AI Act (Regulation (EU) 2024/1689), Article 4, applies from 2 February 2025, as amended by Regulation (EU) 2026/1744 (in force July 2026). Both checked 4 November 2026. This plan is general guidance, not legal or HR advice.</p>" +
+      "</div></details></div>";
+
+    html += '<div class="aic-nav aic-noprint"><button type="button" class="aic-btn aic-btn-ghost" data-act="back" data-to="team">← Edit the team</button><button type="button" class="aic-link" data-act="restart">Start over</button></div>';
+
+    $("results").innerHTML = html;
+    if (!S.completed) { S.completed = true; emit("tool_completed", { assessment_result: label }); }
+    emit("result_viewed", { assessment_result: label });
+  }
+
+  /* ---------------- Events ---------------- */
+  ROOT.addEventListener("click", function (e) {
+    var opt = e.target.closest(".aic-opt"); if (opt) { selectOpt(opt); return; }
+    var sib = e.target.closest("[data-sib]");
+    if (sib) { emit("cta_clicked", { cta: "sibling:" + sib.getAttribute("data-sib"), assessment_result: (S.lastResult || {}).label }); sib.target = CFG.linkTarget || "_self"; return; }
+    var cta = e.target.closest("[data-cta]");
+    if (cta) {
+      var base = cta.getAttribute("data-base"), name = cta.getAttribute("data-cta"), lead = cta.getAttribute("data-lead");
+      var fields = name === "newsletter" ? { source_page: window.location.href, source_content_or_tool: SLUG, cta_clicked: name } : leadFields(name, lead);
+      emit("cta_clicked", { cta: name, lead_type: lead, assessment_result: (S.lastResult || {}).label });
+      if (!isSet(base)) { e.preventDefault(); return; }
+      cta.href = buildUrl(base, fields);
+      cta.target = CFG.linkTarget || "_self";
+      return;
+    }
+    var b = e.target.closest("[data-act]"); if (!b) return;
+    var act = b.getAttribute("data-act"), r;
+    switch (act) {
+      case "start": if (!S.started) { S.started = true; emit("tool_started"); } show("team"); break;
+      case "back": show(b.getAttribute("data-to")); break;
+      case "toToday": if (S.roles.length) { renderQuestions(); show("today"); } break;
+      case "toResults": show("results"); break;
+      case "addCommon": var c = findCommon(b.getAttribute("data-name")); r = addRole(c[0], c[1], c[2]); if (r) { var ni = ROOT.querySelector('[data-role="' + r.id + '"] input[data-f="n"]'); if (ni) ni.focus(); } break;
+      case "addCustom": var inp = ROOT.querySelector("#aic-custom"), v = inp.value.trim(); if (!v) { inp.focus(); return; } r = addRole(v.slice(0, 60), "docs", false); inp.value = ""; if (r) { var ws = ROOT.querySelector('[data-role="' + r.id + '"] select[data-f="work"]'); if (ws) ws.focus(); } break;
+      case "example":
+        S.roles = []; [["Customer service representative", 8], ["HR specialist", 2], ["Data analyst", 2], ["Team manager or supervisor", 1]].forEach(function (x) { var cc = findCommon(x[0]); addRole(cc[0], cc[1], cc[2], x[1]); });
+        renderRoles(); break;
+      case "inc": case "dec": r = roleById(b); if (!r) return; r.n = Math.max(1, Math.min(999, r.n + (act === "inc" ? 1 : -1))); renderRoles(); var cb = ROOT.querySelector('[data-role="' + r.id + '"] [data-act="' + act + '"]'); if (cb) cb.focus(); break;
+      case "removeRole": r = roleById(b); S.roles = S.roles.filter(function (x) { return x !== r; }); renderRoles(); var first = ROOT.querySelector('[data-act="addCommon"]'); if (first) first.focus(); break;
+      case "print": window.print(); break;
+      case "restart": S.roles = []; S.answers = {}; S.worries = []; S.completed = false; S.started = false; renderRoles(); show("intro"); break;
+    }
+  });
+  ROOT.addEventListener("input", function (e) {
+    var el = e.target, f = el.getAttribute("data-f"); if (!f) return;
+    var r = roleById(el); if (!r) return;
+    if (f === "name") { r.name = el.value.trim() || "Unnamed role"; return; }
+    if (f === "n") { var n = parseInt(el.value, 10); if (n >= 1) { r.n = Math.min(999, n); var t = teamTotal(); $("teamHint").textContent = t + (t === 1 ? " person" : " people") + " in the plan"; } }
+  });
+  ROOT.addEventListener("change", function (e) {
+    var el = e.target, f = el.getAttribute("data-f"); if (!f) return;
+    var r = roleById(el); if (!r) return;
+    if (f === "n") { r.n = Math.max(1, Math.min(999, parseInt(el.value, 10) || 1)); renderRoles(); return; }
+    if (f === "work") r.work = el.value;
+    if (f === "sens") r.sens = el.checked;
+    if (f === "name") renderRoles();
+  });
+  ROOT.addEventListener("keydown", function (e) {
+    var opt = e.target.closest && e.target.closest(".aic-opt"); if (!opt) return;
+    if (opt.hasAttribute("data-multi")) { if (e.key === " " || e.key === "Enter") { e.preventDefault(); selectOpt(opt); } return; }
+    var opts = Array.prototype.slice.call(opt.parentElement.querySelectorAll(".aic-opt")), i = opts.indexOf(opt), n = null;
+    if (e.key === "ArrowDown" || e.key === "ArrowRight") n = opts[(i + 1) % opts.length];
+    if (e.key === "ArrowUp" || e.key === "ArrowLeft") n = opts[(i - 1 + opts.length) % opts.length];
+    if (e.key === " " || e.key === "Enter") { e.preventDefault(); selectOpt(opt); return; }
+    if (n) { e.preventDefault(); n.focus(); selectOpt(n); }
+  });
+  ROOT.addEventListener("keypress", function (e) { if (e.target.id === "aic-custom" && e.key === "Enter") { e.preventDefault(); ROOT.querySelector('[data-act="addCustom"]').click(); } });
+  window.addEventListener("beforeprint", function () { ROOT.querySelectorAll("details").forEach(function (d) { if (!d.open) { d.setAttribute("data-was-closed", ""); d.open = true; } }); });
+  window.addEventListener("afterprint", function () { ROOT.querySelectorAll("details[data-was-closed]").forEach(function (d) { d.open = false; d.removeAttribute("data-was-closed"); }); });
+
+  renderCommon(); renderRoles(); show("intro", true);
+})();
+</script>
+<!-- AIC:END -->
+</body>
+</html>
+
+</body></html>

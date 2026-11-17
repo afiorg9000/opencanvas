@@ -1,0 +1,939 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>where-could-ai-actually-help-your-business</title><style>html,body{margin:0;background:#F7F8FA}@media (prefers-color-scheme:dark){html,body{background:#F7F8FA}}</style></head><body>
+<!--
+  TOOL: Where Could AI Actually Help Your Business?
+  Slug: where-could-ai-actually-help-your-business
+  Type: tool
+  Audience: Business (Priority 1: business owners and mid-market companies). Library-plan entry: "Where Should
+  You Start? Pick your industry (retail, clinic, agency, restaurant, other) and team size; get your three best
+  first uses, starting with customer service." Written in house voice from the start, 4 Nov 2026.
+
+  WHAT IT COVERS
+  Four short steps: industry (8 options), team size (5 bands), the kinds of work that eat the week (12, tick
+  any), and where the business is with AI tools today (5 options). The result ranks 3 to 5 starting uses by
+  likely payoff against risk, each with: what it looks like in practice; what to watch (data, accuracy, who
+  checks it); a one-task test to try this week; and "you don't need this yet" where that's the honest answer.
+  Then a payoff-vs-risk chart, a note matched to where they are with AI today, "Where not to start" (general
+  plus industry-specific), one next step (run the one-task test; copy or print the plan) and one member route:
+  matchUrl when the picks carry high risk, the team is 50+, or the picks involve connecting company documents or
+  data (team 10+); coursesUrl otherwise. Then "Email me my results" and a separate newsletter link.
+
+  METHOD (editorial judgment, not measurement)
+  Each use has a base payoff and risk rating (1-5), adjusted by industry and team size (tables PAYOFF/RISK,
+  IND_MOD and SIZE_MOD in the script). Ranking score = 2 x payoff - risk. If fewer than three kinds of work are
+  ticked, the list is topped up with common starting points for that industry, marked "Not on your list".
+  Ratings are shown as High / Medium / Low labels only. No invented figures.
+
+  SOURCES CHECKED (4 Nov 2026)
+  - U.S. Chamber of Commerce, "U.S. Chamber's Latest 'Empowering Small Business' Report Shows Majority of
+    Businesses in All 50 States Are Embracing AI", 18 Aug 2025: "58% of small businesses say they use
+    generative AI—up from 40% in 2024." Self-reported; definitions vary; directional. Report PDF:
+    https://www.uschamber.com/assets/documents/Empowering-Small-Business-Report-2025.pdf
+  - EU AI Act, Regulation (EU) 2024/1689, Annex III point 4(a): AI used for recruitment or selection, including
+    to analyze and filter job applications, is high-risk. European Commission AI Act Service Desk (checked
+    4 Nov 2026). No application dates are given in the tool (they were moved by the 2026 amendments).
+  - Library plan by role (Oct 2026): "Customer service is the proven first step because the return is
+    immediate" was softened to a qualitative ranking (enquiry replies rank high by default); the Salesforce
+    figures cited there were not used.
+
+  PRIVACY: Runs entirely in the browser. Answers live in memory only: no storage, no cookies, no network
+  requests. Nothing is stored or sent unless the visitor clicks a link.
+
+  EMBED IN WORDPRESS
+  Option A (Custom HTML block): paste everything between "AIC:START" and "AIC:END" below.
+  Option B (iframe):
+    <iframe src="/tools/where-could-ai-actually-help-your-business.html" title="Where could AI actually help your business?"
+      style="width:100%;border:0;min-height:1500px" loading="lazy"></iframe>
+  CONFIG URLS (window.AICHANNEL_CONFIG; set before the tool or edit the block at the top of the script):
+    resultsFormUrl  "Email me my results" form page
+    coursesUrl      "Learn with a member" (Central AI course schedule)
+    matchUrl        "Get matched to someone" (advisory / implementation form)
+    newsletterUrl   separate newsletter opt-in (never auto-subscribed)
+  CTA query params: lead_type, audience (business), source_page, source_content_or_tool, cta_clicked,
+    assessment_name, assessment_result ("Start with: <use> · <industry> · <size>"), plus utm_* from the page URL.
+  EVENTS: window "aichannel:event" CustomEvent + parent.postMessage({type:"aichannel:event", ...}) for
+    tool_started (first answer), tool_completed and result_viewed (result shown), cta_clicked.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Where could AI actually help your business? | AI Channel</title>
+<meta name="description" content="Pick your industry, team size and the work that eats your week. Get three to five realistic places to start with AI, ranked by payoff against risk, with a test to try this week.">
+<!-- AI Channel design A: tool design system v2 (visual layer only; no behaviour changes) -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style id="aic-theme">
+/* ---------- tokens ---------- */
+:root,html{color-scheme:light!important;
+ --pine:#2859c7!important;--pine-deep:#1945ac!important;--accent:#2859c7!important;--accent-deep:#1945ac!important;--primary:#2859c7!important;--blue:#2859c7!important;--blue-d:#1945ac!important;
+ --paper:#ffffff!important;--bg:#ffffff!important;--white:#fff!important;--card:#fff!important;--ink:#14213d!important;--ink-soft:#3f4a5c!important;--ink-mute:#5b6577!important;--muted:#3f4a5c!important;
+ --line:#d9e2f0!important;--sage:#eef3fc!important;--amber-soft:#fbf3e4!important;--accent-wash:#eef3fc!important;--blue-wash:#eef3fc!important;--sky:#eef3fc!important;--pale:#f4f7fc!important;--warm:#f4f7fc!important;
+ --serif:"Newsreader",Georgia,serif!important;--sans:"Inter",system-ui,sans-serif!important;--mono:"IBM Plex Mono",ui-monospace,monospace!important}
+html body .aic-tool,html body .aic-article{
+ --aic-paper:#ffffff!important;--aic-white:#ffffff!important;--aic-ink:#14213d!important;--aic-soft:#46526a!important;--aic-line:#d9e2f0!important;--aic-sage:#eef3fc!important;
+ --aic-blue:#2859c7!important;--aic-blue-deep:#1945ac!important;--aic-blue-soft:#eef3fc!important;--aic-on-blue:#ffffff!important;--aic-focus:#9fbcff!important;
+ --aic-grey:#46526a!important;--aic-grey-soft:#f4f7fc!important;
+ --aic-radius:16px!important;--aic-radius-sm:12px!important;--aic-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important;
+ color-scheme:light!important;background:#fff!important;color:#14213d!important;
+ font-family:"Inter",system-ui,sans-serif!important;-webkit-font-smoothing:antialiased}
+html,body{background:#fff!important}
+html body .aic-tool{padding:56px 0 96px!important}
+html body .aic-article{padding:0 0 112px!important}
+html body .aic-tool .aic-col,html body .aic-article .aic-col{max-width:860px!important}
+@media(min-width:600px){html body .aic-tool .aic-col,html body .aic-article .aic-col{padding-inline:32px!important}}
+
+/* ---------- type ---------- */
+html body .aic-tool .aic-h1,html body .aic-article h1,body h1{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important;line-height:1.02!important;font-size:clamp(38px,5.4vw,62px)!important;color:#14213d}
+html body .aic-tool .aic-h2,html body .aic-article h2,body h2{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important;line-height:1.1!important}
+html body .aic-article h2{font-size:clamp(28px,3.6vw,38px)!important;margin-top:72px!important}
+html body .aic-tool .aic-h2{font-size:clamp(26px,3.4vw,36px)!important}
+html body .aic-tool .aic-h3,html body .aic-article h3,body h3{font-family:"Newsreader",Georgia,serif!important;font-weight:550!important;letter-spacing:-.01em!important;font-size:22px!important;line-height:1.2!important}
+body h4,body h5,body h6{font-family:"Inter",system-ui,sans-serif!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow,html body .aic-tool .aic-qnum,html body .aic-tool .aic-nav-hint,.aic-mono{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;letter-spacing:.06em!important;text-transform:uppercase;font-size:12px!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow{color:#2859c7!important;display:flex!important;align-items:center;gap:12px}
+html body .aic-tool .aic-eyebrow::before,html body .aic-article .aic-head .aic-eyebrow::before{content:"";width:28px;height:1px;background:#2859c7;flex:none}
+html body .aic-tool .aic-lede,html body .aic-article .aic-lede,html body .aic-article .aic-dek{font-size:20px!important;line-height:1.55!important;color:#3f4a5c!important;max-width:60ch}
+html body .aic-tool .aic-soft,html body .aic-tool .aic-small{color:#46526a!important}
+html body .aic-tool .aic-small{font-size:14px!important}
+html body .aic-article{font-size:18.5px!important;line-height:1.72!important}
+html body .aic-article p+p{margin-top:22px!important}
+html body .aic-article .aic-head{padding:72px 0 40px!important;border-bottom:1px solid #d9e2f0;margin-bottom:48px}
+html body .aic-article .aic-meta,html body .aic-article .aic-head p:not(.aic-lede):not(.aic-dek){font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px!important;letter-spacing:.03em;color:#5b6577!important}
+html body .aic-tool a,html body .aic-article a{color:#2859c7}
+
+/* ---------- panels ---------- */
+html body .aic-tool .aic-card,html body .aic-article .aic-card{background:#fff!important;border:1px solid #d9e2f0!important;border-radius:16px!important;box-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important}
+@media(min-width:600px){html body .aic-tool .aic-card{padding:36px 40px!important}html body .aic-article .aic-card{padding:32px 36px!important}}
+html body .aic-tool .aic-stack>*+*{margin-top:20px!important}
+html body .aic-tool .aic-grid2,html body .aic-article .aic-grid{gap:16px!important}
+/* the short answer: a framed figure, like the site's tool previews */
+html body .aic-article .aic-short{background:#fff!important;border:1px solid #d9e2f0!important;box-shadow:0 0 0 10px #eef3fc,0 0 0 11px #d9e2f0!important;margin:12px 11px 56px!important;border-radius:12px!important;border-left:1px solid #d9e2f0!important}
+html body .aic-article .aic-short .aic-eyebrow,html body .aic-article .aic-short>:first-child{color:#2859c7!important}
+/* notes and callouts */
+html body .aic-tool .aic-note,html body .aic-article .aic-note,html body .aic-article .aic-callout{background:#f4f7fc!important;border-left:3px solid #2859c7!important;border-radius:0 12px 12px 0!important;padding:18px 22px!important;font-size:15.5px!important;color:#14213d!important}
+html body .aic-tool .aic-note.aic-warn{background:#fdf7ec!important;border-left-color:#a46207!important}
+html body .aic-tool .aic-note.aic-bad{background:#fdf0ee!important;border-left-color:#b42318!important}
+html body .aic-tool .aic-note.aic-good{background:#eef8f1!important;border-left-color:#2f7a4e!important}
+/* calls to action become navy bands */
+html body .aic-tool .aic-cta,html body .aic-article .aic-cta,html body .aic-tool .aic-dark,html body .aic-article .aic-dark{--aic-ink:#ffffff!important;--aic-soft:#c9d6ee!important;--aic-white:#13264a!important;--aic-line:#2a3f6a!important;--aic-blue:#9fbcff!important;--aic-blue-soft:#1d3563!important;--aic-on-blue:#13264a!important;
+ background:#13264a!important;color:#fff!important;border-color:#13264a!important;box-shadow:none!important}
+html body .aic-tool .aic-cta *:not(.aic-btn):not(.aic-btn *),html body .aic-article .aic-cta *:not(.aic-btn):not(.aic-btn *){color:inherit}
+html body .aic-tool .aic-cta .aic-btn-primary,html body .aic-article .aic-cta .aic-btn-primary{background:#fff!important;color:#13264a!important;border-color:#fff!important}
+html body .aic-tool .aic-cta a:not(.aic-btn),html body .aic-article .aic-cta a:not(.aic-btn){color:#9fbcff!important}
+
+/* ---------- questions and answer options ---------- */
+html body .aic-tool .aic-q{margin-top:28px!important}
+html body .aic-tool .aic-qnum{color:#2859c7!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;font-size:clamp(22px,2.6vw,27px)!important;line-height:1.22!important;letter-spacing:-.01em!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qhint{font-size:15px!important;color:#46526a!important;margin-bottom:18px!important}
+html body .aic-tool .aic-opts{gap:10px!important;margin-top:18px!important}
+html body .aic-tool .aic-opt,html body .aic-tool .aic-pick,html body .aic-tool .aic-check{background:#fff!important;border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:16px 18px!important;font-size:16px!important;gap:14px!important;transition:border-color .15s,box-shadow .15s,background-color .15s,transform .15s!important}
+html body .aic-tool .aic-opt:hover,html body .aic-tool .aic-pick:hover,html body .aic-tool .aic-check:hover{border-color:#2859c7!important;box-shadow:0 6px 18px rgba(40,89,199,.10)!important;transform:translateY(-1px)}
+html body .aic-tool .aic-opt[aria-checked="true"],html body .aic-tool .aic-opt[aria-pressed="true"],html body .aic-tool .aic-pick:has(input:checked),html body .aic-tool .aic-check:has(input:checked),html body .aic-tool .aic-opt:has(input:checked){border-color:#2859c7!important;background:#f4f7fc!important;box-shadow:0 0 0 3px #dbe6fb!important}
+html body .aic-tool .aic-dot{width:22px!important;height:22px!important;border:2px solid #9aa8c0!important}
+html body .aic-tool .aic-dot::after{inset:4px!important;background:#2859c7!important}
+html body .aic-tool .aic-opt[aria-checked="true"] .aic-dot{border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-size:14px!important;color:#46526a!important;margin-top:4px!important}
+html body .aic-tool .aic-opt.aic-opt-unsure{background:transparent!important;border-style:dashed!important}
+html body .aic-tool input[type=text],html body .aic-tool input[type=search],html body .aic-tool input[type=email],html body .aic-tool textarea,html body .aic-tool select,html body .aic-tool .aic-input{border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:14px 16px!important;background:#fff!important;font-size:16px!important}
+html body .aic-tool input:focus,html body .aic-tool textarea:focus,html body .aic-tool select:focus{border-color:#2859c7!important;outline:none!important;box-shadow:0 0 0 3px #dbe6fb!important}
+
+/* ---------- controls ---------- */
+html body .aic-tool .aic-btn,html body .aic-article .aic-btn{min-height:50px!important;padding:14px 24px!important;font-weight:600!important;font-size:15px!important;border-radius:999px!important;border:1.5px solid #c9d6ee!important;box-shadow:none!important}
+html body .aic-tool .aic-btn:hover,html body .aic-article .aic-btn:hover{border-color:#2859c7!important}
+html body .aic-tool .aic-btn-primary,html body .aic-article .aic-btn-primary{background:#2859c7!important;border-color:#2859c7!important;color:#fff!important}
+html body .aic-tool .aic-btn-primary:hover,html body .aic-article .aic-btn-primary:hover{background:#1945ac!important;border-color:#1945ac!important}
+html body .aic-tool .aic-btn-ghost{border-color:transparent!important;text-decoration:underline;text-underline-offset:4px;color:#3f4a5c!important}
+html body .aic-tool .aic-btn[disabled]{opacity:.4!important}
+html body .aic-tool .aic-nav{margin-top:36px!important;padding-top:24px!important;border-top:1px solid #d9e2f0!important}
+html body .aic-tool .aic-actions{gap:12px!important}
+html body .aic-tool .aic-seg{border:1.5px solid #d9e2f0!important;padding:4px!important}
+html body .aic-tool .aic-seg button{font-weight:600!important;color:#3f4a5c!important}
+html body .aic-tool .aic-seg button[aria-pressed="true"],html body .aic-tool .aic-seg button[aria-checked="true"]{background:#13264a!important;color:#fff!important}
+html body .aic-tool .aic-progress{height:4px!important;background:#e3eaf6!important;margin:20px 0 8px!important}
+html body .aic-tool .aic-progress span,html body .aic-tool .aic-progress i{background:#2859c7!important}
+html body .aic-tool .aic-chip,html body .aic-tool .aic-pill{border:1.5px solid #d9e2f0!important;background:#fff!important;font-weight:600!important;border-radius:999px!important}
+html body .aic-tool .aic-chip[aria-pressed="true"],html body .aic-tool .aic-chip.aic-on,html body .aic-tool .aic-pill.aic-on{background:#eef3fc!important;border-color:#2859c7!important;color:#1945ac!important}
+html body .aic-tool .aic-tag,html body .aic-article .aic-tag{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;padding:5px 11px!important}
+html body .aic-tool .aic-privacy{font-size:14px!important;color:#46526a!important;margin-top:20px!important}
+
+/* ---------- results ---------- */
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-stat b,html body .aic-tool .aic-stat strong,html body .aic-tool .aic-display{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important}
+html body .aic-tool .aic-bar{height:8px!important;background:#e3eaf6!important}
+html body .aic-tool .aic-bar-row{padding:14px 0!important;border-bottom-color:#e3eaf6!important}
+html body .aic-tool .aic-bar-label{font-weight:600!important}
+html body .aic-tool table,html body .aic-article table{border-collapse:collapse}
+html body .aic-tool th,html body .aic-article th{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;text-transform:uppercase;color:#2859c7!important;background:#f4f7fc!important}
+html body .aic-tool td,html body .aic-article td{border-color:#e3eaf6!important}
+html body .aic-article .aic-sources,html body .aic-tool .aic-sources{font-size:14px!important;color:#46526a!important;border-top:1px solid #d9e2f0;padding-top:32px!important;margin-top:72px!important}
+html body .aic-article .aic-related,html body .aic-article .aic-deeper{margin-top:72px!important}
+
+/* ---------- pages outside the shared system ---------- */
+body:not(:has(.aic-tool)):not(:has(.aic-article)) h1,body:not(:has(.aic-tool)):not(:has(.aic-article)) h2,body:not(:has(.aic-tool)):not(:has(.aic-article)) h3{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important}
+html,body{font-family:"Inter",system-ui,sans-serif}
+input[type=range],input[type=checkbox],input[type=radio]{accent-color:#2859c7!important}
+:focus-visible{outline-color:#2859c7!important}
+[tabindex="-1"]:focus,h1:focus,h2:focus,h3:focus{outline:none!important;box-shadow:none!important}
+
+/* ================= v3: product-grade tool shell ================= */
+html,body{background:#f4f7fc!important}
+html body .aic-tool{background:#f4f7fc!important}
+html body .aic-tool .aic-col{max-width:980px!important}
+html body .aic-tool .aic-h1{font-size:clamp(40px,5vw,62px)!important;max-width:20ch}
+html body .aic-tool .aic-grid2>.aic-card{box-shadow:none!important;background:#fff!important;border-radius:14px!important}
+html body .aic-tool.aic-in-q .aic-h1{font-size:22px!important;line-height:1.2!important;max-width:none;margin:6px 0 20px!important;font-weight:500!important}
+html body .aic-tool.aic-in-q .aic-lede,html body .aic-tool.aic-in-q > .aic-col > .aic-privacy,html body .aic-tool.aic-in-q .aic-col > * > .aic-privacy{display:none!important}
+html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:56px 64px 44px!important;border:0!important;border-radius:24px!important;box-shadow:0 1px 0 rgba(19,38,74,.05),0 30px 70px rgba(19,38,74,.10)!important;min-height:460px}
+@media(max-width:700px){html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:32px 22px 28px!important;border-radius:18px!important;min-height:0}}
+html body .aic-tool .aic-progress{height:3px!important;background:#e3eaf6!important;border-radius:0!important;margin:14px 0 36px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-size:clamp(26px,3.2vw,38px)!important;line-height:1.12!important;letter-spacing:-.02em!important;margin-bottom:12px!important;max-width:28ch}
+html body .aic-tool .aic-qhint{font-size:16px!important;margin-bottom:24px!important}
+html body .aic-tool .aic-opts{counter-reset:aicopt;gap:12px!important}
+html body .aic-tool .aic-opt{counter-increment:aicopt;align-items:center!important;min-height:64px;padding:16px 20px!important;font-size:17px!important;font-weight:500;border-radius:14px!important}
+html body .aic-tool .aic-opt .aic-dot{display:none!important}
+html body .aic-tool .aic-opt::before{content:counter(aicopt,upper-alpha);flex:none;width:30px;height:30px;display:grid;place-items:center;border:1.5px solid #c9d6ee;border-radius:8px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;font-weight:500;color:#2859c7;background:#fff;transition:all .15s}
+html body .aic-tool .aic-opt:hover::before{border-color:#2859c7}
+html body .aic-tool .aic-opt[aria-checked="true"]::before{background:#2859c7;border-color:#2859c7;color:#fff;content:"\2713"}
+html body .aic-tool .aic-opt[aria-checked="true"]{background:#eef3fc!important;box-shadow:0 0 0 2px #2859c7!important;border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-weight:400}
+html body .aic-tool .aic-nav{border-top:0!important;margin-top:40px!important;padding-top:0!important}
+html body .aic-tool .aic-nav .aic-btn-primary{min-width:150px}
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-display{font-size:clamp(56px,8vw,96px)!important;line-height:.95!important;color:#14213d}
+
+/* ================= v4: legibility ================= */
+html body .aic-tool{font-size:17px!important;line-height:1.6!important}
+html body .aic-tool,html body .aic-article{--aic-soft:#334055!important}
+html body .aic-tool .aic-small,html body .aic-tool .aic-opt-sub,html body .aic-tool .aic-privacy,html body .aic-tool .aic-nav-hint{font-size:15px!important;color:#334055!important}
+html body .aic-tool p,html body .aic-tool li{color:#1d2a44}
+html body .aic-tool .aic-lede{font-size:20px!important;color:#2a364d!important}
+html body .aic-tool .aic-note{font-size:16.5px!important}
+html body .aic-tool .aic-opt{font-size:18px!important;color:#14213d!important}
+html body .aic-tool .aic-qhint{font-size:17px!important;color:#334055!important}
+html body .aic-tool .aic-eyebrow,html body .aic-tool .aic-qnum,.aic-mono{font-size:12.5px!important;color:#2859c7!important;letter-spacing:.05em!important}
+html body .aic-tool .aic-tag{font-size:12.5px!important}
+html body .aic-tool th,html body .aic-article th{font-size:12.5px!important}
+html body .aic-tool td{font-size:16px}
+html body .aic-article{color:#14213d!important}
+html body .aic-article p,html body .aic-article li{color:#1d2a44}
+</style>
+<script>
+(function(){
+  function hsl(c){var m=c&&c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/);if(!m)return null;var r=m[1]/255,g=m[2]/255,b=m[3]/255,a=m[4]===undefined?1:+m[4];
+    var mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn,s=d?d/(1-Math.abs(2*l-1)):0,h=0;
+    if(d){h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;if(h<0)h+=360}return {h:h,s:s,l:l,a:a}}
+  function blue(c){var x=hsl(c);return x&&x.a>0.05&&x.s>0.3&&x.l>0.28&&x.l<0.95&&x.h>=205&&x.h<=240?x:null}
+  function N(x,dark,light){return x.a<0.95?"rgba(40,89,199,"+Math.min(x.a,0.12).toFixed(3)+")":(x.l>0.82?light:dark)}
+  function fix(el){var c0=getComputedStyle(el),bg=hsl(c0.backgroundColor),fg=hsl(c0.color);if(bg&&fg&&bg.a>0.9&&bg.l<0.6&&bg.s>0.3&&bg.h>=205&&bg.h<=240&&fg.l<0.6)el.style.setProperty("color","#ffffff","important");
+    if(el.closest(".aic-cta,.aic-dark")||el.matches(".aic-opt,.aic-pick,.aic-check,.aic-btn,.aic-chip,.aic-pill,.aic-seg button,.aic-card,.aic-note"))return;var cs=getComputedStyle(el),x;
+    if((x=blue(cs.color)))el.style.setProperty("color",x.l>0.75?"#eef3fc":"#2859c7","important");
+    if((x=blue(cs.backgroundColor)))el.style.setProperty("background-color",N(x,"#2859c7",x.l>0.9?"#eef3fc":"#d6e2f8"),"important");
+    if(el instanceof SVGElement){if((x=blue(cs.fill)))el.style.setProperty("fill",N(x,"#2859c7","#eef3fc"),"important");if((x=blue(cs.stroke)))el.style.setProperty("stroke",N(x,"#2859c7","#d6e2f8"),"important")}
+    if(cs.textTransform==="uppercase"&&parseFloat(cs.fontSize)<=13.5&&!el.closest("button")&&!el.classList.contains("aic-mono"))el.classList.add("aic-mono");}
+  var t;function mode(){document.querySelectorAll(".aic-tool").forEach(function(r){var q=[].some.call(r.querySelectorAll(".aic-progress,.aic-qtext,.aic-q-text"),function(e){return e.offsetParent!==null});if(q!==r.classList.contains("aic-in-q"))r.classList.toggle("aic-in-q",q)})}
+  function run(){clearTimeout(t);t=setTimeout(function(){mode();document.querySelectorAll("body *").forEach(fix)},30)}
+  document.addEventListener("DOMContentLoaded",function(){run();new MutationObserver(run).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class","aria-pressed","aria-checked","data-state"]});
+    document.addEventListener("change",run,true);document.addEventListener("click",run,true);});
+})();
+</script>
+</head>
+<body style="margin:0;background:#F7F8FA">
+<!-- ===== AIC:START — for a WordPress Custom HTML block, paste everything from here to AIC:END ===== -->
+<style>
+.aic-tool{
+  --aic-paper:#F7F8FA; --aic-white:#FFFFFF; --aic-ink:#162033; --aic-soft:#667085; --aic-line:#DEE3EA; --aic-sage:#EEF1F6;
+  --aic-blue:#315EFB; --aic-blue-deep:#2448C9; --aic-blue-soft:#EEF3FF; --aic-on-blue:#FFFFFF;
+  --aic-amber:#A46207; --aic-amber-soft:#FBF3E4; --aic-green:#2F7A4E; --aic-green-soft:#E9F5EE;
+  --aic-red:#B42318; --aic-red-soft:#FDEDEB;
+  --aic-radius:18px; --aic-radius-sm:12px; --aic-shadow:0 10px 28px rgba(21,32,51,.055);
+  background:var(--aic-paper); color:var(--aic-ink);
+  font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size:16px; line-height:1.55; padding:32px 0 56px; -webkit-text-size-adjust:100%; text-align:left;
+  overflow-wrap:break-word; overflow-x:clip;
+}
+@media (prefers-color-scheme:dark){
+  .aic-tool{
+    --aic-paper:#101B2D; --aic-white:#162033; --aic-ink:#F2F4F8; --aic-soft:#A6B3C7; --aic-line:#2A3850; --aic-sage:#1E2A40;
+    --aic-blue:#7A97FF; --aic-blue-deep:#9BB2FF; --aic-blue-soft:#1F2B45; --aic-on-blue:#0B1426;
+    --aic-amber:#E0A34A; --aic-amber-soft:#2D2617; --aic-green:#6FC592; --aic-green-soft:#15302A;
+    --aic-red:#F97066; --aic-red-soft:#3A1E22; --aic-shadow:none; color-scheme:dark;
+  }
+}
+.aic-tool *,.aic-tool *::before,.aic-tool *::after{box-sizing:border-box}
+.aic-tool h1,.aic-tool h2,.aic-tool h3,.aic-tool h4,.aic-tool p,.aic-tool ul,.aic-tool ol,.aic-tool li,.aic-tool fieldset,.aic-tool legend,.aic-tool dl,.aic-tool dd{margin:0;padding:0}
+.aic-tool ul,.aic-tool ol{list-style:none}
+.aic-tool button{font:inherit;color:inherit}
+.aic-tool a{color:var(--aic-blue);font-weight:700;text-decoration:none}
+.aic-tool a:hover{text-decoration:underline}
+.aic-tool :focus-visible{outline:3px solid #9DB2FF;outline-offset:2px;border-radius:8px}
+.aic-tool [hidden]{display:none!important}
+.aic-tool .aic-sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;margin:-1px;padding:0;border:0}
+.aic-tool .aic-col{max-width:820px;margin:0 auto;padding-inline:16px}
+@media (min-width:600px){.aic-tool .aic-col{padding-inline:24px}}
+.aic-tool .aic-eyebrow{display:block;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--aic-blue)}
+.aic-tool .aic-h1{font-size:clamp(30px,6.4vw,50px);line-height:1.04;font-weight:800;letter-spacing:-.035em;margin:12px 0 16px}
+.aic-tool .aic-h2{font-size:clamp(24px,4.4vw,34px);line-height:1.1;font-weight:800;letter-spacing:-.035em;margin:8px 0 10px}
+.aic-tool .aic-h3{font-size:19px;line-height:1.25;font-weight:800;letter-spacing:-.02em;margin:0 0 6px}
+.aic-tool .aic-lede{font-size:18px;color:var(--aic-soft);max-width:640px}
+.aic-tool .aic-soft{color:var(--aic-soft)}
+.aic-tool .aic-small{font-size:13.5px;color:var(--aic-soft);line-height:1.55}
+.aic-tool .aic-card{background:var(--aic-white);border:1px solid var(--aic-line);border-radius:var(--aic-radius);box-shadow:var(--aic-shadow);padding:20px}
+@media (min-width:600px){.aic-tool .aic-card{padding:26px 28px}}
+.aic-tool .aic-fade{animation:aicFade .35s ease both}
+@keyframes aicFade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.aic-tool .aic-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;min-height:46px;border-radius:999px;border:1px solid var(--aic-line);background:var(--aic-white);color:var(--aic-ink);font-weight:750;font-size:15px;cursor:pointer;text-decoration:none;line-height:1.2;transition:background .15s,border-color .15s}
+.aic-tool .aic-btn:hover{border-color:#B8C7FF;text-decoration:none}
+.aic-tool .aic-btn-primary{background:var(--aic-blue);border-color:var(--aic-blue);color:var(--aic-on-blue);box-shadow:0 6px 16px rgba(49,94,251,.14)}
+.aic-tool .aic-btn-primary:hover{background:var(--aic-blue-deep);border-color:var(--aic-blue-deep);color:var(--aic-on-blue)}
+.aic-tool .aic-btn-ghost{background:none;border-color:transparent;color:var(--aic-soft);padding-inline:10px}
+.aic-tool .aic-btn-ghost:hover{color:var(--aic-ink);border-color:transparent}
+.aic-tool .aic-btn[disabled]{opacity:.45;cursor:not-allowed;box-shadow:none}
+.aic-tool .aic-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.aic-tool .aic-nav{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-top:22px;padding-top:18px;border-top:1px solid var(--aic-line)}
+.aic-tool .aic-nav-hint{font-size:13px;color:var(--aic-soft);font-weight:650}
+
+.aic-tool .aic-progress{height:6px;border-radius:999px;background:var(--aic-sage);overflow:hidden;margin:12px 0 18px}
+.aic-tool .aic-progress span{display:block;height:100%;width:0;background:var(--aic-blue);border-radius:999px;transition:width .35s ease}
+.aic-tool .aic-qnum{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--aic-soft)}
+.aic-tool .aic-qtext{font-size:21px;font-weight:800;line-height:1.3;letter-spacing:-.02em;margin:6px 0 6px}
+.aic-tool .aic-qhint{font-size:14.5px;color:var(--aic-soft);margin-bottom:4px}
+.aic-tool .aic-opts{display:grid;gap:8px;margin-top:14px;grid-template-columns:1fr}
+@media (min-width:640px){.aic-tool .aic-opts.aic-two{grid-template-columns:1fr 1fr}}
+.aic-tool .aic-opt{display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;padding:12px 14px;border:1px solid var(--aic-line);border-radius:var(--aic-radius-sm);background:var(--aic-paper);cursor:pointer;font-size:15.5px;line-height:1.4;transition:border-color .15s,background .15s}
+.aic-tool .aic-opt:hover{border-color:#B8C7FF;background:var(--aic-white)}
+.aic-tool .aic-dot{flex:none;width:18px;height:18px;border-radius:50%;border:2px solid #A9B4C6;margin-top:1px;position:relative}
+.aic-tool .aic-opt[data-multi] .aic-dot{border-radius:5px}
+.aic-tool .aic-dot::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--aic-blue);transform:scale(0);transition:transform .15s}
+.aic-tool .aic-opt[data-multi] .aic-dot::after{border-radius:2px}
+.aic-tool .aic-opt[aria-checked="true"]{border-color:var(--aic-blue);background:var(--aic-white);box-shadow:0 0 0 3px var(--aic-blue-soft)}
+.aic-tool .aic-opt[aria-checked="true"] .aic-dot{border-color:var(--aic-blue)}
+.aic-tool .aic-opt[aria-checked="true"] .aic-dot::after{transform:scale(1)}
+.aic-tool .aic-opt b{font-weight:750}
+.aic-tool .aic-opt-sub{display:block;font-size:13.5px;color:var(--aic-soft);margin-top:2px}
+
+.aic-tool .aic-note{border-radius:var(--aic-radius-sm);padding:14px 16px;background:var(--aic-blue-soft);border-left:3px solid var(--aic-blue);font-size:15px;color:var(--aic-ink)}
+.aic-tool .aic-note.aic-warn{background:var(--aic-amber-soft);border-left-color:var(--aic-amber)}
+.aic-tool .aic-note strong{font-weight:800}
+.aic-tool .aic-tag{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:5px 10px;border-radius:999px;background:var(--aic-sage);color:var(--aic-soft);line-height:1.35}
+.aic-tool .aic-tag.aic-t-good{background:var(--aic-green-soft);color:var(--aic-green)}
+.aic-tool .aic-tag.aic-t-warn{background:var(--aic-amber-soft);color:var(--aic-amber)}
+.aic-tool .aic-tag.aic-t-bad{background:var(--aic-red-soft);color:var(--aic-red)}
+.aic-tool .aic-tag.aic-t-blue{background:var(--aic-blue-soft);color:var(--aic-blue)}
+.aic-tool .aic-privacy{display:flex;gap:8px;align-items:flex-start;font-size:13.5px;color:var(--aic-soft);margin-top:14px}
+.aic-tool .aic-privacy svg{flex:none;margin-top:3px}
+.aic-tool .aic-list li{position:relative;padding-left:18px;margin-top:8px}
+.aic-tool .aic-list li::before{content:"";position:absolute;left:2px;top:.62em;width:7px;height:7px;border-radius:50%;background:var(--aic-blue)}
+.aic-tool .aic-list.aic-list-x li::before{background:var(--aic-amber)}
+
+.aic-tool .aic-next{display:grid;gap:12px;grid-template-columns:1fr}
+@media (min-width:700px){.aic-tool .aic-next{grid-template-columns:1fr 1fr}}
+.aic-tool .aic-next .aic-card{display:flex;flex-direction:column;gap:10px}
+.aic-tool .aic-next .aic-card .aic-btn{align-self:flex-start}
+.aic-tool .aic-next .aic-card .aic-actions{margin-top:auto}
+.aic-tool .aic-solution{border-color:#C7D3FF;background:linear-gradient(180deg,var(--aic-blue-soft),var(--aic-white) 70%)}
+.aic-tool .aic-handoff{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;font-size:14px;margin-top:14px}
+.aic-tool .aic-linkbtn{background:none;border:0;padding:4px 0;color:var(--aic-blue);font-weight:750;cursor:pointer;text-decoration:underline;text-underline-offset:3px;font-size:14px}
+.aic-tool .aic-sources{font-size:13px;color:var(--aic-soft);line-height:1.6}
+.aic-tool .aic-sources li{margin-top:8px}
+.aic-tool .aic-sources a{font-weight:650;overflow-wrap:anywhere}
+.aic-tool details.aic-more summary{cursor:pointer;padding:12px 0;font-weight:800;list-style:none;display:flex;justify-content:space-between;gap:10px}
+.aic-tool details.aic-more summary::-webkit-details-marker{display:none}
+.aic-tool details.aic-more summary::after{content:"+";color:var(--aic-soft)}
+.aic-tool details.aic-more[open] summary::after{content:"\2013"}
+
+/* This tool */
+.aic-tool .aic-wh-chart{display:grid;gap:16px;grid-template-columns:1fr;align-items:center}
+@media (min-width:700px){.aic-tool .aic-wh-chart{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}}
+.aic-tool .aic-wh-chart svg{width:100%;height:auto;display:block;max-width:420px}
+.aic-tool .aic-wh-key li{display:grid;grid-template-columns:26px 1fr;gap:8px;align-items:start;margin-top:8px;font-size:14.5px;font-weight:650}
+.aic-tool .aic-wh-num{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--aic-blue);color:var(--aic-on-blue);font-size:12.5px;font-weight:800;font-variant-numeric:tabular-nums}
+.aic-tool .aic-wh-num.aic-wh-sugg{background:var(--aic-white);color:var(--aic-blue);border:2px solid var(--aic-blue)}
+.aic-tool .aic-wh-use{margin-top:14px}
+.aic-tool .aic-wh-top{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start}
+.aic-tool .aic-wh-rank{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;background:var(--aic-blue);color:var(--aic-on-blue);font-weight:800;font-size:17px}
+.aic-tool .aic-wh-rank.aic-wh-sugg{background:var(--aic-white);color:var(--aic-blue);border:2px solid var(--aic-blue)}
+.aic-tool .aic-wh-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.aic-tool .aic-wh-sec{margin-top:16px}
+.aic-tool .aic-wh-label{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--aic-soft);margin-bottom:4px}
+.aic-tool .aic-wh-watch{display:grid;gap:8px;grid-template-columns:1fr;margin-top:4px}
+@media (min-width:700px){.aic-tool .aic-wh-watch{grid-template-columns:1fr 1fr 1fr}}
+.aic-tool .aic-wh-watch div{background:var(--aic-paper);border:1px solid var(--aic-line);border-radius:12px;padding:10px 12px;font-size:14.5px}
+.aic-tool .aic-wh-watch b{display:block;font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--aic-amber);margin-bottom:2px}
+.aic-tool .aic-wh-test{background:var(--aic-green-soft);border-radius:12px;padding:12px 14px;font-size:15px}
+.aic-tool .aic-wh-test b{color:var(--aic-green)}
+.aic-tool .aic-wh-notyet{font-size:14.5px;border-top:1px dashed var(--aic-line);padding-top:12px}
+.aic-tool .aic-wh-later{margin-top:14px}
+.aic-tool .aic-wh-later li{display:inline-block;margin:6px 6px 0 0}
+
+@media (prefers-reduced-motion:reduce){
+  .aic-tool .aic-fade{animation:none}
+  .aic-tool *{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+}
+@media print{
+  .aic-tool{--aic-paper:#fff;--aic-white:#fff;--aic-ink:#000;--aic-soft:#444;--aic-line:#bbb;--aic-sage:#eee;--aic-blue:#2448C9;--aic-on-blue:#fff;--aic-shadow:none;background:#fff!important;color:#000;padding:0;font-size:11pt}
+  .aic-tool .aic-noprint{display:none!important}
+  .aic-tool.aic-wh-has-result .aic-wh-form{display:none!important}
+  .aic-tool .aic-card{box-shadow:none;border-color:#bbb;break-inside:avoid;padding:14px 16px}
+  .aic-tool .aic-col{max-width:none;padding:0}
+  .aic-tool .aic-tag,.aic-tool .aic-note,.aic-tool .aic-wh-rank,.aic-tool .aic-wh-num,.aic-tool .aic-wh-test{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .aic-tool a{color:#000;text-decoration:underline}
+}
+</style>
+<div class="aic-tool" id="aic-where-could-ai-actually-help-your-business"><noscript><div class="aic-col"><p>This tool needs JavaScript to run. It all happens in your browser, and nothing is sent.</p></div></noscript></div>
+<script>
+window.AICHANNEL_CONFIG = Object.assign({
+  resultsFormUrl: "#",      // "Email me my results" form (WordPress form page)
+  coursesUrl: "#",          // "Learn with a member" (Central AI course schedule)
+  matchUrl: "#",            // "Get matched to someone" (advisory/consulting form)
+  newsletterUrl: "#"        // separate newsletter opt-in
+}, window.AICHANNEL_CONFIG || {});
+(function () {
+  'use strict';
+  var CFG = window.AICHANNEL_CONFIG;
+  var SLUG = 'where-could-ai-actually-help-your-business';
+  var TOOL_NAME = 'Where Could AI Actually Help Your Business?';
+  var AUDIENCE = 'business';
+  var ROOT = document.getElementById('aic-' + SLUG);
+  if (!ROOT) return;
+  var reducedMotion = false;
+  try { reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+
+  /* ---------- Shared helpers (results hand-off, events, DOM) ---------- */
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function $(sel, ctx) { return (ctx || ROOT).querySelector(sel); }
+  function $$(sel, ctx) { return Array.prototype.slice.call((ctx || ROOT).querySelectorAll(sel)); }
+  function utmParams() {
+    var out = {};
+    try { new URLSearchParams(window.location.search).forEach(function (v, k) { if (/^utm_/i.test(k)) out[k] = v; }); } catch (e) {}
+    return out;
+  }
+  /* DOM event + postMessage so GA4/GTM on the host page can track. No direct analytics calls. */
+  function emit(name, extra) {
+    var detail = { event: name, tool: SLUG, assessment_name: TOOL_NAME, audience: AUDIENCE };
+    if (extra) for (var k in extra) if (Object.prototype.hasOwnProperty.call(extra, k)) detail[k] = extra[k];
+    try { window.dispatchEvent(new CustomEvent('aichannel:event', { detail: detail })); } catch (e) {}
+    try { var msg = { type: 'aichannel:event' }; for (var j in detail) msg[j] = detail[j]; window.parent.postMessage(msg, '*'); } catch (e) {}
+  }
+  function buildUrl(base, cta, result) {
+    var params = {
+      lead_type: result.lead_type || 'tool_result', audience: AUDIENCE, source_page: window.location.href,
+      source_content_or_tool: SLUG, cta_clicked: cta, assessment_name: TOOL_NAME, assessment_result: result.label || ''
+    };
+    var utm = utmParams(); for (var u in utm) params[u] = utm[u];
+    try {
+      var url = new URL(base || '#', window.location.href);
+      for (var p in params) url.searchParams.set(p, params[p]);
+      return url.toString();
+    } catch (e) {
+      var qs = Object.keys(params).map(function (k) { return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]); }).join('&');
+      return (base || '#') + (String(base).indexOf('?') > -1 ? '&' : '?') + qs;
+    }
+  }
+  function wireCtas(container, result) {
+    $$('[data-aic-cta]', container).forEach(function (a) {
+      var kind = a.getAttribute('data-aic-cta');
+      var base = CFG[a.getAttribute('data-aic-url')] || '#';
+      var lead = a.getAttribute('data-aic-lead') || 'tool_result';
+      a.setAttribute('href', kind === 'newsletter' ? base : buildUrl(base, kind, { label: result.label, lead_type: lead }));
+      a.addEventListener('click', function () { emit('cta_clicked', { cta_clicked: kind, lead_type: lead, assessment_result: result.label }); });
+    });
+  }
+  function focusHeading(el) { if (!el) return; el.setAttribute('tabindex', '-1'); try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); } }
+  function scrollToEl(el) { if (!el) return; try { el.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' }); } catch (e) { el.scrollIntoView(); } }
+  var LOCK_SVG = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="2" y="6" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M4.5 6V4.5a2.5 2.5 0 015 0V6" stroke="currentColor" stroke-width="1.5"/></svg>';
+
+  /* ---------- Data ---------- */
+  var INDUSTRIES = [
+    { id: 'pro', noun: 'a professional services firm or agency', label: 'Professional services or agency', sub: 'Consulting, legal, marketing, design, IT services' },
+    { id: 'retail', noun: 'a retail or e-commerce business', label: 'Retail or e-commerce', sub: 'Shop, online store, wholesale' },
+    { id: 'clinic', noun: 'a clinic or health practice', label: 'Clinic or health practice', sub: 'Dental, physio, vet, therapy, private practice' },
+    { id: 'food', noun: 'a restaurant, café or hospitality business', label: 'Restaurant, café or hospitality', sub: 'Food, drink, hotels, events' },
+    { id: 'trade', noun: 'a manufacturing, construction or trades business', label: 'Manufacturing, construction or trades', sub: 'Workshop, factory, contractors, field service' },
+    { id: 'fin', noun: 'a finance, accounting or insurance business', label: 'Finance, accounting or insurance', sub: 'Bookkeeping, accounting practice, brokers, advisers' },
+    { id: 'edu', noun: 'an education or training provider', label: 'Education or training provider', sub: 'Training company, school, tutoring, courses' },
+    { id: 'other', noun: 'a business', label: 'Something else', sub: 'You’ll get the general version' }
+  ];
+  var SIZES = [
+    { id: 'solo', label: 'Just me' },
+    { id: 's', label: '2–9 people' },
+    { id: 'm', label: '10–49 people' },
+    { id: 'l', label: '50–249 people' },
+    { id: 'xl', label: '250 or more' }
+  ];
+  var READY = [
+    { id: 'none', label: 'Nobody here really uses AI tools yet' },
+    { id: 'own', label: 'A few people use their own accounts, on their own initiative' },
+    { id: 'paid', label: 'We pay for a business AI tool, but it isn’t used much' },
+    { id: 'active', label: 'We use AI tools regularly, with some rules in place' },
+    { id: 'unsure', label: 'I’m not sure, honestly' }
+  ];
+  var READY_NOTE = {
+    none: '<strong>Before the first test:</strong> choose one tool on a business plan and write the one-page rule. What it’s for, what data never goes in, and who checks the output. Then run the test below.',
+    own: '<strong>Write the one-page rule first.</strong> The AI in daily use is rarely the AI that was approved. Ask people what they already use and what they paste into it, then agree one tool and one page of rules before you run the test below.',
+    paid: '<strong>Use the tool you already pay for before buying anything else.</strong> Companies buy the AI tool, hand it to staff, and it just... sits there. One-task tests on real work, with a clock running, are how that changes.',
+    active: '<strong>You’re past the first step.</strong> Pick the use below that your team hasn’t tried yet and measure it the same way: same job, clock running, errors counted.',
+    unsure: '<strong>Start by finding out.</strong> If asked today, could you list the AI tools people in your business use for work? Ask around this week. It will change which of the uses below is safe to try first.'
+  };
+
+  /* Work types. p = base payoff, r = base risk (1-5, editorial). */
+  var WORK = [
+    { id: 'enq', label: 'Customer emails and enquiries', sub: 'The same questions, every week', short: 'Enquiry replies', p: 4, r: 2,
+      title: 'Draft replies to the enquiries you answer every week',
+      practice: 'Write a one-page facts sheet: prices, hours, policies, lead times. The AI tool drafts a reply to each common enquiry from that sheet, and a person reads it, fixes it and sends it. Nothing goes out unread.',
+      ind: { clinic: 'Admin questions only: opening hours, booking, directions, what to bring. Anything about symptoms or treatment goes straight to a clinician.',
+        food: 'Bookings, group menus, opening hours. Allergen answers come from your own allergen sheet, word for word, never from the AI’s general knowledge.',
+        retail: 'Order status, returns, sizing and delivery questions make up most of it, and they repeat.',
+        fin: 'General service questions only. Anything that reads as advice about a client’s money stays with a qualified person.',
+        pro: 'New-business enquiries and “what’s the status?” emails are the obvious pair to start with.' },
+      data: 'Customer names, emails and order details go into the tool. Use a business plan whose terms say your data isn’t used for training.',
+      acc: 'If the facts sheet doesn’t cover a question, it will invent a policy or price that sounds right.',
+      check: 'Whoever answers enquiries today. They send every reply.',
+      test: 'Take your last ten enquiries. Draft replies from the facts sheet with the clock running. Count how many you’d send with light edits.',
+      notYet: 'A chatbot on your website that answers customers on its own. Earn that after a few months of drafts you barely edit.' },
+    { id: 'quote', label: 'Quotes and proposals', sub: 'Writing them up, pricing them out', short: 'Quotes and proposals', p: 4, r: 2,
+      title: 'First drafts of quotes and proposals, built from your past ones',
+      practice: 'Give the tool two or three of your best past proposals and your notes from a new enquiry. It drafts the structure, the scope wording and the cover note. You set the price and the promises.',
+      ind: { trade: 'Turning site notes or a voice memo into a written quote with clear inclusions and exclusions is where the hours go.',
+        pro: 'Scope sections and case-study paragraphs are the slow part. A first pass from your own examples saves the blank page.',
+        edu: 'Training proposals for corporate clients: outline, outcomes and logistics from your existing course descriptions.' },
+      data: 'Past proposals often hold client names and pricing. Strip them out or use an approved business tool.',
+      acc: 'It fills gaps with confident detail: a deliverable you never offered, a timeline you can’t meet, sums that don’t add up.',
+      check: 'The person who signs the quote checks every number, date and commitment.',
+      test: 'Pick one enquiry from this week. Draft the proposal both ways, your usual way and with AI, and time each.',
+      notYet: 'Proposal software wired into your CRM. Prove the drafting saves time on ten quotes first.' },
+    { id: 'sched', label: 'Scheduling, bookings and rotas', sub: 'Back-and-forth to find a time', short: 'Scheduling', p: 2, r: 1,
+      title: 'Sort out scheduling, starting with the boring tools',
+      practice: 'Most scheduling pain is fixed by a plain booking tool or shared calendar, with no AI at all. AI helps with the messy middle: turning a long email thread into a list of options, or drafting a rota from who can work when.',
+      ind: { clinic: 'Online booking and automatic reminders do most of the work. AI can draft the reminder and rebooking messages.',
+        food: 'Rotas and shift swaps. AI can turn availability messages into a draft rota you then fix.' },
+      data: 'Staff availability and customer contact details. Keep health or personal reasons for absence out of it.',
+      acc: 'It can double-book or miss a constraint you mentioned once. It doesn’t know your calendar unless it’s connected to it.',
+      check: 'Whoever owns the calendar or rota today signs it off.',
+      test: 'Paste one week’s availability messages, with surnames removed, and ask for a draft rota. Compare it with the one you made.',
+      notYet: 'An AI assistant that books, moves and cancels appointments on its own.' },
+    { id: 'books', label: 'Bookkeeping, invoices and chasing payment', sub: 'Receipts, reminders, reconciling', short: 'Bookkeeping admin', p: 3, r: 4,
+      title: 'Use the AI features in your accounting software to clear the admin',
+      practice: 'Receipt capture, bank-feed matching and invoice reminders. Many accounting packages now include some of this. Start inside the tool that already holds your numbers, rather than pasting figures into a chatbot.',
+      ind: { fin: 'For an accounting practice the gain is in client admin: chasing missing documents, and drafting plain-language notes on a set of accounts for the client to read.' },
+      data: 'Financial data plus supplier and customer details. Check what the software’s AI feature sends, and to whom, before you switch it on.',
+      acc: 'Language AI is unreliable at arithmetic and will give a total that looks right. Numbers come from your books, never from the chat.',
+      check: 'Your bookkeeper or accountant reconciles exactly as they do today. Nothing changes about who signs off.',
+      test: 'Have the tool draft three overdue-invoice reminders in your tone. Send only the ones you’d have sent anyway.',
+      notYet: 'Tax answers from a general chatbot. Ask your accountant.' },
+    { id: 'mkt', label: 'Marketing content', sub: 'Posts, newsletters, product or service descriptions', short: 'Marketing drafts', p: 4, r: 1,
+      title: 'Drafts for posts, newsletters and descriptions',
+      practice: 'Give it a few examples of your own writing and a list of what’s happening this month. It drafts the week’s posts or the newsletter. You cut, fix the facts and add the part only you know.',
+      ind: { retail: 'Product descriptions from your own spec sheets are a strong fit: repetitive, checkable, and easy to compare with the source.',
+        clinic: 'Stick to opening hours, team news and general tips you’d stand behind. Health claims need the same care as ever.',
+        fin: 'Financial promotions are regulated in many countries. Treat AI drafts like any other draft that needs compliance sign-off.',
+        food: 'Menu descriptions, specials and event posts. Check dishes and prices against the actual menu.',
+        edu: 'Course descriptions and enrollment emails, drafted from your own course outlines.' },
+      data: 'Low, as long as customer lists and unpublished plans stay out of it.',
+      acc: 'Generic sameness, and claims you can’t back up. AI images can raise rights questions, so read the tool’s terms.',
+      check: 'Whoever publishes today reads everything before it goes out.',
+      test: 'Draft next week’s posts from a sample of your writing and five things happening. Time it against how long it usually takes.',
+      notYet: 'A tool that posts for you on a schedule, without a person reading first.' },
+    { id: 'report', label: 'Reporting and weekly numbers', sub: 'Pulling figures together, writing them up', short: 'Weekly reporting', p: 3, r: 3,
+      title: 'Turn your own numbers into a short weekly update',
+      practice: 'Export last month’s figures from the system you already use. Ask for the three changes that matter and a plain-language summary for the team. The spreadsheet stays the source; the AI writes the words around it.',
+      ind: { fin: 'Commentary on management accounts is a good fit, with every figure checked against the ledger.',
+        retail: 'Weekly sales by product or channel, written up in a paragraph the team will actually read.',
+        trade: 'Job progress and margin by job, summarized for the Monday meeting.' },
+      data: 'Business figures, sometimes customer-level data. Total things up before you paste, or use an approved tool.',
+      acc: 'It can misread columns, mix up periods and calculate wrong while sounding sure.',
+      check: 'The person who owns the numbers checks every figure before the update goes out.',
+      test: 'Take a report you already wrote last month. Generate the AI version from the same export and mark every error you find.',
+      notYet: 'A dashboard or data-warehouse project. Get value from the exports you already have.' },
+    { id: 'docs', label: 'Reading and reviewing documents', sub: 'Contracts, tenders, policies, long briefs', short: 'Document first reads', p: 3, r: 4,
+      title: 'A first read of long documents: summary plus questions',
+      practice: 'The tool gives a summary, a list of unusual terms and the questions to ask. A person still reads the document before anyone relies on it.',
+      ind: { pro: 'Tenders and client briefs are a strong fit: it flags requirements and deadlines that you then check.',
+        fin: 'Policy wordings and client documents: useful for a first pass, never a replacement for the regulated review.',
+        clinic: 'Keep clinical records out of general AI tools entirely, unless the tool and contract are built for health data.',
+        edu: 'Marking and feedback drafts can save hours, but a teacher decides every grade.' },
+      data: 'Contracts and client documents are often confidential. This needs an approved business tool with clear terms on retention and training.',
+      acc: 'It misses things, especially in long documents, and it can describe a clause that isn’t there.',
+      check: 'The person who would sign, approve or advise on the document reads it in full.',
+      test: 'Use a document you already know well. Ask for a summary and the five riskiest clauses, then see what it missed.',
+      notYet: 'Letting the summary stand in for reading the document.' },
+    { id: 'know', label: 'Finding information inside the business', sub: '“Where’s the latest version?” “How do we do this?”', short: 'Internal knowledge', p: 3, r: 3,
+      title: 'Answers from your own procedures and policies',
+      practice: 'Put your up-to-date procedures, price lists and how-to notes in one place, and let people ask questions of them in an approved tool. New staff stop interrupting the one person who knows everything.',
+      ind: {},
+      data: 'Internal documents, sometimes HR or client material. Check who can see what before you connect anything.',
+      acc: 'Out-of-date documents produce confident out-of-date answers. It’s only as good as the folder.',
+      check: 'Name an owner for the folder who keeps it current. Staff check anything that affects a customer.',
+      test: 'Collect your ten most-asked internal questions. Put the documents that answer them in one folder, ask the tool each question, and mark the answers.',
+      notYet: 'A custom-built company chatbot. If your procedures aren’t written down yet, write them first. That’s the real work, and it pays off with or without AI.' },
+    { id: 'hire', label: 'Hiring admin', sub: 'Job ads, interviews, candidate emails', short: 'Hiring admin', p: 2, r: 2,
+      title: 'Job ads, interview guides and candidate emails',
+      practice: 'Drafting the job ad from your notes, a structured set of interview questions for the role, and the scheduling and candidate emails. A person reads all of it before it goes out.',
+      ind: {},
+      data: 'CVs and applications are personal data. Keep them out of general AI tools.',
+      acc: 'Job ads can pick up biased or inflated wording. Read them the way a candidate would.',
+      check: 'The hiring manager owns every word and every decision.',
+      test: 'Draft your next job ad and interview guide with AI from your own notes. Ask a colleague to compare them with your last ones.',
+      notYet: 'AI that screens, scores or ranks candidates. That’s where the discrimination risk sits, and the EU AI Act treats AI used to filter job applications as high-risk.' },
+    { id: 'meet', label: 'Meeting notes and follow-ups', sub: 'Who said what, who does what next', short: 'Meeting notes', p: 3, r: 3,
+      title: 'Meeting notes and follow-up actions',
+      practice: 'A notes tool transcribes the meeting and drafts the summary and the action list. Someone who was in the room fixes it and sends it.',
+      ind: { clinic: 'Patient consultations are a different matter: only with tools built and contracted for health records, and with consent.',
+        pro: 'Client calls are the obvious use. Tell clients you’re using it, and check your engagement terms first.' },
+      data: 'Everything said in the meeting goes into the tool. Tell people, and check the consent rules where you operate.',
+      acc: 'It gets who said what wrong and drops the quiet decisions. Names and numbers are where errors hide.',
+      check: 'The person who chaired the meeting edits and sends the notes.',
+      test: 'Run it on one internal meeting this week. Compare its action list with yours.',
+      notYet: 'Recording client or customer conversations before you’ve told them and checked your terms.' },
+    { id: 'admin', label: 'Data entry and copying between systems', sub: 'Orders, forms, PDFs into spreadsheets', short: 'Document data entry', p: 3, r: 2,
+      title: 'Pull details out of emails, forms and PDFs into a sheet',
+      practice: 'Order details, supplier invoices, job sheets, application forms. The AI reads the document and fills the columns. A person spot-checks before the data goes anywhere that matters.',
+      ind: { retail: 'Supplier product data into your catalog format is a common, checkable win.',
+        trade: 'Job sheets, delivery notes and supplier price lists into the format your system wants.',
+        clinic: 'Supplier and stock paperwork, yes. Patient forms only in a tool built for health data.' },
+      data: 'Depends on the documents. Supplier paperwork is low risk; customer or patient forms are not.',
+      acc: 'Copying slips: a digit, a date, a swapped column. They look exactly like correct data.',
+      check: 'Check every line at first, then a sample every time.',
+      test: 'Take twenty documents you’ve already keyed in by hand. Run them through and count the errors against your version.',
+      notYet: 'Full automation that moves the data into your systems with no check. Run it with checks for a month first.' },
+    { id: 'train', label: 'Training and onboarding new staff', sub: 'Explaining the same things again', short: 'Staff guides', p: 3, r: 1,
+      title: 'Checklists, how-to guides and quizzes for new staff',
+      practice: 'Turn the way you actually do things into short guides, checklists and quiz questions. The expert explains it once, out loud or in notes, and the AI tidies it into something a new starter can follow.',
+      ind: { edu: 'Course materials, worksheets and practice questions from your own outlines. Your trainers check every fact.',
+        trade: 'Method steps written up from a walk-through. Safety content is checked by whoever is responsible for it.',
+        food: 'Opening and closing checklists, station guides, and the house way of doing things.' },
+      data: 'Low. Your own procedures, usually nothing personal.',
+      acc: 'It smooths over the step that matters. The expert reads it and puts the tricky part back.',
+      check: 'The person who does the job best checks the guide.',
+      test: 'Pick one task new starters always ask about. Record a five-minute explanation, have AI turn it into a checklist, and hand it to the next new person.',
+      notYet: 'An AI tutor or learning platform. Start with one good checklist.' }
+  ];
+  var WORK_BY = {}; WORK.forEach(function (w, i) { w.order = i; WORK_BY[w.id] = w; });
+
+  /* Industry and size adjustments: {workId: [payoffDelta, riskDelta]} */
+  var IND_MOD = {
+    pro: { quote: [1, 0], docs: [1, 0], meet: [1, 0] },
+    retail: { enq: [1, 0], mkt: [1, 0], admin: [1, 0], report: [1, 0] },
+    clinic: { enq: [0, 1], docs: [0, 1], meet: [0, 2], mkt: [0, 1], sched: [1, 0], admin: [0, 1] },
+    food: { mkt: [1, 0], sched: [1, 0], enq: [0, 1], report: [-1, 0], docs: [-1, 0], train: [1, 0] },
+    trade: { quote: [1, 0], admin: [1, 0], train: [1, 0], mkt: [-1, 0] },
+    fin: { report: [1, 1], docs: [1, 1], books: [1, 0], enq: [0, 1], mkt: [0, 1] },
+    edu: { train: [1, 0], mkt: [1, 0], docs: [0, 1] },
+    other: {}
+  };
+  var SIZE_MOD = {
+    solo: { know: [-2, 0], train: [-2, 0], hire: [-2, 0], meet: [-1, 0] },
+    s: { know: [-1, 0], train: [-1, 0], hire: [-1, 0] },
+    m: {},
+    l: { know: [1, 0], train: [1, 0], hire: [1, 0] },
+    xl: { know: [1, 0], train: [1, 0], hire: [1, 0], report: [1, 0] }
+  };
+  /* Common starting points by industry, used to top up a short list. */
+  var DEFAULTS = {
+    pro: ['enq', 'quote', 'meet', 'mkt'], retail: ['enq', 'mkt', 'admin'], clinic: ['sched', 'enq', 'train'],
+    food: ['mkt', 'enq', 'train'], trade: ['quote', 'admin', 'train'], fin: ['report', 'enq', 'mkt'],
+    edu: ['train', 'mkt', 'enq'], other: ['enq', 'mkt', 'train']
+  };
+  var NOT_HERE = {
+    pro: 'Advice that goes out to clients under your name without an expert reading it first.',
+    retail: 'Automatic price changes or refunds decided by AI.',
+    clinic: 'Anything clinical: symptoms, triage, diagnosis or treatment advice.',
+    food: 'Allergen or dietary answers drawn from the AI’s general knowledge instead of your own sheet.',
+    trade: 'Safety-critical instructions, measurements or load figures.',
+    fin: 'Advice to clients, or figures that reach a client or a filing without being reconciled.',
+    edu: 'Grades or progress decisions that a teacher doesn’t review.',
+    other: ''
+  };
+
+  function clamp(v) { return Math.max(1, Math.min(5, v)); }
+  function rate(w) {
+    var p = w.p, r = w.r, im = (IND_MOD[S.ind] || {})[w.id], sm = (SIZE_MOD[S.size] || {})[w.id];
+    if (im) { p += im[0]; r += im[1]; }
+    if (sm) { p += sm[0]; r += sm[1]; }
+    p = clamp(p); r = clamp(r);
+    return { w: w, p: p, r: r, score: 2 * p - r };
+  }
+  function lvl(v) { return v >= 4 ? 'High' : v === 3 ? 'Medium' : 'Low'; }
+  function band(x) {
+    if (x.r >= 4) return { t: 'Only with checks in place', tone: 'warn' };
+    if (x.p >= 4 && x.r <= 2) return { t: 'Strong first pick', tone: 'good' };
+    if (x.p >= 3) return { t: 'Worth a test', tone: 'blue' };
+    return { t: 'Small win', tone: '' };
+  }
+
+  /* ---------- State (memory only) ---------- */
+  var S, started, lastResult = null;
+  function fresh() { S = { step: 0, ind: null, size: null, work: [], ready: null }; started = false; }
+  fresh();
+
+  var STEPS = [
+    { key: 'ind', q: 'What kind of business is it?', hint: 'Pick the closest. It changes the examples and what to watch for.', type: 'radio', opts: INDUSTRIES, two: true },
+    { key: 'size', q: 'How many people work in the business?', hint: 'Count everyone, including part-time staff.', type: 'radio', opts: SIZES, two: true },
+    { key: 'work', q: 'Which kinds of work eat your week?', hint: 'Tick everything that takes more time than it should. Three to six works best.', type: 'multi', opts: WORK, two: true },
+    { key: 'ready', q: 'Where are you with AI tools today?', hint: 'No wrong answer. It decides what to do before the first test.', type: 'radio', opts: READY, two: false }
+  ];
+
+  /* ---------- Render ---------- */
+  ROOT.innerHTML = '<div class="aic-col">' +
+    '<div class="aic-wh-form">' +
+    '<header class="aic-fade"><span class="aic-eyebrow">For business owners and managers</span>' +
+    '<h1 class="aic-h1" id="aic-wh-h1">Where could AI actually help your business?</h1>' +
+    '<p class="aic-lede">Four quick questions, about three minutes. You’ll get three to five places to start, ranked by payoff against risk, a test to run this week, and where not to start.</p>' +
+    '<p class="aic-privacy">' + LOCK_SVG + '<span>Everything runs in your browser. No email, nothing stored or sent.</span></p></header>' +
+    '<section class="aic-card" style="margin-top:22px" aria-live="polite" id="aic-wh-step"></section>' +
+    '</div>' +
+    '<section class="aic-wh-result" id="aic-wh-result" aria-labelledby="aic-wh-rh" hidden></section>' +
+    '</div>';
+
+  function optHtml(step, o) {
+    var multi = step.type === 'multi';
+    var on = multi ? S.work.indexOf(o.id) > -1 : S[step.key] === o.id;
+    return '<button type="button" class="aic-opt" role="' + (multi ? 'checkbox' : 'radio') + '" aria-checked="' + on + '"' + (multi ? ' data-multi' : '') +
+      ' data-k="' + step.key + '" data-v="' + o.id + '"><span class="aic-dot" aria-hidden="true"></span><span><b>' + esc(o.label) + '</b>' +
+      (o.sub ? '<span class="aic-opt-sub">' + esc(o.sub) + '</span>' : '') + '</span></button>';
+  }
+  function answered(i) {
+    var k = STEPS[i].key;
+    return k === 'work' ? S.work.length > 0 : !!S[k];
+  }
+  function renderStep(focus) {
+    var i = S.step, st = STEPS[i], last = i === STEPS.length - 1;
+    var gid = 'aic-wh-q' + i;
+    var host = $('#aic-wh-step');
+    var count = st.type === 'multi' ? '<span class="aic-nav-hint" id="aic-wh-count">' + S.work.length + ' ticked</span>' : '<span class="aic-nav-hint">' + (answered(i) ? '' : 'Choose one to continue') + '</span>';
+    host.innerHTML =
+      '<div class="aic-qnum">Question ' + (i + 1) + ' of ' + STEPS.length + '</div>' +
+      '<div class="aic-progress" aria-hidden="true"><span style="width:' + Math.round(i / STEPS.length * 100) + '%"></span></div>' +
+      '<h2 class="aic-qtext" id="' + gid + '">' + esc(st.q) + '</h2>' +
+      '<p class="aic-qhint">' + esc(st.hint) + '</p>' +
+      '<div class="aic-opts' + (st.two ? ' aic-two' : '') + '" role="' + (st.type === 'multi' ? 'group' : 'radiogroup') + '" aria-labelledby="' + gid + '">' +
+        st.opts.map(function (o) { return optHtml(st, o); }).join('') + '</div>' +
+      '<div class="aic-nav">' +
+        (i > 0 ? '<button type="button" class="aic-btn aic-btn-ghost" data-act="back">← Back</button>' : '<span></span>') +
+        '<div class="aic-actions">' + count +
+        '<button type="button" class="aic-btn aic-btn-primary" data-act="next"' + (answered(i) ? '' : ' disabled') + '>' + (last ? 'Show where to start' : 'Next →') + '</button></div>' +
+      '</div>';
+    if (st.type === 'radio') roving($('[role="radiogroup"]', host));
+    if (focus) focusHeading($('#' + gid));
+  }
+  function roving(group) {
+    var opts = $$('[role="radio"]', group);
+    var on = opts.filter(function (o) { return o.getAttribute('aria-checked') === 'true'; })[0] || opts[0];
+    opts.forEach(function (o) { o.setAttribute('tabindex', o === on ? '0' : '-1'); });
+  }
+  function touch() { if (!started) { started = true; emit('tool_started', {}); } }
+
+  ROOT.addEventListener('click', function (e) {
+    var opt = e.target.closest('.aic-opt');
+    if (opt && ROOT.contains(opt)) {
+      var k = opt.getAttribute('data-k'), v = opt.getAttribute('data-v');
+      touch();
+      if (k === 'work') {
+        var ix = S.work.indexOf(v);
+        if (ix > -1) S.work.splice(ix, 1); else S.work.push(v);
+        opt.setAttribute('aria-checked', String(ix === -1));
+        $('#aic-wh-count').textContent = S.work.length + ' ticked';
+      } else {
+        S[k] = v;
+        $$('[data-k="' + k + '"]').forEach(function (b) { b.setAttribute('aria-checked', String(b === opt)); });
+        roving(opt.parentNode);
+        var hint = $('#aic-wh-step .aic-nav-hint'); if (hint) hint.textContent = '';
+      }
+      $('[data-act="next"]').disabled = !answered(S.step);
+      return;
+    }
+    var act = e.target.closest('[data-act]');
+    if (!act) return;
+    var a = act.getAttribute('data-act');
+    if (a === 'next' && answered(S.step)) {
+      if (S.step < STEPS.length - 1) { S.step++; renderStep(true); scrollToEl($('#aic-wh-step')); }
+      else renderResult();
+    }
+    if (a === 'back' && S.step > 0) { S.step--; renderStep(true); }
+    if (a === 'edit') {
+      $('#aic-wh-result').hidden = true; ROOT.classList.remove('aic-wh-has-result'); $('.aic-wh-form').hidden = false;
+      S.step = 2; renderStep(true); scrollToEl($('#aic-wh-step'));
+    }
+    if (a === 'restart') {
+      fresh(); $('#aic-wh-result').hidden = true; ROOT.classList.remove('aic-wh-has-result'); $('.aic-wh-form').hidden = false;
+      renderStep(false); scrollToEl(ROOT); focusHeading($('#aic-wh-h1'));
+    }
+    if (a === 'print') { try { window.print(); } catch (err) {} }
+    if (a === 'copy') copyPlan(act);
+  });
+  ROOT.addEventListener('keydown', function (e) {
+    var opt = e.target.closest && e.target.closest('[role="radio"]');
+    if (!opt) return;
+    var opts = $$('[role="radio"]', opt.parentNode), i = opts.indexOf(opt), n = null;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') n = opts[(i + 1) % opts.length];
+    if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') n = opts[(i - 1 + opts.length) % opts.length];
+    if (n) { e.preventDefault(); n.focus(); n.click(); }
+  });
+
+  /* ---------- Result ---------- */
+  function compute() {
+    var picks = S.work.map(function (id) { return rate(WORK_BY[id]); });
+    picks.sort(function (a, b) { return b.score - a.score || b.p - a.p || a.w.order - b.w.order; });
+    var top = picks.slice(0, 5), later = picks.slice(5);
+    var fill = (DEFAULTS[S.ind] || []).concat(['enq', 'mkt', 'train', 'admin', 'meet']);
+    for (var i = 0; top.length < 3 && i < fill.length; i++) {
+      if (!top.some(function (x) { return x.w.id === fill[i]; })) { var x = rate(WORK_BY[fill[i]]); x.sugg = true; top.push(x); }
+    }
+    return { top: top, later: later };
+  }
+
+  function chartSvg(top) {
+    /* Plot area x 40..322, y 24..224. Quadrant splits: risk 2.5, payoff 3.5 (matches "Strong first pick"). */
+    function X(r) { return 40 + (r - 0.5) / 5 * 282; }
+    function Y(p) { return 224 - (p - 0.5) / 5 * 200; }
+    var seen = {}, dots = '';
+    top.forEach(function (x, i) {
+      var key = x.p + '|' + x.r, k = seen[key] || 0; seen[key] = k + 1;
+      var cx = X(x.r) + (k === 0 ? 0 : (k % 2 ? 1 : -1) * Math.ceil(k / 2) * 22), cy = Y(x.p);
+      dots += '<g><circle cx="' + cx + '" cy="' + cy + '" r="11" fill="' + (x.sugg ? 'var(--aic-white)' : 'var(--aic-blue)') + '" stroke="var(--aic-blue)" stroke-width="2"/>' +
+        '<text x="' + cx + '" y="' + (cy + 4.5) + '" text-anchor="middle" font-size="12" font-weight="800" fill="' + (x.sugg ? 'var(--aic-blue)' : 'var(--aic-on-blue)') + '">' + (i + 1) + '</text></g>';
+    });
+    var desc = top.map(function (x, i) { return (i + 1) + ': ' + x.w.short + ', payoff ' + lvl(x.p).toLowerCase() + ', risk ' + lvl(x.r).toLowerCase(); }).join('; ');
+    return '<svg viewBox="0 0 330 270" role="img" aria-label="Payoff against risk for your starting points. ' + esc(desc) + '">' +
+      '<rect x="40" y="24" width="112" height="79" rx="10" fill="var(--aic-green-soft)"/>' +
+      '<rect x="154" y="24" width="168" height="79" rx="10" fill="var(--aic-amber-soft)"/>' +
+      '<rect x="40" y="105" width="112" height="119" rx="10" fill="var(--aic-sage)"/>' +
+      '<rect x="154" y="105" width="168" height="119" rx="10" fill="var(--aic-sage)" opacity=".6"/>' +
+      '<text x="44" y="16" font-size="11" font-weight="800" fill="var(--aic-green)">START HERE</text>' +
+      '<text x="318" y="16" font-size="11" font-weight="800" fill="var(--aic-amber)" text-anchor="end">WORTH IT, WITH CHECKS</text>' +
+      '<text x="44" y="240" font-size="11" font-weight="800" fill="var(--aic-soft)">SMALL WINS</text>' +
+      '<text x="318" y="240" font-size="11" font-weight="800" fill="var(--aic-soft)" text-anchor="end">LATER</text>' +
+      '<text x="181" y="262" font-size="11.5" font-weight="700" fill="var(--aic-soft)" text-anchor="middle">Lower risk  →  Higher risk</text>' +
+      '<text x="16" y="124" font-size="11.5" font-weight="700" fill="var(--aic-soft)" text-anchor="middle" transform="rotate(-90 16 124)">Smaller  →  Bigger payoff</text>' +
+      dots + '</svg>';
+  }
+
+  function useHtml(x, i) {
+    var w = x.w, b = band(x), extra = w.ind[S.ind];
+    var pTone = x.p >= 4 ? 'good' : x.p === 3 ? 'blue' : '';
+    var rTone = x.r >= 4 ? 'bad' : x.r === 3 ? 'warn' : 'good';
+    return '<article class="aic-card aic-wh-use" aria-labelledby="aic-wh-u' + i + '">' +
+      '<div class="aic-wh-top"><span class="aic-wh-rank' + (x.sugg ? ' aic-wh-sugg' : '') + '" aria-hidden="true">' + (i + 1) + '</span><div>' +
+        '<h3 class="aic-h3" id="aic-wh-u' + i + '"><span class="aic-sr">' + (i + 1) + '. </span>' + esc(w.title) + '</h3>' +
+        '<div class="aic-wh-tags"><span class="aic-tag aic-t-' + b.tone + '">' + b.t + '</span><span class="aic-tag aic-t-' + pTone + '">Payoff: ' + lvl(x.p) + '</span><span class="aic-tag aic-t-' + rTone + '">Risk: ' + lvl(x.r) + '</span>' +
+        (x.sugg ? '<span class="aic-tag">Not on your list</span>' : '') + '</div></div></div>' +
+      '<div class="aic-wh-sec"><div class="aic-wh-label">What it looks like</div><p>' + esc(w.practice) + (extra ? ' ' + esc(extra) : '') + '</p></div>' +
+      '<div class="aic-wh-sec"><div class="aic-wh-label">What to watch</div><div class="aic-wh-watch">' +
+        '<div><b>Data</b>' + esc(w.data) + '</div><div><b>Accuracy</b>' + esc(w.acc) + '</div><div><b>Who checks it</b>' + esc(w.check) + '</div></div></div>' +
+      '<div class="aic-wh-sec aic-wh-test"><b>Run the one-task test this week.</b> ' + esc(w.test) + '</div>' +
+      (w.notYet ? '<p class="aic-wh-sec aic-wh-notyet"><b>You don’t need this yet:</b> ' + esc(w.notYet) + '</p>' : '') +
+      '</article>';
+  }
+
+  function chooseSolution(top) {
+    var bigTeam = S.size === 'l' || S.size === 'xl';
+    var risky = top.some(function (x) { return x.r >= 4; });
+    var connects = top.some(function (x) { return x.w.id === 'know' || x.w.id === 'admin'; }) && S.size !== 'solo' && S.size !== 's';
+    if (risky) return { cta: 'get_matched', url: 'matchUrl', lead: 'advisory', btn: 'Get matched to someone', h: 'Set it up with someone who has done it before',
+      p: 'Some of your best starting points touch confidential documents, money or decisions about people. A member who advises on AI adoption can help you pick the tool, set the data rules and decide who checks what, before anyone relies on it.' };
+    if (bigTeam || connects) return { cta: 'get_matched', url: 'matchUrl', lead: 'advisory', btn: 'Get matched to someone', h: 'Plan it across the team, not one person at a time',
+      p: bigTeam ? 'At your size, the hard part is rolling a good test out to more people without losing control of tools and data. A member who advises on AI adoption can plan that with you.' : 'Your picks mean connecting company documents or data to an AI tool. A member who advises on AI adoption can help you set that up safely.' };
+    return { cta: 'learn_with_member', url: 'coursesUrl', lead: 'training', btn: 'Learn with a member', h: 'Get your team doing this well',
+      p: 'Your best starting points are everyday drafting work. A short hands-on course with a member gets people doing it on their own real tasks, and teaches them when not to trust the output.' };
+  }
+
+  function renderResult() {
+    var res = compute(), top = res.top, ind = INDUSTRIES.filter(function (o) { return o.id === S.ind; })[0];
+    var size = SIZES.filter(function (o) { return o.id === S.size; })[0];
+    var first = top[0];
+    var label = 'Start with: ' + first.w.short + ' · ' + ind.label + ' · ' + size.label;
+    lastResult = { label: label, top: top, ind: ind, size: size };
+    var sol = chooseSolution(top);
+    var notHere = [
+      'Anything that sends AI-written words to customers without a person reading them first.',
+      'Anything that decides about people: hiring, credit, individual pricing, care.',
+      'Buying a new tool before you’ve tested the idea on the one you already have, or on a free one with nothing confidential.'
+    ];
+    if (NOT_HERE[S.ind]) notHere.unshift(NOT_HERE[S.ind]);
+    var forWhom = 'For ' + ind.noun + ' ' + sizePhrase();
+
+    var html = '<div class="aic-fade">' +
+      '<header class="aic-card"><span class="aic-eyebrow">Where to start</span>' +
+      '<h2 class="aic-h2" id="aic-wh-rh">Start with ' + esc(first.w.short.toLowerCase()) + '.</h2>' +
+      '<p class="aic-soft">' + esc(forWhom) + ', starting from the work you ticked. Ranked by likely payoff against risk. The ratings are our judgment, not a measurement; your own test is what counts.</p>' +
+      '<div class="aic-wh-chart" style="margin-top:16px">' + chartSvg(top) +
+        '<ol class="aic-wh-key">' + top.map(function (x, i) { return '<li><span class="aic-wh-num' + (x.sugg ? ' aic-wh-sugg' : '') + '" aria-hidden="true">' + (i + 1) + '</span><span>' + esc(x.w.short) + (x.sugg ? ' <span class="aic-small">(not on your list)</span>' : '') + '</span></li>'; }).join('') + '</ol>' +
+      '</div></header>' +
+      '<div class="aic-note" style="margin-top:14px">' + READY_NOTE[S.ready] + '</div>' +
+      top.map(useHtml).join('') +
+      (res.later.length ? '<div class="aic-card aic-wh-later"><h3 class="aic-h3">The rest of your list, for later</h3><p class="aic-small">You ticked these too. They ranked lower for now; come back to them once the first test has paid off.</p><ul>' +
+        res.later.map(function (x) { return '<li><span class="aic-tag">' + esc(x.w.short) + '</span></li>'; }).join('') + '</ul></div>' : '') +
+      '<div class="aic-card" style="margin-top:14px"><span class="aic-eyebrow" style="color:var(--aic-amber)">Where not to start</span>' +
+        '<h3 class="aic-h3" style="margin-top:6px">Leave these until you’ve got a few tests behind you.</h3>' +
+        '<ul class="aic-list aic-list-x">' + notHere.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul></div>' +
+
+      '<div class="aic-next aic-noprint" style="margin-top:14px">' +
+        '<div class="aic-card"><span class="aic-eyebrow">Your next step</span><h3 class="aic-h3">Run the one-task test on number one</h3>' +
+          '<p class="aic-soft">' + esc(first.w.test) + ' Same job, clock running. If it doesn’t save time on real work, you’ve learned that for the price of an afternoon.</p>' +
+          '<div class="aic-actions"><button type="button" class="aic-btn" data-act="copy">Copy my plan</button><button type="button" class="aic-btn aic-btn-ghost" data-act="print">Print</button></div></div>' +
+        '<div class="aic-card aic-solution"><span class="aic-eyebrow">Need more than an answer?</span><h3 class="aic-h3">' + esc(sol.h) + '</h3><p class="aic-soft">' + esc(sol.p) + '</p>' +
+          '<div class="aic-actions"><a class="aic-btn aic-btn-primary" data-aic-cta="' + sol.cta + '" data-aic-url="' + sol.url + '" data-aic-lead="' + sol.lead + '" target="_blank" rel="noopener">' + sol.btn + '</a></div></div>' +
+      '</div>' +
+      '<div class="aic-handoff aic-noprint"><a data-aic-cta="email_results" data-aic-url="resultsFormUrl" target="_blank" rel="noopener">Email me my results</a>' +
+        '<a data-aic-cta="newsletter" data-aic-url="newsletterUrl" target="_blank" rel="noopener">Keep up without keeping up with everything</a>' +
+        '<button type="button" class="aic-linkbtn" data-act="edit">Change what I ticked</button><button type="button" class="aic-linkbtn" data-act="restart">Start again</button></div>' +
+
+      '<details class="aic-more aic-card" style="margin-top:18px"><summary>How this works, and sources</summary><div class="aic-sources">' +
+        '<p>Each kind of work has a payoff and a risk rating from 1 to 5, adjusted for your industry and team size, and ranked by payoff weighted twice as heavily as risk. Payoff means time likely saved on repetitive, checkable work. Risk means what happens when the output is wrong, and how sensitive the data is. These are editorial ratings, not measurements, and the result is a starting point, not advice.</p>' +
+        '<p style="margin-top:8px">You’re not early. In the U.S. Chamber of Commerce’s 2025 small-business survey, 58% of small businesses said they use generative AI, up from 40% in 2024. Self-reported, and definitions vary, so treat it as a direction.</p>' +
+        '<ol style="list-style:decimal;padding-left:20px;margin-top:8px">' +
+          '<li>U.S. Chamber of Commerce, “U.S. Chamber’s Latest ‘Empowering Small Business’ Report Shows Majority of Businesses in All 50 States Are Embracing AI,” 18 August 2025. <a href="https://www.uschamber.com/technology/artificial-intelligence/u-s-chambers-latest-empowering-small-business-report-shows-majority-of-businesses-in-all-50-states-are-embracing-ai" target="_blank" rel="noopener">uschamber.com</a>. Full report: <a href="https://www.uschamber.com/assets/documents/Empowering-Small-Business-Report-2025.pdf" target="_blank" rel="noopener">Empowering Small Business 2025 (PDF)</a>. Checked 4 November 2026.</li>' +
+          '<li>Regulation (EU) 2024/1689 (EU AI Act), Annex III, point 4(a): AI used for recruitment or selection, including to analyze and filter job applications, is high-risk. <a href="https://eur-lex.europa.eu/eli/reg/2024/1689/oj" target="_blank" rel="noopener">EUR-Lex</a>; European Commission <a href="https://ai-act-service-desk.ec.europa.eu/" target="_blank" rel="noopener">AI Act Service Desk</a>. Checked 4 November 2026.</li>' +
+        '</ol>' +
+        '<p style="margin-top:8px">No tool or vendor is recommended here. Everything ran in your browser; nothing was stored or sent.</p>' +
+      '</div></details>' +
+      '</div>';
+
+    var host = $('#aic-wh-result');
+    host.innerHTML = html;
+    host.hidden = false;
+    $('.aic-wh-form').hidden = true;
+    ROOT.classList.add('aic-wh-has-result');
+    wireCtas(host, { label: label });
+    scrollToEl(ROOT);
+    focusHeading($('#aic-wh-rh'));
+    emit('tool_completed', { assessment_result: label, industry: S.ind, team_size: S.size, work_ticked: S.work.length, ai_today: S.ready });
+    emit('result_viewed', { assessment_result: label, top_uses: top.map(function (x) { return x.w.id; }).join(',') });
+  }
+  function sizePhrase() {
+    return { solo: 'run by one person', s: 'with 2–9 people', m: 'with 10–49 people', l: 'with 50–249 people', xl: 'with 250 people or more' }[S.size];
+  }
+
+  function copyPlan(btn) {
+    if (!lastResult) return;
+    var r = lastResult;
+    var lines = ['Where could AI actually help your business?', r.ind.label + ' · ' + r.size.label, ''];
+    r.top.forEach(function (x, i) {
+      lines.push((i + 1) + '. ' + x.w.title + ' (payoff ' + lvl(x.p).toLowerCase() + ', risk ' + lvl(x.r).toLowerCase() + ')');
+      lines.push('   Who checks it: ' + x.w.check);
+      lines.push('   One-task test: ' + x.w.test);
+      if (x.w.notYet) lines.push('   You don’t need this yet: ' + x.w.notYet);
+      lines.push('');
+    });
+    lines.push('Made with AI Channel. A starting point, not advice.');
+    var text = lines.join('\n');
+    function done(ok) { btn.textContent = ok ? 'Copied' : 'Copy didn’t work: try Print'; }
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(false); });
+      else done(false);
+    } catch (e) { done(false); }
+  }
+
+  renderStep(false);
+})();
+</script>
+<!-- ===== AIC:END ===== -->
+</body>
+</html>
+
+</body></html>

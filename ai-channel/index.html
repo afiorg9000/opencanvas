@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Channel designs</title>
+<meta name="description" content="AI Channel by LLPA: practical AI tools and insights, AI training from LLPA members, and expert support routed by the LLPA team.">
+<script src="config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Instrument+Serif:ital@0;1&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=IBM+Plex+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,300;9..144,400&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#17263d;--muted:#5b6a80;--blue:#2859c7;--blue-d:#1945ac;--pale:#f5f7fb;--line:#e3e8f0;--navy:#142744;--white:#fff;--sky:#eaf0ff;--mute:#5b6a80;--band:#f5f7fb;color-scheme:light}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:#fff;line-height:1.55;font-size:16px;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}img{display:block;max-width:100%}
+p{max-width:68ch}
+:focus-visible{outline:3px solid var(--blue);outline-offset:3px;border-radius:6px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wrap{max-width:1160px;margin:auto;padding:0 28px}
+.mock{background:var(--pale);color:var(--muted);font-size:12px;text-align:center;padding:6px 16px;border-bottom:1px solid var(--line)}
+/* header */
+.top{height:76px;position:sticky;top:0;background:#ffffffed;backdrop-filter:blur(16px);border-bottom:1px solid var(--line);z-index:30}
+.nav{display:flex;align-items:center;justify-content:space-between;height:100%;gap:24px}
+.logo{font-size:23px;font-weight:800;letter-spacing:-1.1px;white-space:nowrap;display:flex;align-items:baseline;gap:0}
+.logo span{color:var(--blue)}.logo small{font-size:9px;color:#7d8ca2;letter-spacing:0;margin-left:7px;font-weight:600;align-self:flex-start;margin-top:4px}
+.navlinks{display:flex;align-items:center;gap:24px;font-size:14px;font-weight:600}
+.navlinks a:not(.btn):hover,.navlinks a[aria-current]:not(.btn){color:var(--blue)}
+.navlinks a[aria-current]:not(.btn){box-shadow:inset 0 -2px 0 var(--blue);padding:6px 0}
+.icon-btn{width:40px;height:40px;border-radius:8px;border:1px solid #cbd5e4;background:#fff;display:grid;place-items:center;color:var(--ink)}
+.icon-btn:hover{background:#f1f5fc}
+.hamb{display:none;background:none;border:0;font-size:24px;color:var(--ink)}
+.mobilemenu{display:none}
+/* buttons */
+.btn{border:0;background:var(--blue);color:#fff;border-radius:8px;padding:13px 19px;font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:8px;justify-content:center;transition:background-color .2s,transform .2s,box-shadow .2s;text-decoration:none}
+.btn:hover{background:var(--blue-d)}.btn:active{transform:scale(.97)}
+.btn.outline{background:#fff;border:1px solid #cbd5e4;color:var(--ink)}.btn.outline:hover{background:#f1f5fc}
+.btn.light{background:#fff;color:#173f93}.btn.light:hover{background:#eef3ff}
+.btn.small{padding:10px 15px}
+.btn[disabled]{opacity:.45;pointer-events:none}
+.textlink{color:var(--blue);font-size:14px;font-weight:600}.textlink:hover{text-decoration:underline;text-underline-offset:3px}
+/* type */
+.eyebrow{color:var(--blue);font-size:12px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase}
+h1,h2,h3{margin:0;color:var(--ink)}
+.section{padding:80px 0}.section.soft{background:var(--pale)}
+.section h2,.pagehead h1{font-size:clamp(30px,3.3vw,40px);line-height:1.15;letter-spacing:-1.5px;margin:10px 0 14px;font-weight:800}
+.sub{color:var(--muted);max-width:690px;margin:0 0 32px;font-size:17px}
+.fine{font-size:12px;color:var(--muted);margin-top:12px}
+/* hero */
+.hero{background:linear-gradient(115deg,#f1f5fd,#fff 70%);padding:80px 0}
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:64px;align-items:center}.hero-grid>*{min-width:0}
+.hero h1{font-size:clamp(40px,5vw,64px);line-height:1.08;letter-spacing:-2.6px;margin:18px 0 24px;max-width:720px;font-weight:800}
+.hero h1 em{font-style:normal;color:var(--blue)}
+.lead{font-size:18px;color:#53647b;max-width:600px;margin:0}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+.hero-art{border-radius:20px;padding:28px;color:#fff;box-shadow:0 22px 65px #14274424;min-height:420px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden;isolation:isolate}
+.hero-art>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2}
+.hero-art:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(20,39,68,.05) 20%,rgba(20,39,68,.92))}
+.art-label{font-size:12px;color:#c4d4ff;text-transform:uppercase;letter-spacing:1.4px;font-weight:800;margin-bottom:8px}
+.art-row{background:#ffffff1f;border:1px solid #ffffff2e;backdrop-filter:blur(6px);padding:12px 16px;border-radius:10px;margin:8px 0 0;display:flex;justify-content:space-between;gap:12px;font-size:14px}
+.art-row b{font-weight:800}
+/* grids + cards */
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}.grid.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;display:flex;flex-direction:column;align-items:stretch;overflow:hidden;transition:transform .2s,box-shadow .2s,border-color .2s}
+.card:hover{transform:translateY(-3px);box-shadow:0 13px 35px #19365a14;border-color:#b9c9ea}
+.card .ph{aspect-ratio:16/10;overflow:hidden;background:var(--pale)}
+.card .ph img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
+.card:hover .ph img{transform:scale(1.04)}
+.card .in{padding:22px 24px 24px;display:flex;flex-direction:column;flex:1}
+.card h3{font-size:19px;line-height:1.3;letter-spacing:-.4px;margin:0 0 8px;font-weight:800}
+.card p{font-size:14px;color:var(--muted);margin:0 0 20px}
+.card p.q{color:var(--ink);font-weight:600;font-size:15px;margin-bottom:8px}
+.card .textlink{margin-top:auto}
+.tag{font-size:11px;color:var(--blue);font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+/* resource cards */
+.resource-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.resource-grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.resource{border:1px solid var(--line);border-radius:12px;padding:22px;background:#fff;display:flex;flex-direction:column;transition:border-color .2s,box-shadow .2s,transform .2s}
+.resource:hover{border-color:#9fb8ed;box-shadow:0 8px 25px #17263d12;transform:translateY(-2px)}
+.resource h3{font-size:17px;line-height:1.35;margin:4px 0 8px;font-weight:800}
+.resource p{font-size:14px;color:var(--muted);margin:0 0 16px}
+.resource .textlink{margin-top:auto}
+.resource.soon{opacity:.6;cursor:default}.resource.soon:hover{transform:none;box-shadow:none;border-color:var(--line)}
+.resource.dark{background:var(--navy);border-color:var(--navy);color:#fff}.resource.dark h3{color:#fff}.resource.dark p{color:#bdcde5}.resource.dark .tag{color:#9fbcff}.resource.dark .textlink{color:#fff}
+/* feature (navy, with photo) */
+.feature{background:var(--navy);color:#fff;border-radius:18px;padding:44px;display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;transition:transform .2s,box-shadow .2s}
+a.feature:hover{transform:translateY(-3px);box-shadow:0 18px 40px #14274433}
+.feature p{color:#bdcde5;margin:0 0 24px}.feature .tag{color:#9fbcff}
+.feature h2,.feature h3{color:#fff;font-size:clamp(26px,2.8vw,33px);line-height:1.15;letter-spacing:-1px;margin:6px 0 12px;font-weight:800}
+.feature .fph{border-radius:14px;overflow:hidden;aspect-ratio:4/3}.feature .fph img{width:100%;height:100%;object-fit:cover}
+/* page heads */
+.pagehead{padding:64px 0 48px;background:linear-gradient(120deg,#f4f7fd,#fff)}
+.pagehead .wrap{display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center}
+.pagehead .wrap.solo{display:block}
+.pagehead p{color:var(--muted);font-size:17px;margin:0}
+.pagehead .hph{border-radius:18px;overflow:hidden;aspect-ratio:4/3;box-shadow:0 18px 45px #14274418}.pagehead .hph img{width:100%;height:100%;object-fit:cover}
+.breadcrumb{color:var(--muted);font-size:13px;margin-bottom:18px}.breadcrumb a{text-decoration:underline;text-underline-offset:3px}
+.pagehead h1.big{font-size:clamp(32px,3.8vw,44px)}
+.pagehead .intro{font-size:clamp(20px,2vw,24px);line-height:1.4;color:var(--ink);font-weight:600;margin-top:12px}
+/* pathway steps */
+.path-step{display:grid;grid-template-columns:180px 1fr;gap:40px;padding:48px 0;border-bottom:1px solid var(--line)}
+.path-step:last-of-type{border-bottom:0}
+.path-step .index{font-size:12px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:1px;line-height:1.6}
+.path-step .index b{display:block;font-size:32px;color:var(--ink);letter-spacing:-1px;line-height:1.1;margin-bottom:6px}
+.path-step h2{font-size:27px;letter-spacing:-.6px;margin:0 0 8px;font-weight:800}
+.path-step>div>p{color:var(--muted);margin:0 0 24px}
+/* chips + search */
+.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:8px 0 28px;flex-wrap:wrap}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid #d9e1ee;border-radius:50px;padding:8px 14px;background:#fff;color:#43546c;font-size:14px;font-weight:600;transition:background-color .2s,border-color .2s,color .2s}
+.chip.active,.chip:hover{background:var(--sky);border-color:#b6c9f4;color:#1e4cae}
+.searchbox{border:1px solid #cbd5e4;border-radius:8px;padding:12px 15px;min-width:300px;max-width:100%;background:#fff}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 28px}.pills span{background:var(--sky);color:#1e4cae;border-radius:50px;padding:6px 12px;font-size:13px;font-weight:600}
+.subh{font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:0 0 12px}
+.resource-grid+.subh{margin-top:40px}
+/* steps (about) */
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.step{padding:24px;border-left:3px solid #c8d6f2;background:#fff}
+.step b{display:block;font-size:17px;margin:8px 0}.step p{font-size:14px;color:var(--muted);margin:0}
+.num{font-size:12px;font-weight:800;color:var(--blue);letter-spacing:1px;text-transform:uppercase}
+/* callout */
+.callout{background:var(--sky);border-radius:16px;padding:32px;margin:0;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.callout strong{font-size:20px;letter-spacing:-.4px}.callout p{margin:6px 0 0;color:#53647b}
+.callout-band{padding:0 0 80px}
+/* forms: navigator + help */
+.navi-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:56px;align-items:start}
+.navi-grid .nph{border-radius:16px;overflow:hidden;aspect-ratio:4/3;margin-top:28px}.navi-grid .nph img{width:100%;height:100%;object-fit:cover}
+.formbox{background:#fff;border:1px solid var(--line);border-radius:16px;padding:32px;box-shadow:0 10px 35px #1427440d}
+.formbox.center{max-width:760px;margin:48px auto 80px}
+.progress{height:5px;background:#e7ecf5;border-radius:9px;overflow:hidden;margin-bottom:12px}.progress>div{height:100%;background:var(--blue);transition:width .3s}
+.mini{font-size:12px;color:var(--muted);margin:0 0 4px;font-weight:600}
+.formbox h3{font-size:24px;line-height:1.25;letter-spacing:-.6px;margin:4px 0 20px;font-weight:800}
+.options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 0 8px}
+.option{padding:15px;text-align:left;border:1px solid #d5dfed;background:#fff;border-radius:9px;color:var(--ink);font-weight:600;font-size:15px;transition:border-color .2s,background-color .2s}
+.option:hover{border-color:var(--blue);background:#f6f9ff}
+.option small{display:block;color:var(--muted);font-weight:400;font-size:13px;margin-top:2px}
+.formnav{display:flex;justify-content:space-between;gap:12px;margin-top:24px;flex-wrap:wrap}
+.field{display:block;margin:16px 0}.field span{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+.field input,.field textarea,.field select{width:100%;border:1px solid #cbd5e4;border-radius:8px;padding:12px;background:#fff;color:var(--ink)}
+.field textarea{min-height:100px}
+.navi-step,.hstep{display:none}.navi-step.on,.hstep.on{display:block;animation:fade .3s ease}
+.svc{border:1px solid var(--line);border-radius:10px;padding:16px;margin:0 0 10px}.svc b{display:block}.svc p{margin:4px 0 0;color:var(--muted);font-size:14px}
+.notice{padding:14px 16px;background:#fff8e8;border:1px solid #f0dcac;border-radius:9px;color:#775a19;font-size:13px;margin-top:16px}
+.recs{display:grid;gap:10px}
+/* faq */
+.faq details{border-bottom:1px solid var(--line);padding:18px 0}.faq summary{font-weight:600;cursor:pointer;font-size:17px}.faq .a{color:var(--muted);margin-top:8px}.faq .a p{margin:8px 0}
+.fairnote{margin-top:24px;font-size:13px;color:var(--muted)}
+/* footer */
+.footer{background:var(--navy);color:#e8eefb;padding:64px 0 28px}
+.fnews{display:flex;justify-content:space-between;align-items:center;gap:24px;padding-bottom:40px;margin-bottom:40px;border-bottom:1px solid #ffffff24;flex-wrap:wrap}
+.fnews h2{color:#fff;font-size:clamp(22px,2.6vw,30px);letter-spacing:-.8px;font-weight:800;margin:0}
+.fnews form{display:flex;gap:8px;flex-wrap:wrap}.fnews input{border:0;border-radius:8px;padding:12px 14px;min-width:240px}
+.footergrid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:36px}
+.footer a{display:block;font-size:14px;color:#b8c7de;margin:10px 0}.footer a:hover{color:#fff}
+.footer h4{font-size:14px;margin:0 0 4px;color:#fff}.footer .logo{color:#fff}.footer .muted{color:#b8c7de;font-size:14px}
+.llpa{display:inline-block;background:#fff;border-radius:8px;padding:8px 12px;margin-top:12px}.llpa img{height:26px;width:auto}
+.footbottom{border-top:1px solid #ffffff24;margin-top:44px;padding-top:22px;font-size:12px;color:#b8c7de;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.footbottom .legal{display:flex;gap:16px}.footbottom .legal a{display:inline;margin:0;font-size:12px}
+/* motion */
+.rv{opacity:0;transform:translateY(18px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1);transition-delay:var(--d,0ms)}
+.rv.in{opacity:1;transform:none}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+main>div{animation:fade .35s ease both}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}html{scroll-behavior:auto}}
+/* viewer, search, toast */
+.viewer{position:fixed;inset:0;z-index:60;background:#fff;display:none;flex-direction:column}
+.viewer.on{display:flex;animation:fade .3s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.vbar{display:flex;align-items:center;gap:12px;padding:8px 16px;border-bottom:1px solid var(--line);min-height:64px}
+.vbar .t{flex:1;min-width:0;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vbar .btn{min-height:42px;padding:0 16px;font-size:14px}
+.viewer iframe{flex:1;border:0;width:100%;background:#F7F8FA}
+@media(max-width:640px){.vbar .hide-s{display:none}}
+.search{position:fixed;inset:0;z-index:55;background:rgba(22,32,51,.45);display:none;align-items:flex-start;justify-content:center;padding:12vh 16px 16px}
+.search.on{display:flex;animation:fade .2s ease}
+.search .box{width:100%;max-width:640px;background:#fff;border-radius:20px;padding:16px;box-shadow:0 30px 60px -20px rgba(0,0,0,.4)}
+.search input{width:100%;border:0;font:inherit;font-size:20px;padding:8px 8px;outline:none}
+.search .hint{font-size:14px;color:var(--mute);margin:4px 8px 8px}
+.search .res a{display:block;padding:12px 8px;border-radius:12px;text-decoration:none;font-weight:600}
+.search .res a:hover,.search .res a.sel{background:var(--band)}
+.search .res small{display:block;color:var(--mute);font-weight:400;font-size:12px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:70;background:var(--navy);color:#fff;padding:12px 16px;border-radius:12px;font-size:15px;display:none;max-width:calc(100% - 32px)}
+.toast.on{display:block}
+
+
+/* ===== v6: compact editorial system ===== */
+body{font-size:16px}
+.section{padding:48px 0}.section.tight{padding:28px 0}
+.section h2{font-size:clamp(22px,2.2vw,28px);letter-spacing:-.6px;margin:6px 0 10px}
+.sub{font-size:16px;margin-bottom:20px}
+.pagehead{padding:36px 0 28px;background:var(--pale);border-bottom:1px solid var(--line)}
+.pagehead .wrap{display:block}.pagehead h1{font-size:clamp(28px,3.2vw,38px);line-height:1.15;letter-spacing:-1.2px;margin:6px 0 8px;font-weight:800;max-width:26ch}
+.pagehead p{font-size:17px;max-width:62ch}
+.navlinks{gap:18px;font-size:14px}.navlinks>a.cur,.drop.cur>button{color:var(--blue);box-shadow:inset 0 -2px 0 var(--blue)}
+.mm-h{margin:8px 0 0;font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.mobilemenu.open{max-height:calc(100vh - 76px);overflow:auto;gap:12px!important}
+/* hero */
+.hero2{padding:40px 0 32px;background:linear-gradient(115deg,#f1f5fd,#fff 70%)}
+.h2grid{display:grid;grid-template-columns:1.25fr .75fr;gap:48px;align-items:center}
+.hero2 h1{font-size:clamp(32px,4vw,48px);line-height:1.08;letter-spacing:-1.8px;margin:12px 0 14px;font-weight:800}
+.hero2 h1 em{font-style:normal;color:var(--blue)}.hero2 .lead{font-size:17px}.hero2 .actions{margin-top:22px}
+.h2ph{border-radius:16px;overflow:hidden;aspect-ratio:4/3;box-shadow:0 18px 45px #14274418}.h2ph img{width:100%;height:100%;object-fit:cover}
+@media(max-width:900px){.h2grid{grid-template-columns:1fr}.h2ph{display:none}}
+/* four actions */
+.acts4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+.act4{display:flex;flex-direction:column;gap:4px;padding:18px 20px;border-left:1px solid var(--line);transition:background-color .2s}
+.act4:first-child{border-left:0}.act4:hover{background:#f6f9ff}.act4 b{font-size:17px}.act4 span:not(.a-n){font-size:14px;color:var(--muted)}
+.a-n{font-size:12px;font-weight:800;color:var(--blue)}
+@media(max-width:900px){.acts4{grid-template-columns:1fr 1fr}.act4:nth-child(3){border-left:0}.act4:nth-child(n+3){border-top:1px solid var(--line)}}
+@media(max-width:520px){.acts4{grid-template-columns:1fr}.act4{border-left:0;border-top:1px solid var(--line)}.act4:first-child{border-top:0}}
+/* list rows */
+.rows{border-top:1px solid var(--line)}
+.row{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center;padding:14px 4px;border-bottom:1px solid var(--line);transition:background-color .2s}
+a.row:hover{background:#f6f9ff}.row.soon{opacity:.6}
+.r-body{display:flex;flex-direction:column;gap:2px;min-width:0}
+.r-meta{font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--blue)}
+.r-t{font-weight:700;font-size:16px;line-height:1.35}
+.r-d{font-size:14px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:80ch}
+.r-go{font-size:14px;font-weight:600;color:var(--blue);white-space:nowrap}
+@media(max-width:600px){.row{grid-template-columns:1fr}.r-go{justify-self:start}}
+.tlist{list-style:none;padding:0;margin:0;columns:2;column-gap:32px}.tlist li{break-inside:avoid;padding:6px 0;font-size:15px}
+.tlist a{font-weight:600}.tlist a:hover{color:var(--blue);text-decoration:underline}.tlist em{font-style:normal;color:var(--muted);font-size:13px;margin-left:6px}
+.tlist.plain{columns:1}.tlist.plain li{padding:6px 0}
+@media(max-width:700px){.tlist{columns:1}}
+.subh{font-size:13px!important;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:24px 0 10px!important}
+.section .subh:first-child{margin-top:0!important}
+.more{margin:14px 0 0;font-size:15px}
+.intro{font-size:17px;max-width:68ch;margin:0 0 6px}.crossref{font-size:15px;margin:0 0 18px;color:var(--muted)}
+.split{display:grid;grid-template-columns:1.6fr 1fr;gap:40px;align-items:start}@media(max-width:900px){.split{grid-template-columns:1fr}}
+.paths{border:1px solid var(--line);border-radius:14px;background:#fff;padding:8px}.paths h3{font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:10px 12px 6px}
+.paths a{display:block;padding:12px;border-radius:10px}.paths a:hover{background:#f6f9ff}.paths b{display:block}.paths span{font-size:14px;color:var(--muted)}
+.trust{display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap}.trust p{margin:0;max-width:72ch;font-size:15px;color:var(--muted)}.trust b{color:var(--ink)}
+/* six topics */
+.topics6{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line)}
+.topics6 a{display:grid;grid-template-columns:40px 1fr auto;gap:14px;align-items:baseline;padding:18px 6px;border-bottom:1px solid var(--line);transition:background-color .2s}
+.topics6 li:nth-child(odd) a{border-right:1px solid var(--line);padding-right:20px}.topics6 li:nth-child(even) a{padding-left:20px}
+.topics6 a:hover{background:#f6f9ff}.t-n{font-weight:800;color:var(--blue);font-size:14px}.t-b b{display:block;font-size:18px}.t-b span{font-size:14px;color:var(--muted)}.t-c{font-size:13px;color:var(--blue);font-weight:600;white-space:nowrap}
+@media(max-width:800px){.topics6{grid-template-columns:1fr}.topics6 li a{border-right:0!important;padding:16px 4px!important}.t-c{grid-column:2}}
+/* next steps */
+.nextstrip{display:grid;grid-template-columns:auto 1fr 1fr;gap:12px;align-items:stretch;margin-top:28px;padding:14px;border-radius:14px;background:var(--pale)}
+.ns-l{align-self:center;font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:0 8px}
+.nx{display:block;padding:14px 16px;background:#fff;border:1px solid var(--line);border-radius:10px;transition:border-color .2s}.nx:hover{border-color:var(--blue)}.nx b{display:block;color:var(--blue)}.nx span{font-size:14px;color:var(--muted)}
+.nextstrip:has(.nx:only-of-type){grid-template-columns:auto 1fr}
+@media(max-width:800px){.nextstrip{grid-template-columns:1fr!important}}
+.orgs4{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line)}
+.orgs4 a{display:flex;flex-direction:column;gap:4px;padding:18px 6px;border-bottom:1px solid var(--line)}.orgs4 a:nth-child(odd){border-right:1px solid var(--line);padding-right:20px}.orgs4 a:nth-child(even){padding-left:20px}
+.orgs4 a:hover{background:#f6f9ff}.orgs4 b{font-size:18px}.orgs4 span{color:var(--muted);font-size:15px}.orgs4 .go{color:var(--blue);font-weight:600;font-size:14px}
+@media(max-width:700px){.orgs4{grid-template-columns:1fr}.orgs4 a{border-right:0!important;padding:16px 4px!important}}
+.go3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:24px}.go3 a{padding:14px 16px;border:1px solid var(--line);border-radius:10px}.go3 a:hover{border-color:var(--blue)}.go3 b{display:block}.go3 span{font-size:14px;color:var(--muted)}
+@media(max-width:700px){.go3{grid-template-columns:1fr}}
+/* society */
+.key4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:0}.key4 div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px}.key4 dt{font-weight:800;font-size:15px}.key4 dd{margin:4px 0 0;font-size:14px;color:var(--muted)}
+@media(max-width:800px){.key4{grid-template-columns:1fr 1fr}}
+.socpart{display:grid;grid-template-columns:1fr 1.6fr;gap:32px;padding:20px 0;border-top:1px solid var(--line)}.socpart:first-child{border-top:0;padding-top:0}
+.sp-h h2{font-size:22px!important;margin:0 0 6px!important}.sp-h p{font-size:15px;color:var(--muted);margin:0 0 8px}
+@media(max-width:800px){.socpart{grid-template-columns:1fr;gap:12px}}
+/* about */
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:0 40px;margin:0}.facts div{padding:14px 0;border-bottom:1px solid var(--line)}.facts dt{font-weight:800}.facts dd{margin:4px 0 0;color:var(--muted);font-size:15px}
+@media(max-width:800px){.facts{grid-template-columns:1fr}}
+/* all resources filters */
+.filters{padding:14px}
+/* footer */
+.footer{padding:28px 0 22px}
+.fl1{display:flex;gap:28px;align-items:center;flex-wrap:wrap;padding-bottom:16px;border-bottom:1px solid #ffffff24}.fl1 nav{display:flex;flex-wrap:wrap;gap:6px 18px}.fl1 nav a{margin:0;font-size:14px}
+.fl2{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding-top:14px;font-size:13px;color:#b8c7de}.fl2 .llpa{margin:0;padding:6px 10px}.fl2 .llpa img{height:20px}
+.adv-grid{gap:36px}.formbox{padding:24px}
+.faq details{padding:12px 0}.faq summary{font-size:16px}
+
+/* ===== v5: brief build ===== */
+.skip{position:absolute;left:-9999px;top:8px;z-index:100;background:#fff;color:var(--ink);padding:10px 14px;border-radius:8px;font-weight:600}.skip:focus{left:12px}
+.mock:empty{display:none}.mock a{color:var(--blue);font-weight:600;margin-left:6px}
+.navlinks{gap:20px}.navlinks a.cur:not(.btn),.drop.cur>button{color:var(--blue);box-shadow:inset 0 -2px 0 var(--blue)}
+@media(max-width:1180px){.navlinks{display:none}.hamb{display:block}.mobilemenu.open{display:flex;position:absolute;top:76px;left:0;right:0;background:#fff;border-bottom:1px solid var(--line);padding:20px 28px;flex-direction:column;gap:16px;font-weight:600}}
+.mini-search{max-width:560px;margin:28px auto 0;text-align:left}.mini-search label,.f-search label,.f-sel label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:6px}
+.ms-row{display:flex;gap:8px;align-items:center;background:#fff;border:1px solid #cbd5e4;border-radius:10px;padding:4px 4px 4px 14px}.ms-row:focus-within{border-color:var(--blue);box-shadow:0 0 0 3px #2859c733}
+.ms-row input{flex:1;border:0;outline:0;padding:10px 4px;background:transparent;min-width:0}.ms-row svg{color:var(--muted);flex:none}
+.acts .act{display:flex;flex-direction:column;gap:6px;padding:24px;border:1px solid var(--line);border-radius:14px;background:#fff;transition:transform .2s,box-shadow .2s,border-color .2s}
+.acts .act:hover{transform:translateY(-3px);box-shadow:0 13px 35px #19365a14;border-color:#b9c9ea}.act h3{font-size:19px;font-weight:800;margin:0}.act p{color:var(--muted);font-size:15px;margin:0 0 12px}.act .textlink{margin-top:auto}
+.grid.roles{grid-template-columns:repeat(5,minmax(0,1fr))}
+.role{position:relative;display:block;border-radius:14px;overflow:hidden;aspect-ratio:3/4;isolation:isolate}
+.role .ph{position:absolute;inset:0;z-index:-2}.role .ph img{width:100%;height:100%;object-fit:cover;transition:transform .6s}.role:hover .ph img{transform:scale(1.05)}
+.role:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,transparent 45%,rgba(20,39,68,.85))}
+.role span{position:absolute;left:16px;right:16px;bottom:14px;color:#fff;font-weight:800;font-size:17px}
+@media(max-width:900px){.grid.roles{grid-template-columns:repeat(2,minmax(0,1fr))}.role{aspect-ratio:4/3}}
+.duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.duo.one{grid-template-columns:minmax(0,640px)}
+.svc-panel{display:flex;flex-direction:column;gap:8px;padding:32px;border-radius:16px;background:var(--navy);color:#fff;transition:transform .2s,box-shadow .2s}
+.svc-panel.alt{background:#1f3b6b}.svc-panel h3{color:#fff;font-size:24px;font-weight:800;margin:0}.svc-panel p{color:#c8d4ea;margin:0 0 16px}.svc-panel .tag{color:#9fbcff}.svc-panel .btn{align-self:flex-start;margin-top:auto}
+a.svc-panel:hover{transform:translateY(-3px);box-shadow:0 18px 40px #14274433}
+.svc-panel.plain{background:#fff;border:1px solid var(--line);color:var(--ink)}.svc-panel.plain h3{color:var(--ink)}.svc-panel.plain p{color:var(--muted)}.svc-panel.plain .tag{color:var(--blue)}
+@media(max-width:760px){.duo{grid-template-columns:1fr}}
+.resource .aud{font-size:12px;color:var(--muted);margin:-8px 0 14px}
+.filters{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:12px;align-items:end;padding:20px;border:1px solid var(--line);border-radius:14px;background:var(--pale)}
+.f-sel select{width:100%;border:1px solid #cbd5e4;border-radius:10px;padding:12px;background:#fff;color:var(--ink)}
+@media(max-width:900px){.filters{grid-template-columns:1fr 1fr}.f-search{grid-column:1/-1}}
+@media(max-width:520px){.filters{grid-template-columns:1fr}}
+.count{font-size:14px;color:var(--muted);margin:16px 0}
+.empty{grid-column:1/-1;text-align:center;padding:48px 16px;border:1px dashed #cbd5e4;border-radius:14px}.empty h3{margin:0 0 6px}.empty p{margin:0 auto 16px;color:var(--muted)}
+.soc-promo{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:28px 32px;border:1px solid var(--line);border-radius:16px;background:#fff}.soc-promo h3{margin:4px 0 6px;font-size:22px;font-weight:800}.soc-promo p{margin:0;color:var(--muted)}
+@media(max-width:760px){.soc-promo{flex-direction:column;align-items:flex-start}}
+.howto{list-style:none;padding:0;margin:0 0 24px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.howto li{display:flex;gap:12px;align-items:flex-start;padding:16px;border:1px solid var(--line);border-radius:12px;background:#fff;font-size:15px}
+.howto b{flex:none;width:28px;height:28px;border-radius:50%;background:var(--sky);color:var(--blue);display:grid;place-items:center;font-size:14px}
+@media(max-width:760px){.howto{grid-template-columns:1fr}}
+.embed{position:relative;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}.embed iframe{display:block;width:100%;border:0}
+.embed-loading{position:absolute;inset:0 0 auto 0;padding:24px;color:var(--muted);text-align:center}
+.blocker{padding:28px;border:1.5px dashed #c9a24a;background:#fffaf0;border-radius:14px}.blocker h3{margin:4px 0 8px;font-size:20px}.blocker p{margin:0 0 8px;color:#5c4a1e}.blocker .tag{color:#9a6b00}.blocker.small{padding:16px 18px;margin-bottom:16px}
+code{background:var(--pale);padding:2px 6px;border-radius:6px;font-size:.9em}
+.adv-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:48px;align-items:start}.adv-grid .formbox{margin:0}
+@media(max-width:900px){.adv-grid{grid-template-columns:1fr}}
+.adv-side h2{font-size:24px;font-weight:800;margin:0 0 16px}
+.steps-v{list-style:none;counter-reset:s;padding:0;margin:0 0 28px}.steps-v li{counter-increment:s;position:relative;padding:0 0 18px 44px}
+.steps-v li:before{content:counter(s);position:absolute;left:0;top:0;width:30px;height:30px;border-radius:50%;background:var(--sky);color:var(--blue);display:grid;place-items:center;font-weight:800;font-size:14px}
+.steps-v b{display:block}.steps-v span{color:var(--muted);font-size:15px}
+.areas{padding-left:18px;margin:0 0 8px;color:var(--ink)}.areas li{margin:4px 0}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}@media(max-width:560px){.row2{grid-template-columns:1fr}}
+.field i,legend i{font-style:normal;color:var(--muted);font-weight:400;font-size:12px}
+.field small{display:block;color:var(--muted);font-size:12px;margin-top:4px}
+fieldset.field{border:0;padding:0;margin:16px 0}fieldset.field legend{font-size:13px;font-weight:600;margin-bottom:8px;padding:0}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px}@media(max-width:560px){.checks{grid-template-columns:1fr}}
+.chk input,.consent input{width:auto!important;flex:none;margin-top:3px}
+.chk{display:flex;text-align:left;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid #d5dfed;border-radius:9px;font-size:14px;cursor:pointer}.chk:has(input:checked){border-color:var(--blue);background:#f3f7ff}
+.ferr{display:block;color:#b42318;font-size:13px;font-style:normal;min-height:0;margin-top:4px}.ferr:empty{display:none}
+[aria-invalid="true"]{border-color:#b42318!important}
+.err-sum{border:1.5px solid #b42318;background:#fff5f4;border-radius:10px;padding:14px 16px;margin-bottom:12px}.err-sum ul{margin:6px 0 0;padding-left:18px}.err-sum a{color:#b42318}
+.opt{margin:12px 0}.opt summary{cursor:pointer;font-weight:600;color:var(--blue);font-size:14px}
+.opt pre{white-space:pre-wrap;font-size:12px;background:var(--pale);padding:12px;border-radius:8px;max-height:280px;overflow:auto}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.result{padding:16px 18px;border-radius:10px;margin-top:16px;font-size:15px}.result.ok{background:#effaf3;border:1px solid #9ad5ae}.result.ok h3{margin:0 0 6px}
+.result.warn{background:#fffaf0;border:1px solid #e6c97a}.result.err{background:#fff5f4;border:1px solid #f1a59c}
+.btn[disabled]{opacity:.6;pointer-events:none}
+.tasks{display:grid;gap:12px}
+.task{display:grid;grid-template-columns:44px 1fr 24px;gap:16px;align-items:center;padding:20px 22px;border:1px solid var(--line);border-radius:14px;background:#fff;transition:border-color .2s,transform .2s,box-shadow .2s}
+.task:hover{border-color:#9fb8ed;transform:translateX(4px);box-shadow:0 8px 25px #17263d12}
+.task .n{width:40px;height:40px;border-radius:10px;background:var(--sky);color:var(--blue);display:grid;place-items:center;font-weight:800}
+.task h3{margin:0 0 4px;font-size:18px;font-weight:800}.task p{margin:0;color:var(--muted);font-size:15px}.task .tag{display:inline;margin:0 6px 0 0}.task .arr{color:var(--blue);font-weight:800}
+.status{width:100%;border-collapse:collapse;font-size:15px}.status th,.status td{text-align:left;padding:12px;border-bottom:1px solid var(--line);vertical-align:top}
+.pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700}.pill.ok{background:#e6f6ec;color:#17663a}.pill.no{background:#fff1e0;color:#9a5b00}
+.links{font-size:14px;margin:0}
+.tablewrap{overflow-x:auto}
+#search .res .all{color:var(--blue)}#search .none{padding:8px;color:var(--muted)}
+
+/* v4 additions */
+.drop{position:relative}.drop>button{background:none;border:0;font-weight:600;font-size:14px;color:var(--ink);padding:6px 0;display:flex;gap:4px;align-items:center}
+.drop>button:hover,.drop.cur>button{color:var(--blue)}.drop.cur>button{box-shadow:inset 0 -2px 0 var(--blue)}
+.drop .menu{display:none;position:absolute;top:calc(100% + 12px);left:-16px;min-width:240px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 18px 40px #14274420;padding:8px;z-index:40}
+.drop.open .menu{display:block;animation:fade .15s ease}
+.drop .menu a{display:block;padding:9px 12px;border-radius:8px;font-weight:600}.drop .menu a:hover{background:var(--pale);color:var(--blue)}
+.drop .sep{height:1px;background:var(--line);margin:6px 4px}
+.resource-grid.four,.steps.four{grid-template-columns:repeat(4,minmax(0,1fr))}.resource-grid.one{grid-template-columns:minmax(0,520px)}
+.why{border-left:3px solid var(--blue);background:var(--pale);border-radius:0 10px 10px 0;padding:12px 16px}.why p{margin:4px 0 0;color:var(--muted);font-size:14px}
+.consent{display:flex;gap:10px;align-items:flex-start;font-size:14px;margin:16px 0}.consent input{margin-top:4px}
+.hint-err{color:#b42318;font-size:14px;margin:8px 0 0}
+.editorial{color:#b8c7de;font-size:13px;margin:40px 0 0;max-width:80ch}
+.hero-c{text-align:center;padding:72px 0 88px}
+.hero-c .hc-copy{max-width:880px;margin:0 auto}.hero-c .hc-copy>*{animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
+.hero-c .hc-copy>*:nth-child(2){animation-delay:.08s}.hero-c .hc-copy>*:nth-child(3){animation-delay:.16s}.hero-c .hc-copy>*:nth-child(4){animation-delay:.24s}.hero-c .hc-copy>*:nth-child(5){animation-delay:.32s}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.pill-eyebrow{display:inline-block;margin:0 0 4px;padding:7px 16px;border-radius:999px;background:var(--sky);color:var(--blue);font-weight:600;font-size:14px}
+.hero-c h1{margin-left:auto;margin-right:auto;max-width:15ch}.hero-c .lead{margin:0 auto}.hero-c .actions{justify-content:center}
+.hero-media{position:relative;max-width:1040px;margin:56px auto 0;text-align:left}
+.hero-media .frame{border-radius:20px;overflow:hidden;aspect-ratio:16/7;box-shadow:0 22px 65px #14274424}
+.hero-media .frame img{width:100%;height:100%;object-fit:cover;object-position:50% 45%;transform:scale(1.03)}
+.hero-media .proof{position:absolute;display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 16px;box-shadow:0 16px 32px rgba(15,23,42,.12);animation:rise .8s .45s cubic-bezier(.2,.7,.2,1) both}
+.hero-media .proof b{display:block;font-size:17px;font-weight:800;line-height:1.2}
+.hero-media .proof span{font-size:14px;color:var(--muted)}
+.hero-media .proof i{width:40px;height:40px;border-radius:10px;background:var(--sky);color:var(--blue);display:grid;place-items:center;font-style:normal;font-weight:800;flex:none}
+.hero-media .p1{left:-24px;bottom:32px}.hero-media .p2{right:-24px;top:32px;animation-delay:.6s}
+@media(max-width:900px){.hero-media .frame{aspect-ratio:4/3}.hero-media .p1{left:12px;bottom:12px}.hero-media .p2{right:12px;top:12px}}
+@media(max-width:520px){.hero-media .p2{display:none}}
+.path-step .subh{margin-top:8px}.path-step .resource-grid+.subh{margin-top:28px}
+@media(max-width:900px){.resource-grid.four,.steps.four{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.resource-grid.four,.steps.four,.resource-grid.one{grid-template-columns:1fr}}
+
+/* responsive */
+@media(max-width:900px){.navlinks{display:none}.hamb{display:block}.mobilemenu.open{display:flex;position:absolute;top:76px;left:0;right:0;background:#fff;border-bottom:1px solid var(--line);padding:20px 28px;flex-direction:column;gap:16px;font-weight:600}
+ .hero-grid,.pagehead .wrap,.navi-grid,.feature{grid-template-columns:1fr}.hero-art{min-height:340px}
+ .grid,.resource-grid,.grid.four{grid-template-columns:repeat(2,minmax(0,1fr))}.footergrid{grid-template-columns:repeat(2,1fr)}.path-step{grid-template-columns:1fr;gap:8px}.steps{grid-template-columns:1fr}}
+@media(max-width:560px){.wrap{padding:0 16px}.hero{padding:48px 0}.hero h1{letter-spacing:-1.6px}.section{padding:56px 0}
+ .grid,.grid.two,.grid.four,.resource-grid,.resource-grid.two,.options,.footergrid{grid-template-columns:1fr}.feature{padding:28px 24px}.callout{display:block}.callout .btn{margin-top:16px}.formbox{padding:22px}.searchbox{min-width:0;width:100%}.fnews input{min-width:0;flex:1}}
+@media(max-width:700px){.grid.roles{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;margin:0 -16px;padding:0 16px 8px;scroll-padding-inline:16px;scrollbar-width:none}.grid.roles::-webkit-scrollbar{display:none}.grid.roles .card{flex:0 0 78%;scroll-snap-align:start}}
+
+/* ===== design directions ===== */
+.dv-switch{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:90;display:flex;gap:4px;align-items:center;padding:5px;border-radius:999px;background:#111c;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 10px 30px #0003;max-width:calc(100vw - 24px);overflow-x:auto}
+.dv-switch span{color:#fff9;font:600 12px Inter,sans-serif;padding:0 8px 0 10px;white-space:nowrap}
+.dv-switch button{border:0;background:transparent;color:#fff;font:600 13px Inter,sans-serif;padding:8px 12px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.dv-switch button[aria-pressed="true"]{background:#fff;color:#111}
+.footer{padding-bottom:80px!important}
+html[data-v] .footer .logo span{color:#ffffff99}
+.vj img,.ve img,.vf img{display:block}
+.vj .more,.ve .more,.vf .more{margin-top:16px}
+
+/* ---------- A · Journey ---------- */
+html[data-v="j"]{--ink:#1d1d1b;--muted:#6b6b66;--blue:#1d1d1b;--blue-d:#000;--pale:#f2f2f0;--line:#dcdcd6;--navy:#161615;--sky:#ececea}
+[data-v="j"] em{font-family:"Instrument Serif",serif;font-style:italic;font-weight:400;letter-spacing:0}
+[data-v="j"] h1,[data-v="j"] h2{font-weight:500!important;letter-spacing:-.03em!important}
+[data-v="j"] .btn{border-radius:999px;background:#1d1d1b}[data-v="j"] .btn.outline{background:#fff;color:#1d1d1b}
+[data-v="j"] .pagehead{background:#f2f2f0}
+[data-v="j"] .eyebrow,[data-v="j"] .r-meta,[data-v="j"] .a-n,[data-v="j"] .t-n{color:#6b6b66}
+[data-v="j"] .navlinks>a.cur,[data-v="j"] .drop.cur>button{color:#1d1d1b;box-shadow:inset 0 -2px 0 #1d1d1b}
+.j-hero{position:relative;min-height:min(84vh,700px);display:flex;flex-direction:column;justify-content:center;color:#fff;overflow:hidden;background:#222}
+.j-hero>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.j-hero:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#0008 0%,#0006 45%,#000c 100%)}
+.j-hero-in{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:40px;padding-bottom:40px;width:100%}
+.j-pill{margin:0 0 18px;padding:7px 16px;border-radius:999px;background:#ffffff26;backdrop-filter:blur(8px);font-size:13px;border:1px solid #ffffff40}
+.j-hero h1{color:#fff;font-size:clamp(38px,5.4vw,68px);line-height:1.05;font-weight:400!important;margin:0;max-width:15ch}
+.j-hero-foot{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:flex-end;gap:20px;padding-bottom:32px;width:100%}
+.j-hero-foot p{max-width:40ch;margin:0;font-size:15px;color:#ffffffd8}
+.j-acts{display:flex;gap:10px;flex-wrap:wrap}
+.j-btn{display:inline-flex;gap:10px;align-items:center;padding:12px 22px;border-radius:999px;background:#1d1d1b;color:#fff;font-weight:600;font-size:14px;border:1px solid #1d1d1b;transition:transform .2s,background-color .2s}
+.j-btn:hover{transform:translateY(-1px)}.j-btn.light{background:#fff;border-color:#fff;color:#111}.j-btn.ghost{background:transparent;color:#fff;border-color:#ffffffa0}.j-btn.ghost:hover{background:#ffffff22}
+.j-acts4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.j-act{display:flex;flex-direction:column;gap:6px;padding:18px;border:1px solid #d6d6d0;border-radius:14px;transition:border-color .2s}
+.j-act:hover{border-color:#1d1d1b}.j-act b{font-size:17px;font-weight:600}.j-act .a-d{font-size:14px;color:var(--muted)}
+.j-act.c3{background:#161615;color:#fff;border-color:#161615}.j-act.c3 .a-d,.j-act.c3 .a-n{color:#fffa}
+.j-act .a-n{width:30px;height:30px;border-radius:50%;border:1px solid currentColor;display:grid;place-items:center;font-size:11px;margin-bottom:6px}
+.j-grey{background:#f2f2f0}
+.j-split{display:grid;grid-template-columns:1.5fr 1fr;gap:40px;align-items:start}
+.j-split h2{font-size:clamp(28px,3vw,40px)!important;margin:4px 0 16px!important}
+.j-gh{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:6px 0 12px}
+.j-paths{display:flex;flex-direction:column;gap:10px}
+.j-card{position:relative;display:block;border-radius:14px;overflow:hidden;aspect-ratio:16/7;color:#fff;background:#333}
+.j-card img{width:100%;height:100%;object-fit:cover;transition:transform .5s}.j-card:hover img{transform:scale(1.04)}
+.j-card:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#000b,#0000 80%)}
+.j-card-in{position:absolute;left:16px;right:16px;bottom:14px;z-index:1;display:flex;flex-direction:column}.j-card-in b{font-size:19px;font-weight:600}.j-card-in span{font-size:13px;color:#fffd}
+.j-trust{position:relative;color:#fff;overflow:hidden;background:#222}
+.j-trust>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.j-trust:after{content:"";position:absolute;inset:0;background:#000a}
+.j-trust-in{position:relative;z-index:1;padding:80px 24px;text-align:center}.j-trust p{max-width:62ch;margin:0 auto 18px;font-size:clamp(18px,2vw,22px);line-height:1.5;color:#fffd}.j-trust b{color:#fff;font-weight:600}
+.j-trust .textlink{color:#fff;text-decoration:underline;text-underline-offset:4px}
+@media(max-width:900px){.j-acts4{grid-template-columns:1fr 1fr}.j-split{grid-template-columns:1fr}}
+@media(max-width:600px){.j-acts4{grid-template-columns:1fr}.j-hero-foot{flex-direction:column;align-items:flex-start}}
+
+/* ---------- B · Editorial ---------- */
+html[data-v="e"]{--ink:#1f1d19;--muted:#6e695f;--blue:#2f4a2c;--blue-d:#203520;--pale:#ece7dc;--line:#d9d2c3;--navy:#1f1d19;--sky:#e4dfd2}
+html[data-v="e"] body{background:#f4f1ea}
+[data-v="e"] h1,[data-v="e"] h2,[data-v="e"] h3:not(.e-k),[data-v="e"] .r-t,[data-v="e"] .t-b b,[data-v="e"] .logo{font-family:Newsreader,Georgia,serif;font-weight:400!important;letter-spacing:-.02em!important}
+[data-v="e"] em{font-style:italic;color:inherit}
+[data-v="e"] .logo{font-size:26px}[data-v="e"] .top{background:#f4f1eaee}
+[data-v="e"] .pagehead{background:#f4f1ea}[data-v="e"] .pagehead h1{font-size:clamp(34px,4.4vw,56px)}
+[data-v="e"] .section.soft{background:#ece7dc}
+[data-v="e"] .btn{border-radius:999px;background:#2f4a2c}[data-v="e"] .btn.outline{background:transparent;color:#1f1d19;border-color:#1f1d19}
+[data-v="e"] .r-t{font-size:20px}[data-v="e"] .row:hover,[data-v="e"] .topics6 a:hover{background:#ece7dc}
+[data-v="e"] .paths,[data-v="e"] .acts4,[data-v="e"] .nx{background:transparent;border-radius:0}
+.e-hero{padding:22px 0 0}
+.e-meta{display:flex;justify-content:space-between;padding:0 0 14px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.e-hero-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:36px;align-items:end;border-top:1px solid var(--line);padding-top:24px}
+.e-hero h1{font-size:clamp(44px,5.6vw,84px)!important;line-height:.98;margin:0}
+.e-hero-img{aspect-ratio:4/3;overflow:hidden}.e-hero-img img{width:100%;height:100%;object-fit:cover}
+.e-hero-foot{display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;border-top:1px solid var(--line);margin-top:24px;padding:18px 0 8px}
+.e-hero-foot p{margin:0;max-width:52ch;font-family:Newsreader,Georgia,serif;font-size:21px;line-height:1.35}
+.e-hero-foot .actions{display:flex;gap:10px;flex-wrap:wrap;margin:0}
+.e-btn{display:inline-block;padding:11px 18px;background:#2f4a2c;color:#f4f1ea;font-size:14px;font-weight:600;border-radius:999px;border:1px solid #2f4a2c}
+.e-btn.line{background:transparent;color:#1f1d19;border-color:#1f1d19}
+.e-acts{padding:40px 0}
+.e-acts-g{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid #1f1d19}
+.e-act{display:flex;flex-direction:column;gap:6px;padding:16px 18px 20px 0;margin-right:18px;border-bottom:1px solid var(--line)}
+.e-act .a-n{font-size:11px;letter-spacing:.1em;color:var(--muted);font-weight:600}
+.e-act b{font-family:Newsreader,Georgia,serif;font-weight:400;font-size:25px;letter-spacing:-.02em;line-height:1.1}.e-act .a-d{font-size:14px;color:var(--muted)}
+.e-act:hover b{text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}
+.e-read{padding:48px 0;background:#ece7dc}
+.e-read-g{display:grid;grid-template-columns:1.5fr 1fr;gap:48px}
+.e-read h2{font-size:clamp(30px,3.4vw,46px)!important;margin:4px 0 18px!important}
+.e-k{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:6px 0 12px}
+.e-row{display:grid;grid-template-columns:120px 1fr;gap:16px;align-items:center;padding:14px 0;border-top:1px solid var(--line)}
+.e-row b{display:block;font-family:Newsreader,Georgia,serif;font-weight:400;font-size:24px;letter-spacing:-.02em}.e-row span span{font-size:14px;color:var(--muted);display:block}
+.e-row-img{aspect-ratio:4/3;overflow:hidden}.e-row-img img{width:100%;height:100%;object-fit:cover;transition:transform .6s}.e-row:hover .e-row-img img{transform:scale(1.05)}
+.e-trust{padding:72px 0}.e-trust .wrap{max-width:720px;text-align:center}
+.e-trust p{font-family:Newsreader,Georgia,serif;font-size:clamp(21px,2.3vw,27px);line-height:1.4;margin:0 0 18px;color:var(--muted)}.e-trust b{color:var(--ink);font-weight:400}
+.e-trust .textlink{font-size:14px;font-weight:600;border-bottom:1px solid currentColor;color:var(--ink)}
+@media(max-width:900px){.e-hero-grid,.e-read-g{grid-template-columns:1fr;gap:20px}.e-acts-g{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.e-acts-g{grid-template-columns:1fr}.e-act{margin-right:0}}
+
+/* ---------- C · Field ---------- */
+html[data-v="f"]{--ink:#111;--muted:#5d5d58;--blue:#111;--blue-d:#000;--pale:#f7f7f2;--line:#e4e4de;--navy:#111;--sky:#fff2b8}
+[data-v="f"] h1,[data-v="f"] h2,[data-v="f"] h3:not(.f-gh),[data-v="f"] .r-t,[data-v="f"] .t-b b{font-family:Fraunces,Georgia,serif;font-weight:300!important;letter-spacing:-.02em!important}
+[data-v="f"] em{font-style:normal;color:inherit}
+[data-v="f"] .r-t{font-weight:400!important;font-size:19px}
+[data-v="f"] .btn{border-radius:0;background:#ffe07d;color:#111}[data-v="f"] .btn:hover{background:#ffd34d}[data-v="f"] .btn.outline{background:#fff;border-color:#111}
+[data-v="f"] .navlinks a[data-sec="advisory"]{background:#8ee59a;padding:8px 12px;color:#111}
+[data-v="f"] .navlinks>a.cur,[data-v="f"] .drop.cur>button{box-shadow:inset 0 -2px 0 #111}
+[data-v="f"] .pagehead{background:#fff}[data-v="f"] .pagehead h1{font-size:clamp(34px,4.6vw,60px);max-width:22ch}
+[data-v="f"] .section.soft{background:#f7f7f2}
+[data-v="f"] .paths,[data-v="f"] .acts4,[data-v="f"] .nx,[data-v="f"] .key4 div,[data-v="f"] .nextstrip,[data-v="f"] .formbox{border-radius:0}
+[data-v="f"] .eyebrow,[data-v="f"] .r-meta,[data-v="f"] .a-n,[data-v="f"] .t-n,[data-v="f"] .r-go,[data-v="f"] .textlink{color:#111}
+.f-hero{overflow:hidden}
+.f-hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;min-height:600px;position:relative}
+.f-hero-txt{padding:96px 0 56px;position:relative;z-index:2}
+.f-kick{font-size:15px;margin:0 0 22px}
+.f-hero h1{font-size:clamp(40px,4.9vw,70px)!important;line-height:1.04;margin:0 0 24px;width:14ch}
+.f-lead{font-size:16px;color:var(--muted);max-width:46ch;margin:0 0 32px}
+.f-acts-b{display:flex;gap:10px;flex-wrap:wrap}
+.f-btn{display:inline-flex;align-items:center;gap:24px;padding:17px 22px;background:#ffe07d;color:#111;font-size:16px;transition:background-color .2s}.f-btn:hover{background:#ffd34d}
+.f-btn.alt{background:#8ee59a}.f-btn.alt:hover{background:#74db83}
+.f-hero-art{position:relative;margin-right:calc(-1 * max(24px,(100vw - 1180px)/2));margin-left:-60px;align-self:stretch}
+.f-hero-art img{width:100%;height:100%;object-fit:cover;min-height:600px}
+.f-notch{position:absolute;left:0;top:0;width:34%;height:44px;background:#fff;z-index:1}
+.f-acts{border-top:1px solid #111;border-bottom:1px solid #111}
+.f-acts-g{display:grid;grid-template-columns:repeat(4,1fr)}
+.f-act{display:flex;flex-direction:column;gap:6px;padding:24px 22px 28px;border-left:1px solid #111;transition:background-color .2s}.f-act:first-child{border-left:0}
+.f-act b{font-family:Fraunces,Georgia,serif;font-weight:400;font-size:22px}.f-act .a-d{font-size:14px;color:var(--muted)}.f-act .a-n{font-size:12px;font-weight:600}
+.f-act.c0:hover{background:#c9f1ff}.f-act.c1:hover{background:#d2f7d6}.f-act.c2:hover{background:#fff2b8}.f-act.c3:hover{background:#ffd9e8}
+.f-tint{background:#f7f7f2}
+.f-two{display:grid;grid-template-columns:1.5fr 1fr;gap:48px}
+.f-two h2{font-size:clamp(32px,3.6vw,48px)!important;line-height:1.08;margin:4px 0 20px!important}
+.f-gh{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin:6px 0 12px}
+.f-paths{display:flex;flex-direction:column;gap:14px}
+.f-tile{display:grid;grid-template-columns:140px 1fr;gap:14px;align-items:center;background:#fff;padding:10px;border:1px solid var(--line)}
+.f-tile img{width:100%;aspect-ratio:4/3;object-fit:cover}
+.f-tile b{display:block;font-family:Fraunces,Georgia,serif;font-weight:400;font-size:22px}.f-tile span span{font-size:14px;color:var(--muted)}
+.f-tile:hover{border-color:#111}
+.f-trust{background:#c9f1ff;padding:56px 0}.f-trust .wrap{display:flex;justify-content:space-between;align-items:center;gap:28px;flex-wrap:wrap}
+.f-trust p{margin:0;max-width:66ch;font-family:Fraunces,Georgia,serif;font-weight:300;font-size:clamp(19px,2vw,23px);line-height:1.45}.f-trust b{font-weight:400}
+.f-trust .textlink{font-weight:600;text-decoration:underline;text-underline-offset:4px}
+@media(max-width:900px){.f-hero-grid{grid-template-columns:1fr;min-height:0}.f-hero-txt{padding:44px 0 28px}.f-hero h1{width:auto}
+ .f-hero-art{margin:0 -16px}.f-hero-art img{min-height:0;aspect-ratio:1}.f-notch{display:none}
+ .f-acts-g{grid-template-columns:1fr 1fr}.f-act:nth-child(3){border-left:0}.f-act:nth-child(n+3){border-top:1px solid #111}.f-two{grid-template-columns:1fr;gap:20px}}
+@media(max-width:520px){.f-acts-g{grid-template-columns:1fr}.f-act{border-left:0;border-top:1px solid #111}.f-act:first-child{border-top:0}.f-tile{grid-template-columns:100px 1fr}}
+/* page headers with photos */
+.ph-img .ph-g{display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:center}
+.ph-img .ph-pic{overflow:hidden;aspect-ratio:16/10}.ph-img .ph-pic img{width:100%;height:100%;object-fit:cover;display:block}
+/* A: full-bleed photo header */
+[data-v="j"] .ph-img{position:relative;padding:0;background:#222;color:#fff;overflow:hidden;border:0}
+[data-v="j"] .ph-img .ph-g{display:block;position:static;padding-top:72px;padding-bottom:44px;min-height:300px}
+[data-v="j"] .ph-img .ph-t{position:relative;z-index:1}
+[data-v="j"] .ph-img .ph-pic{position:absolute;inset:0;aspect-ratio:auto}
+[data-v="j"] .ph-img .ph-pic:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#000c,#0006 70%,#0003)}
+[data-v="j"] .ph-img h1{color:#fff;font-size:clamp(34px,4.4vw,56px)}[data-v="j"] .ph-img p{color:#ffffffd8}
+[data-v="j"] .ph-img .eyebrow,[data-v="j"] .ph-img .breadcrumb,[data-v="j"] .ph-img .breadcrumb a{color:#ffffffb0}
+/* B: framed photo beside the title */
+[data-v="e"] .ph-img{padding:32px 0}[data-v="e"] .ph-img .ph-pic{aspect-ratio:4/3}
+/* C: stippled photo bleeding off the right edge */
+[data-v="f"] .ph-img{padding:0;overflow:hidden}[data-v="f"] .ph-img .ph-t{padding:48px 0}
+[data-v="f"] .ph-img .ph-pic{align-self:stretch;aspect-ratio:auto;min-height:320px;margin-right:calc(-1 * max(24px,(100vw - 1180px)/2))}
+@media(max-width:800px){.ph-img .ph-g{grid-template-columns:1fr;gap:16px}[data-v="e"] .ph-img .ph-pic{order:-1}[data-v="f"] .ph-img .ph-pic{margin:0 -16px;min-height:0;aspect-ratio:16/9}[data-v="f"] .ph-img .ph-t{padding:32px 0 0}}
+/* ===== B: Perplexity-style fonts only (spacing unchanged) ===== */
+[data-v="e"] h1,[data-v="e"] h2,[data-v="e"] .e-act b,[data-v="e"] .e-row b,[data-v="e"] .r-t,[data-v="e"] .t-b b{font-weight:300!important;letter-spacing:-.025em!important;font-variation-settings:"opsz" 72}
+[data-v="e"] .eyebrow,[data-v="e"] .r-meta,[data-v="e"] .e-k,[data-v="e"] .a-n,[data-v="e"] .e-meta,[data-v="e"] .subh,[data-v="e"] .t-n{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:400!important;letter-spacing:.04em!important;text-transform:uppercase}
+[data-v="e"] .navlinks a,[data-v="e"] .navlinks button{font-weight:400}
+/* ===== tool figures (Atlas-style) ===== */
+.fig{display:flex;flex-direction:column;gap:8px;color:inherit}
+.fig-l{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.fig-f{display:block;border:1px solid var(--line);background:var(--pale);padding:14px;overflow:hidden}
+.fig-f img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;object-position:top;border:1px solid var(--line);transition:transform .5s}
+.fig:hover .fig-f img{transform:scale(1.015)}
+.fig-c{font-size:15px;line-height:1.35}.fig-c i{font-family:Newsreader,Georgia,serif;font-size:18px}
+.fig-n{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-right:6px}
+.fig-d{font-size:13.5px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fig-go{font-size:13px;font-weight:600}
+.figs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px;margin:8px 0 28px}.figs.one{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.show h2{font-size:clamp(24px,2.6vw,34px)!important;max-width:30ch;margin:6px 0 28px!important}
+.show-g{display:grid;grid-template-columns:1fr 1.15fr;gap:48px;align-items:start}
+.show-l{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.show-l a{display:grid;grid-template-columns:48px 1fr;gap:14px;padding:16px 8px 16px 0;border-bottom:1px solid var(--line);color:var(--muted);transition:color .2s,background-color .2s}
+.show-l a b{display:block;color:var(--ink);font-size:16px;font-weight:600;line-height:1.3;margin-bottom:3px}
+.show-l a>span:last-child>span{font-size:13.5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.show-gl{color:var(--muted);padding-top:4px}.show-gl svg{width:40px;height:20px;display:block}
+.show-l a.on .show-gl,.show-l a:hover .show-gl{color:var(--ink)}
+.show-l a.on{box-shadow:inset 2px 0 0 var(--ink);padding-left:10px}
+.show-f{position:sticky;top:96px}.show-p{display:none}.show-p.on{display:block}
+.show-p .fig-d{display:none}
+.guide-f{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);margin-top:14px;background:var(--white,#fff)}
+.guide-f a{position:relative;display:flex;flex-direction:column;gap:4px;padding:20px 20px 52px;border-left:1px solid var(--line);transition:background-color .2s}
+.guide-f a:first-child{border-left:0}.guide-f a:hover{background:var(--pale)}
+.guide-i{display:block;aspect-ratio:16/10;overflow:hidden;margin-bottom:12px}.guide-i img{width:100%;height:100%;object-fit:cover;transition:transform .5s}.guide-f a:hover .guide-i img{transform:scale(1.04)}
+.guide-f b{font-size:21px;font-weight:500;letter-spacing:-.01em}.guide-f span:not(.guide-i):not(.guide-go){font-size:14px;color:var(--muted)}
+.guide-go{position:absolute;left:20px;bottom:18px;font-size:15px}
+/* per design */
+[data-v="j"] .fig-f,[data-v="j"] .guide-f{border-radius:14px}[data-v="j"] .fig-f img{border-radius:8px}[data-v="j"] .guide-f{overflow:hidden}
+[data-v="e"] .fig-f{background:#ece7dc;border-color:#d9d2c3}[data-v="e"] .guide-f{background:#f4f1ea;border-color:#d9d2c3}[data-v="e"] .guide-f a{border-color:#d9d2c3}[data-v="e"] .guide-f b{font-family:Newsreader,Georgia,serif;font-weight:300;font-size:26px}
+[data-v="e"] .show-l a b{font-family:Newsreader,Georgia,serif;font-weight:400;font-size:19px}
+[data-v="f"] .fig-f{background:#fff;border-color:#111}[data-v="f"] .guide-f{border-color:#111}[data-v="f"] .guide-f a{border-color:#111}[data-v="f"] .guide-f b,[data-v="f"] .show-l a b,[data-v="f"] .fig-c i{font-family:Fraunces,Georgia,serif;font-weight:400;font-style:normal}
+[data-v="f"] .guide-f a:nth-child(1):hover{background:#fff2b8}[data-v="f"] .guide-f a:nth-child(2):hover{background:#c9f1ff}[data-v="f"] .guide-f a:nth-child(3):hover{background:#ffd9e8}
+[data-v="j"] .fig-c i{font-family:"Instrument Serif",serif;font-size:19px}
+@media(max-width:900px){.show-g{grid-template-columns:1fr}.show-f{position:static;order:-1}.guide-f{grid-template-columns:1fr}.guide-f a{border-left:0;border-top:1px solid var(--line)}.guide-f a:first-child{border-top:0}}
+@media(max-width:700px){.figs,.figs.one{grid-template-columns:1fr}}
+/* ===== A: new fonts (Newsreader light + Plex Mono labels), A colours kept ===== */
+[data-v="j"] h1,[data-v="j"] h2,[data-v="j"] h3:not(.j-gh),[data-v="j"] .r-t,[data-v="j"] .t-b b,[data-v="j"] .j-act b,[data-v="j"] .j-card-in b,[data-v="j"] .guide-f b,[data-v="j"] .show-l a b,[data-v="j"] .j-band-in b{font-family:Newsreader,Georgia,serif!important;font-weight:300!important;letter-spacing:-.025em!important;font-style:normal}
+[data-v="j"] .r-t,[data-v="j"] .show-l a b,[data-v="j"] .j-act b{font-weight:400!important}
+[data-v="j"] .r-t{font-size:19px}[data-v="j"] .j-act b{font-size:21px}[data-v="j"] .guide-f b{font-size:26px}[data-v="j"] .show-l a b{font-size:19px}
+[data-v="j"] em,[data-v="j"] .fig-c i{font-family:Newsreader,Georgia,serif!important;font-style:italic;font-weight:300}
+[data-v="j"] .j-hero h1{font-size:clamp(42px,6vw,80px)!important;line-height:1}
+[data-v="j"] .eyebrow,[data-v="j"] .r-meta,[data-v="j"] .a-n,[data-v="j"] .t-n,[data-v="j"] .subh,[data-v="j"] .j-gh,[data-v="j"] .j-pill,[data-v="j"] .breadcrumb{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:400!important;letter-spacing:.05em!important;text-transform:uppercase}
+[data-v="j"] .j-pill{font-size:11px}
+[data-v="j"] .navlinks a,[data-v="j"] .navlinks button{font-weight:400}
+[data-v="j"] .logo{font-family:Newsreader,Georgia,serif;font-weight:400;letter-spacing:-.02em;font-size:26px}
+/* ===== feature rows for tools (inner pages) ===== */
+.feats{border-top:1px solid var(--line);margin:8px 0 28px}
+.feat{display:grid;grid-template-columns:40px minmax(0,.8fr) minmax(0,1.2fr);gap:20px 28px;padding:32px 0;border-bottom:1px solid var(--line);align-items:start}
+.feat-n{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;color:var(--muted);padding-top:22px}
+.feat-t{display:flex;flex-direction:column;gap:8px}.feat-t b{font-family:Newsreader,Georgia,serif;font-weight:400;font-size:26px;line-height:1.12;letter-spacing:-.02em}
+.feat-t>span:last-child{font-size:14px;color:var(--muted);max-width:42ch}
+.feat-i{position:relative;display:block;border-radius:12px;overflow:hidden;background:var(--pale);border:1px solid var(--line);aspect-ratio:16/10}
+.feat-i img{width:100%;height:100%;object-fit:cover;object-position:top;transition:transform .6s}.feat:hover .feat-i img{transform:scale(1.02)}
+.feat-tag{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#1d1d1bE6;color:#fff;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;padding:7px 12px;border-radius:4px;opacity:.92;transition:opacity .2s}
+.feat:hover .feat-tag{opacity:1}
+[data-v="f"] .feat-i{border-radius:0;border-color:#111}[data-v="f"] .feat-t b{font-family:Fraunces,Georgia,serif;font-weight:300}
+@media(max-width:800px){.feat{grid-template-columns:28px 1fr}.feat-i{grid-column:1/-1}.feat-n{padding-top:4px}}
+/* ===== A: more blue (LLPA blue accent, navy darks) ===== */
+html[data-v="j"]{--blue:#2859c7;--blue-d:#1945ac;--pale:#f1f5fc;--sky:#e7eefb;--line:#dbe3ef;--navy:#13264a;--ink:#14213d;--muted:#5b6a80}
+[data-v="j"] .btn,[data-v="j"] .j-btn{background:#2859c7;border-color:#2859c7}[data-v="j"] .btn:hover,[data-v="j"] .j-btn:hover{background:#1945ac}
+[data-v="j"] .btn.outline{background:#fff;color:#2859c7;border-color:#2859c7}
+[data-v="j"] .j-btn.light{background:#fff;color:#1945ac;border-color:#fff}[data-v="j"] .j-btn.ghost{background:transparent;border-color:#ffffffa0}
+[data-v="j"] .eyebrow,[data-v="j"] .r-meta,[data-v="j"] .a-n,[data-v="j"] .t-n,[data-v="j"] .fig-l,[data-v="j"] .fig-n,[data-v="j"] .feat-n,[data-v="j"] .j-gh,[data-v="j"] .subh{color:#2859c7!important}
+[data-v="j"] .textlink,[data-v="j"] .r-go,[data-v="j"] .fig-go,[data-v="j"] .more a,[data-v="j"] .t-c,[data-v="j"] .guide-go{color:#2859c7}
+[data-v="j"] .navlinks>a.cur,[data-v="j"] .drop.cur>button{color:#2859c7;box-shadow:inset 0 -2px 0 #2859c7}
+[data-v="j"] .j-act.c3{background:#13264a;border-color:#13264a}[data-v="j"] .j-act:hover{border-color:#2859c7}
+[data-v="j"] .j-grey,[data-v="j"] .pagehead,[data-v="j"] .section.soft{background:#f1f5fc}
+[data-v="j"] .fig-f,[data-v="j"] .feat-i{background:#e7eefb;border-color:#d3def2}
+[data-v="j"] .show-l a.on{box-shadow:inset 2px 0 0 #2859c7}[data-v="j"] .show-l a.on .show-gl,[data-v="j"] .show-l a:hover .show-gl{color:#2859c7}
+[data-v="j"] .feat-tag{background:#13264aE6}
+[data-v="j"] .guide-f a:hover{background:#f1f5fc}
+[data-v="j"] .j-hero:after{background:linear-gradient(180deg,#0b1a3a99 0%,#0b1a3a66 45%,#0b1a3ae0 100%)}
+[data-v="j"] .j-trust:after{background:#0b1a3ad0}
+[data-v="j"] .ph-img .ph-pic:after{background:linear-gradient(90deg,#0b1a3ae0,#0b1a3a80 70%,#0b1a3a40)}
+[data-v="j"] .footer{background:#13264a}
+[data-v="j"] .row:hover{background:#f1f5fc}
+/* home "Worth reading now" as feature rows */
+.feats.home .feat{grid-template-columns:40px minmax(0,.8fr) minmax(0,1.2fr)}
+[data-v="j"] .j-trust .textlink{color:#fff!important}
+/* ===== Guidance for: tall photo cards with text on the image ===== */
+.guide-h{font-size:clamp(30px,3.4vw,44px)!important;margin:0 0 24px!important}
+.gcards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.gcard{position:relative;display:block;aspect-ratio:4/5;border-radius:14px;overflow:hidden;color:#fff;background:#13264a}
+.gcard img{width:100%;height:100%;object-fit:cover;transition:transform .6s}.gcard:hover img{transform:scale(1.04)}
+.gcard:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#0000 45%,#0b1a3ad9 100%)}
+.gcard-in{position:absolute;left:20px;right:20px;bottom:18px;z-index:1;display:flex;flex-direction:column;gap:4px}
+.gcard-in b{font-family:Newsreader,Georgia,serif;font-weight:500;font-size:28px;letter-spacing:-.015em;line-height:1.1}
+.gcard-in span{font-size:14.5px;font-weight:500;color:#ffffffe0}
+.gcard-go{position:absolute;top:14px;right:14px;z-index:1;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:#ffffff40;backdrop-filter:blur(6px);color:#fff;font-size:16px;transition:background-color .2s}
+.gcard:hover .gcard-go{background:#2859c7}
+[data-v="f"] .gcard{border-radius:0}[data-v="f"] .gcard-in b{font-family:Fraunces,Georgia,serif}
+@media(max-width:800px){.gcards{grid-template-columns:1fr}.gcard{aspect-ratio:4/3}}
+/* ===== heavier, darker text (A) ===== */
+html[data-v="j"]{--muted:#3f4a5c;--ink:#14213d}
+[data-v="j"] h1,[data-v="j"] h2,[data-v="j"] .j-band-in b{font-weight:450!important;letter-spacing:-.02em!important}
+[data-v="j"] .r-t,[data-v="j"] .show-l a b,[data-v="j"] .j-act b,[data-v="j"] .feat-t b,[data-v="j"] .t-b b,[data-v="j"] .fig-c i{font-weight:500!important;letter-spacing:-.01em!important}
+[data-v="j"] .j-hero h1{font-weight:500!important}
+[data-v="j"] em{font-weight:450!important}
+[data-v="j"] .eyebrow,[data-v="j"] .r-meta,[data-v="j"] .a-n,[data-v="j"] .t-n,[data-v="j"] .fig-l,[data-v="j"] .fig-n,[data-v="j"] .feat-n,[data-v="j"] .subh,[data-v="j"] .j-pill,[data-v="j"] .breadcrumb{font-weight:500!important}
+[data-v="j"] .r-d,[data-v="j"] .a-d,[data-v="j"] .feat-t>span:last-child,[data-v="j"] .show-l a>span:last-child>span,[data-v="j"] .pagehead p,[data-v="j"] .intro,[data-v="j"] .fig-d{color:#3f4a5c!important;font-size:15px}
+[data-v="j"] .navlinks a,[data-v="j"] .navlinks button{font-weight:500}
+[data-v="j"] .logo{font-weight:500}
+[data-v="j"] .j-act.c3 .a-d{color:#ffffffd0!important}[data-v="j"] .j-act.c3 .a-n{color:#9fbcff!important;border-color:#9fbcff}
+/* ===== inner-page cards ===== */
+.gcards.two{grid-template-columns:repeat(2,1fr)}.gcards.two .gcard{aspect-ratio:16/10}
+.gcard-num{position:absolute;top:16px;left:18px;z-index:1;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;font-weight:500;color:#fff;background:#ffffff30;backdrop-filter:blur(6px);padding:4px 9px;border-radius:999px}
+.gcard-x{margin-top:8px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11.5px!important;letter-spacing:.05em;text-transform:uppercase;color:#cfe0ff!important}
+.feats+.gcards{margin-top:56px}
+/* page headers on photos: readable subtitles and labels */
+[data-v="j"] .ph-img p{color:#ffffffe6!important;font-size:17px}
+[data-v="j"] .ph-img .eyebrow{color:#a9c4ff!important}[data-v="j"] .ph-img .breadcrumb,[data-v="j"] .ph-img .breadcrumb a{color:#ffffffc0!important}
+/* AI & Society: stack each part so rows and previews get the full width */
+html[data-v]:not([data-v="o"]) .socpart{display:block;padding:56px 0}
+html[data-v]:not([data-v="o"]) .sp-h{max-width:64ch;margin-bottom:28px}
+html[data-v]:not([data-v="o"]) .sp-h h2{font-size:clamp(26px,2.8vw,36px)!important}
+/* ===== more space everywhere ===== */
+html[data-v]:not([data-v="o"]) .section{padding:104px 0}
+html[data-v]:not([data-v="o"]) .section.tight{padding:64px 0}
+html[data-v]:not([data-v="o"]) .pagehead{padding:88px 0 80px}
+html[data-v]:not([data-v="o"]) .ph-img .ph-g{padding-top:120px;padding-bottom:88px;min-height:420px}
+html[data-v="e"] .ph-img,html[data-v="f"] .ph-img{padding:72px 0}
+html[data-v]:not([data-v="o"]) .pagehead h1{margin:14px 0 18px}
+html[data-v]:not([data-v="o"]) .row{padding:24px 6px}
+html[data-v]:not([data-v="o"]) .feat{padding:56px 0;gap:24px 40px}
+html[data-v]:not([data-v="o"]) .feats{margin:16px 0 48px}
+html[data-v]:not([data-v="o"]) .subh{margin:48px 0 20px!important}
+html[data-v]:not([data-v="o"]) .more{margin-top:32px}
+html[data-v]:not([data-v="o"]) .intro{margin:0 0 40px;font-size:18px;line-height:1.65}
+html[data-v]:not([data-v="o"]) .crossref{margin:-16px 0 40px}
+html[data-v]:not([data-v="o"]) .nextstrip{margin-top:72px;padding:22px}
+html[data-v]:not([data-v="o"]) .key4{gap:20px}html[data-v]:not([data-v="o"]) .key4 div{padding:20px 22px}
+html[data-v]:not([data-v="o"]) .gcards{gap:24px}
+html[data-v]:not([data-v="o"]) .tlist li{padding:10px 0}
+html[data-v]:not([data-v="o"]) .facts{gap:0 64px}html[data-v]:not([data-v="o"]) .facts div{padding:22px 0}
+html[data-v]:not([data-v="o"]) .faq details{padding:18px 0}
+html[data-v]:not([data-v="o"]) .footer{padding-top:64px}html[data-v]:not([data-v="o"]) .fl1{padding-bottom:28px;gap:36px}html[data-v]:not([data-v="o"]) .fl1 nav{gap:10px 26px}html[data-v]:not([data-v="o"]) .fl2{padding-top:24px}
+html[data-v]:not([data-v="o"]) .split{gap:72px}
+html[data-v]:not([data-v="o"]) .adv-grid{gap:64px}html[data-v]:not([data-v="o"]) .formbox{padding:36px}
+.show-g{gap:72px!important}.show h2{margin-bottom:44px!important}.show-l a{padding:22px 8px 22px 0!important}
+.j-acts4{gap:16px!important}.j-act{padding:24px!important}
+.guide-h{margin-bottom:36px!important}
+.j-hero-foot{padding-bottom:48px}
+@media(max-width:700px){html[data-v]:not([data-v="o"]) .section{padding:64px 0}html[data-v]:not([data-v="o"]) .feat{padding:36px 0}html[data-v]:not([data-v="o"]) .ph-img .ph-g{padding-top:72px;padding-bottom:56px;min-height:0}.gcards.two{grid-template-columns:1fr}}
+/* ===== MotionSites pass: motion, air, short copy ===== */
+.fu{opacity:0;transform:translateY(20px);transition:opacity .6s ease-out,transform .6s ease-out}
+.fu.fu-in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.fu{opacity:1;transform:none;transition:none}}
+.j-btn,.btn,.f-btn,.e-btn{transition:transform .2s ease,background-color .2s!important}.j-btn:hover,.btn:hover,.f-btn:hover,.e-btn:hover{transform:scale(1.03)}.j-btn:active,.btn:active{transform:scale(.98)}
+html[data-v]:not([data-v="o"]) .section{padding:136px 0}
+@media(max-width:700px){html[data-v]:not([data-v="o"]) .section{padding:80px 0}}
+.show h2{font-size:clamp(40px,5vw,64px)!important;line-height:1!important}
+.guide-h,[data-v="j"] .section h2{letter-spacing:-.025em!important}
+[data-v="j"] .vj .section > .wrap > h2,[data-v="j"] .vj .guide-h{font-size:clamp(40px,5vw,64px)!important;line-height:1!important}
+.feat-t b{font-size:30px!important}.feat-t>span:last-child{font-size:16px!important}
+.show-l a>span:last-child>span{-webkit-line-clamp:1!important}
+/* ===== lead generation: about line + conversion section ===== */
+.about-line{padding:36px 0;border-top:1px solid var(--line)}
+.about-line p{margin:0;font-size:16px;color:var(--muted)}
+.conv{background:#eef3fc;padding:88px 0;border-top:1px solid #d9e2f0}
+.conv-g{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:64px;align-items:center}
+.conv-h h2{font-family:Newsreader,Georgia,serif!important;font-weight:450!important;font-size:clamp(34px,4vw,50px)!important;line-height:1.04!important;letter-spacing:-.02em!important;margin:0 0 16px!important;color:#14213d}
+.conv-h p{margin:0;font-size:17px;color:#3f4a5c;max-width:44ch}
+.conv-h .conv-note{margin-top:18px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.03em;color:#46526a}
+.conv-opts{border-top:1px solid #c9d6ee}
+.conv-opts a{display:grid;grid-template-columns:36px 1fr auto;gap:18px;align-items:center;padding:26px 0;border-bottom:1px solid #c9d6ee;color:#14213d}
+.conv-n{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;color:#2859c7}
+.conv-t b{display:block;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:24px;letter-spacing:-.01em;line-height:1.15;margin-bottom:4px}
+.conv-t span{font-size:15px;color:#3f4a5c}
+.conv-go{white-space:nowrap;font-size:14px;font-weight:600;color:#fff;background:#2859c7;padding:11px 18px;border-radius:999px;transition:background-color .2s,transform .2s}
+.conv-opts a:hover .conv-go{background:#1945ac;transform:translateX(2px)}
+[data-v="f"] .conv-go{border-radius:0;background:#ffe07d;color:#111}[data-v="f"] .conv-opts a:nth-child(2) .conv-go{background:#8ee59a}
+[data-v="e"] .conv{background:#ece7dc;border-color:#d9d2c3}[data-v="e"] .conv-go{background:#2f4a2c}
+@media(max-width:860px){.conv-g{grid-template-columns:1fr;gap:28px}.conv{padding:64px 0}.conv-opts a{grid-template-columns:28px 1fr}.conv-go{grid-column:2;justify-self:start}}
+/* ===== homepage v2: cohesive editorial composition ===== */
+.h2v .hs{padding:72px 0 0}
+.h2v .hs:last-of-type{padding-bottom:72px}
+.sh{display:flex;justify-content:space-between;align-items:baseline;gap:20px;border-top:1px solid var(--line);padding-top:20px;margin-bottom:28px}
+.sh h2{margin:0!important;font-size:clamp(26px,2.6vw,34px)!important;line-height:1.1!important;font-weight:450!important;letter-spacing:-.015em!important}
+.sh-link{font-size:14px;font-weight:600;color:var(--blue);white-space:nowrap}
+.sh-link:hover{text-decoration:underline;text-underline-offset:4px}
+/* hero: shorter, actions under the lead */
+[data-v="j"] .h2-hero{min-height:0}
+.h2-hero-in{position:relative;z-index:1;padding-top:96px;padding-bottom:72px;display:flex;flex-direction:column;align-items:flex-start;text-align:left}
+.h2-hero-in h1{color:#fff;font-size:clamp(40px,5.2vw,68px)!important;line-height:1.02!important;margin:0 0 18px!important;max-width:14ch;text-align:left}
+.h2-lead{margin:0 0 28px;font-size:18px;color:#ffffffe0;max-width:46ch}
+.ve .h2-lead,.vf .h2-lead{color:var(--muted)}
+.serv{display:flex;gap:10px;flex-wrap:wrap}
+/* tools showcase, tightened */
+.h2v .show-g{gap:48px!important;grid-template-columns:1fr 1.1fr}
+.h2v .show-l a{padding:16px 8px 16px 0!important}
+.h2v .show-f{top:88px}
+.h2v .show-p{display:none}.h2v .show-p.on{display:block}
+/* pathways: shorter cards */
+.gcards.g3 .gcard{aspect-ratio:3/2}
+.gcards.g3 .gcard-in b{font-size:24px}
+/* reading list: two-column index */
+.rl{display:grid;grid-template-columns:1fr 1fr;column-gap:48px;border-top:0}
+.rl-i{display:flex;flex-direction:column;gap:4px;padding:18px 0;border-bottom:1px solid var(--line)}
+.rl-i b{font-family:Newsreader,Georgia,serif;font-weight:500;font-size:21px;line-height:1.2;letter-spacing:-.01em;color:var(--ink)}
+.rl-i span:last-child{font-size:15px;color:var(--muted)}
+.rl-k{font-size:12px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:.06em}
+.rl-i:hover b{text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}
+/* one closing line */
+.close2{border-top:1px solid var(--line);padding:28px 0}
+.close2 .wrap{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+.close2 p{margin:0;font-family:Newsreader,Georgia,serif;font-size:22px;color:var(--ink)}
+.close2 nav{display:flex;gap:28px;flex-wrap:wrap}.close2 a{font-weight:600;font-size:15px;color:var(--blue)}.close2 a:hover{text-decoration:underline;text-underline-offset:4px}
+.fl2 span a{color:#cfe0ff;text-decoration:underline;text-underline-offset:3px}
+@media(max-width:800px){.rl{grid-template-columns:1fr}.h2v .hs{padding-top:56px}.h2-hero-in{padding-top:64px;padding-bottom:48px}.gcards.g3{grid-template-columns:1fr}}
+.h2v .hs + .close2{margin-top:64px}
+/* homepage v2: restore air */
+.h2v .hs{padding:112px 0 0}
+.h2v .hs.acts-s{padding-top:56px}
+.h2v .f-acts + .hs{padding-top:112px}
+.sh{padding-top:24px;margin-bottom:44px}
+.h2v .show-l a{padding:22px 8px 22px 0!important}
+.h2v .show-g{gap:64px!important}
+.gcards.g3{gap:24px}
+.rl-i{padding:24px 0}
+.h2v .hs + .close2{margin-top:112px}
+.close2{padding:36px 0}
+.h2-hero-in{padding-top:120px;padding-bottom:96px}
+@media(max-width:800px){.h2v .hs{padding-top:72px}.h2v .hs.acts-s{padding-top:40px}.h2v .hs + .close2{margin-top:72px}}
+/* ===== closing CTA panel ===== */
+.h2v .hs + .next{margin-top:112px}
+.next{padding:0 0 112px}
+.next-box{background:#13264a;border-radius:20px;padding:44px 28px 30px;text-align:center;color:#fff}
+.next-k{margin:0 0 10px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#a9c4ff}
+.next-box h2{margin:0 0 12px!important;color:#fff!important;font-size:clamp(28px,3vw,38px)!important;line-height:1.1!important;font-weight:450!important}
+.next-sub{margin:0 auto 30px;max-width:60ch;font-size:17px;color:#ffffffd0}
+.next-g{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:1040px;margin:0 auto;text-align:left}
+.next-c{display:flex;flex-direction:column;gap:8px;background:#fff;color:#14213d;border-radius:14px;padding:26px 26px 24px;transition:transform .2s,box-shadow .2s}
+.next-c:hover{transform:translateY(-2px);box-shadow:0 14px 30px #0005}
+.next-i{color:#2859c7;margin-bottom:8px}
+.next-c b{font-family:Newsreader,Georgia,serif;font-weight:500;font-size:25px;letter-spacing:-.01em;line-height:1.15}
+.next-d{font-size:15.5px;color:#3f4a5c;flex:1;margin-bottom:14px}
+.next-go{font-weight:600;font-size:16px;color:#2859c7}
+.next-c:hover .next-go{text-decoration:underline;text-underline-offset:4px}
+.next-f{margin:22px 0 0;font-size:14px;color:#ffffffb0}
+[data-v="f"] .next-box,[data-v="f"] .next-c{border-radius:0}
+[data-v="e"] .next-box{background:#2f4a2c}[data-v="e"] .next-i,[data-v="e"] .next-go{color:#2f4a2c}
+@media(max-width:760px){.next-g{grid-template-columns:1fr}.next-box{padding:36px 18px 24px}.next{padding-bottom:72px}.h2v .hs + .next{margin-top:72px}}
+.h2v .readfeat{margin-top:112px;padding:96px 0}
+.h2v .readfeat + .next{margin-top:112px}
+.h2v .readfeat .feats{margin-bottom:24px}
+@media(max-width:760px){.h2v .readfeat{margin-top:72px;padding:64px 0}.h2v .readfeat + .next{margin-top:72px}}
+/* photos for articles and guides; sharper tool previews */
+.feat-i img.photo{object-position:center}
+.feat-i:has(img.photo){border:0}
+.feat-i:has(img.photo) .feat-tag{background:#ffffffe6;color:#13264a}
+.feat-i img.shot{object-position:top left}
+</style>
+</head>
+<body>
+<a class="skip" href="#app">Skip to content</a>
+<div class="mock" id="devbar" role="note"></div>
+<header class="top" id="top"><div class="wrap nav">
+  <a class="logo" href="#/" aria-label="AI Channel home">AI<span>Channel</span></a>
+  <nav class="navlinks" aria-label="Main">
+    <div class="drop" data-sec="explore"><button type="button" aria-expanded="false">Tools &amp; Insights <span aria-hidden="true">▾</span></button>
+      <div class="menu"><a href="#/explore">All six topics</a><div class="sep"></div><a href="#/topic/work">AI at Work</a><a href="#/topic/business">AI for Business</a><a href="#/topic/safety">AI Safety &amp; Risks</a><a href="#/topic/governance">AI Governance</a><a href="#/topic/everyday">AI in Everyday Life</a><a href="#/topic/future">The Future of AI</a><div class="sep"></div><a href="#/explore/all">Search all resources</a></div></div>
+    <div class="drop" data-sec="org"><button type="button" aria-expanded="false">For Organizations <span aria-hidden="true">▾</span></button>
+      <div class="menu"><a href="#/organizations">All roles</a><div class="sep"></div><a href="#/for/business">Business owners</a><a href="#/for/executives">Executives</a><a href="#/for/hr">HR &amp; L&amp;D</a><a href="#/for/government">Government</a></div></div>
+    <a href="#/for/you" data-sec="you">For Individuals</a>
+    <a href="#/society" data-sec="society">AI &amp; Society</a>
+    <a href="#/training" data-sec="training">AI Training</a>
+    <a href="#/advisory" data-sec="advisory">Advisory &amp; Consulting</a>
+    <a href="#/about" data-sec="about">About</a>
+    <button class="icon-btn" type="button" id="searchbtn" aria-label="Search articles, tools, and guides"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>
+  </nav>
+  <button class="hamb" id="menubtn" type="button" aria-label="Open menu" aria-expanded="false">☰</button>
+</div>
+<nav class="mobilemenu" id="mobilemenu" aria-label="Mobile">
+  <a href="#/">Home</a>
+  <p class="mm-h">Tools &amp; Insights</p><a href="#/topic/work">AI at Work</a><a href="#/topic/business">AI for Business</a><a href="#/topic/safety">AI Safety &amp; Risks</a><a href="#/topic/governance">AI Governance</a><a href="#/topic/everyday">AI in Everyday Life</a><a href="#/topic/future">The Future of AI</a>
+  <p class="mm-h">For Organizations</p><a href="#/for/business">Business owners</a><a href="#/for/executives">Executives</a><a href="#/for/hr">HR &amp; L&amp;D</a><a href="#/for/government">Government</a>
+  <p class="mm-h">More</p><a href="#/for/you">For Individuals</a><a href="#/society">AI &amp; Society</a><a href="#/training">AI Training</a><a href="#/advisory">Advisory &amp; Consulting</a><a href="#/about">About</a><a href="#" data-search>Search</a></nav>
+</header>
+
+<main id="app" tabindex="-1"></main>
+
+<footer class="footer"><div class="wrap">
+  <div class="fl1"><div class="logo">AI<span>Channel</span></div><nav aria-label="Footer"><a href="#/explore">Tools &amp; Insights</a><a href="#/training">AI Training</a><a href="#/advisory">Advisory &amp; Consulting</a><a href="#/organizations">For Organizations</a><a href="#/for/you">For Individuals</a><a href="#/society">AI &amp; Society</a><a href="#/about">About</a><a href="#/about/faq">FAQ</a><a href="#/legal/privacy">Privacy</a><a href="#/legal/terms">Terms</a><a href="#/about/contact">Contact</a></nav></div>
+  <div class="fl2"><span>AI Channel is run by the Leading Learning Partners Association (LLPA). Courses and advisory services come from LLPA members.</span><span class="llpa"><img src="img/llpa-logo.png" alt="LLPA, Leading Learning Partners Association"></span></div>
+</div></footer>
+
+<div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-labelledby="vtitle">
+  <div class="vbar"><button class="btn outline" type="button" id="vback">← Back</button><span class="t" id="vtitle"></span><a class="btn outline hide-s" id="vfull" href="#" target="_blank" rel="noopener">Open full page ↗</a><a class="btn outline hide-s" href="#/training" data-close data-cta="training" data-loc="viewer">Related training</a><a class="btn" href="#/advisory" data-close data-cta="advisory" data-loc="viewer">Request expert support</a></div>
+  <iframe id="vframe" title="Tool or guide"></iframe>
+</div>
+<div class="search" id="search" role="dialog" aria-modal="true" aria-label="Search">
+  <div class="box"><label class="sr" for="q">Search guides and tools</label><input id="q" type="search" placeholder="Search articles, tools, and guides…" autocomplete="off"><p class="hint">Searches AI Channel's articles, guides and tools. Press Enter to see all results.</p><div class="res" id="res" role="listbox"></div></div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script>
+const ALL_AUD = ["business","executives","hr","government","you","technical","educators"];
+const CATALOG = [
+ // ---- Tools: where you stand
+ {s:"business-ai-audit",t:"Where does your business actually stand on AI?",l:"Assess where AI could save you time, what data goes into AI tools, whether AI skills are spreading through your team, and your plan if AI could do the core of what you sell. Get a readiness score and a checklist matched to your weakest areas.",type:"Tool",a:["business"],tp:["adopt","work"],g:"stand",kw:"business audit readiness small business smb owner"},
+ {s:"business-ai-exposure-check",t:"How exposed is your business's AI use?",l:"Do you know which AI tools your team is actually using, what information they're sharing, and what happens to that data? Check where your business could be exposed without realizing it.",type:"Tool",a:["business","executives"],tp:["data","safe"],g:"stand",kw:"shadow ai exposure staff tools approved"},
+ {s:"where-could-ai-actually-help-your-business",t:"Where could AI actually help your business?",l:"Before you spend on AI, check whether it's worth it for your business, and where it would actually save you time.",type:"Tool",a:["business"],tp:["adopt"],g:"stand",kw:"use cases industry retail clinic agency restaurant roi"},
+ {s:"is-your-organization-actually-ready-for-ai",t:"Is your organization actually ready for AI?",l:"Wanting to adopt AI isn't the same as being ready to. Answer questions on strategy, adoption, governance, data and your workforce, with advice on what to put in place first.",type:"Tool",a:["executives","hr","business"],tp:["adopt","gov"],g:"stand",kw:"strategy board leadership readiness ceo coo"},
+ {s:"which-parts-of-your-teams-work-could-ai-change-first",t:"Which parts of your team's work could AI change first?",l:"AI won't affect every role or task equally. See which parts of your team's work AI may be able to take on, and where your people might need new skills.",type:"Tool",a:["hr","executives"],tp:["work"],g:"stand",kw:"team workforce reskill roles tasks hr l&d"},
+ {s:"which-ai-skills-does-your-team-actually-need",t:"Which AI skills does your team actually need?",l:"Not everyone needs to become an AI expert. See which skills could actually help people in different roles, where your team might have gaps, and what training is worth prioritizing.",type:"Tool",a:["hr"],tp:["work","adopt"],g:"stand",kw:"skills training plan l&d literacy"},
+ {s:"does-your-organization-have-the-controls-to-govern-ai",t:"Does your organization have the controls to govern the AI it uses?",l:"Who decides which AI systems your organization can use, who keeps track of them, and what happens when something goes wrong? Find out where your oversight and safeguards may be falling short.",type:"Tool",a:["government","executives"],tp:["gov"],g:"stand",kw:"governance controls public sector procurement logging audit"},
+ {s:"how-ready-are-you-for-the-ai-shift",t:"How ready are you for the AI shift?",l:"AI could change how you work, what skills are valuable, and the opportunities available to you. How prepared are you? Check where you stand and what you could do now to prepare.",type:"Tool",a:["you"],tp:["work","resil"],g:"stand",kw:"personal prepare future career me"},
+ {s:"check-your-job",t:"Which parts of your job can AI already do?",l:"AI might be able to do more of your job than you think. Choose your occupation to explore which tasks AI can already handle, how that could change over time, and what you can do to prepare.",type:"Tool",a:["you","hr"],tp:["work"],g:"stand",kw:"my job career replace automation occupation exposure"},
+ {s:"ai-dependency-score",t:"Which systems would stop you trading if they failed?",l:"How much do you depend on AI and other digital systems to keep things running? Find out which tools and services you rely on most, and what could happen if they suddenly became unavailable.",type:"Tool",a:["business","you"],tp:["resil"],g:"stand",kw:"dependency outage single point of failure"},
+ // ---- Tools: before you decide
+ {s:"ai-due-diligence-checklist",t:"Before your business adopts any AI tool, run through this checklist.",l:"An AI tool might save your business time, but what could it cost you if something goes wrong? Check what to ask about data privacy, security, compliance, and the vendor before committing.",type:"Checklist",a:["business","executives","government"],tp:["safe","gov"],g:"decide",kw:"vendor procurement due diligence buy tool supplier"},
+ {s:"eu-ai-act-risk-tier-checker",t:"What risk tier is your AI system under the EU AI Act?",l:"Not all AI systems face the same legal requirements. Find out which risk category may apply to yours, what obligations come with it, and what you may need to do to comply.",type:"Tool",a:["executives","business","government","technical"],tp:["gov"],g:"decide",kw:"eu ai act regulation compliance law europe high-risk"},
+ {s:"ai-data-sharing-risk-checker",t:"What is your team putting into AI tools, and where does it go?",l:"Customer details, internal documents, financial information. What happens when your team shares these with AI tools? Check what data could be exposed, where it might end up, and how to reduce the risks.",type:"Tool",a:["business","hr","government"],tp:["data","safe"],g:"decide",kw:"chatgpt data privacy confidential leak staff paste"},
+ {s:"digital-resilience-checklist",t:"Could your business get through an outage, a hacked account or a lost laptop?",l:"One hacked account or lost device could disrupt more than you expect. Check whether you have the backups, security measures, and recovery plans to keep things running when something goes wrong.",type:"Checklist",a:["business","you"],tp:["resil","data"],g:"decide",kw:"cyber backup passkeys hacked resilience"},
+ // ---- Tools: run it with your team
+ {s:"ai-tabletop-exercise-kit",t:"Would your leadership team cope with a serious AI incident?",l:"An AI system makes a costly mistake, exposes sensitive information, or causes a major disruption. Who makes the decisions, and how quickly can your team respond? Put your leadership through a realistic scenario to find out.",type:"Kit",a:["executives","government","business"],tp:["risk","gov","resil"],g:"team",kw:"tabletop incident exercise crisis scenario"},
+ // ---- Tools: see how AI works
+ {s:"p-doom-scenario-explorer",t:"Is AI actually dangerous? Test the assumptions yourself.",l:"How dangerous could advanced AI become? The answer depends on what you believe about its capabilities, our ability to control it, and how quickly it develops. Change the assumptions and see how they affect the risks.",type:"Tool",a:["you","executives","government","educators","technical"],tp:["risk"],g:"how",kw:"p(doom) pdoom danger experts disagree"},
+ // ---- Guides
+ {s:"small-business-ai-safety",t:"How do you use AI safely when it's just you, or a small team?",l:"You don't need an IT department to protect yourself from AI-related risks. Learn how to keep sensitive information private, spot scams, check AI-generated answers, and set simple rules for using AI safely.",type:"Guide",a:["business"],tp:["safe","data"],g:"safe",kw:"small business safety sole trader"},
+ {s:"the-ai-sandbox",t:"How do we use AI tools without exposing our data?",l:"What you paste into an AI tool may be stored, read by the vendor or used to train it. How to try tools without confidential data being exposed.",type:"Guide",a:["business","executives","government","technical"],tp:["data","safe"],g:"safe",kw:"sandbox confidential data public servants"},
+ {s:"when-ai-gets-it-wrong",t:"What should you do when AI gets it wrong at work?",l:"What if an AI mistake reaches a customer, affects a decision, or exposes your business to risk? Learn who's responsible, when AI outputs need extra scrutiny, and what to do first when something goes wrong.",type:"Guide",a:["business","hr","executives","you"],tp:["safe"],g:"safe",kw:"wrong mistake accountable error"},
+ {s:"context-windows",t:"Why does AI forget what you told it earlier?",l:"In long chats, AI quietly forgets what you said earlier. See why.",type:"Visual",a:["you","business","hr","technical"],tp:["learn","safe"],g:"how",soon:true,kw:"context window memory forget long chat"},
+ {s:"ai-hallucinations",t:"Why does AI sound so confident when it's wrong?",l:"AI sometimes makes things up, and sounds just as sure. How to catch it.",type:"Explainer",a:["you","business","hr","technical","educators"],tp:["safe","learn"],g:"safe",kw:"hallucination wrong confident trust accuracy"},
+ {s:"healthy-ai-use",t:"Am I leaning on AI too much?",l:"AI can make work easier, but could relying on it too much weaken your judgment or skills? Learn when to think for yourself, what to double-check, and how to keep people involved in important decisions.",type:"Guide",a:["you","hr"],tp:["safe"],g:"safe",kw:"healthy wellbeing dependence over-reliance"},
+ {s:"responsible-ai-is-a-liability",t:"Is our AI an asset or a liability?",l:"AI could create value for your organization, but poor oversight can turn it into a costly risk. What should your board be asking to make sure AI is helping rather than exposing the business?",type:"Guide",a:["executives","business"],tp:["gov"],g:"lead",kw:"board responsible ai liability"},
+ {s:"in-house-llm-governance",t:"We're building our own AI. What do we need to govern?",l:"Building an AI system means taking responsibility for what it does. Learn which safeguards, testing practices, and oversight measures to put in place before your system reaches real users.",type:"Guide",a:["technical","executives","government"],tp:["gov","data"],g:"lead",kw:"in-house llm build own model rag governance"},
+ {s:"ai-and-jobs-explained",t:"Which jobs will AI replace?",l:"Make sense of the debate about AI and jobs: how to think about it and what replacement is likely to look like, and what to do about it.",type:"Article",a:["business","executives","hr","you"],tp:["work"],g:"work",kw:"jobs debate replacement entry-level pyramid hiring layoffs"},
+ {s:"ten-ways-ai-risk-becomes-a-real-world-problem",t:"What are the most serious risks from AI?",l:"Some AI harms are happening now, and some researchers think far worse is possible. Learn what the evidence shows, what's still uncertain, and what you can do about it.",type:"Article",a:["business","executives","hr","government","you"],tp:["risk"],g:"risk",kw:"risk hub ten ways danger serious"},
+ {s:"can-ai-take-over-the-world",t:"Can AI take over the world?",l:"Could an AI system become powerful enough to escape human control? Intelligence alone wouldn't be enough. Explore what capabilities, access, and failures would have to come together for an AI takeover to become possible.",type:"Article",a:["you","executives","business","government"],tp:["risk"],g:"risk",kw:"takeover control"},
+ {s:"can-ai-be-shut-down",t:"Can AI be shut down?",l:"Turning off an AI system sounds simple. But what happens when it can make copies of itself or becomes essential to services we rely on? Explore why keeping AI under human control could become increasingly difficult.",type:"Article",a:["executives","business","government","technical"],tp:["risk","gov"],g:"risk",kw:"shutdown off switch stop"},
+ {s:"ai-apocalypse-scenarios",t:"What would an AI apocalypse actually look like?",l:"Could a series of AI failures, accidents, or systems we can no longer control lead to a catastrophe? Explore the scenarios researchers take seriously, and what separates plausible risks from science fiction.",type:"Article",a:["you","executives","business"],tp:["risk"],g:"risk",kw:"apocalypse disaster scenarios"},
+ {s:"ai-singularity-explained",t:"What is the AI singularity?",l:"What happens if AI becomes capable of improving itself, making each new generation smarter than the last? Explore why some researchers think this could lead to an explosion in technological progress, and why others remain skeptical.",type:"Article",a:["you","executives","hr"],tp:["risk","learn"],g:"risk",kw:"singularity agi superintelligence"},
+ {s:"ai-extinction-risk-p-doom",t:"Could AI wipe out humanity?",l:"Could advanced AI really pose a threat to humanity's survival? Some researchers think the risk is serious, while others disagree. Explore how experts estimate the chances of catastrophe, what “p(doom)” means, and why no one knows the true probability.",type:"Article",a:["you","executives"],tp:["risk"],g:"risk",kw:"extinction p(doom) humanity"},
+ {s:"could-ai-control-critical-infrastructure",t:"Could AI take control of the power grid and other critical systems?",l:"Could AI disrupt electricity, water, or other services millions of people depend on? Explore what access an AI system would need, how it could cause harm, and what safeguards stand in its way.",type:"Article",a:["government","executives","business"],tp:["risk","resil"],g:"risk",kw:"infrastructure power grid critical"},
+ {s:"can-ai-lie",t:"Can AI lie to you?",l:"AI doesn't always tell the truth, and sometimes it may mislead people in ways that appear deliberate. Explore what researchers have discovered about AI deception, why it happens, and how much we still don't understand.",type:"Article",a:["you","business","technical"],tp:["risk","safe"],g:"risk",kw:"lie deception scheming mislead"},
+ {s:"can-ai-copy-itself",t:"Can AI copy itself and spread?",l:"Could an AI system make copies of itself and spread across the internet without anyone's permission? Explore what researchers have tested, what AI can actually do today, and what would be needed for it to keep running beyond human control.",type:"Article",a:["technical","business","government","you"],tp:["risk"],g:"risk",kw:"copy replicate self-replication"},
+ {s:"ai-glossary",t:"What is AGI? Will AI take my job? Is it dangerous?",l:"AI is changing fast, and the jargon can make it hard to keep up. Get clear, straightforward answers to the biggest questions about what AI can do, where it's headed, and what it means for you.",type:"Explainer",a:["you","business","hr","executives","government","educators"],tp:["learn"],g:"learn",kw:"glossary terms jargon agi definitions"},
+ {s:"resource-library",t:"Where can I read the best on AI safety, privacy and regulation?",l:"There's no shortage of information about AI, but where should you start? Find a curated selection of trusted resources on AI safety, privacy, and regulation, organized around what's relevant to you.",type:"Guide",a:ALL_AUD,tp:["learn","gov"],g:"read",kw:"reading library sources further"}
+];
+
+const FAQ = [
+ {c:"About AI Channel",q:"What is AI Channel?",home:true,a:"<p>A free site that helps people and organizations understand AI, see where they stand, and find a sensible next step. It's run by the Leading Learning Partners Association (LLPA), a network of independent training and advisory companies.</p>"},
+ {c:"About AI Channel",q:"Who are the members?",home:true,a:"<p>LLPA (the Leading Learning Partners Association) is a network of independent training and advisory companies in many countries. The guides, tools and news here are free for everyone. If you ask for help, your request goes to one member firm that fits, and we tell you who it is.</p>"},
+ {c:"Using the site",q:"Is the search box an AI chatbot?",home:true,a:"<p>No. It searches AI Channel's own guides and tools and takes you to the closest match. If nothing fits, the <a href=\"#/map\">content map</a> shows everything on one page.</p>"},
+ {c:"Using the site",q:"Do the tools store my answers?",home:true,a:"<p>No. Answers stay in your browser for this session only. Nothing is stored or sent unless you choose “Email me my results”, and that never signs you up to the newsletter.</p>"},
+ {c:"Using the site",q:"What do “Learn with a member” and “Get matched to someone” do?",a:"<p><strong>Learn with a member</strong> shows courses and workshops from member training companies. <strong>Get matched to someone</strong> is a short form: you say what you're trying to solve, and one member who fits follows up. (Placeholder links in this mockup.)</p>"},
+ {c:"Using the site",q:"Do I have to pay?",a:"<p>The tools, guides and news are free. Courses and advisory come from members, who set their own terms with you.</p>"},
+ {c:"How we work",q:"Are you selling a particular AI product?",a:"<p>No. We don't push one vendor, and we'll tell you when the honest answer is “you don't need this yet.”</p>"},
+ {c:"How we work",q:"How do you decide what's true?",a:"<p>We name our sources, put an “as of” date on figures, and say plainly what's evidence, what's an estimate and what's still argued about. Where serious people disagree, we show the range.</p>"},
+ {c:"How we work",q:"Who is AI Channel for?",a:"<p>Mostly business owners, executives, and the HR, L&amp;D and team leads who decide on training. Also the public sector and anyone who wants to understand what AI means for them.</p>"}
+];
+
+(function(){
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const CFG=Object.assign({trainingEmbed:{},advisory:{},contact:{},legal:{},analytics:{}},window.AIC_CONFIG||{});
+const BY=Object.fromEntries(CATALOG.map(x=>[x.s,x]));
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const im=(n,alt)=>`<img src="img/${n}.jpg" alt="${esc(alt||"")}" loading="lazy">`;
+const live=CATALOG.filter(x=>!x.soon);
+const AUD={
+ business:{dimg:"ref-08",name:"Business owners",short:"Business",focus:"AI opportunities, readiness, practical implementation, and risk",promise:"Use AI without creating problems you'll have to fix later.",img:"ref-11",tool:"where-could-ai-actually-help-your-business",timg:"ref-15",deeper:["small-business-ai-safety","the-ai-sandbox","ai-due-diligence-checklist"],also:"business-ai-audit",quote:["We bought the AI licences. Hardly anyone uses them.","business-ai-exposure-check"]},
+ executives:{dimg:"ref-16",name:"Executives",short:"Executives",focus:"AI strategy, governance, organizational readiness, and decision-making",promise:"Make better decisions about AI before they become expensive decisions.",img:"ref-18",tool:"is-your-organization-actually-ready-for-ai",timg:"ref-12",deeper:["responsible-ai-is-a-liability","eu-ai-act-risk-tier-checker","ai-tabletop-exercise-kit","in-house-llm-governance"],also:"ten-ways-ai-risk-becomes-a-real-world-problem",quote:["The board wants an AI strategy and we don't have one.","is-your-organization-actually-ready-for-ai"]},
+ hr:{dimg:"ref-11",name:"HR & L&D",short:"HR & L&D",focus:"Workforce transformation, skills development, and training",promise:"Help your team adapt to AI without guessing what comes next.",img:"ref-05",tool:"which-ai-skills-does-your-team-actually-need",timg:"ref-14",deeper:["which-parts-of-your-teams-work-could-ai-change-first","healthy-ai-use","when-ai-gets-it-wrong"],also:"ai-and-jobs-explained",quote:["I need to know which parts of my team's work change first.","which-parts-of-your-teams-work-could-ai-change-first"]},
+ government:{dimg:"ref-17",name:"Government",short:"Government",focus:"Responsible AI adoption, governance, risk, and institutional readiness",promise:"Understand what AI changes, and what governments can actually do about it.",img:"ref-19",tool:"does-your-organization-have-the-controls-to-govern-ai",timg:"ref-13",deeper:["the-ai-sandbox","eu-ai-act-risk-tier-checker","in-house-llm-governance"],also:"ai-tabletop-exercise-kit",quote:["We're a public body and we have to show the AI we use is under control.","does-your-organization-have-the-controls-to-govern-ai"]},
+ you:{dimg:"ref-14",name:"For individuals",short:"For You",focus:"Your work, your skills, and what's worth worrying about",promise:"AI is changing work, information and everyday life. Here's what actually matters to you.",img:"ref-08",tool:"check-your-job",timg:"ref-06",deeper:["healthy-ai-use","ai-hallucinations","ai-and-jobs-explained","ai-glossary"],also:"how-ready-are-you-for-the-ai-shift",quote:["Honestly, I'm worried about my own job.","check-your-job"]}
+};
+
+/* ---------- taxonomy: six topics (one primary topic per resource), formats, audiences ---------- */
+const TOPICS=[
+ {k:"work",n:"AI at Work",q:"How will AI change jobs, tasks, and the skills people need?",intro:"Which parts of work AI can already do, which skills are worth building, and how people and teams can prepare.",
+  feat:["check-your-job","which-parts-of-your-teams-work-could-ai-change-first","which-ai-skills-does-your-team-actually-need","ai-and-jobs-explained"],more:["how-ready-are-you-for-the-ai-shift","when-ai-gets-it-wrong"],next:"training"},
+ {k:"business",n:"AI for Business",q:"Where can AI create value, and how can organizations adopt it responsibly?",intro:"Find worthwhile uses, check whether you're ready, and put the basic safeguards in place before you rely on AI.",
+  feat:["where-could-ai-actually-help-your-business","is-your-organization-actually-ready-for-ai","the-ai-sandbox","ai-due-diligence-checklist"],more:["business-ai-audit","business-ai-exposure-check","ai-data-sharing-risk-checker","small-business-ai-safety","ai-dependency-score","digital-resilience-checklist"],next:"advisory"},
+ {k:"safety",n:"AI Safety & Risks",q:"What could go wrong with AI, and how serious are the risks?",intro:"Harms that are happening now, from confident mistakes to deception, and what current systems can and can't do on their own.",
+  feat:["ten-ways-ai-risk-becomes-a-real-world-problem","can-ai-lie","can-ai-copy-itself","could-ai-control-critical-infrastructure"],more:["can-ai-be-shut-down"],next:"society"},
+ {k:"governance",n:"AI Governance",q:"Who should control AI, and what safeguards are needed?",intro:"Rules, oversight and accountability: what the law requires, what good governance looks like inside an organization, and how to prepare for incidents.",
+  feat:["does-your-organization-have-the-controls-to-govern-ai","eu-ai-act-risk-tier-checker","responsible-ai-is-a-liability","in-house-llm-governance"],more:["ai-tabletop-exercise-kit","resource-library"],next:"advisory"},
+ {k:"everyday",n:"AI in Everyday Life",q:"How can people use AI effectively and understand its impact?",intro:"Plain explanations of how AI behaves, where it goes wrong, and how to use it without leaning on it too much.",
+  feat:["ai-hallucinations","healthy-ai-use","ai-glossary"],more:["context-windows"],next:"training"},
+ {k:"future",n:"The Future of AI",q:"Where is AI heading, and what could more powerful systems mean for society?",intro:"Scenarios researchers take seriously, from self-improving AI to loss of control. Each piece separates evidence, forecasts and open questions.",
+  feat:["p-doom-scenario-explorer","ai-extinction-risk-p-doom","ai-singularity-explained","can-ai-take-over-the-world"],more:["ai-apocalypse-scenarios"],next:"society"}];
+const TOPIC_BY=Object.fromEntries(TOPICS.map(t=>[t.k,t]));
+const TOPIC_OF={};TOPICS.forEach(t=>[...t.feat,...t.more].forEach(s=>TOPIC_OF[s]=t.k));
+const FORMAT=x=>x.type==="Visual"?"Interactive explainer":x.type==="Tool"?"Tool":x.type==="Checklist"||x.type==="Kit"?"Checklist / kit":x.type==="Article"?"Article":"Guide";
+const FORMATS=["Tool","Guide","Explainer","Checklist / kit","Article"];
+const fmtMatch=(x,f)=>f==="Explainer"?x.type==="Explainer"||x.type==="Visual":FORMAT(x)===f;
+const AUDIENCES=[["business","Business owners"],["executives","Executives"],["hr","HR & L&D"],["government","Government"],["you","Individuals"]];
+const cta=x=>x.soon?"Coming soon":x.type==="Tool"||x.type==="Visual"?"Use tool":x.type==="Checklist"?"Use checklist":x.type==="Kit"?"Use kit":x.type==="Article"?"Read article":"Read guide";
+
+/* ---------- analytics: no personal data, ever ---------- */
+const ATTR=(()=>{try{const k="aic_attr";let a=JSON.parse(sessionStorage.getItem(k)||"null");
+  if(!a){a={landing:location.hash||"#/",referrer:document.referrer?new URL(document.referrer).hostname:"",utm:Object.fromEntries([...new URLSearchParams(location.search)].filter(([k])=>k.startsWith("utm_")))};sessionStorage.setItem(k,JSON.stringify(a));}return a;}catch(e){return {landing:location.hash||"#/"}}})();
+let LAST_CTA="";
+function track(name,detail){const d=Object.assign({event:name,page:(location.hash||"#/").split("?")[0]},detail||{});
+  try{document.dispatchEvent(new CustomEvent("aichannel:event",{detail:d}));if(window.parent!==window)window.parent.postMessage({type:"aichannel:event",detail:d},"*");}catch(e){}}
+document.addEventListener("click",e=>{const a=e.target.closest("[data-cta]");if(!a)return;LAST_CTA=a.dataset.cta;track("cta_clicked",{cta:a.dataset.cta,location:a.dataset.loc||""});});
+
+/* ---------- two components: a list row, and a compact link list ---------- */
+function row(s,o){o=o||{};const x=BY[s];if(!x)return"";
+  const meta=`<span class="r-meta">${esc(o.tag||FORMAT(x))}${x.soon?" · Coming soon":""}</span>`;
+  const body=`<span class="r-body">${meta}<span class="r-t">${esc(x.t)}</span><span class="r-d">${esc(x.l)}</span></span>`;
+  if(x.soon) return `<div class="row soon" aria-disabled="true">${body}<span class="r-go" aria-hidden="true"></span></div>`;
+  return `<a class="row" href="#/open/${x.s}">${body}<span class="r-go">${esc(o.btn||cta(x))} <span aria-hidden="true">→</span></span></a>`;}
+let rows=(list,o)=>`<div class="rows">${list.map(s=>row(s,o)).join("")}</div>`;
+const titles=list=>`<ul class="tlist">${list.map(s=>{const x=BY[s];return x.soon?`<li><span>${esc(x.t)}</span> <em>Coming soon</em></li>`:`<li><a href="#/open/${s}">${esc(x.t)}</a> <em>${esc(FORMAT(x))}</em></li>`}).join("")}</ul>`;
+const head=(eyebrow,title,sub)=>`${eyebrow?`<div class="eyebrow">${eyebrow}</div>`:""}<h2>${esc(title)}</h2>${sub?`<p class="sub">${esc(sub)}</p>`:""}`;
+const section=(inner,soft,id)=>`<section class="section${soft?" soft":""}"${id?` id="${id}"`:""}><div class="wrap">${inner}</div></section>`;
+function pagehead(eyebrow,title,sub,crumb){return `<div class="pagehead"><div class="wrap">${crumb?`<nav class="breadcrumb" aria-label="Breadcrumb">${crumb}</nav>`:""}<div class="eyebrow">${eyebrow}</div><h1>${esc(title)}</h1>${sub?`<p>${esc(sub)}</p>`:""}</div></div>`;}
+const NEXT={
+ training:`<a class="nx" href="#/training" data-cta="training" data-loc="next"><b>Find AI training</b><span>Courses from LLPA members. Select Learn More and our team will connect you.</span></a>`,
+ advisory:`<a class="nx" href="#/advisory" data-cta="advisory" data-loc="next"><b>Get expert support</b><span>Tell us what you're working on. The LLPA team will connect you with a member who can help.</span></a>`,
+ society:`<a class="nx" href="#/society"><b>AI &amp; Society</b><span>An editorial introduction to AI's wider consequences, with claims labelled by how well established they are.</span></a>`};
+const nextStrip=(keys,loc)=>`<div class="nextstrip"><span class="ns-l">Next step, if you want one</span>${keys.map(k=>NEXT[k].replace('data-loc="next"',`data-loc="${loc}"`)).join("")}</div>`;
+
+/* ---------- Home: four blocks ---------- */
+function homeBase(){
+  const acts=[["Explore AI","Understand developments, opportunities, risks, and what they mean.","#/explore","explore"],
+    ["Assess your needs","Use practical tools and assessments to evaluate AI opportunities, readiness, and risks.","#/explore/all?f=Tool","assess"],
+    ["Find AI training","Explore courses offered by LLPA members.","#/training","training"],
+    ["Get expert support","Request advisory or consulting assistance.","#/advisory","advisory"]];
+  return `<div>
+  <section class="hero2"><div class="wrap h2grid">
+    <div><p class="pill-eyebrow">AI Channel by LLPA</p>
+      <h1>Understand AI. <em>Use it well.</em> Prepare for what's next.</h1>
+      <p class="lead">Practical guidance, tools, training, and expert support to help you make informed decisions about AI.</p>
+      <div class="actions"><a class="btn" href="#/explore" data-cta="explore" data-loc="hero">Explore AI →</a><a class="btn outline" href="#/advisory" data-cta="advisory" data-loc="hero">Get expert support</a></div></div>
+    <div class="h2ph">${im("ref-14","People learning together at a laptop")}</div>
+  </div></section>
+  <section class="section tight"><div class="wrap"><h2 class="sr">What would you like to do?</h2><div class="acts4">${acts.map(([t,d,h,c],i)=>`<a class="act4" href="${h}" data-cta="${c}" data-loc="home"><span class="a-n">0${i+1}</span><b>${esc(t)}</b><span>${esc(d)}</span></a>`).join("")}</div></div></section>
+  ${section(`<div class="split"><div>${head("Worth reading now","A few good places to start.")}${rows(["where-could-ai-actually-help-your-business","check-your-job","ten-ways-ai-risk-becomes-a-real-world-problem","ai-hallucinations"])}<p class="more"><a class="textlink" href="#/explore">See all six topics →</a></p></div>
+    <aside class="paths"><h3>Guidance for</h3><a href="#/organizations"><b>Organizations</b><span>Business owners, executives, HR &amp; L&amp;D, government</span></a><a href="#/for/you"><b>Individuals</b><span>Your work, skills and everyday AI</span></a><a href="#/society"><b>AI &amp; Society</b><span>Risks, governance and the future of AI</span></a></aside></div>`,true)}
+  ${section(`<div class="trust"><p><b>Run by the Leading Learning Partners Association (LLPA).</b> Our resources name their sources and separate evidence from estimates and open questions. Courses and advisory services come from LLPA members, and the LLPA team reviews every inquiry.</p><a class="textlink" href="#/about">About AI Channel and our editorial standards →</a></div>`)}
+  </div>`;
+}
+
+/* ---------- Tools & Insights: six topics ---------- */
+function explore(){
+  return `<div>${pagehead("Tools &amp; Insights","Start with the question you have.","Practical tools and clear explanations, organized into six topics.")}
+  ${section(`<ol class="topics6">${TOPICS.map((t,i)=>`<li><a href="#/topic/${t.k}"><span class="t-n">0${i+1}</span><span class="t-b"><b>${esc(t.n)}</b><span>${esc(t.q)}</span></span><span class="t-c">${t.feat.length+t.more.length} resources →</span></a></li>`).join("")}</ol>
+    <p class="more"><a class="textlink" href="#/explore/all">Search all resources →</a></p>`)}
+  </div>`;
+}
+function topicPage(k){
+  const t=TOPIC_BY[k]; if(!t) return null; const i=TOPICS.indexOf(t);
+  const soc=["safety","governance","future"].includes(k)?`<p class="crossref">Part of a bigger picture: <a class="textlink" href="#/society">AI &amp; Society →</a></p>`:"";
+  return `<div>${pagehead(`Topic 0${i+1}`,t.n,t.q,`<a href="#/explore">Tools &amp; Insights</a> / ${esc(t.n)}`)}
+  ${section(`<p class="intro">${esc(t.intro)}</p>${soc}${rows(t.feat)}${t.more.length?`<h2 class="subh">More in this topic</h2>${titles(t.more)}`:""}${nextStrip([t.next],"topic-"+k)}`)}
+  </div>`;
+}
+
+/* ---------- All resources: search, not chat ---------- */
+let F={q:"",topic:"",aud:"",fmt:""};
+function allResources(){
+  return `<div>${pagehead("Tools &amp; Insights","All resources","Search every article, guide and tool on AI Channel.",`<a href="#/explore">Tools &amp; Insights</a> / All resources`)}
+  <section class="section tight"><div class="wrap">
+    <form class="filters" role="search" id="flt" onsubmit="return false">
+      <div class="f-search"><label for="exq">Search articles, tools, and guides</label><div class="ms-row"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="exq" type="search" autocomplete="off"></div></div>
+      <div class="f-sel"><label for="ft">Topic</label><select id="ft"><option value="">All topics</option>${TOPICS.map(t=>`<option value="${t.k}">${esc(t.n)}</option>`).join("")}</select></div>
+      <div class="f-sel"><label for="fa">Audience</label><select id="fa"><option value="">Everyone</option>${AUDIENCES.map(([k,n])=>`<option value="${k}">${esc(n)}</option>`).join("")}</select></div>
+      <div class="f-sel"><label for="ff">Format</label><select id="ff"><option value="">All formats</option>${FORMATS.map(n=>`<option>${esc(n)}</option>`).join("")}</select></div>
+      <button class="btn outline" type="button" id="freset">Reset</button>
+    </form>
+    <p class="count" id="fcount" role="status" aria-live="polite"></p>
+    <div id="results"></div>
+  </div></section></div>`;
+}
+function bindExplore(qs){
+  if(!$("#results")) return;
+  const p=new URLSearchParams(qs||""); F={q:p.get("q")||"",topic:p.get("t")||"",aud:p.get("a")||"",fmt:p.get("f")||""};
+  $("#exq").value=F.q;$("#ft").value=F.topic;$("#fa").value=F.aud;$("#ff").value=F.fmt;
+  const draw=()=>{const t=F.q.toLowerCase().trim();
+    const items=CATALOG.filter(x=>(!F.topic||TOPIC_OF[x.s]===F.topic)&&(!F.aud||x.a.includes(F.aud))&&(!F.fmt||fmtMatch(x,F.fmt))&&(!t||(x.t+" "+x.l+" "+(x.kw||"")).toLowerCase().includes(t)));
+    const filtered=F.q||F.topic||F.aud||F.fmt;
+    $("#fcount").textContent=items.length?`${items.length} of ${CATALOG.length} resources`:"";
+    $("#results").innerHTML=items.length?rows(items.map(x=>x.s)):`<div class="empty"><h3>No matching resources</h3><p>Try a different word, or reset the filters to see everything.</p><button class="btn outline" type="button" data-reset>Reset filters</button></div>`;};
+  const upd=()=>{F={q:$("#exq").value,topic:$("#ft").value,aud:$("#fa").value,fmt:$("#ff").value};draw();};
+  let tm;$("#exq").addEventListener("input",()=>{clearTimeout(tm);tm=setTimeout(()=>{upd();track("resource_search",{has_query:!!F.q.trim()});},250);});
+  ["#ft","#fa","#ff"].forEach(id=>$(id).addEventListener("change",()=>{upd();track("resource_filter",{topic:F.topic,audience:F.aud,format:F.fmt});}));
+  const reset=()=>{$("#exq").value="";$("#ft").value="";$("#fa").value="";$("#ff").value="";upd();$("#exq").focus();};
+  $("#freset").onclick=reset; $("#results").addEventListener("click",e=>{if(e.target.closest("[data-reset]"))reset();});
+  draw();
+}
+
+/* ---------- AI Training: external embed, never rebuilt ---------- */
+function training(){
+  const E=CFG.trainingEmbed||{};
+  const faq=[["How do I ask about a course?","Find a course in the catalog and select Learn More. Your inquiry goes to the LLPA team."],
+    ["Who provides the courses?","LLPA member firms. AI Channel doesn't deliver courses itself."],
+    ["Are prices listed?","No. Ask about a course and the LLPA team will follow up with you."],
+    ["What happens after I select Learn More?","The LLPA team reviews your inquiry and connects you with the member that offers the course."]];
+  const embed=E.url?`<div class="embed" id="embedbox"><div class="embed-loading" id="embedload" role="status">Loading the course catalog…</div>
+      <iframe id="embedframe" src="${esc(E.url)}" title="${esc(E.title||"AI course catalog")}" loading="lazy" style="min-height:${+E.minHeight||900}px" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+      ${E.openInNewTabAllowed?`<p class="fine">Trouble seeing the catalog? <a class="textlink" href="${esc(E.url)}" target="_blank" rel="noopener">Open it in a new tab ↗</a></p>`:""}`
+    :`<div class="blocker" role="note"><div class="tag">Not connected yet</div><h3>The course catalog will appear here</h3><p>The catalog is managed outside AI Channel and appears here as an embed once LLPA supplies its address. No courses are listed until then.</p><p class="fine">For developers: set <code>trainingEmbed.url</code> in <code>config.js</code>.</p></div>`;
+  return `<div>${pagehead("AI Training","Find AI training that fits your needs.","Explore AI courses from LLPA's network of learning providers. Interested in a course? Select Learn More, and our team will help connect you with the relevant member.")}
+  <section class="section tight"><div class="wrap">${embed}</div></section>
+  ${section(`<div class="split"><div>${head("","Questions about courses")}<div class="faq">${faq.map(([q,a])=>`<details><summary>${esc(q)}</summary><div class="a"><p>${esc(a)}</p></div></details>`).join("")}</div></div>
+    <aside class="paths"><h3>Planning training for a whole team?</h3><a href="#/advisory?s=Workforce+development+and+training" data-cta="advisory" data-loc="training"><b>Get expert support</b><span>Describe what your team needs. The LLPA team will connect you with a member.</span></a></aside></div>`,true)}
+  </div>`;
+}
+function bindTraining(){
+  const f=$("#embedframe"); if(!f){ if($(".blocker"))track("training_embed_missing");return;}
+  let done=false;
+  f.addEventListener("load",()=>{done=true;const l=$("#embedload");if(l)l.remove();track("training_embed_loaded");});
+  setTimeout(()=>{if(!done){const l=$("#embedload");if(l)l.textContent="The course catalog is taking longer than usual to load.";track("training_embed_slow");}},12000);
+}
+
+/* ---------- Advisory & Consulting: human-routed form ---------- */
+const SUPPORT=["AI strategy and adoption","AI readiness and assessment","Implementation and automation","AI governance and risk","Workforce development and training","Not sure yet"];
+function advisory(qs){
+  const pre=new URLSearchParams(qs||"").get("s")||"";
+  const ok=!!(CFG.advisory&&CFG.advisory.endpoint);
+  return `<div>${pagehead("Advisory &amp; Consulting","Find the right AI expertise for your organization.","Tell us what you're working on. Our team will review your needs and connect you with an LLPA member who can help.")}
+  <section class="section tight"><div class="wrap adv-grid">
+    <aside class="adv-side">
+      <h2>What happens next</h2>
+      <ol class="steps-v"><li><b>You tell us what you need</b><span>Six short fields.</span></li><li><b>The LLPA team reviews it</b><span>A person reads every request. Nothing is matched automatically.</span></li><li><b>We connect you with a member</b><span>If a member fits, they'll contact you. If none does, we'll tell you.</span></li></ol>
+      <p class="fine">Member coverage varies by country and topic.</p>
+    </aside>
+    <form class="formbox" id="advform" novalidate>
+      ${ok?"":`<div class="blocker small" role="note"><div class="tag">Not connected yet</div><p>This form isn't connected to the LLPA team's system yet, so submitting it will not send your request.${CFG.contact&&CFG.contact.email?` Meanwhile you can email <a class="textlink" href="mailto:${esc(CFG.contact.email)}">${esc(CFG.contact.email)}</a>.`:""}</p></div>`}
+      <div class="err-sum" id="errsum" role="alert" tabindex="-1" hidden></div>
+      <div class="row2">
+        <label class="field"><span>Name</span><input id="a_name" name="name" autocomplete="name" required aria-describedby="e_name"><em class="ferr" id="e_name"></em></label>
+        <label class="field"><span>Work email</span><input id="a_email" name="email" type="email" autocomplete="email" required aria-describedby="e_email"><em class="ferr" id="e_email"></em></label>
+      </div>
+      <div class="row2">
+        <label class="field"><span>Organization</span><input id="a_org" name="organization" autocomplete="organization" required aria-describedby="e_org"><em class="ferr" id="e_org"></em></label>
+        <label class="field"><span>Country</span><input id="a_country" name="country" autocomplete="country-name" required aria-describedby="e_country"><em class="ferr" id="e_country"></em></label>
+      </div>
+      <fieldset class="field" aria-describedby="e_svc"><legend>Type of support needed <i>(choose any)</i></legend>
+        <div class="checks">${SUPPORT.map(s=>`<label class="chk"><input type="checkbox" name="service" value="${esc(s)}"${pre&&s===pre?" checked":""}> <span>${esc(s)}</span></label>`).join("")}</div><em class="ferr" id="e_svc"></em></fieldset>
+      <label class="field"><span>Briefly, what's the challenge?</span><textarea id="a_goal" name="goal" required maxlength="2000" aria-describedby="e_goal" placeholder="For example: We bought Copilot licences and hardly anyone uses them."></textarea><em class="ferr" id="e_goal"></em></label>
+      <div class="hp" aria-hidden="true"><label>Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label></div>
+      <label class="consent"><input type="checkbox" id="a_consent" aria-describedby="e_consent"> <span>I understand that LLPA may review my request and share it with a relevant member firm to respond to my inquiry. ${CFG.legal&&CFG.legal.privacyUrl?`<a class="textlink" href="${esc(CFG.legal.privacyUrl)}" target="_blank" rel="noopener">Privacy notice ↗</a>`:`<a class="textlink" href="#/legal/privacy">Privacy notice</a>`}</span></label><em class="ferr" id="e_consent"></em>
+      <p class="fine">All fields are required.</p>
+      <div class="formnav"><span></span><button class="btn" type="submit" id="a_submit">Send to the LLPA team</button></div>
+      <div id="a_result" role="status" aria-live="polite"></div>
+    </form>
+  </div></section></div>`;
+}
+function bindAdvisory(){
+  const f=$("#advform"); if(!f) return; let busy=false;
+  const set=(id,msg)=>{const e=$("#e_"+id);if(e)e.textContent=msg||"";const inp=id==="svc"?null:$("#a_"+id);if(inp)inp.setAttribute("aria-invalid",msg?"true":"false");};
+  f.addEventListener("submit",async e=>{e.preventDefault(); if(busy) return;
+    const v=n=>(f.elements[n]&&f.elements[n].value||"").trim();
+    const svc=[...f.querySelectorAll('input[name="service"]:checked')].map(x=>x.value);
+    const errs=[]; const chk=(id,cond,msg)=>{set(id,cond?"":msg);if(!cond)errs.push([id,msg]);};
+    chk("name",v("name"),"Enter your name.");
+    chk("email",/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v("email")),"Enter a valid email address, like name@company.com.");
+    chk("org",v("organization"),"Enter your organization, or “Individual”.");
+    chk("country",v("country"),"Enter your country.");
+    chk("svc",svc.length,"Choose at least one type of support, or “Not sure yet”.");
+    chk("goal",v("goal").length>=10,"Tell us briefly what the challenge is.");
+    chk("consent",$("#a_consent").checked,"Please confirm you understand how your request is shared.");
+    const sum=$("#errsum");
+    if(errs.length){sum.hidden=false;sum.innerHTML=`<b>Please fix ${errs.length} thing${errs.length>1?"s":""}:</b><ul>${errs.map(([id,m])=>`<li><a href="#" data-focus="${id==="svc"?"svc":"a_"+id}">${esc(m)}</a></li>`).join("")}</ul>`;sum.focus();track("advisory_validation_error",{count:errs.length});return;}
+    sum.hidden=true;
+    if(v("website")){$("#a_result").innerHTML="";return;}
+    const payload={type:"advisory",inquiryId:(crypto.randomUUID?crypto.randomUUID():String(Date.now())),submittedAt:new Date().toISOString(),
+      name:v("name"),email:v("email"),organization:v("organization"),country:v("country"),services:svc,challenge:v("goal"),
+      consent:{given:true,text:"I understand that LLPA may review my request and share it with a relevant member firm to respond to my inquiry."},
+      attribution:{sourcePage:ATTR.landing,referrer:ATTR.referrer||"",utm:ATTR.utm||{},lastCta:LAST_CTA}};
+    track("advisory_submit_attempt",{services:svc});
+    const res=$("#a_result"), btn=$("#a_submit");
+    if(!(CFG.advisory&&CFG.advisory.endpoint)){
+      res.innerHTML=`<div class="result warn"><b>Not sent.</b> This form isn't connected to the LLPA team yet, so your request has not been delivered.${CFG.contact&&CFG.contact.email?` Please email <a class="textlink" href="mailto:${esc(CFG.contact.email)}">${esc(CFG.contact.email)}</a> instead.`:""}
+        <details class="opt"><summary>Test only: the request that would be sent</summary><pre>${esc(JSON.stringify(payload,null,2))}</pre></details></div>`;
+      track("advisory_not_configured");return;}
+    busy=true;btn.disabled=true;btn.textContent="Sending…";res.innerHTML="";
+    try{const r=await fetch(CFG.advisory.endpoint,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+      if(!r.ok) throw new Error("status "+r.status);
+      f.innerHTML=`<div class="result ok" tabindex="-1" id="okmsg"><h3>Thanks. Your request has been received by the LLPA team.</h3><p>We'll review your needs and follow up about next steps.</p><p class="fine">Meanwhile: <a class="textlink" href="#/explore">explore free tools and guides →</a></p></div>`;
+      $("#okmsg").focus(); track("advisory_submit_success",{services:svc});
+    }catch(err){busy=false;btn.disabled=false;btn.textContent="Send to the LLPA team";
+      res.innerHTML=`<div class="result err"><b>We couldn't send your request. Please try again.</b>${CFG.contact&&CFG.contact.email?` If it keeps failing, email <a class="textlink" href="mailto:${esc(CFG.contact.email)}">${esc(CFG.contact.email)}</a>.`:""}</div>`;
+      track("advisory_submit_failure");}
+  });
+  f.addEventListener("click",e=>{const a=e.target.closest("[data-focus]");if(!a)return;e.preventDefault();const id=a.dataset.focus;const el=id==="svc"?f.querySelector('input[name="service"]'):$("#"+id);if(el)el.focus();});
+}
+
+/* ---------- For Organizations + audience pages: headline, Start here, Next steps ---------- */
+const PATH={
+ business:{name:"Business owners",h:"Make AI useful for your business, without costly guesswork.",start:["where-could-ai-actually-help-your-business","business-ai-audit","ai-due-diligence-checklist"],topic:"business",next:["training","advisory"]},
+ executives:{name:"Executives",h:"Make AI decisions your organization can stand behind.",start:["is-your-organization-actually-ready-for-ai","does-your-organization-have-the-controls-to-govern-ai","responsible-ai-is-a-liability"],topic:"governance",next:["advisory","training"]},
+ hr:{name:"HR & L&D",h:"Prepare your people for work that's already changing.",start:["which-parts-of-your-teams-work-could-ai-change-first","which-ai-skills-does-your-team-actually-need","when-ai-gets-it-wrong"],topic:"work",next:["training","advisory"]},
+ government:{name:"Government",h:"Adopt AI responsibly, in ways you can account for in public.",start:["does-your-organization-have-the-controls-to-govern-ai","eu-ai-act-risk-tier-checker","in-house-llm-governance"],topic:"governance",next:["advisory","training"],note:"Obligations depend on jurisdiction. The EU AI Act tool applies where EU rules apply; it isn't a compliance determination."}
+};
+function orgs(){
+  return `<div>${pagehead("For Organizations","Find the AI guidance that fits your role.","Each page starts with three tools or guides chosen for that role.")}
+  ${section(`<div class="orgs4">${Object.entries(PATH).map(([k,P])=>`<a href="#/for/${k}"><b>${esc(P.name)}</b><span>${esc(P.h)}</span><span class="go">Open →</span></a>`).join("")}</div>
+    <p class="more">Looking for yourself? <a class="textlink" href="#/for/you">For Individuals →</a></p>`)}</div>`;
+}
+function pathway(k){
+  if(k==="you") return individuals();
+  const P=PATH[k]; if(!P) return notFound(); const T=TOPIC_BY[P.topic];
+  return `<div>${pagehead(esc(P.name),P.h,"",`<a href="#/organizations">For Organizations</a> / ${esc(P.name)}`)}
+  ${section(`<h2 class="subh">Start here</h2>${rows(P.start)}${P.note?`<p class="notice">${esc(P.note)}</p>`:""}<p class="more">More on this in <a class="textlink" href="#/topic/${T.k}">${esc(T.n)} →</a></p>${nextStrip(P.next,"pathway-"+k)}`)}
+  </div>`;
+}
+function individuals(){
+  const qs=[["How might AI affect my job?","check-your-job"],["How do I prepare for changes in work?","how-ready-are-you-for-the-ai-shift"],["What's actually going to happen to jobs?","ai-and-jobs-explained"],["How do I use AI without leaning on it too much?","healthy-ai-use"],["Can I trust what AI tells me?","ai-hallucinations"]];
+  return `<div>${pagehead("For Individuals","Understand what AI means for you.","Your work, your skills, and the AI you already use every day.")}
+  ${section(`<h2 class="subh">Start with a question</h2><div class="rows">${qs.map(([q,s])=>{const x=BY[s];return `<a class="row" href="#/open/${s}"><span class="r-body"><span class="r-meta">${esc(FORMAT(x))}</span><span class="r-t">${esc(q)}</span><span class="r-d">${esc(x.t)}</span></span><span class="r-go">${esc(cta(x))} <span aria-hidden="true">→</span></span></a>`}).join("")}</div>
+    <div class="go3"><a href="#/topic/work"><b>AI at Work</b><span>Jobs, tasks and skills</span></a><a href="#/topic/everyday"><b>AI in Everyday Life</b><span>Using AI well, day to day</span></a><a href="#/society"><b>AI &amp; Society</b><span>Risks, rules and the future</span></a></div>
+    ${nextStrip(["training"],"pathway-you")}`)}
+  </div>`;
+}
+
+/* ---------- AI & Society: editorial destination ---------- */
+function society(){
+  const L=(h,t,ext)=>`<a class="textlink" href="${h}"${ext?' target="_blank" rel="noopener"':""}>${esc(t)}${ext?" ↗":""}</a>`;
+  const parts=[["safety","AI Safety & Risks","Some harms are already documented: confident errors, misuse, systems that mislead. Others are argued about. We show which is which.",["ten-ways-ai-risk-becomes-a-real-world-problem","can-ai-lie"]],
+    ["governance","AI Governance","Who decides how AI is built and used: governments, companies, independent testers and the public, and what the rules already require.",["eu-ai-act-risk-tier-checker","resource-library"]],
+    ["future","The Future of AI","What more capable systems could mean, from self-improving AI to loss of human control. These are scenarios and forecasts, labelled as such.",["p-doom-scenario-explorer","ai-extinction-risk-p-doom"]]];
+  return `<div>${pagehead("AI &amp; Society","What AI means for all of us.","AI is changing work, institutions and public life. Some of its risks are documented today; others are serious possibilities that experts still disagree about. This section helps you tell them apart.")}
+  ${section(`<h2 class="subh">How we label claims</h2><dl class="key4"><div><dt>Established</dt><dd>Documented in research or real incidents.</dd></div><div><dt>Plausible scenario</dt><dd>Could happen; the mechanism is understood.</dd></div><div><dt>Forecast</dt><dd>An expert estimate about the future, with its uncertainty.</dd></div><div><dt>Contested</dt><dd>Serious people disagree; we show the range.</dd></div></dl>`,true)}
+  ${section(parts.map(([k,n,d,feat])=>`<div class="socpart"><div class="sp-h"><h2>${esc(n)}</h2><p>${esc(d)}</p><a class="textlink" href="#/topic/${k}">All of ${esc(n)} →</a></div>${rows(feat)}</div>`).join(""))}
+  ${section(`<div class="split"><div><h2 class="subh">What you can do</h2><ul class="tlist plain">
+      <li><b>Follow policy:</b> ${L("https://artificialintelligenceact.eu/","EU AI Act explorer",1)} · ${L("https://ec.europa.eu/info/law/better-regulation/have-your-say","EU Have Your Say",1)}</li>
+      <li><b>Contact representatives:</b> ${L("https://www.europarl.europa.eu/meps/en/home","Find your MEP",1)} · ${L("https://members.parliament.uk/FindYourMP","Find your UK MP",1)} · ${L("https://www.congress.gov/members/find-your-member","Find your members of Congress",1)}</li>
+      <li><b>Keep learning:</b> ${L("https://oecd.ai/en/","OECD.AI Policy Observatory",1)} · ${L("https://aisafety.info/","AISafety.info",1)} · ${L("https://www.aisafety.com/","AISafety.com",1)}</li>
+      <li><b>Share:</b> <a class="textlink" href="#" data-share>Copy a link to this page</a> · ${L("#/open/ai-glossary","The plain-language AI glossary")}</li></ul>
+      <p class="fine">AI Channel aims to present evidence and policy perspectives fairly, without endorsing a political party.</p></div>
+    <aside class="paths"><h3>Also on AI &amp; work and daily life</h3><a href="#/topic/work"><b>AI at Work</b><span>Jobs, tasks and skills</span></a><a href="#/topic/everyday"><b>AI in Everyday Life</b><span>Using AI well, day to day</span></a></aside></div>`,true)}
+  </div>`;
+}
+document.addEventListener("click",e=>{const a=e.target.closest("[data-share]");if(!a)return;e.preventDefault();const u=location.href;(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>toast("Link copied."),()=>toast(u));});
+
+/* ---------- About, FAQ, contact ---------- */
+function about(){
+  const email=CFG.contact&&CFG.contact.email;
+  const faq=[["Is AI Channel free to use?","Yes. Articles, guides, tools and checklists are free and don't need an account or email address. Courses and advisory services are provided by LLPA members, who set their own terms, so they may be paid."],
+    ["Who provides the courses?","LLPA member firms. AI Channel shows their courses through an embedded catalog on the AI Training page."],
+    ["What happens when I select Learn More?","Your inquiry goes to the LLPA team, which reviews it and connects you with the member that offers the course."],
+    ["How does advisory matching work?","You describe your needs in a short form. A person on the LLPA team reviews it and, where a suitable member is available, connects you. Nothing is matched automatically."],
+    ["Does AI Channel provide independent guidance?","AI Channel is run by LLPA, an association of training and advisory firms. Its resources don't recommend specific vendors, and anything provided by an LLPA member is labelled as such. LLPA's full editorial policy will be published here."],
+    ["How is my information used?","Only to respond to your inquiry, as set out in the privacy notice. Browsing doesn't require any personal details."]];
+  return `<div>${pagehead("About AI Channel","Clear AI guidance, with a practical next step.","AI Channel is a free resource from the Leading Learning Partners Association (LLPA) for anyone working out what AI means for them.")}
+  ${section(`<dl class="facts">
+    <div><dt>What it is</dt><dd>Plain explanations, tools and assessments about AI at work, in business, in everyday life and in society, plus routes to training and expert help.</dd></div>
+    <div><dt>Why LLPA created it</dt><dd>Most AI questions can start with a good explanation or tool. When they can't, LLPA's members offer training and advice, and AI Channel helps you reach the right one.</dd></div>
+    <div><dt>Who it serves</dt><dd>Business owners, executives, HR and L&amp;D, public-sector teams, and individuals.</dd></div>
+    <div><dt>How resources are developed</dt><dd>Each names its sources, dates time-sensitive figures and separates established findings from estimates, scenarios and opinion.</dd></div>
+    <div><dt>How referrals work</dt><dd><b>Training:</b> select Learn More on a course and the LLPA team connects you with the member who runs it. <b>Advisory:</b> send the short form and the team reviews it and introduces a suitable member, or tells you if none is available.</dd></div>
+    <div><dt>How members take part</dt><dd>LLPA members are independent training and advisory companies. They list courses in the catalog and take on advisory requests the LLPA team routes to them.</dd></div>
+    <div><dt>Commercial relationships</dt><dd>Courses and advisory services come from LLPA members, and the site says so wherever they appear. Editorial resources don't promote specific vendors.</dd></div></dl>`)}
+  ${section(head("FAQ","Questions people ask us.")+`<div class="faq">${faq.map(([q,a])=>`<details><summary>${esc(q)}</summary><div class="a"><p>${esc(a)}</p></div></details>`).join("")}</div>`,true,"faq")}
+  ${section(`<h2 class="subh">Contact</h2>`+(email?`<p>Email <a class="textlink" href="mailto:${esc(email)}">${esc(email)}</a>. For expert support, the <a class="textlink" href="#/advisory">advisory form</a> is quickest.</p>`:`<p>A contact address will be published here before launch. For expert support, use the <a class="textlink" href="#/advisory">advisory form</a>.</p>`),false,"contact")}
+  </div>`;
+}
+function legal(k){
+  const N={privacy:["Privacy notice","privacyUrl"],terms:["Terms of use","termsUrl"],cookies:["Cookie policy","cookiesUrl"]}[k]; if(!N) return notFound();
+  const url=CFG.legal&&CFG.legal[N[1]];
+  return `<div>${pagehead("Legal",N[0],"")}${section(url?`<p>The ${esc(N[0].toLowerCase())} is published by LLPA. <a class="textlink" href="${esc(url)}" target="_blank" rel="noopener">Read the ${esc(N[0].toLowerCase())} ↗</a></p>`:`<div class="blocker" role="note"><div class="tag">Not published yet</div><h3>LLPA's ${esc(N[0].toLowerCase())} will be published here before launch.</h3><p>It needs LLPA's approved wording.</p></div>`)}</div>`;
+}
+function status(){
+  const rowsS=[["AI Training catalog embed",!!(CFG.trainingEmbed&&CFG.trainingEmbed.url),"trainingEmbed.url","Embed URL; confirm Learn More sends the course and contact details to the LLPA team."],
+    ["Advisory inquiry delivery",!!(CFG.advisory&&CFG.advisory.endpoint),"advisory.endpoint","Secure endpoint that stores the request and returns 2xx only on success."],
+    ["Contact address",!!(CFG.contact&&CFG.contact.email),"contact.email","A monitored LLPA team address."],
+    ["Privacy notice",!!(CFG.legal&&CFG.legal.privacyUrl),"legal.privacyUrl","Approved wording, consent and retention policy."],
+    ["Terms of use",!!(CFG.legal&&CFG.legal.termsUrl),"legal.termsUrl","Approved terms."],
+    ["Cookie policy",!!(CFG.legal&&CFG.legal.cookiesUrl),"legal.cookiesUrl","Needed if analytics or the embed set cookies."]];
+  return `<div>${pagehead("Launch status","Integrations and launch blockers","Reads config.js. Every item must be connected and tested before launch.")}
+  ${section(`<div class="tablewrap"><table class="status"><thead><tr><th scope="col">Integration</th><th scope="col">Status</th><th scope="col">Setting</th><th scope="col">Needed</th></tr></thead><tbody>${rowsS.map(([n,ok,k,need])=>`<tr><td>${esc(n)}</td><td><span class="pill ${ok?"ok":"no"}">${ok?"Configured":"Not connected"}</span></td><td><code>${esc(k)}</code></td><td>${esc(need)}</td></tr>`).join("")}</tbody></table></div>
+  <p class="fine">“Configured” means a value is set, not that delivery has been verified. Test each route with a real submission before launch.</p>`)}</div>`;
+}
+function notFound(){return `<div>${pagehead("Not found","Page not found","")}${section(`<a class="btn" href="#/">Go home →</a>`)}</div>`}
+
+/* ---------- search overlay (resource search, not chat) ---------- */
+function score(x,q){const hay=(x.t+" "+x.l+" "+(x.kw||"")).toLowerCase();let s=0;q.toLowerCase().split(/\s+/).filter(Boolean).forEach(w=>{if(x.t.toLowerCase().includes(w))s+=3;else if(hay.includes(w))s+=1});return s;}
+function openSearch(){$("#search").classList.add("on");$("#q").value="";$("#res").innerHTML="";setTimeout(()=>$("#q").focus(),30);}
+function closeSearch(){$("#search").classList.remove("on");}
+$("#searchbtn").onclick=openSearch;
+document.addEventListener("click",e=>{if(e.target.closest("[data-search]")){e.preventDefault();openSearch();} if(e.target.id==="search")closeSearch();});
+$("#q").addEventListener("input",()=>{const v=$("#q").value.trim();if(!v){$("#res").innerHTML="";return;}
+  const hits=live.map(x=>[score(x,v),x]).filter(a=>a[0]>0).sort((a,b)=>b[0]-a[0]).slice(0,6).map(a=>a[1]);
+  $("#res").innerHTML=hits.length?hits.map(x=>`<a href="#/open/${x.s}">${esc(x.t)}<small>${esc(FORMAT(x))}</small></a>`).join("")+`<a href="#/explore/all?q=${encodeURIComponent(v)}" class="all">See all results →</a>`:`<p class="none">No matching resources. Try a different term or <a class="textlink" href="#/explore/all">browse all resources</a>.</p>`;});
+$("#q").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();location.hash="#/explore/all?q="+encodeURIComponent($("#q").value.trim());} if(e.key==="Escape")closeSearch();});
+$("#res").addEventListener("click",()=>closeSearch());
+document.addEventListener("submit",e=>{const f=e.target.closest("[data-searchform]");if(!f)return;e.preventDefault();const v=f.querySelector("input").value.trim();track("resource_search",{has_query:!!v,from:"home"});location.hash="#/explore/all"+(v?"?q="+encodeURIComponent(v):"");});
+
+/* ---------- resource viewer ---------- */
+let last="#/";
+function openPiece(s){const x=BY[s]; if(!x||x.soon){toast("That one is still being built.");return false;}
+  $("#vtitle").textContent=x.t; $("#vfull").href="t/"+s+".html";
+  const f=document.createElement("iframe"); f.id="vframe"; f.title=x.t; $("#vframe").replaceWith(f); f.contentWindow.location.replace("t/"+s+".html");
+  $("#viewer").classList.add("on"); document.body.style.overflow="hidden"; $("#vback").focus(); track("resource_opened",{resource:s,format:FORMAT(x)}); return true;}
+function closePiece(){$("#viewer").classList.remove("on"); document.body.style.overflow="";}
+$("#vback").onclick=()=>{location.hash=last;};
+$$("#viewer [data-close]").forEach(a=>a.addEventListener("click",()=>closePiece()));
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("#viewer").classList.contains("on"))location.hash=last;});
+
+/* ---------- misc ---------- */
+let tt; function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("on"),2800);}
+$("#menubtn").onclick=()=>{const o=$("#mobilemenu").classList.toggle("open");$("#menubtn").setAttribute("aria-expanded",o);$("#menubtn").textContent=o?"✕":"☰";};
+const closeDrops=()=>$$(".drop").forEach(d=>{d.classList.remove("open");d.querySelector("button").setAttribute("aria-expanded","false");});
+$$(".drop").forEach(d=>{const b=d.querySelector("button");b.onclick=e=>{e.stopPropagation();const o=!d.classList.contains("open");closeDrops();d.classList.toggle("open",o);b.setAttribute("aria-expanded",o);};});
+document.addEventListener("click",e=>{if(!e.target.closest(".drop")||e.target.closest(".drop .menu a"))closeDrops();});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeDrops();});
+function reveal(){if(matchMedia("(prefers-reduced-motion: reduce)").matches||!("IntersectionObserver" in window)){$$("#app .rv").forEach(el=>el.classList.add("in"));return;}
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}}),{threshold:.1});
+  const g=new Map();$$("#app .rv").forEach(el=>{const p=el.parentElement,i=g.get(p)||0;g.set(p,i+1);el.style.setProperty("--d",Math.min(i,5)*60+"ms");io.observe(el);});}
+/* dev banner: honest about what isn't connected */
+(function(){const miss=[!(CFG.trainingEmbed&&CFG.trainingEmbed.url)&&"course catalog",!(CFG.advisory&&CFG.advisory.endpoint)&&"advisory form",!(CFG.legal&&CFG.legal.privacyUrl)&&"privacy notice"].filter(Boolean);
+  const b=$("#devbar"); if(!b) return; if(!miss.length){b.remove();return;} b.innerHTML=`Development build: ${esc(miss.join(", "))} not connected yet. <a href="#/status">Launch status</a>`;})();
+
+
+/* ---------- design directions: one site, three looks ---------- */
+let DV=(()=>{const q=new URLSearchParams(location.search).get("v");if(["j","e","f","o"].includes(q))return q;try{return localStorage.getItem("aic_dv")||"j"}catch(e){return "j"}})();
+document.documentElement.dataset.v=DV;
+const di=(n,alt,cls)=>`<img src="dimg/${n}" alt="${esc(alt||"")}"${cls?` class="${cls}"`:""} loading="lazy">`;
+/* All copy below is the live AI Channel home copy, unchanged. Only layout and styling differ per design. */
+const HC={eyebrow:"AI Channel by LLPA",lead:"Practical guidance, tools, training, and expert support to help you make informed decisions about AI.",
+  acts:[["Explore AI","Understand developments, opportunities, risks, and what they mean.","#/explore","explore"],
+    ["Assess your needs","Use practical tools and assessments to evaluate AI opportunities, readiness, and risks.","#/explore/all?f=Tool","assess"],
+    ["Find AI training","Explore courses offered by LLPA members.","#/training","training"],
+    ["Get expert support","Request advisory or consulting assistance.","#/advisory","advisory"]],
+  picks:["where-could-ai-actually-help-your-business","check-your-job","ten-ways-ai-risk-becomes-a-real-world-problem","ai-hallucinations"],
+  paths:[["Organizations","Business owners, executives, HR &amp; L&amp;D, government","#/organizations"],["Individuals","Your work, skills and everyday AI","#/for/you"],["AI &amp; Society","Risks, governance and the future of AI","#/society"]],
+  trust:`<b>Run by the Leading Learning Partners Association (LLPA).</b> Our resources name their sources and separate evidence from estimates and open questions. Courses and advisory services come from LLPA members, and the LLPA team reviews every inquiry.`,
+  trustLink:`<a class="textlink" href="#/about">About AI Channel and our editorial standards →</a>`};
+const H1=`Understand AI. <em>Use it well.</em> Prepare for what's next.`;
+const BTNS=(c1,c2)=>`<a class="${c1}" href="#/training" data-cta="training" data-loc="hero">Explore AI Training →</a><a class="${c2}" href="#/advisory" data-cta="advisory" data-loc="hero">Get Expert Support</a>`;
+const ACT=(cls)=>HC.acts.map(([t,d,h,c],i)=>`<a class="${cls} c${i}" href="${h}" data-cta="${c}" data-loc="home"><span class="a-n">0${i+1}</span><b>${esc(t)}</b><span class="a-d">${esc(d)}</span></a>`).join("");
+/* ---------- tool figures, Atlas-style: real screenshots of the tools, labelled and captioned ---------- */
+const FIG=new Set(["check-your-job","p-doom-scenario-explorer","where-could-ai-actually-help-your-business","eu-ai-act-risk-tier-checker","which-parts-of-your-teams-work-could-ai-change-first","does-your-organization-have-the-controls-to-govern-ai","ai-data-sharing-risk-checker","business-ai-audit","business-ai-exposure-check","ai-dependency-score","is-your-organization-actually-ready-for-ai","which-ai-skills-does-your-team-actually-need","how-ready-are-you-for-the-ai-shift"]);
+const GLYPH=[`<svg viewBox="0 0 40 20" aria-hidden="true"><path d="M2 16 L10 12 L16 14 L24 6 L30 9 L38 3" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="38" cy="3" r="2" fill="currentColor"/></svg>`,
+  `<svg viewBox="0 0 40 20" aria-hidden="true"><circle cx="6" cy="14" r="2.2" fill="currentColor"/><circle cx="20" cy="5" r="2.2" fill="currentColor"/><circle cx="33" cy="12" r="2.2" fill="currentColor"/><path d="M6 14 L20 5 L33 12" fill="none" stroke="currentColor" stroke-width="1"/></svg>`,
+  `<svg viewBox="0 0 40 20" aria-hidden="true"><rect x="3" y="11" width="5" height="7" fill="currentColor" opacity=".5"/><rect x="11" y="7" width="5" height="11" fill="currentColor" opacity=".7"/><rect x="19" y="3" width="5" height="15" fill="currentColor"/><path d="M28 10 H38" stroke="currentColor" stroke-dasharray="2 2"/></svg>`,
+  `<svg viewBox="0 0 40 20" aria-hidden="true"><path d="M2 10 H38" stroke="currentColor" stroke-dasharray="2 3"/><circle cx="26" cy="10" r="3.5" fill="none" stroke="currentColor"/><circle cx="26" cy="10" r="1.2" fill="currentColor"/></svg>`,
+  `<svg viewBox="0 0 40 20" aria-hidden="true">${[0,1,2,3,4].map(c=>[0,1,2].map(r=>`<rect x="${4+c*7}" y="${2+r*6}" width="5" height="4" fill="currentColor" opacity="${(c+r)%3?.35:1}"/>`).join("")).join("")}</svg>`];
+const figLabel=x=>`${esc(TOPIC_BY[TOPIC_OF[x.s]]?TOPIC_BY[TOPIC_OF[x.s]].n:"")} · ${esc(FORMAT(x))}`;
+let FIGN=0;
+function figure(s,big){const x=BY[s];FIGN++;
+  return `<a class="fig${big?" big":""}" href="#/open/${s}"><span class="fig-l">${figLabel(x)}</span><span class="fig-f"><img src="tfig/${s}.jpg" alt="Preview of the tool: ${esc(x.t)}" loading="lazy"></span>
+    <span class="fig-c"><span class="fig-n">Fig. ${FIGN}</span> <i>${esc(x.t)}</i></span><span class="fig-d">${esc(x.l)}</span><span class="fig-go">${esc(cta(x))} →</span></a>`;}
+/* outside the home page, tools in any list are shown as figures, other resources stay as rows */
+let NOFIG=false;const _rows=rows;
+rows=function(list,o){if(DV==="o"||NOFIG)return _rows(list,o);return `<div class="feats">${list.filter(s=>BY[s]&&!BY[s].soon).map((s,i)=>featRow(s,i)).join("")}</div>`+(list.some(s=>BY[s]&&BY[s].soon)?_rows(list.filter(s=>BY[s]&&BY[s].soon),o):"");};
+/* Perplexity-style feature row: number, title and description left; large preview right with a small mono tag */
+const PHOTO_POOL=["05","06","07","08","09","10","11","12","13","14","15","16","17","18","19"];
+function featImg(s){const x=BY[s];if(FIG.has(s))return `<img class="shot" src="tfig/${s}.jpg" alt="Preview of the tool: ${esc(x.t)}" loading="lazy">`;
+  let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))>>>0;const k=PHOTO_POOL[h%PHOTO_POOL.length];
+  const f=DV==="f"?`pf-${k}.png`:`p${DV==="o"?"j":DV}-${k}.jpg`;return `<img class="photo" src="dimg/${f}" alt="" loading="lazy">`;}
+function featRow(s,i){const x=BY[s];return `<a class="feat" href="#/open/${s}"><span class="feat-n">0${i+1}</span><span class="feat-t"><span class="fig-l">${figLabel(x)}</span><b>${esc(x.t)}</b><span>${esc(x.l)}</span></span>
+  <span class="feat-i">${featImg(s)}<span class="feat-tag">${esc(cta(x))}</span></span></a>`;}
+
+/* home showcase: list on the left, one large figure on the right that follows hover and focus */
+const SHOW=["check-your-job","p-doom-scenario-explorer","where-could-ai-actually-help-your-business","which-parts-of-your-teams-work-could-ai-change-first","eu-ai-act-risk-tier-checker"];
+function showcase(){FIGN=0;
+  return `<section class="section show"><div class="wrap"><div class="eyebrow">${esc(HC.acts[1][0])}</div><h2>${esc(HC.acts[1][1])}</h2>
+  <div class="show-g"><ol class="show-l">${SHOW.map((s,i)=>{const x=BY[s];return `<li><a href="#/open/${s}" data-fig="${i}"${i?"":' class="on"'}><span class="show-gl">${GLYPH[i]}</span><span><b>${esc(x.t)}</b><span>${esc(x.l)}</span></span></a></li>`}).join("")}</ol>
+  <div class="show-f">${SHOW.map((s,i)=>`<div class="show-p${i?"":" on"}" data-p="${i}">${figure(s,true)}</div>`).join("")}</div></div>
+  <p class="more"><a class="textlink" href="#/explore/all?f=Tool">${esc(HC.acts[1][0])} →</a></p></div></section>`;}
+document.addEventListener("mouseover",e=>{const a=e.target.closest("[data-fig]");if(a)showFig(a)});
+document.addEventListener("focusin",e=>{const a=e.target.closest("[data-fig]");if(a)showFig(a)});
+function showFig(a){const i=a.dataset.fig;document.querySelectorAll("[data-fig]").forEach(x=>x.classList.toggle("on",x===a));document.querySelectorAll(".show-p").forEach(p=>p.classList.toggle("on",p.dataset.p===i));}
+
+/* Guidance for: its own framed section */
+function guidance(img){return `<section class="section guide"><div class="wrap"><h2 class="guide-h">Guidance for</h2>
+  <div class="gcards">${HC.paths.map(([t,d,h],i)=>`<a class="gcard" href="${h}">${di(img[i],"")}<span class="gcard-go" aria-hidden="true">→</span><span class="gcard-in"><b>${t}</b><span>${d}</span></span></a>`).join("")}</div></div></section>`;}
+/* short About statement + conversion section before the footer (real destinations only) */
+const ABOUT=()=>`<section class="about-line"><div class="wrap"><p>AI Channel is a free resource from the Leading Learning Partners Association (LLPA). <a class="textlink" href="#/about">About AI Channel →</a></p></div></section>`;
+const CONV=()=>`<section class="conv" aria-labelledby="conv-h"><div class="wrap conv-g">
+  <div class="conv-h"><h2 id="conv-h">Ready to put AI into practice?</h2><p>Find the right training for your team or connect with experts who can help you move forward.</p>
+    <p class="conv-note">The LLPA team reviews every inquiry and connects you with a relevant member.</p></div>
+  <div class="conv-opts">
+    <a href="#/training" data-cta="training" data-loc="home-conversion"><span class="conv-n">01</span><span class="conv-t"><b>Explore AI Training</b><span>Browse AI courses from LLPA members.</span></span><span class="conv-go">Find courses →</span></a>
+    <a href="#/advisory" data-cta="advisory" data-loc="home-conversion"><span class="conv-n">02</span><span class="conv-t"><b>Get AI Advisory &amp; Consulting</b><span>Tell us what you need. We'll connect you with a suitable LLPA member.</span></span><span class="conv-go">Request support →</span></a>
+  </div></div></section>`;
+const READ=()=>`<div class="eyebrow">Worth reading now</div><h2>A few good places to start.</h2><div class="feats home">${HC.picks.map((s,i)=>featRow(s,i)).join("")}</div><p class="more"><a class="textlink" href="#/explore">See all six topics →</a></p>`;
+
+function home(){NOFIG=true;const h=DV==="j"?homeJ():DV==="e"?homeE():DV==="f"?homeF():homeBase();NOFIG=false;return h;}
+
+/* A · Journey */
+function homeJ(){
+  return `<div class="vj">
+  <section class="j-hero">${di("j-hero.jpg","")}
+    <div class="j-hero-in wrap"><p class="j-pill">${HC.eyebrow}</p><h1>${H1}</h1></div>
+    <div class="j-hero-foot wrap"><p>${esc(HC.lead)}</p><div class="j-acts">${BTNS("j-btn light","j-btn ghost")}</div></div></section>
+  <section class="section"><div class="wrap"><h2 class="sr">What would you like to do?</h2><div class="j-acts4">${ACT("j-act")}</div></div></section>
+  ${showcase()}
+  ${guidance(["j-11.jpg","j-15.jpg","j-13.jpg"])}
+  <section class="section j-grey"><div class="wrap">${READ()}</div></section>
+  ${ABOUT()}
+  ${CONV()}
+  </div>`;
+}
+
+/* B · Editorial */
+function homeE(){
+  return `<div class="ve">
+  <section class="e-hero"><div class="wrap">
+    <div class="e-meta"><span>${HC.eyebrow}</span></div>
+    <div class="e-hero-grid"><h1>${H1}</h1><div class="e-hero-img">${di("e-hero.jpg","People learning together at a laptop")}</div></div>
+    <div class="e-hero-foot"><p>${esc(HC.lead)}</p><div class="actions">${BTNS("e-btn","e-btn line")}</div></div>
+  </div></section>
+  <section class="e-acts"><div class="wrap"><h2 class="sr">What would you like to do?</h2><div class="e-acts-g">${ACT("e-act")}</div></div></section>
+  ${showcase()}
+  ${guidance(["e-17.jpg","e-09.jpg","e-18.jpg"])}
+  <section class="e-read"><div class="wrap">${READ()}</div></section>
+  ${ABOUT()}
+  ${CONV()}
+  </div>`;
+}
+
+/* C · Field */
+function homeF(){
+  return `<div class="vf">
+  <section class="f-hero"><div class="f-hero-grid wrap">
+    <div class="f-hero-txt"><p class="f-kick">${HC.eyebrow}</p><h1>${H1}</h1><p class="f-lead">${esc(HC.lead)}</p><div class="f-acts-b">${BTNS("f-btn","f-btn alt")}</div></div>
+    <div class="f-hero-art"><span class="f-notch" aria-hidden="true"></span>${di("f-hero.png","")}</div>
+  </div></section>
+  <section class="f-acts"><div class="wrap"><h2 class="sr">What would you like to do?</h2><div class="f-acts-g">${ACT("f-act")}</div></div></section>
+  ${showcase()}
+  ${guidance(["f-a.png","f-c.png","f-b.png"])}
+  <section class="section f-tint"><div class="wrap">${READ()}</div></section>
+  ${ABOUT()}
+  ${CONV()}
+  </div>`;
+}
+
+/* page headers get a photo in each design (copy unchanged) */
+const PH_IMG={"explore":"08","explore/all":"06","topic/work":"07","topic/business":"11","topic/safety":"13","topic/governance":"12","topic/everyday":"15","topic/future":"16",
+  "organizations":"10","for/business":"17","for/executives":"09","for/hr":"05","for/government":"18","for/you":"14","society":"19","training":"12","advisory":"08","about":"10","browse":"06","all":"06","help":"08"};
+const _pagehead=pagehead;
+pagehead=function(eyebrow,title,sub,crumb){
+  if(DV==="o") return _pagehead(eyebrow,title,sub,crumb);
+  const p=(location.hash||"#/").replace(/^#\/?/,"").split("?")[0].split("/");
+  const k=PH_IMG[p[0]+"/"+(p[1]||"")]||PH_IMG[p[0]]; if(!k) return _pagehead(eyebrow,title,sub,crumb);
+  const f=DV==="f"?`pf-${k}.png`:`p${DV}-${k}.jpg`;
+  return `<div class="pagehead ph-img"><div class="wrap ph-g"><div class="ph-t">${crumb?`<nav class="breadcrumb" aria-label="Breadcrumb">${crumb}</nav>`:""}<div class="eyebrow">${eyebrow}</div><h1>${esc(title)}</h1>${sub?`<p>${esc(sub)}</p>`:""}</div><div class="ph-pic">${di(f,"")}</div></div></div>`;
+};
+/* switcher */
+(function(){
+  const N={j:"A · Journey",e:"B · Editorial",f:"C · Field",o:"Current"};
+  const el=document.createElement("div");el.className="dv-switch";el.setAttribute("role","group");el.setAttribute("aria-label","Design direction");
+  el.innerHTML=`<span>Design</span>`+Object.keys(N).map(k=>`<button type="button" data-dv="${k}" aria-pressed="${k===DV}">${N[k]}</button>`).join("");
+  document.body.appendChild(el);
+  el.addEventListener("click",e=>{const b=e.target.closest("[data-dv]");if(!b)return;try{localStorage.setItem("aic_dv",b.dataset.dv)}catch(_){}
+    DV=b.dataset.dv;document.documentElement.dataset.v=DV;el.querySelectorAll("[data-dv]").forEach(x=>x.setAttribute("aria-pressed",x===b));
+    location.reload();});
+})();
+/* ---------- inner pages use the home page's components (copy unchanged) ---------- */
+const PIMG=k=>DV==="f"?`pf-${k}.png`:`p${DV}-${k}.jpg`;
+const TOPIC_PH={work:"07",business:"11",safety:"13",governance:"12",everyday:"15",future:"16"};
+const ROLE_PH={business:"17",executives:"09",hr:"05",government:"18"};
+const gcard=(h,img,title,sub,num,extra)=>`<a class="gcard" href="${h}">${di(img,"")}${num?`<span class="gcard-num">${num}</span>`:""}<span class="gcard-go" aria-hidden="true">→</span><span class="gcard-in"><b>${title}</b><span>${sub}</span>${extra?`<span class="gcard-x">${extra}</span>`:""}</span></a>`;
+const _explore=explore;
+explore=function(){if(DV==="o")return _explore();
+  return `<div>${pagehead("Tools &amp; Insights","Start with the question you have.","Practical tools and clear explanations, organized into six topics.")}
+  ${section(`<div class="gcards">${TOPICS.map((t,i)=>gcard(`#/topic/${t.k}`,PIMG(TOPIC_PH[t.k]),esc(t.n),esc(t.q),`0${i+1}`,`${t.feat.length+t.more.length} resources`)).join("")}</div>
+    <p class="more"><a class="textlink" href="#/explore/all">Search all resources →</a></p>`)}</div>`;};
+const _orgs=orgs;
+orgs=function(){if(DV==="o")return _orgs();
+  return `<div>${pagehead("For Organizations","Find the AI guidance that fits your role.","Each page starts with three tools or guides chosen for that role.")}
+  ${section(`<div class="gcards two">${Object.entries(PATH).map(([k,P])=>gcard(`#/for/${k}`,PIMG(ROLE_PH[k]),esc(P.name),esc(P.h),"","Open")).join("")}</div>
+    <p class="more">Looking for yourself? <a class="textlink" href="#/for/you">For Individuals →</a></p>`)}</div>`;};
+const _individuals=individuals;
+individuals=function(){if(DV==="o")return _individuals();
+  const qs=[["How might AI affect my job?","check-your-job"],["How do I prepare for changes in work?","how-ready-are-you-for-the-ai-shift"],["What's actually going to happen to jobs?","ai-and-jobs-explained"],["How do I use AI without leaning on it too much?","healthy-ai-use"],["Can I trust what AI tells me?","ai-hallucinations"]];
+  return `<div>${pagehead("For Individuals","Understand what AI means for you.","Your work, your skills, and the AI you already use every day.")}
+  ${section(`<h2 class="subh">Start with a question</h2><div class="feats">${qs.map(([q,s],i)=>{const x=BY[s];return `<a class="feat" href="#/open/${s}"><span class="feat-n">0${i+1}</span><span class="feat-t"><span class="fig-l">${esc(FORMAT(x))}</span><b>${esc(q)}</b><span>${esc(x.t)}</span></span><span class="feat-i">${featImg(s)}<span class="feat-tag">${esc(cta(x))}</span></span></a>`}).join("")}</div>
+    <div class="gcards">${gcard("#/topic/work",PIMG("07"),"AI at Work","Jobs, tasks and skills")}${gcard("#/topic/everyday",PIMG("15"),"AI in Everyday Life","Using AI well, day to day")}${gcard("#/society",PIMG("19"),"AI &amp; Society","Risks, rules and the future")}</div>
+    ${nextStrip(["training"],"pathway-you")}`)}
+  </div>`;};
+/* ---------- short copy (MotionSites rule: one short line per card) ---------- */
+const SHORT={
+"business-ai-audit":"A readiness score and checklist in five minutes.",
+"business-ai-exposure-check":"See where your team's AI use leaves you exposed.",
+"where-could-ai-actually-help-your-business":"Find where AI would actually save you time.",
+"is-your-organization-actually-ready-for-ai":"Check readiness before you commit to AI.",
+"which-parts-of-your-teams-work-could-ai-change-first":"Map which team tasks AI changes first.",
+"which-ai-skills-does-your-team-actually-need":"Find the AI skills worth training for.",
+"does-your-organization-have-the-controls-to-govern-ai":"Find the gaps in your AI oversight.",
+"how-ready-are-you-for-the-ai-shift":"See how prepared you are, and what to do now.",
+"check-your-job":"See which of your tasks AI can already do.",
+"ai-dependency-score":"Find the systems you can't run without.",
+"ai-due-diligence-checklist":"What to ask before you buy an AI tool.",
+"eu-ai-act-risk-tier-checker":"Find your risk tier and what it requires.",
+"ai-data-sharing-risk-checker":"See what your team shares with AI, and where it goes.",
+"digital-resilience-checklist":"Are you ready for a hack, outage or lost laptop?",
+"ai-tabletop-exercise-kit":"Rehearse an AI incident with your leadership team.",
+"p-doom-scenario-explorer":"Change the assumptions. Watch the risk move.",
+"small-business-ai-safety":"Simple AI safety for small teams.",
+"the-ai-sandbox":"Try AI tools without exposing your data.",
+"when-ai-gets-it-wrong":"What to do when an AI mistake reaches work.",
+"context-windows":"Why AI forgets what you said earlier.",
+"ai-hallucinations":"Why AI makes things up, and how to catch it.",
+"healthy-ai-use":"Use AI without losing your own judgment.",
+"responsible-ai-is-a-liability":"What your board should ask about AI.",
+"in-house-llm-governance":"The safeguards to set before launch.",
+"ai-and-jobs-explained":"What AI will really do to jobs.",
+"ten-ways-ai-risk-becomes-a-real-world-problem":"The real risks, and how sure we are.",
+"can-ai-take-over-the-world":"What a takeover would actually require.",
+"can-ai-be-shut-down":"Why switching AI off may get harder.",
+"ai-apocalypse-scenarios":"The scenarios researchers take seriously.",
+"ai-singularity-explained":"Self-improving AI, explained.",
+"ai-extinction-risk-p-doom":"How experts estimate the odds of catastrophe.",
+"could-ai-control-critical-infrastructure":"Could AI disrupt power and water?",
+"can-ai-lie":"What research shows about AI deception.",
+"can-ai-copy-itself":"Can AI spread beyond our control?",
+"ai-glossary":"Plain answers to the big AI questions.",
+"resource-library":"The best free reading on AI safety and rules."};
+const SH=s=>SHORT[s]||(BY[s]?BY[s].l:"");
+/* swap long descriptions for the short line everywhere the site lists resources */
+DV!=="o"&&Object.keys(SHORT).forEach(s=>{if(BY[s]){BY[s].full=BY[s].l;BY[s].l=SHORT[s];}});
+/* shorter section copy */
+if(DV!=="o"){HC.lead="Guidance, tools, training and expert support for AI.";
+HC.trust=`<b>Run by the Leading Learning Partners Association.</b> Sourced, labelled, and reviewed by people.`;
+HC.acts[0][1]="Developments, risks, and what they mean.";
+HC.acts[1][1]="Tools to test readiness, value and risk.";
+HC.acts[2][1]="Courses from LLPA members.";
+HC.acts[3][1]="Advisory and consulting help.";}
+/* page subtitles: keep the first sentence only */
+const _ph2=pagehead;
+pagehead=function(e,t,sub,c){if(DV!=="o"&&sub){const m=String(sub).match(/^.*?[.?!](\s|$)/);if(m)sub=m[0].trim();}return _ph2(e,t,sub,c);};
+/* showcase heading: short */
+const _show=showcase;
+showcase=function(){return _show().replace(/<h2>[^<]*<\/h2>/,`<h2>Assess your <em>needs</em>.</h2>`).replace(/<div class="eyebrow">[^<]*<\/div>/,`<div class="eyebrow">Tools</div>`);};
+/* MotionSites motion: fade up, staggered, once, as sections enter */
+(function(){if(DV==="o"||matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  const SEL=".j-act,.gcard,.feat,.show-l li,.show-f,.row,.e-act,.f-act,.guide-h,.section h2,.pagehead .wrap > *,.ph-t > *";
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("fu-in");io.unobserve(e.target);}}),{rootMargin:"0px 0px -60px 0px"});
+  function arm(){document.querySelectorAll("#app "+SEL.split(",").join(",#app ")).forEach(el=>{if(el.classList.contains("fu"))return;el.classList.add("fu");
+    const sib=[...el.parentElement.children].filter(x=>x.matches(SEL));el.style.transitionDelay=Math.min(sib.indexOf(el),6)*70+"ms";io.observe(el);});}
+  new MutationObserver(()=>requestAnimationFrame(arm)).observe(document.getElementById("app"),{childList:true});arm();
+})();
+
+/* ---------- homepage v2: one cohesive editorial composition ---------- */
+const SH2=(title,link,href)=>`<div class="sh"><h2>${title}</h2>${link?`<a class="sh-link" href="${href}">${link} →</a>`:""}</div>`;
+function tools2(){FIGN=0;
+  return `<section class="hs"><div class="wrap">${SH2("Assess your needs","All tools","#/explore/all?f=Tool")}
+  <div class="show-g"><ol class="show-l">${SHOW.map((s,i)=>{const x=BY[s];return `<li><a href="#/open/${s}" data-fig="${i}"${i?"":' class="on"'}><span class="show-gl">${GLYPH[i]}</span><span><b>${esc(x.t)}</b><span>${esc(x.l)}</span></span></a></li>`}).join("")}</ol>
+  <div class="show-f">${SHOW.map((s,i)=>`<a class="show-p${i?"":" on"}" data-p="${i}" href="#/open/${s}" tabindex="-1" aria-hidden="true"><span class="fig-f"><img src="tfig/${s}.jpg" alt="" loading="lazy"></span></a>`).join("")}</div></div></div></section>`;}
+function paths2(img){return `<section class="hs"><div class="wrap">${SH2("Guidance for","For Organizations","#/organizations")}
+  <div class="gcards g3">${HC.paths.map(([t,d,h],i)=>`<a class="gcard" href="${h}">${di(img[i],"")}<span class="gcard-in"><b>${t}</b><span>${d}</span></span></a>`).join("")}</div></div></section>`;}
+function read2(){return `<section class="hs"><div class="wrap">${SH2("Worth reading now","See all six topics","#/explore")}
+  <div class="rl">${HC.picks.map(s=>{const x=BY[s];return `<a class="rl-i" href="#/open/${s}"><span class="rl-k">${esc(FORMAT(x))}</span><b>${esc(x.t)}</b><span>${esc(x.l)}</span></a>`}).join("")}</div></div></section>`;}
+const CLOSE2=()=>`<section class="next"><div class="wrap"><div class="next-box"><p class="next-k">Your next step</p><h2>Ready to put AI into practice?</h2><p class="next-sub">Find the right training for your team or connect with experts who can help you move forward.</p><div class="next-g"><a class="next-c" href="#/training" data-cta="training" data-loc="home-next"><span class="next-i"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/></svg></span><b>Explore AI Training</b><span class="next-d">Browse AI courses from LLPA members.</span><span class="next-go">Find courses →</span></a><a class="next-c" href="#/advisory" data-cta="advisory" data-loc="home-next"><span class="next-i"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><circle cx="17" cy="9" r="2.6"/><path d="M15.5 14.6c3 .3 5.5 2.2 5.5 5.4"/></svg></span><b>Get AI Advisory &amp; Consulting</b><span class="next-d">Tell us what you need. We'll connect you with a suitable LLPA member.</span><span class="next-go">Request support →</span></a></div><p class="next-f">Inquiries are reviewed by the LLPA team and directed to relevant members.</p></div></div></section>`;
+const SERV=(primary,secondary)=>`<div class="serv"><a class="${primary}" href="#/training" data-cta="training" data-loc="hero">Explore AI Training →</a><a class="${secondary}" href="#/advisory" data-cta="advisory" data-loc="hero">Get Expert Support</a></div>`;
+
+function homeJ(){
+  return `<div class="vj h2v">
+  <section class="j-hero h2-hero">${di("j-hero.jpg","")}
+    <div class="wrap h2-hero-in"><p class="j-pill">${HC.eyebrow}</p><h1>${H1}</h1><p class="h2-lead">${esc(HC.lead)}</p>${SERV("j-btn light","j-btn ghost")}</div></section>
+  <section class="hs acts-s"><div class="wrap"><h2 class="sr">What would you like to do?</h2><div class="j-acts4">${ACT("j-act")}</div></div></section>
+  ${tools2()}
+  ${paths2(["j-11.jpg","j-15.jpg","j-13.jpg"])}
+  <section class="section j-grey readfeat"><div class="wrap">${READ()}</div></section>
+  ${CLOSE2()}
+  </div>`;
+}
+function homeE(){
+  return `<div class="ve h2v">
+  <section class="e-hero"><div class="wrap">
+    <div class="e-hero-grid"><div><p class="eyebrow">${HC.eyebrow}</p><h1>${H1}</h1><p class="h2-lead">${esc(HC.lead)}</p>${SERV("e-btn","e-btn line")}</div><div class="e-hero-img">${di("e-hero.jpg","People learning together at a laptop")}</div></div>
+  </div></section>
+  <section class="hs acts-s"><div class="wrap"><h2 class="sr">What would you like to do?</h2><div class="e-acts-g">${ACT("e-act")}</div></div></section>
+  ${tools2()}
+  ${paths2(["e-17.jpg","e-09.jpg","e-18.jpg"])}
+  <section class="e-read readfeat"><div class="wrap">${READ()}</div></section>
+  ${CLOSE2()}
+  </div>`;
+}
+function homeF(){
+  return `<div class="vf h2v">
+  <section class="f-hero"><div class="f-hero-grid wrap">
+    <div class="f-hero-txt"><p class="f-kick">${HC.eyebrow}</p><h1>${H1}</h1><p class="f-lead">${esc(HC.lead)}</p>${SERV("f-btn","f-btn alt")}</div>
+    <div class="f-hero-art"><span class="f-notch" aria-hidden="true"></span>${di("f-hero.png","")}</div>
+  </div></section>
+  <section class="f-acts"><div class="wrap"><h2 class="sr">What would you like to do?</h2><div class="f-acts-g">${ACT("f-act")}</div></div></section>
+  ${tools2()}
+  ${paths2(["f-a.png","f-c.png","f-b.png"])}
+  <section class="section f-tint readfeat"><div class="wrap">${READ()}</div></section>
+  ${CLOSE2()}
+  </div>`;
+}
+/* footer: concise LLPA attribution with a link to About */
+document.addEventListener("DOMContentLoaded",()=>{});
+(function(){const f=document.querySelector(".fl2 span");if(f&&DV!=="o")f.innerHTML='AI Channel is a free resource from the Leading Learning Partners Association (LLPA). Courses and advisory services come from LLPA members. <a href="#/about">About AI Channel →</a>';})();
+
+/* ---------- router ---------- */
+const LEGACY_TOPIC={adopt:"business",work:"work",safe:"everyday",data:"business",gov:"governance",risk:"safety",learn:"everyday",resil:"business"};
+function render(p,qs){
+  let h;
+  switch(p[0]){
+    case "": case "home": h=home(); break;
+    case "explore": h=p[1]==="all"?allResources():explore(); break;
+    case "browse": case "all": h=allResources(); break;
+    case "topic": h=topicPage(p[1])||topicPage(LEGACY_TOPIC[p[1]])||explore(); break;
+    case "training": h=training(); break;
+    case "advisory": case "help": h=advisory(qs); break;
+    case "organizations": h=orgs(); break;
+    case "for": h=pathway(p[1]); break;
+    case "society": h=society(); break;
+    case "about": h=about(); break;
+    case "legal": h=legal(p[1]); break;
+    case "status": h=status(); break;
+    default: h=notFound();
+  }
+  $("#app").innerHTML=h;
+  const legacy=p[0]==="browse"&&p[1]==="role"&&p[2]?"a="+p[2]:"";
+  bindExplore(qs||legacy); bindTraining(); bindAdvisory(); reveal();
+  const sec=p[0]===""||p[0]==="home"?"home":p[0]==="for"?(p[1]==="you"?"you":"org"):p[0]==="organizations"?"org":["browse","topic","all","explore"].includes(p[0])?"explore":p[0]==="help"?"advisory":p[0];
+  $$(".navlinks [data-sec]").forEach(a=>{const on=a.dataset.sec===sec;a.classList.toggle("cur",on);if(a.tagName==="A")on?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current");});
+  const tt=p[0]==="topic"&&TOPIC_BY[p[1]]?TOPIC_BY[p[1]].n+" · AI Channel":null;
+  document.title=tt||({"":"AI Channel by LLPA",home:"AI Channel by LLPA",explore:"Tools & Insights · AI Channel",training:"AI Training · AI Channel",advisory:"Advisory & Consulting · AI Channel",help:"Advisory & Consulting · AI Channel",organizations:"For Organizations · AI Channel",for:(p[1]==="you"?"For Individuals · ":PATH[p[1]]?PATH[p[1]].name+" · ":"")+"AI Channel",society:"AI & Society · AI Channel",about:"About · AI Channel",status:"Launch status · AI Channel"})[p[0]]||"AI Channel";
+  track("page_view",{route:"#/"+p.filter(Boolean).join("/")});
+}
+let curKey=null;
+function route(){
+  const raw=(location.hash||"#/").replace(/^#\/?/,""); const [path,qs]=raw.split("?"); const p=path.split("/");
+  $("#mobilemenu").classList.remove("open"); $("#menubtn").textContent="☰"; closeSearch(); closeDrops();
+  if(p[0]==="open"){ if(curKey===null){render(["explore"]);curKey="explore/";} if(!openPiece(p[1]))history.replaceState(null,"","#/explore"); return; }
+  closePiece();
+  const scrollTo=(p[0]==="home"&&p[1])?p[1]:(p[0]==="about"&&p[1])?p[1]:null;
+  const pageKey=(p[0]==="home"?"":p[0])+"/"+((["home","about"].includes(p[0]))?"":(p[1]||"")+"/"+(p[2]||""))+"?"+(qs||"");
+  if(pageKey!==curKey){render(p[0]==="home"?[""]:p,qs); curKey=pageKey; if(!scrollTo) window.scrollTo(0,0); const m=$("#app");m&&m.focus({preventScroll:true});}
+  last=location.hash||"#/";
+  if(scrollTo) setTimeout(()=>{const el=document.getElementById(scrollTo); if(el) el.scrollIntoView({behavior:"smooth",block:"start"});},40);
+}
+window.addEventListener("hashchange",route); route();
+
+})();
+</script>
+</body>
+</html>

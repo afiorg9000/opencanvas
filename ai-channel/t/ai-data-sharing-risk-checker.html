@@ -1,0 +1,976 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ai-data-sharing-risk-checker</title><style>html,body{margin:0;background:#F7F8FA}@media (prefers-color-scheme:dark){html,body{background:#F7F8FA}}</style></head><body>
+<!--
+TOOL: AI Data-Sharing Risk Checker
+FILE: ai-data-sharing-risk-checker.html   (slug: ai-data-sharing-risk-checker)   TYPE: tool
+TITLE (H1): "What is your team putting into AI tools, and where does it go?" (her Exposure Check section title
+  "What's going in, and where does it go?", as a reader's question).
+AUDIENCE: Business first (owners, managers, team leads, ops/IT generalists); also works for sole traders
+  ("works for a team of one"). Useful for public-sector teams handling personal data.
+
+WHAT IT DOES: 3 steps, ~6 minutes. (1) Seven kinds of AI tool (assistants, office-suite AI, meeting note-takers, AI
+  inside existing software, coding assistants, extensions/small apps, image/video/voice) x account type (not used /
+  personal or free / business account or contract / not sure). (2) Nine kinds of data x how often it goes in (never /
+  sometimes / often / not sure). (3) Seven controls (written rule, approval route, terms checked, DPA in place,
+  identifier-stripping habit, note-taker consent, no-blame mistake route). Result: overall level (Critical if
+  secrets go in; otherwise highest per-data risk: High / Medium / Low), a plain explanation naming what is at risk,
+  four stats, a per-data risk table, up to six fixes tagged Today / This week / This month / This quarter, a
+  verified table of what the main providers' personal vs business terms say, and an auto-drafted, editable
+  ONE-PAGE AI DATA RULE (approved accounts from their answers, never-list, approved-accounts-only list, before you
+  paste, before you use the output, note-takers, what to do after a mistake, review date) with Print (prints only
+  the rule) and Copy as text. Next step: AI Due Diligence Checklist (sibling). Member route: High/Critical or
+  controls < 40% -> matchUrl (Get matched to someone: accounts, terms, governance); otherwise coursesUrl (Learn with
+  a member: what's safe to paste). Email me my results + separate newsletter link.
+
+SOURCES (checked 4 Nov 2026):
+  - OpenAI help: "How your data is used to improve model performance" (individual services may train unless "Improve
+    the model for everyone" is off; Temporary Chat not used; ChatGPT Business/Enterprise/API not trained by default).
+  - Anthropic, "Updates to Consumer Terms and Privacy Policy" (Free/Pro/Max choose; 5-year retention if allowed, 30
+    days if not; deadline 8 Oct 2025; Commercial Terms products excluded).
+  - Google Gemini Apps Privacy Hub (last updated Oct 2026): subset of chats human-reviewed, kept up to 3 years; "don't
+    enter confidential information..."; Google Workspace generative AI privacy hub (no training without permission).
+  - Microsoft Learn, Enterprise data protection (DPA and Product Terms; prompts/responses not used to train
+    foundation models).
+  - GDPR Art. 28 (processor contract) and Art. 33 (72-hour notification where required).
+  - Samsung generative-AI restriction after source-code upload (Bloomberg via Japan Times, 2 May 2023).
+  - UK Cyber security breaches survey 2025/2026 (30 Apr 2026): 24% of businesses using/considering AI have cyber
+    practices for AI risk (method note only).
+  Not used: Microsoft consumer Copilot training terms (not verified; the table says "check its own settings").
+
+WHAT CHANGED vs aidoomsdayguide.com/tools/ai-data-sharing-risk-checker/: the original was 8 checkboxes for one
+  prompt ("I removed unnecessary personal data...") and a percentage with three fixed tips. This version maps the
+  whole team's tools, accounts and data, explains the risk per kind of data, names the provider terms that drive it
+  (verified, dated), and produces the deliverable a business actually needs: a one-page rule to print. Business
+  framing, her voice, AI Channel next steps, no ads, no "doomsday" branding.
+
+PRIVACY: in-browser only; answers in sessionStorage for this tab (try/catch); fields typed into the rule are never
+  sent. No network requests, cookies or localStorage.
+
+HOW TO EMBED IN WORDPRESS: (a) Custom HTML block: paste everything between "BEGIN AI CHANNEL TOOL" and "END AI
+  CHANNEL TOOL" (scoped CSS, aic- classes, IIFE). Printing from a theme page may include the theme header; the
+  iframe prints cleanly. (b) iframe: <iframe src="/tools/ai-data-sharing-risk-checker.html" title="AI data-sharing
+  risk checker" style="width:100%;min-height:1600px;border:0" loading="lazy"></iframe>
+
+CONFIG URLS (window.AICHANNEL_CONFIG): resultsFormUrl, coursesUrl, matchUrl, newsletterUrl, contentBaseUrl (prefix
+  for ai-due-diligence-checklist.html). CTA query fields: lead_type, audience (business), source_page,
+  source_content_or_tool, cta_clicked, assessment_name, assessment_result (Critical / High risk / Medium risk / Low
+  risk), score (% of controls in place), utm_*. Events: tool_started, tool_completed, result_viewed, cta_clicked
+  (also print_rule, copy_rule).
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What is your team putting into AI tools? AI Data-Sharing Risk Checker</title>
+<meta name="description" content="Map what your team puts into which AI tools, under which terms. Get a risk read per kind of data, the fixes that matter most, and a one-page AI data rule to print.">
+<!-- AI Channel design A: tool design system v2 (visual layer only; no behaviour changes) -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style id="aic-theme">
+/* ---------- tokens ---------- */
+:root,html{color-scheme:light!important;
+ --pine:#2859c7!important;--pine-deep:#1945ac!important;--accent:#2859c7!important;--accent-deep:#1945ac!important;--primary:#2859c7!important;--blue:#2859c7!important;--blue-d:#1945ac!important;
+ --paper:#ffffff!important;--bg:#ffffff!important;--white:#fff!important;--card:#fff!important;--ink:#14213d!important;--ink-soft:#3f4a5c!important;--ink-mute:#5b6577!important;--muted:#3f4a5c!important;
+ --line:#d9e2f0!important;--sage:#eef3fc!important;--amber-soft:#fbf3e4!important;--accent-wash:#eef3fc!important;--blue-wash:#eef3fc!important;--sky:#eef3fc!important;--pale:#f4f7fc!important;--warm:#f4f7fc!important;
+ --serif:"Newsreader",Georgia,serif!important;--sans:"Inter",system-ui,sans-serif!important;--mono:"IBM Plex Mono",ui-monospace,monospace!important}
+html body .aic-tool,html body .aic-article{
+ --aic-paper:#ffffff!important;--aic-white:#ffffff!important;--aic-ink:#14213d!important;--aic-soft:#46526a!important;--aic-line:#d9e2f0!important;--aic-sage:#eef3fc!important;
+ --aic-blue:#2859c7!important;--aic-blue-deep:#1945ac!important;--aic-blue-soft:#eef3fc!important;--aic-on-blue:#ffffff!important;--aic-focus:#9fbcff!important;
+ --aic-grey:#46526a!important;--aic-grey-soft:#f4f7fc!important;
+ --aic-radius:16px!important;--aic-radius-sm:12px!important;--aic-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important;
+ color-scheme:light!important;background:#fff!important;color:#14213d!important;
+ font-family:"Inter",system-ui,sans-serif!important;-webkit-font-smoothing:antialiased}
+html,body{background:#fff!important}
+html body .aic-tool{padding:56px 0 96px!important}
+html body .aic-article{padding:0 0 112px!important}
+html body .aic-tool .aic-col,html body .aic-article .aic-col{max-width:860px!important}
+@media(min-width:600px){html body .aic-tool .aic-col,html body .aic-article .aic-col{padding-inline:32px!important}}
+
+/* ---------- type ---------- */
+html body .aic-tool .aic-h1,html body .aic-article h1,body h1{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important;line-height:1.02!important;font-size:clamp(38px,5.4vw,62px)!important;color:#14213d}
+html body .aic-tool .aic-h2,html body .aic-article h2,body h2{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important;line-height:1.1!important}
+html body .aic-article h2{font-size:clamp(28px,3.6vw,38px)!important;margin-top:72px!important}
+html body .aic-tool .aic-h2{font-size:clamp(26px,3.4vw,36px)!important}
+html body .aic-tool .aic-h3,html body .aic-article h3,body h3{font-family:"Newsreader",Georgia,serif!important;font-weight:550!important;letter-spacing:-.01em!important;font-size:22px!important;line-height:1.2!important}
+body h4,body h5,body h6{font-family:"Inter",system-ui,sans-serif!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow,html body .aic-tool .aic-qnum,html body .aic-tool .aic-nav-hint,.aic-mono{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;letter-spacing:.06em!important;text-transform:uppercase;font-size:12px!important}
+html body .aic-tool .aic-eyebrow,html body .aic-article .aic-eyebrow{color:#2859c7!important;display:flex!important;align-items:center;gap:12px}
+html body .aic-tool .aic-eyebrow::before,html body .aic-article .aic-head .aic-eyebrow::before{content:"";width:28px;height:1px;background:#2859c7;flex:none}
+html body .aic-tool .aic-lede,html body .aic-article .aic-lede,html body .aic-article .aic-dek{font-size:20px!important;line-height:1.55!important;color:#3f4a5c!important;max-width:60ch}
+html body .aic-tool .aic-soft,html body .aic-tool .aic-small{color:#46526a!important}
+html body .aic-tool .aic-small{font-size:14px!important}
+html body .aic-article{font-size:18.5px!important;line-height:1.72!important}
+html body .aic-article p+p{margin-top:22px!important}
+html body .aic-article .aic-head{padding:72px 0 40px!important;border-bottom:1px solid #d9e2f0;margin-bottom:48px}
+html body .aic-article .aic-meta,html body .aic-article .aic-head p:not(.aic-lede):not(.aic-dek){font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px!important;letter-spacing:.03em;color:#5b6577!important}
+html body .aic-tool a,html body .aic-article a{color:#2859c7}
+
+/* ---------- panels ---------- */
+html body .aic-tool .aic-card,html body .aic-article .aic-card{background:#fff!important;border:1px solid #d9e2f0!important;border-radius:16px!important;box-shadow:0 1px 0 rgba(19,38,74,.04),0 14px 36px rgba(19,38,74,.07)!important}
+@media(min-width:600px){html body .aic-tool .aic-card{padding:36px 40px!important}html body .aic-article .aic-card{padding:32px 36px!important}}
+html body .aic-tool .aic-stack>*+*{margin-top:20px!important}
+html body .aic-tool .aic-grid2,html body .aic-article .aic-grid{gap:16px!important}
+/* the short answer: a framed figure, like the site's tool previews */
+html body .aic-article .aic-short{background:#fff!important;border:1px solid #d9e2f0!important;box-shadow:0 0 0 10px #eef3fc,0 0 0 11px #d9e2f0!important;margin:12px 11px 56px!important;border-radius:12px!important;border-left:1px solid #d9e2f0!important}
+html body .aic-article .aic-short .aic-eyebrow,html body .aic-article .aic-short>:first-child{color:#2859c7!important}
+/* notes and callouts */
+html body .aic-tool .aic-note,html body .aic-article .aic-note,html body .aic-article .aic-callout{background:#f4f7fc!important;border-left:3px solid #2859c7!important;border-radius:0 12px 12px 0!important;padding:18px 22px!important;font-size:15.5px!important;color:#14213d!important}
+html body .aic-tool .aic-note.aic-warn{background:#fdf7ec!important;border-left-color:#a46207!important}
+html body .aic-tool .aic-note.aic-bad{background:#fdf0ee!important;border-left-color:#b42318!important}
+html body .aic-tool .aic-note.aic-good{background:#eef8f1!important;border-left-color:#2f7a4e!important}
+/* calls to action become navy bands */
+html body .aic-tool .aic-cta,html body .aic-article .aic-cta,html body .aic-tool .aic-dark,html body .aic-article .aic-dark{--aic-ink:#ffffff!important;--aic-soft:#c9d6ee!important;--aic-white:#13264a!important;--aic-line:#2a3f6a!important;--aic-blue:#9fbcff!important;--aic-blue-soft:#1d3563!important;--aic-on-blue:#13264a!important;
+ background:#13264a!important;color:#fff!important;border-color:#13264a!important;box-shadow:none!important}
+html body .aic-tool .aic-cta *:not(.aic-btn):not(.aic-btn *),html body .aic-article .aic-cta *:not(.aic-btn):not(.aic-btn *){color:inherit}
+html body .aic-tool .aic-cta .aic-btn-primary,html body .aic-article .aic-cta .aic-btn-primary{background:#fff!important;color:#13264a!important;border-color:#fff!important}
+html body .aic-tool .aic-cta a:not(.aic-btn),html body .aic-article .aic-cta a:not(.aic-btn){color:#9fbcff!important}
+
+/* ---------- questions and answer options ---------- */
+html body .aic-tool .aic-q{margin-top:28px!important}
+html body .aic-tool .aic-qnum{color:#2859c7!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;font-size:clamp(22px,2.6vw,27px)!important;line-height:1.22!important;letter-spacing:-.01em!important;margin-bottom:10px!important}
+html body .aic-tool .aic-qhint{font-size:15px!important;color:#46526a!important;margin-bottom:18px!important}
+html body .aic-tool .aic-opts{gap:10px!important;margin-top:18px!important}
+html body .aic-tool .aic-opt,html body .aic-tool .aic-pick,html body .aic-tool .aic-check{background:#fff!important;border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:16px 18px!important;font-size:16px!important;gap:14px!important;transition:border-color .15s,box-shadow .15s,background-color .15s,transform .15s!important}
+html body .aic-tool .aic-opt:hover,html body .aic-tool .aic-pick:hover,html body .aic-tool .aic-check:hover{border-color:#2859c7!important;box-shadow:0 6px 18px rgba(40,89,199,.10)!important;transform:translateY(-1px)}
+html body .aic-tool .aic-opt[aria-checked="true"],html body .aic-tool .aic-opt[aria-pressed="true"],html body .aic-tool .aic-pick:has(input:checked),html body .aic-tool .aic-check:has(input:checked),html body .aic-tool .aic-opt:has(input:checked){border-color:#2859c7!important;background:#f4f7fc!important;box-shadow:0 0 0 3px #dbe6fb!important}
+html body .aic-tool .aic-dot{width:22px!important;height:22px!important;border:2px solid #9aa8c0!important}
+html body .aic-tool .aic-dot::after{inset:4px!important;background:#2859c7!important}
+html body .aic-tool .aic-opt[aria-checked="true"] .aic-dot{border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-size:14px!important;color:#46526a!important;margin-top:4px!important}
+html body .aic-tool .aic-opt.aic-opt-unsure{background:transparent!important;border-style:dashed!important}
+html body .aic-tool input[type=text],html body .aic-tool input[type=search],html body .aic-tool input[type=email],html body .aic-tool textarea,html body .aic-tool select,html body .aic-tool .aic-input{border:1.5px solid #d9e2f0!important;border-radius:12px!important;padding:14px 16px!important;background:#fff!important;font-size:16px!important}
+html body .aic-tool input:focus,html body .aic-tool textarea:focus,html body .aic-tool select:focus{border-color:#2859c7!important;outline:none!important;box-shadow:0 0 0 3px #dbe6fb!important}
+
+/* ---------- controls ---------- */
+html body .aic-tool .aic-btn,html body .aic-article .aic-btn{min-height:50px!important;padding:14px 24px!important;font-weight:600!important;font-size:15px!important;border-radius:999px!important;border:1.5px solid #c9d6ee!important;box-shadow:none!important}
+html body .aic-tool .aic-btn:hover,html body .aic-article .aic-btn:hover{border-color:#2859c7!important}
+html body .aic-tool .aic-btn-primary,html body .aic-article .aic-btn-primary{background:#2859c7!important;border-color:#2859c7!important;color:#fff!important}
+html body .aic-tool .aic-btn-primary:hover,html body .aic-article .aic-btn-primary:hover{background:#1945ac!important;border-color:#1945ac!important}
+html body .aic-tool .aic-btn-ghost{border-color:transparent!important;text-decoration:underline;text-underline-offset:4px;color:#3f4a5c!important}
+html body .aic-tool .aic-btn[disabled]{opacity:.4!important}
+html body .aic-tool .aic-nav{margin-top:36px!important;padding-top:24px!important;border-top:1px solid #d9e2f0!important}
+html body .aic-tool .aic-actions{gap:12px!important}
+html body .aic-tool .aic-seg{border:1.5px solid #d9e2f0!important;padding:4px!important}
+html body .aic-tool .aic-seg button{font-weight:600!important;color:#3f4a5c!important}
+html body .aic-tool .aic-seg button[aria-pressed="true"],html body .aic-tool .aic-seg button[aria-checked="true"]{background:#13264a!important;color:#fff!important}
+html body .aic-tool .aic-progress{height:4px!important;background:#e3eaf6!important;margin:20px 0 8px!important}
+html body .aic-tool .aic-progress span,html body .aic-tool .aic-progress i{background:#2859c7!important}
+html body .aic-tool .aic-chip,html body .aic-tool .aic-pill{border:1.5px solid #d9e2f0!important;background:#fff!important;font-weight:600!important;border-radius:999px!important}
+html body .aic-tool .aic-chip[aria-pressed="true"],html body .aic-tool .aic-chip.aic-on,html body .aic-tool .aic-pill.aic-on{background:#eef3fc!important;border-color:#2859c7!important;color:#1945ac!important}
+html body .aic-tool .aic-tag,html body .aic-article .aic-tag{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;padding:5px 11px!important}
+html body .aic-tool .aic-privacy{font-size:14px!important;color:#46526a!important;margin-top:20px!important}
+
+/* ---------- results ---------- */
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-stat b,html body .aic-tool .aic-stat strong,html body .aic-tool .aic-display{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important}
+html body .aic-tool .aic-bar{height:8px!important;background:#e3eaf6!important}
+html body .aic-tool .aic-bar-row{padding:14px 0!important;border-bottom-color:#e3eaf6!important}
+html body .aic-tool .aic-bar-label{font-weight:600!important}
+html body .aic-tool table,html body .aic-article table{border-collapse:collapse}
+html body .aic-tool th,html body .aic-article th{font-family:"IBM Plex Mono",ui-monospace,monospace!important;font-weight:500!important;font-size:11.5px!important;letter-spacing:.05em!important;text-transform:uppercase;color:#2859c7!important;background:#f4f7fc!important}
+html body .aic-tool td,html body .aic-article td{border-color:#e3eaf6!important}
+html body .aic-article .aic-sources,html body .aic-tool .aic-sources{font-size:14px!important;color:#46526a!important;border-top:1px solid #d9e2f0;padding-top:32px!important;margin-top:72px!important}
+html body .aic-article .aic-related,html body .aic-article .aic-deeper{margin-top:72px!important}
+
+/* ---------- pages outside the shared system ---------- */
+body:not(:has(.aic-tool)):not(:has(.aic-article)) h1,body:not(:has(.aic-tool)):not(:has(.aic-article)) h2,body:not(:has(.aic-tool)):not(:has(.aic-article)) h3{font-family:"Newsreader",Georgia,serif!important;font-weight:500!important;letter-spacing:-.015em!important}
+html,body{font-family:"Inter",system-ui,sans-serif}
+input[type=range],input[type=checkbox],input[type=radio]{accent-color:#2859c7!important}
+:focus-visible{outline-color:#2859c7!important}
+[tabindex="-1"]:focus,h1:focus,h2:focus,h3:focus{outline:none!important;box-shadow:none!important}
+
+/* ================= v3: product-grade tool shell ================= */
+html,body{background:#f4f7fc!important}
+html body .aic-tool{background:#f4f7fc!important}
+html body .aic-tool .aic-col{max-width:980px!important}
+html body .aic-tool .aic-h1{font-size:clamp(40px,5vw,62px)!important;max-width:20ch}
+html body .aic-tool .aic-grid2>.aic-card{box-shadow:none!important;background:#fff!important;border-radius:14px!important}
+html body .aic-tool.aic-in-q .aic-h1{font-size:22px!important;line-height:1.2!important;max-width:none;margin:6px 0 20px!important;font-weight:500!important}
+html body .aic-tool.aic-in-q .aic-lede,html body .aic-tool.aic-in-q > .aic-col > .aic-privacy,html body .aic-tool.aic-in-q .aic-col > * > .aic-privacy{display:none!important}
+html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:56px 64px 44px!important;border:0!important;border-radius:24px!important;box-shadow:0 1px 0 rgba(19,38,74,.05),0 30px 70px rgba(19,38,74,.10)!important;min-height:460px}
+@media(max-width:700px){html body .aic-tool.aic-in-q .aic-card:has(.aic-qtext),html body .aic-tool.aic-in-q .aic-card:has(.aic-progress){padding:32px 22px 28px!important;border-radius:18px!important;min-height:0}}
+html body .aic-tool .aic-progress{height:3px!important;background:#e3eaf6!important;border-radius:0!important;margin:14px 0 36px!important}
+html body .aic-tool .aic-qtext,html body .aic-tool .aic-q-text{font-size:clamp(26px,3.2vw,38px)!important;line-height:1.12!important;letter-spacing:-.02em!important;margin-bottom:12px!important;max-width:28ch}
+html body .aic-tool .aic-qhint{font-size:16px!important;margin-bottom:24px!important}
+html body .aic-tool .aic-opts{counter-reset:aicopt;gap:12px!important}
+html body .aic-tool .aic-opt{counter-increment:aicopt;align-items:center!important;min-height:64px;padding:16px 20px!important;font-size:17px!important;font-weight:500;border-radius:14px!important}
+html body .aic-tool .aic-opt .aic-dot{display:none!important}
+html body .aic-tool .aic-opt::before{content:counter(aicopt,upper-alpha);flex:none;width:30px;height:30px;display:grid;place-items:center;border:1.5px solid #c9d6ee;border-radius:8px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;font-weight:500;color:#2859c7;background:#fff;transition:all .15s}
+html body .aic-tool .aic-opt:hover::before{border-color:#2859c7}
+html body .aic-tool .aic-opt[aria-checked="true"]::before{background:#2859c7;border-color:#2859c7;color:#fff;content:"\2713"}
+html body .aic-tool .aic-opt[aria-checked="true"]{background:#eef3fc!important;box-shadow:0 0 0 2px #2859c7!important;border-color:#2859c7!important}
+html body .aic-tool .aic-opt-sub{font-weight:400}
+html body .aic-tool .aic-nav{border-top:0!important;margin-top:40px!important;padding-top:0!important}
+html body .aic-tool .aic-nav .aic-btn-primary{min-width:150px}
+html body .aic-tool .aic-score-num,html body .aic-tool .aic-display{font-size:clamp(56px,8vw,96px)!important;line-height:.95!important;color:#14213d}
+
+/* ================= v4: legibility ================= */
+html body .aic-tool{font-size:17px!important;line-height:1.6!important}
+html body .aic-tool,html body .aic-article{--aic-soft:#334055!important}
+html body .aic-tool .aic-small,html body .aic-tool .aic-opt-sub,html body .aic-tool .aic-privacy,html body .aic-tool .aic-nav-hint{font-size:15px!important;color:#334055!important}
+html body .aic-tool p,html body .aic-tool li{color:#1d2a44}
+html body .aic-tool .aic-lede{font-size:20px!important;color:#2a364d!important}
+html body .aic-tool .aic-note{font-size:16.5px!important}
+html body .aic-tool .aic-opt{font-size:18px!important;color:#14213d!important}
+html body .aic-tool .aic-qhint{font-size:17px!important;color:#334055!important}
+html body .aic-tool .aic-eyebrow,html body .aic-tool .aic-qnum,.aic-mono{font-size:12.5px!important;color:#2859c7!important;letter-spacing:.05em!important}
+html body .aic-tool .aic-tag{font-size:12.5px!important}
+html body .aic-tool th,html body .aic-article th{font-size:12.5px!important}
+html body .aic-tool td{font-size:16px}
+html body .aic-article{color:#14213d!important}
+html body .aic-article p,html body .aic-article li{color:#1d2a44}
+</style>
+<script>
+(function(){
+  function hsl(c){var m=c&&c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/);if(!m)return null;var r=m[1]/255,g=m[2]/255,b=m[3]/255,a=m[4]===undefined?1:+m[4];
+    var mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn,s=d?d/(1-Math.abs(2*l-1)):0,h=0;
+    if(d){h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;if(h<0)h+=360}return {h:h,s:s,l:l,a:a}}
+  function blue(c){var x=hsl(c);return x&&x.a>0.05&&x.s>0.3&&x.l>0.28&&x.l<0.95&&x.h>=205&&x.h<=240?x:null}
+  function N(x,dark,light){return x.a<0.95?"rgba(40,89,199,"+Math.min(x.a,0.12).toFixed(3)+")":(x.l>0.82?light:dark)}
+  function fix(el){var c0=getComputedStyle(el),bg=hsl(c0.backgroundColor),fg=hsl(c0.color);if(bg&&fg&&bg.a>0.9&&bg.l<0.6&&bg.s>0.3&&bg.h>=205&&bg.h<=240&&fg.l<0.6)el.style.setProperty("color","#ffffff","important");
+    if(el.closest(".aic-cta,.aic-dark")||el.matches(".aic-opt,.aic-pick,.aic-check,.aic-btn,.aic-chip,.aic-pill,.aic-seg button,.aic-card,.aic-note"))return;var cs=getComputedStyle(el),x;
+    if((x=blue(cs.color)))el.style.setProperty("color",x.l>0.75?"#eef3fc":"#2859c7","important");
+    if((x=blue(cs.backgroundColor)))el.style.setProperty("background-color",N(x,"#2859c7",x.l>0.9?"#eef3fc":"#d6e2f8"),"important");
+    if(el instanceof SVGElement){if((x=blue(cs.fill)))el.style.setProperty("fill",N(x,"#2859c7","#eef3fc"),"important");if((x=blue(cs.stroke)))el.style.setProperty("stroke",N(x,"#2859c7","#d6e2f8"),"important")}
+    if(cs.textTransform==="uppercase"&&parseFloat(cs.fontSize)<=13.5&&!el.closest("button")&&!el.classList.contains("aic-mono"))el.classList.add("aic-mono");}
+  var t;function mode(){document.querySelectorAll(".aic-tool").forEach(function(r){var q=[].some.call(r.querySelectorAll(".aic-progress,.aic-qtext,.aic-q-text"),function(e){return e.offsetParent!==null});if(q!==r.classList.contains("aic-in-q"))r.classList.toggle("aic-in-q",q)})}
+  function run(){clearTimeout(t);t=setTimeout(function(){mode();document.querySelectorAll("body *").forEach(fix)},30)}
+  document.addEventListener("DOMContentLoaded",function(){run();new MutationObserver(run).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class","aria-pressed","aria-checked","data-state"]});
+    document.addEventListener("change",run,true);document.addEventListener("click",run,true);});
+})();
+</script>
+</head>
+<body style="margin:0;background:#F7F8FA">
+<!-- ===== BEGIN AI CHANNEL TOOL: copy from here to END into a WordPress Custom HTML block ===== -->
+<div class="aic-tool" id="aic-ai-data-sharing-risk-checker" data-theme="light">
+<style>
+.aic-tool{--aic-paper:#F7F8FA;--aic-card:#FFFFFF;--aic-ink:#162033;--aic-soft:#667085;--aic-line:#DEE3EA;--aic-sage:#EEF1F6;--aic-blue:#315EFB;--aic-blue-deep:#2448C9;--aic-blue-wash:#EEF3FF;--aic-amber:#A46207;--aic-amber-wash:#FBF4E8;--aic-green:#2F7A4E;--aic-green-wash:#EAF5EE;--aic-violet:#6D5BD0;--aic-radius:18px;--aic-radius-sm:12px;--aic-shadow:0 10px 28px rgba(21,32,51,.055);--aic-focus:#B8C7FF;
+  display:block;background:var(--aic-paper);color:var(--aic-ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.55;padding:28px 0 56px;-webkit-text-size-adjust:100%;text-align:left}
+@media (prefers-color-scheme:dark){.aic-tool:not([data-theme="light"]){--aic-paper:#101B2D;--aic-card:#162033;--aic-ink:#F2F4F8;--aic-soft:#A6B3C7;--aic-line:#2A3850;--aic-sage:#1E2A40;--aic-blue:#7A97FF;--aic-blue-deep:#9BB2FF;--aic-blue-wash:#1F2B45;--aic-amber:#E0A34A;--aic-amber-wash:#2B2618;--aic-green:#6FC592;--aic-green-wash:#16301F;--aic-violet:#A99CF0;--aic-shadow:none;--aic-focus:#4A63B8;color-scheme:dark}}
+.aic-tool[data-theme="dark"]{--aic-paper:#101B2D;--aic-card:#162033;--aic-ink:#F2F4F8;--aic-soft:#A6B3C7;--aic-line:#2A3850;--aic-sage:#1E2A40;--aic-blue:#7A97FF;--aic-blue-deep:#9BB2FF;--aic-blue-wash:#1F2B45;--aic-amber:#E0A34A;--aic-amber-wash:#2B2618;--aic-green:#6FC592;--aic-green-wash:#16301F;--aic-violet:#A99CF0;--aic-shadow:none;--aic-focus:#4A63B8;color-scheme:dark}
+.aic-tool *,.aic-tool *::before,.aic-tool *::after{box-sizing:border-box}
+.aic-tool h1,.aic-tool h2,.aic-tool h3,.aic-tool h4,.aic-tool p,.aic-tool ul,.aic-tool ol,.aic-tool figure,.aic-tool fieldset,.aic-tool legend{margin:0;padding:0}
+.aic-tool fieldset{border:0;min-width:0}
+.aic-tool ul,.aic-tool ol{padding-left:1.2em}
+.aic-tool button{font-family:inherit}
+.aic-tool a{color:var(--aic-blue);font-weight:700;text-decoration:none}
+.aic-tool a:hover{text-decoration:underline}
+.aic-tool a:focus-visible,.aic-tool button:focus-visible,.aic-tool input:focus-visible+.aic-opt-box,.aic-tool [tabindex]:focus-visible,.aic-tool summary:focus-visible{outline:3px solid var(--aic-focus);outline-offset:2px;border-radius:10px}
+.aic-tool [tabindex="-1"]:focus{outline:none}
+.aic-col{max-width:760px;margin:0 auto;padding-inline:clamp(16px,4vw,24px)}
+.aic-sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0;padding:0;margin:-1px}
+.aic-eyebrow{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--aic-blue);margin-bottom:10px}
+.aic-display{font-weight:800;letter-spacing:-.035em;line-height:1.06}
+.aic-h1{font-size:clamp(32px,6.4vw,50px);margin-bottom:16px}
+.aic-h2{font-size:clamp(24px,4.2vw,32px);font-weight:800;letter-spacing:-.03em;line-height:1.12;margin-bottom:10px}
+.aic-h3{font-size:18px;font-weight:800;letter-spacing:-.02em;line-height:1.25;margin-bottom:6px}
+.aic-lede{font-size:clamp(17px,2.3vw,19px);color:var(--aic-soft);max-width:640px}
+.aic-soft{color:var(--aic-soft)}
+.aic-small{font-size:13.5px}
+.aic-num{font-variant-numeric:tabular-nums}
+.aic-card{background:var(--aic-card);border:1px solid var(--aic-line);border-radius:var(--aic-radius);box-shadow:var(--aic-shadow);padding:clamp(18px,4vw,28px)}
+.aic-stack>*+*{margin-top:16px}
+.aic-gap{margin-top:28px}
+.aic-grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:620px){.aic-grid2{grid-template-columns:1fr}}
+.aic-meta{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 22px}
+.aic-pill{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--aic-soft);background:var(--aic-card);border:1px solid var(--aic-line);border-radius:999px;padding:6px 11px}
+.aic-tag{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:5px 9px;background:var(--aic-blue-wash);color:var(--aic-blue)}
+.aic-tag.is-amber{background:var(--aic-amber-wash);color:var(--aic-amber)}
+.aic-tag.is-green{background:var(--aic-green-wash);color:var(--aic-green)}
+.aic-tag.is-grey{background:var(--aic-sage);color:var(--aic-soft)}
+.aic-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:12px 20px;font-size:15.5px;font-weight:750;border-radius:999px;border:1px solid transparent;cursor:pointer;text-decoration:none!important;line-height:1.2;text-align:center}
+.aic-btn-primary{background:var(--aic-blue);color:#fff!important;box-shadow:0 6px 16px rgba(49,94,251,.16)}
+.aic-btn-primary:hover{background:var(--aic-blue-deep)}
+.aic-tool[data-theme="dark"] .aic-btn-primary{color:#0B1424!important}
+@media (prefers-color-scheme:dark){.aic-tool:not([data-theme="light"]) .aic-btn-primary{color:#0B1424!important}}
+.aic-btn-secondary{background:var(--aic-card);color:var(--aic-ink)!important;border-color:var(--aic-line)}
+.aic-btn-secondary:hover{border-color:var(--aic-blue);color:var(--aic-blue)!important}
+.aic-btn-link{background:none;border:0;color:var(--aic-soft);font-weight:700;font-size:14px;text-decoration:underline!important;padding:8px 4px;min-height:0;cursor:pointer}
+.aic-btn[disabled],.aic-btn[aria-disabled="true"]{opacity:.45;cursor:not-allowed;box-shadow:none}
+.aic-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.aic-row.is-between{justify-content:space-between}
+.aic-progress{height:6px;background:var(--aic-sage);border-radius:999px;overflow:hidden;margin:6px 0 22px}
+.aic-progress>span{display:block;height:100%;width:0;background:var(--aic-blue);border-radius:999px;transition:width .35s ease}
+.aic-qhead{display:flex;justify-content:space-between;gap:10px;align-items:baseline;font-size:13px;font-weight:700;color:var(--aic-soft)}
+.aic-qtext{font-size:clamp(19px,2.8vw,22px);font-weight:800;letter-spacing:-.02em;line-height:1.3;margin:4px 0 18px}
+.aic-opts{display:grid;gap:10px}
+.aic-opt{position:relative;display:block;cursor:pointer}
+.aic-opt input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.aic-opt-box{display:flex;gap:12px;align-items:flex-start;padding:13px 15px;border:1px solid var(--aic-line);border-radius:var(--aic-radius-sm);background:var(--aic-card);font-size:15.5px;line-height:1.45;transition:border-color .15s,background .15s,box-shadow .15s}
+.aic-opt:hover .aic-opt-box{border-color:#AFC0FF}
+.aic-opt-dot{flex:none;width:18px;height:18px;margin-top:2px;border-radius:50%;border:2px solid #B4BDCC;position:relative}
+.aic-opt-dot::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--aic-blue);transform:scale(0);transition:transform .15s}
+.aic-opt input:checked+.aic-opt-box{border-color:var(--aic-blue);box-shadow:0 0 0 3px var(--aic-blue-wash)}
+.aic-opt input:checked+.aic-opt-box .aic-opt-dot{border-color:var(--aic-blue)}
+.aic-opt input:checked+.aic-opt-box .aic-opt-dot::after{transform:scale(1)}
+.aic-opt input:disabled+.aic-opt-box{cursor:default}
+.aic-opt.is-correct input+.aic-opt-box{border-color:var(--aic-green);background:var(--aic-green-wash);box-shadow:none}
+.aic-opt.is-wrong input+.aic-opt-box{border-color:var(--aic-amber);background:var(--aic-amber-wash);box-shadow:none}
+.aic-opt-mark{display:block;font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-top:4px}
+.aic-opt-mark:empty{display:none}
+.aic-opt.is-correct input+.aic-opt-box .aic-opt-dot{border-color:var(--aic-green)}
+.aic-opt.is-wrong input+.aic-opt-box .aic-opt-dot{border-color:var(--aic-amber)}
+.aic-opt.is-wrong input+.aic-opt-box .aic-opt-dot::after{background:var(--aic-amber)}
+.aic-opt.is-correct .aic-opt-mark{color:var(--aic-green)}
+.aic-opt.is-wrong .aic-opt-mark{color:var(--aic-amber)}
+.aic-note{background:var(--aic-blue-wash);border-left:3px solid var(--aic-blue);border-radius:0 var(--aic-radius-sm) var(--aic-radius-sm) 0;padding:14px 16px;font-size:15px}
+.aic-note.is-amber{background:var(--aic-amber-wash);border-left-color:var(--aic-amber)}
+.aic-note.is-green{background:var(--aic-green-wash);border-left-color:var(--aic-green)}
+.aic-reveal{margin-top:18px;padding-top:18px;border-top:1px solid var(--aic-line)}
+.aic-verdict{font-weight:800;font-size:17px;letter-spacing:-.01em;margin-bottom:8px}
+.aic-verdict.is-right{color:var(--aic-green)}
+.aic-verdict.is-wrong{color:var(--aic-amber)}
+.aic-reveal p+p{margin-top:10px}
+.aic-src{margin-top:14px;font-size:14px;color:var(--aic-soft)}
+.aic-src a{overflow-wrap:anywhere}
+.aic-src li{margin-top:4px}
+.aic-nav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:22px;flex-wrap:wrap}
+.aic-bar-row{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr) 56px;gap:12px;align-items:center;padding:11px 0;border-top:1px solid var(--aic-line)}
+.aic-bar-row:first-child{border-top:0}
+@media (max-width:560px){.aic-bar-row{grid-template-columns:minmax(0,1fr) 56px}.aic-bar-row .aic-bar-label{grid-column:1/-1}}
+.aic-bar-label{font-weight:700;font-size:14.5px}
+.aic-bar{display:block;height:10px;background:var(--aic-sage);border-radius:999px;overflow:hidden}
+.aic-bar>span{display:block;height:100%;border-radius:999px;background:var(--aic-blue);transition:width .8s ease}
+.aic-bar>span.is-low{background:var(--aic-amber)}
+.aic-bar>span.is-high{background:var(--aic-green)}
+.aic-bar-pct{font-weight:800;font-size:14px;text-align:right;font-variant-numeric:tabular-nums}
+.aic-score{display:grid;grid-template-columns:auto minmax(0,1fr);gap:24px;align-items:center}
+@media (max-width:560px){.aic-score{grid-template-columns:1fr;gap:14px}}
+.aic-score-num{font-size:clamp(52px,11vw,76px);font-weight:800;letter-spacing:-.05em;line-height:1;font-variant-numeric:tabular-nums}
+.aic-score-num small{font-size:.32em;letter-spacing:0;color:var(--aic-soft);font-weight:700;margin-left:4px}
+.aic-list{display:grid;gap:12px;padding:0!important;list-style:none}
+.aic-item{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:start}
+.aic-item-n{width:30px;height:30px;border-radius:50%;background:var(--aic-blue-wash);color:var(--aic-blue);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center}
+.aic-item p{font-size:15px;color:var(--aic-soft)}
+.aic-dark{background:#162033;color:#E7ECF5;border-radius:var(--aic-radius);padding:clamp(20px,4.5vw,32px)}
+.aic-dark .aic-eyebrow{color:#9BB2FF}
+.aic-dark a{color:#B8C7FF}
+.aic-dark .aic-soft,.aic-dark p{color:#C9D2E1}
+.aic-dark .aic-h2,.aic-dark .aic-h3{color:#fff}
+.aic-dark .aic-btn-primary{background:#fff;color:#162033!important;box-shadow:none}
+.aic-dark .aic-btn-primary:hover{background:#E3E9FF}
+.aic-dark .aic-btn-secondary{background:transparent;color:#fff!important;border-color:#3A4A66}
+.aic-dark .aic-btn-secondary:hover{border-color:#B8C7FF;color:#B8C7FF!important}
+.aic-step{display:grid;gap:6px;padding:16px 0;border-top:1px solid #2E3C57}
+.aic-step:first-of-type{border-top:0;padding-top:4px}
+.aic-step .aic-row{margin-top:8px}
+.aic-keep{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;margin-top:16px;font-size:14px}
+.aic-keep a,.aic-keep button{font-size:14px}
+.aic-noregret li{margin-top:6px;font-size:15px}
+.aic-tool details{border-top:1px solid var(--aic-line)}
+.aic-tool details:last-child{border-bottom:1px solid var(--aic-line)}
+.aic-tool summary{cursor:pointer;list-style:none;padding:14px 0;font-weight:800;display:flex;justify-content:space-between;gap:12px;align-items:center}
+.aic-tool summary::-webkit-details-marker{display:none}
+.aic-tool summary::after{content:"+";color:var(--aic-soft);font-weight:800;font-size:18px}
+.aic-tool details[open] summary::after{content:"\2013"}
+.aic-details-body{padding:0 0 16px;font-size:15px;color:var(--aic-soft)}
+.aic-details-body p+p{margin-top:8px}
+.aic-foot{margin-top:28px;font-size:13px;color:var(--aic-soft);line-height:1.6}
+.aic-foot p+p{margin-top:6px}
+.aic-screen[hidden]{display:none!important}
+.aic-fade{animation:aicFade .3s ease both}
+@keyframes aicFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.aic-tool *,.aic-tool *::before,.aic-tool *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media print{
+  .aic-tool{background:#fff!important;color:#000;padding:0;font-size:11pt}
+  .aic-tool .aic-noprint{display:none!important}
+  .aic-tool .aic-card{box-shadow:none;border:1px solid #bbb;break-inside:avoid}
+  .aic-tool .aic-dark{background:#fff!important;color:#000!important;border:1px solid #bbb}
+  .aic-tool .aic-dark *{color:#000!important}
+  .aic-tool details{display:block}
+  .aic-tool details>*{display:block}
+  .aic-tool a{color:#000;text-decoration:underline}
+  .aic-tool .aic-bar>span,.aic-tool .aic-tag,.aic-tool svg{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+/* ---- extras shared by the four resilience / risk tools ---- */
+.aic-tool{--aic-red:#B42318;--aic-red-wash:#FDEDEB}
+.aic-tool[data-theme="dark"]{--aic-red:#F97066;--aic-red-wash:#3A1E22}
+@media (prefers-color-scheme:dark){.aic-tool:not([data-theme="light"]){--aic-red:#F97066;--aic-red-wash:#3A1E22}}
+.aic-tag.is-red{background:var(--aic-red-wash);color:var(--aic-red)}
+.aic-note.is-red{background:var(--aic-red-wash);border-left-color:var(--aic-red)}
+.aic-seg{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.aic-seg label{position:relative;cursor:pointer;display:inline-flex}
+.aic-seg input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.aic-seg span{display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:7px 13px;border:1px solid var(--aic-line);border-radius:999px;background:var(--aic-card);font-size:14px;font-weight:700;color:var(--aic-soft);line-height:1.25;transition:background .15s,border-color .15s,color .15s}
+.aic-seg label:hover span{border-color:#AFC0FF;color:var(--aic-ink)}
+.aic-seg input:checked+span{background:var(--aic-blue);border-color:var(--aic-blue);color:#fff}
+.aic-tool[data-theme="dark"] .aic-seg input:checked+span{color:#0B1424}
+.aic-seg input:focus-visible+span{outline:3px solid var(--aic-focus);outline-offset:2px}
+.aic-seg.is-chips input[type=checkbox]+span::before{content:"";width:14px;height:14px;border-radius:4px;border:2px solid #B4BDCC;flex:none}
+.aic-seg.is-chips input[type=checkbox]:checked+span::before{border-color:#fff;background:#fff;box-shadow:inset 0 0 0 2px var(--aic-blue)}
+.aic-seg-legend{font-size:13px;font-weight:800;color:var(--aic-soft);letter-spacing:.01em}
+.aic-edition{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:18px}
+.aic-edition .aic-seg{margin-top:0}
+.aic-chipgrid{display:grid;gap:8px;grid-template-columns:1fr}
+@media (min-width:620px){.aic-chipgrid{grid-template-columns:1fr 1fr}}
+.aic-pick{position:relative;display:block;cursor:pointer}
+.aic-pick input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.aic-pick-box{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1px solid var(--aic-line);border-radius:var(--aic-radius-sm);background:var(--aic-card);height:100%}
+.aic-pick:hover .aic-pick-box{border-color:#AFC0FF}
+.aic-pick-check{flex:none;width:20px;height:20px;border-radius:6px;border:2px solid #B4BDCC;margin-top:1px;display:flex;align-items:center;justify-content:center}
+.aic-pick input:checked+.aic-pick-box{border-color:var(--aic-blue);box-shadow:0 0 0 3px var(--aic-blue-wash)}
+.aic-pick input:checked+.aic-pick-box .aic-pick-check{background:var(--aic-blue);border-color:var(--aic-blue)}
+.aic-pick input:checked+.aic-pick-box .aic-pick-check::after{content:"";width:9px;height:5px;border-left:2.5px solid #fff;border-bottom:2.5px solid #fff;transform:rotate(-45deg) translate(1px,-1px)}
+.aic-pick input:focus-visible+.aic-pick-box{outline:3px solid var(--aic-focus);outline-offset:2px}
+.aic-pick-t{font-weight:800;font-size:15.5px;line-height:1.3;display:block}
+.aic-pick-h{font-size:13.5px;color:var(--aic-soft);display:block;margin-top:2px}
+.aic-rows>*+*{border-top:1px solid var(--aic-line)}
+.aic-rowq{padding:16px 0}
+.aic-rowq:first-child{padding-top:4px}
+.aic-rowq-t{font-weight:800;font-size:16.5px;letter-spacing:-.01em}
+.aic-rowq-h{font-size:13.5px;color:var(--aic-soft)}
+.aic-rowq fieldset{margin-top:10px}
+.aic-table{width:100%;border-collapse:collapse;font-size:14.5px}
+.aic-table th{text-align:left;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--aic-soft);font-weight:800;padding:8px 8px 8px 0;border-bottom:1px solid var(--aic-line);vertical-align:bottom}
+.aic-table td{padding:10px 8px 10px 0;border-bottom:1px solid var(--aic-line);vertical-align:top}
+.aic-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.aic-fix{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:start;padding:16px 0;border-top:1px solid var(--aic-line)}
+.aic-fix:first-child{border-top:0;padding-top:4px}
+.aic-fix p{font-size:15px;color:var(--aic-soft);margin-top:4px}
+.aic-fix .aic-tag{margin-bottom:6px}
+.aic-line{display:inline-block;min-width:9em;border-bottom:1px solid var(--aic-soft);height:1.1em;vertical-align:baseline}
+.aic-input{width:100%;padding:10px 12px;border:1px solid var(--aic-line);border-radius:10px;background:var(--aic-card);color:var(--aic-ink);font:inherit;font-size:15px}
+.aic-input:focus{outline:3px solid var(--aic-focus);outline-offset:0;border-color:var(--aic-blue)}
+.aic-field{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:800;color:var(--aic-soft)}
+.aic-fields{display:grid;gap:10px;grid-template-columns:1fr}
+@media (min-width:620px){.aic-fields{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.aic-printonly{display:none}
+@media print{
+  .aic-tool .aic-printonly{display:block!important}
+  .aic-tool .aic-screen[hidden]{display:none!important}
+  .aic-tool .aic-seg span,.aic-tool .aic-note,.aic-tool .aic-tag{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .aic-tool .aic-input{border:0;border-bottom:1px solid #999;border-radius:0;padding:2px 0}
+  .aic-tool .aic-pagebreak{break-before:page}
+  .aic-tool .aic-table tr{break-inside:avoid}
+}
+
+.aic-ds-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:18px}
+@media (min-width:700px){.aic-ds-stats{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.aic-ds-stats div{background:var(--aic-paper);border-radius:12px;padding:12px 14px}
+.aic-ds-stats b{display:block;font-size:26px;font-weight:800;letter-spacing:-.03em;line-height:1.1}
+.aic-ds-stats span{font-size:13px;color:var(--aic-soft);font-weight:650;line-height:1.3;display:block;margin-top:2px}
+.aic-ds-ruletext{border:1px dashed var(--aic-line);border-radius:14px;padding:clamp(16px,4vw,26px);background:var(--aic-paper)}
+.aic-ds-ruleh{font-size:clamp(22px,3.6vw,28px);font-weight:800;letter-spacing:-.03em;line-height:1.15;margin-bottom:4px}
+.aic-ds-rulelist{margin:14px 0 12px;padding-left:1.3em!important;font-size:15.5px}
+.aic-ds-rulelist>li{margin-top:10px}
+.aic-ds-rulelist ul{margin-top:4px;padding-left:1.1em!important}
+.aic-ds-rulelist ul li{margin-top:2px}
+@media print{
+  #aic-ai-data-sharing-risk-checker .aic-card:not(.aic-ds-rulecard),#aic-ai-data-sharing-risk-checker #aic-ds-res>.aic-eyebrow,#aic-ai-data-sharing-risk-checker .aic-foot{display:none!important}
+  #aic-ai-data-sharing-risk-checker .aic-ds-rulecard{border:0;padding:0;margin:0}
+  #aic-ai-data-sharing-risk-checker .aic-ds-ruletext{border:0;padding:0;background:#fff}
+  #aic-ai-data-sharing-risk-checker .aic-ds-rulelist{font-size:11pt}
+}
+
+</style>
+<div class="aic-col">
+  <noscript><p>This tool needs JavaScript. It runs in your browser and nothing is sent.</p></noscript>
+
+  <section class="aic-screen" id="aic-ds-intro" aria-labelledby="aic-ds-h1">
+    <p class="aic-eyebrow">AI data-sharing risk checker · for teams</p>
+    <h1 class="aic-display aic-h1" id="aic-ds-h1" data-focus>What is your team putting into AI tools, and where does it go?</h1>
+    <p class="aic-lede">Three short steps: which AI tools people use and on what accounts, what goes into them, and what&rsquo;s in place around them. You&rsquo;ll get a risk read for each kind of data, the fixes that matter most, and a one-page rule you can edit, print and hand to the team.</p>
+    <div class="aic-meta"><span class="aic-pill">About 6 minutes</span><span class="aic-pill">No email, nothing stored</span><span class="aic-pill">Works for a team of one</span></div>
+    <div class="aic-note" style="margin-bottom:22px"><strong>The most common AI incident in a small business isn&rsquo;t a rogue robot.</strong> It&rsquo;s someone pasting a client contract or a customer list into a personal chatbot account, whose terms let the provider keep it. In 2023 Samsung restricted staff use of generative AI after engineers uploaded internal source code to ChatGPT. Your business doesn&rsquo;t need Samsung&rsquo;s budget to avoid that. It needs the right accounts and a page of rules.</div>
+    <div class="aic-grid2">
+      <div class="aic-card"><p class="aic-eyebrow">Step 1</p><h3 class="aic-h3">Which tools, which accounts?</h3><p class="aic-soft" style="font-size:15px">The AI in daily use is rarely the AI that was approved.</p></div>
+      <div class="aic-card"><p class="aic-eyebrow">Step 2</p><h3 class="aic-h3">What goes in?</h3><p class="aic-soft" style="font-size:15px">Customer details, contracts, code, call recordings, passwords.</p></div>
+      <div class="aic-card"><p class="aic-eyebrow">Step 3</p><h3 class="aic-h3">What&rsquo;s in place?</h3><p class="aic-soft" style="font-size:15px">Rules, terms you&rsquo;ve read, and what happens after a mistake.</p></div>
+      <div class="aic-card"><p class="aic-eyebrow">You get</p><h3 class="aic-h3">A risk read and a one-page rule</h3><p class="aic-soft" style="font-size:15px">Edit it, print it, and walk the team through it.</p></div>
+    </div>
+    <div class="aic-row" style="margin-top:22px"><button type="button" class="aic-btn aic-btn-primary" id="aic-ds-start">Start the check</button></div>
+    <p class="aic-small aic-soft" style="display:flex;gap:8px;margin-top:14px" id="aic-ds-privacy"></p>
+  </section>
+
+  <section class="aic-screen" id="aic-ds-s1" aria-labelledby="aic-ds-s1h" hidden>
+    <p class="aic-eyebrow">Step 1 of 3</p>
+    <div class="aic-progress" aria-hidden="true"><span style="width:20%"></span></div>
+    <h2 class="aic-h2" id="aic-ds-s1h" data-focus>Which AI tools do people use for work, and on what accounts?</h2>
+    <p class="aic-soft" style="margin-bottom:8px">Count what actually happens, not what was approved. If you&rsquo;re not sure, say so: that&rsquo;s an answer too.</p>
+    <details class="aic-noprint" style="margin-bottom:12px"><summary>Personal or business account: how to tell</summary><div class="aic-details-body"><p><strong>Personal:</strong> someone signed up with their own email, free or paid (for example ChatGPT Free or Plus, Claude Free or Pro, the Gemini app on a personal Google account). Consumer terms apply.</p><p><strong>Business:</strong> the business pays, an admin controls the accounts, and there are business terms or a data processing agreement (for example ChatGPT Business or Enterprise, Claude Team or Enterprise, Gemini in Google Workspace, Microsoft 365 Copilot on a work account).</p></div></details>
+    <div class="aic-card"><div class="aic-rows" id="aic-ds-tools"></div></div>
+    <div class="aic-nav"><button type="button" class="aic-btn-link" data-back="intro">&larr; Back</button><span class="aic-small aic-soft" id="aic-ds-s1hint" aria-live="polite"></span><button type="button" class="aic-btn aic-btn-primary" id="aic-ds-s1next">Next: what goes in</button></div>
+  </section>
+
+  <section class="aic-screen" id="aic-ds-s2" aria-labelledby="aic-ds-s2h" hidden>
+    <p class="aic-eyebrow">Step 2 of 3</p>
+    <div class="aic-progress" aria-hidden="true"><span style="width:50%"></span></div>
+    <h2 class="aic-h2" id="aic-ds-s2h" data-focus>What goes into those tools?</h2>
+    <p class="aic-soft" style="margin-bottom:8px">Across the whole team, including &ldquo;just this once&rdquo;. Pasting, uploading a file and letting a note-taker record a call all count.</p>
+    <div class="aic-card"><div class="aic-rows" id="aic-ds-data"></div></div>
+    <div class="aic-nav"><button type="button" class="aic-btn-link" data-back="s1">&larr; Back</button><span class="aic-small aic-soft" id="aic-ds-s2hint" aria-live="polite"></span><button type="button" class="aic-btn aic-btn-primary" id="aic-ds-s2next">Next: what&rsquo;s in place</button></div>
+  </section>
+
+  <section class="aic-screen" id="aic-ds-s3" aria-labelledby="aic-ds-s3h" hidden>
+    <p class="aic-eyebrow">Step 3 of 3</p>
+    <div class="aic-progress" aria-hidden="true"><span style="width:80%"></span></div>
+    <h2 class="aic-h2" id="aic-ds-s3h" data-focus>What&rsquo;s in place around it?</h2>
+    <p class="aic-soft">Seven questions. The honest answer is more useful than the hoped-for one.</p>
+    <div id="aic-ds-ctrl"></div>
+    <div class="aic-nav"><button type="button" class="aic-btn-link" data-back="s2">&larr; Back</button><span class="aic-small aic-soft" id="aic-ds-s3hint" aria-live="polite"></span><button type="button" class="aic-btn aic-btn-primary" id="aic-ds-s3next">See the risk and my rule</button></div>
+  </section>
+
+  <section class="aic-screen" id="aic-ds-res" aria-labelledby="aic-ds-resh" hidden>
+    <p class="aic-eyebrow">Where you stand</p>
+    <div class="aic-card">
+      <span class="aic-tag" id="aic-ds-leveltag"></span>
+      <h2 class="aic-h2" id="aic-ds-resh" data-focus style="margin-top:10px"></h2>
+      <p class="aic-soft" id="aic-ds-resp"></p>
+      <div class="aic-ds-stats" id="aic-ds-stats"></div>
+    </div>
+
+    <div class="aic-card aic-gap">
+      <p class="aic-eyebrow">Data by data</p>
+      <h2 class="aic-h2">What&rsquo;s going in, and how risky it is</h2>
+      <p class="aic-soft" style="margin-bottom:10px" id="aic-ds-tablep"></p>
+      <div class="aic-scroll"><table class="aic-table" id="aic-ds-table"></table></div>
+    </div>
+
+    <div class="aic-card aic-gap">
+      <p class="aic-eyebrow">Fix these first</p>
+      <h2 class="aic-h2">Where to begin</h2>
+      <div id="aic-ds-fixes"></div>
+      <details style="margin-top:8px"><summary>What the main providers&rsquo; terms say (checked November 2026)</summary><div class="aic-details-body" id="aic-ds-terms"></div></details>
+    </div>
+
+    <div class="aic-card aic-gap aic-ds-rulecard" id="aic-ds-rule">
+      <p class="aic-eyebrow aic-noprint">Your one-page rule</p>
+      <h2 class="aic-h2 aic-noprint">Edit it, print it, walk the team through it</h2>
+      <p class="aic-soft aic-noprint" style="margin-bottom:12px">Built from your answers. Fill in the three boxes, then print. Ten minutes with real examples at a team meeting does more than an email.</p>
+      <div class="aic-fields aic-noprint" style="margin-bottom:16px">
+        <label class="aic-field">Business name<input class="aic-input" id="aic-ds-org" autocomplete="organization"></label>
+        <label class="aic-field">Who to ask, and who to tell<input class="aic-input" id="aic-ds-owner" placeholder="Name and how to reach them"></label>
+        <label class="aic-field">Review date<input class="aic-input" id="aic-ds-review" placeholder="e.g. May 2027"></label>
+      </div>
+      <div id="aic-ds-ruletext" class="aic-ds-ruletext"></div>
+      <div class="aic-row aic-noprint" style="margin-top:16px"><button type="button" class="aic-btn aic-btn-secondary" id="aic-ds-print">Print the rule</button><button type="button" class="aic-btn aic-btn-secondary" id="aic-ds-copy">Copy as text</button><span class="aic-small aic-soft" id="aic-ds-copied" aria-live="polite"></span></div>
+    </div>
+
+    <div class="aic-gap" id="aic-ds-handoff"></div>
+    <div class="aic-row aic-noprint" style="margin-top:14px"><button type="button" class="aic-btn-link" id="aic-ds-edit">Change my answers</button><button type="button" class="aic-btn-link" id="aic-ds-restart">Start again</button></div>
+    <div class="aic-foot aic-noprint">
+      <details><summary>How the risk read works, and the sources</summary><div class="aic-details-body" id="aic-ds-method"></div></details>
+    </div>
+  </section>
+</div>
+
+<script>
+window.AICHANNEL_CONFIG = Object.assign({
+  resultsFormUrl: "#",      // "Email me my results" form (WordPress form page)
+  coursesUrl: "#",          // "Learn with a member" (Central AI course schedule)
+  matchUrl: "#",            // "Get matched to someone" (advisory/consulting form)
+  newsletterUrl: "#",       // separate newsletter opt-in
+  contentBaseUrl: ""        // prefix for links to sibling AI Channel pieces by slug, e.g. "/tools/" ("" = same folder)
+}, window.AICHANNEL_CONFIG || {});
+(function () {
+  'use strict';
+  var TOOL = { slug: 'ai-data-sharing-risk-checker', rootId: 'aic-ai-data-sharing-risk-checker', audience: 'business', name: 'AI Data-Sharing Risk Checker' };
+  /* ---------- Shared helpers (same in every AI Channel tool) ---------- */
+  var CFG = window.AICHANNEL_CONFIG;
+  var root = document.getElementById(TOOL.rootId);
+  if (!root) return;
+  var REDUCE = false;
+  try { REDUCE = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  var IN_FRAME = false;
+  try { IN_FRAME = window.self !== window.top; } catch (e) { IN_FRAME = true; }
+
+  function $(sel, el) { return (el || root).querySelector(sel); }
+  function $all(sel, el) { return Array.prototype.slice.call((el || root).querySelectorAll(sel)); }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function utmParams() {
+    var out = {};
+    try {
+      var p = new URLSearchParams(window.location.search);
+      p.forEach(function (v, k) { if (/^utm_/i.test(k)) out[k] = v; });
+    } catch (e) {}
+    return out;
+  }
+  function emit(name, extra) {
+    var detail = Object.assign({
+      event: name,
+      audience: TOOL.audience,
+      source_content_or_tool: TOOL.slug,
+      assessment_name: TOOL.name
+    }, extra || {});
+    try { window.dispatchEvent(new CustomEvent('aichannel:event', { detail: detail })); } catch (e) {}
+    try { if (window.parent) window.parent.postMessage(Object.assign({ type: 'aichannel:event' }, detail), '*'); } catch (e) {}
+  }
+  var LEAD_TYPES = { email_results: 'results_email', learn_with_member: 'training', get_matched: 'advisory', newsletter: 'newsletter' };
+  function handoffUrl(base, cta, result) {
+    if (!base || base === '#') return '#';
+    var f = Object.assign({
+      lead_type: LEAD_TYPES[cta] || 'other',
+      audience: TOOL.audience,
+      source_page: window.location.href,
+      source_content_or_tool: TOOL.slug,
+      cta_clicked: cta,
+      assessment_name: TOOL.name,
+      assessment_result: result && result.label,
+      score: result && result.score
+    }, utmParams());
+    var q = Object.keys(f).filter(function (k) { return f[k] !== undefined && f[k] !== null && f[k] !== ''; })
+      .map(function (k) { return encodeURIComponent(k) + '=' + encodeURIComponent(f[k]); }).join('&');
+    var hash = '', i = base.indexOf('#');
+    if (i > -1) { hash = base.slice(i); base = base.slice(0, i); }
+    return base + (base.indexOf('?') > -1 ? '&' : '?') + q + hash;
+  }
+  /* Wire a CTA link. getResult() returns {label, score} at click time. */
+  function wireCta(a, cta, cfgKey, getResult) {
+    if (!a) return;
+    function refresh() { a.href = handoffUrl(CFG[cfgKey], cta, getResult ? getResult() : null); }
+    refresh();
+    if (IN_FRAME) { a.target = '_blank'; a.rel = 'noopener'; }
+    a.addEventListener('click', function (ev) {
+      refresh();
+      var r = getResult ? getResult() : {};
+      emit('cta_clicked', { cta_clicked: cta, assessment_result: r && r.label, score: r && r.score });
+      if (a.getAttribute('href') === '#') ev.preventDefault();
+    });
+  }
+  function scrollToRoot() {
+    try {
+      var top = root.getBoundingClientRect().top;
+      if (top < 0 || top > window.innerHeight * 0.5) {
+        window.scrollTo({ top: window.pageYOffset + top - 12, behavior: REDUCE ? 'auto' : 'smooth' });
+      }
+    } catch (e) {}
+  }
+  function focusHeading(el) {
+    if (!el) return;
+    el.setAttribute('tabindex', '-1');
+    try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
+  }
+  function show(screen) {
+    $all('.aic-screen').forEach(function (s) { s.hidden = s !== screen; });
+    screen.classList.remove('aic-fade'); void screen.offsetWidth; screen.classList.add('aic-fade');
+    scrollToRoot();
+    focusHeading(screen.querySelector('[data-focus]') || screen.querySelector('h1,h2'));
+  }
+  function store(key, val) { try { sessionStorage.setItem(TOOL.slug + ':' + key, JSON.stringify(val)); } catch (e) {} }
+  function load(key) { try { var v = sessionStorage.getItem(TOOL.slug + ':' + key); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
+  function clearStore() { try { Object.keys(sessionStorage).forEach(function (k) { if (k.indexOf(TOOL.slug + ':') === 0) sessionStorage.removeItem(k); }); } catch (e) {} }
+  function contentUrl(slug) { return (CFG.contentBaseUrl || '') + slug + '.html'; }
+  var started = false;
+  function startOnce(extra) { if (started) return; started = true; emit('tool_started', extra || {}); }
+
+  /* Result hand-off: one next step, one member route, then email + newsletter. o = {
+     next:{title, body, href, label, newTab}, sol:{kind:'courses'|'match', title, body}, getResult } */
+  function renderHandoff(host, o) {
+    var solCta = o.sol.kind === 'match' ? 'get_matched' : 'learn_with_member';
+    var solKey = o.sol.kind === 'match' ? 'matchUrl' : 'coursesUrl';
+    var solLabel = o.sol.kind === 'match' ? 'Get matched to someone' : 'Learn with a member';
+    host.innerHTML =
+      '<div class="aic-grid2 aic-noprint">' +
+        '<div class="aic-card"><p class="aic-eyebrow">What to do next</p><h3 class="aic-h3">' + esc(o.next.title) + '</h3>' +
+          '<p class="aic-soft" style="font-size:15px">' + esc(o.next.body) + '</p>' +
+          '<div class="aic-row" style="margin-top:14px"><a class="aic-btn aic-btn-secondary" data-aic-next href="' + esc(o.next.href) + '">' + esc(o.next.label) + '</a></div></div>' +
+        '<div class="aic-card" style="border-color:#C7D3FF"><p class="aic-eyebrow">Need more than an answer?</p><h3 class="aic-h3">' + esc(o.sol.title) + '</h3>' +
+          '<p class="aic-soft" style="font-size:15px">' + esc(o.sol.body) + '</p>' +
+          '<div class="aic-row" style="margin-top:14px"><a class="aic-btn aic-btn-primary" data-aic-sol href="#">' + solLabel + '</a></div></div>' +
+      '</div>' +
+      '<div class="aic-keep aic-noprint">' +
+        '<a href="#" data-aic-email>Email me my results</a>' +
+        '<span class="aic-soft">Optional. It opens a short form and doesn’t sign you up to anything.</span>' +
+      '</div>' +
+      '<p class="aic-keep aic-noprint aic-soft" style="margin-top:8px">Keep up without keeping up with everything. <a href="#" data-aic-news>Get the newsletter</a></p>';
+    wireCta($('[data-aic-sol]', host), solCta, solKey, o.getResult);
+    wireCta($('[data-aic-email]', host), 'email_results', 'resultsFormUrl', o.getResult);
+    var news = $('[data-aic-news]', host);
+    news.href = CFG.newsletterUrl || '#';
+    if (IN_FRAME) { news.target = '_blank'; news.rel = 'noopener'; }
+    news.addEventListener('click', function (ev) { var r = o.getResult(); emit('cta_clicked', { cta_clicked: 'newsletter', assessment_result: r.label, score: r.score }); if (news.getAttribute('href') === '#') ev.preventDefault(); });
+    var nx = $('[data-aic-next]', host);
+    if (IN_FRAME) { nx.target = '_top'; }
+    nx.addEventListener('click', function () { var r = o.getResult(); emit('cta_clicked', { cta_clicked: 'next_step', next_step: o.next.label, assessment_result: r.label, score: r.score }); });
+  }
+  function radioQ(name, text, opts, sel, hint) {
+    return '<fieldset class="aic-q" style="margin-top:22px"><legend class="aic-qtext" style="font-size:18px;margin-bottom:12px">' + text + '</legend>' +
+      (hint ? '<p class="aic-small aic-soft" style="margin:-6px 0 12px">' + hint + '</p>' : '') +
+      '<div class="aic-opts">' + opts.map(function (o, i) {
+        return '<label class="aic-opt"><input type="radio" name="' + name + '" value="' + i + '"' + (String(sel) === String(i) ? ' checked' : '') + '><span class="aic-opt-box"><span class="aic-opt-dot" aria-hidden="true"></span><span>' + esc(o[0]) + '</span></span></label>';
+      }).join('') + '</div></fieldset>';
+  }
+  function segQ(name, legend, opts, sel) {
+    return '<fieldset><legend class="aic-seg-legend">' + esc(legend) + '</legend><div class="aic-seg">' + opts.map(function (o, i) {
+      return '<label><input type="radio" name="' + name + '" value="' + i + '"' + (String(sel) === String(i) ? ' checked' : '') + '><span>' + esc(o) + '</span></label>';
+    }).join('') + '</div></fieldset>';
+  }
+  var LOCK_SVG = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true" style="flex:none;margin-top:3px"><rect x="2" y="6" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M4.5 6V4.5a2.5 2.5 0 015 0V6" stroke="currentColor" stroke-width="1.5"/></svg>';
+
+  /* ================= AI Data-Sharing Risk Checker ================= */
+  var TOOLSL = [
+    { id: 'chat', t: 'General AI assistants', h: 'ChatGPT, Claude, Gemini, Copilot and similar chat apps', rule: 'AI assistant' },
+    { id: 'suite', t: 'AI inside your office suite', h: 'Microsoft 365 Copilot, Gemini in Google Workspace', rule: 'AI in our office suite' },
+    { id: 'notes', t: 'Meeting recorders and note-takers', h: 'AI notes in Teams, Zoom or Meet; Otter, Fireflies and similar', rule: 'Meeting note-taker' },
+    { id: 'embedded', t: 'AI features in software you already use', h: 'CRM, accounting, helpdesk, design tools', rule: 'AI features in our existing software' },
+    { id: 'code', n: 'source code', t: 'Coding assistants', h: 'GitHub Copilot, Cursor, Claude Code and similar', rule: 'Coding assistant' },
+    { id: 'ext', t: 'Browser extensions and small AI apps', h: 'Writing helpers, translators, “chat with your PDF” sites, phone apps', rule: 'Browser extension or AI app' },
+    { id: 'media', t: 'Image, video and voice tools', h: 'Image generators, voice-overs, avatar video', rule: 'Image, video or voice tool' }
+  ];
+  var ACCT = ['Not used', 'Personal or free account', 'Business account or contract', 'Not sure'];
+  var DATA = [
+    { id: 'secrets', n: 'passwords and keys', t: 'Passwords, API keys, recovery codes', h: 'Including logins pasted in to “fix this error”', s: 4 },
+    { id: 'customer', n: 'customer details', t: 'Customer or client personal details', h: 'Names, contact details, account and order information', s: 3 },
+    { id: 'special', n: 'health and HR information', t: 'Health, HR or other sensitive personal information', h: 'Sickness notes, disciplinary matters, health, beliefs, ethnicity', s: 4 },
+    { id: 'finance', n: 'financial records', t: 'Financial records and bank details', h: 'Accounts, invoices with bank details, payroll', s: 3 },
+    { id: 'confidential', n: 'contracts and NDA material', t: 'Contracts and anything under NDA', h: 'Client files, tenders, legal documents', s: 3 },
+    { id: 'code', t: 'Source code and product designs', h: 'Including code pasted in to debug it', s: 3 },
+    { id: 'meetings', n: 'call recordings and transcripts', t: 'Recordings and transcripts of calls', h: 'Customer calls, interviews, internal meetings', s: 3 },
+    { id: 'plans', n: 'internal plans and pricing', t: 'Internal plans, pricing and strategy', h: 'Board papers, price lists, forecasts', s: 2 },
+    { id: 'public', n: 'public material', t: 'Public or already-published material', h: 'Website copy, published reports, marketing drafts', s: 0 }
+  ];
+  var FREQ = ['Never', 'Sometimes', 'Often', 'Not sure'];
+  var CTRL = [
+    { id: 'rule', q: 'Is there a written rule about what must never go into an AI tool?',
+      o: [['No', 0], ['It’s been mentioned, nothing written', 1], ['Written and circulated', 2], ['Written, and everyone’s been walked through it with real examples', 3]] },
+    { id: 'approve', q: 'When someone wants to start using a new AI tool or extension, what happens?',
+      o: [['They just start', 0], ['They might mention it to someone', 1], ['There’s a quick check: who’s the vendor, what data goes in', 2], ['A short, fast approval that people actually use because it isn’t painful', 3]] },
+    { id: 'terms', q: 'On the accounts people use, do you know whether the provider keeps, reviews or trains on what’s typed in?',
+      o: [['Never looked', 0], ['Assumed it’s fine', 1], ['Checked for the main tools', 2], ['Checked, written down, and re-checked when the terms change', 3]] },
+    { id: 'dpa', q: 'For tools that handle customer or staff personal data, are the provider’s business terms or data processing agreement in place?',
+      o: [['I don’t know what that is', 0], ['Not that I know of', 1], ['For some of them', 2], ['Yes, for every tool that touches personal data', 3]] },
+    { id: 'habit', q: 'Before pasting, do people take out names, account numbers and other identifiers the task doesn’t need?',
+      o: [['I doubt it', 0], ['The careful ones do', 1], ['Most people, most of the time', 2], ['Yes — we’ve shown everyone how, with examples', 3]] },
+    { id: 'notes', q: 'When an AI note-taker joins a call, do the people on it know and agree?',
+      o: [['Nobody really mentions it', 0], ['Sometimes', 1], ['Usually: we say so at the start', 2], ['Always, and we turn it off when someone asks', 3], ['We don’t use note-takers', 3]] },
+    { id: 'oops', q: 'If someone realized they’d pasted something they shouldn’t, would they know what to do, and feel safe saying so?',
+      o: [['They’d probably keep quiet', 0], ['They might tell their manager', 1], ['There’s a known person to tell, no blame', 2], ['A known person, no blame, and a written first-hour checklist', 3]] }
+  ];
+
+  var S = load('state') || { tools: {}, data: {}, ctrl: {} };
+  function save() { store('state', S); }
+  var screens = { intro: $('#aic-ds-intro'), s1: $('#aic-ds-s1'), s2: $('#aic-ds-s2'), s3: $('#aic-ds-s3'), res: $('#aic-ds-res') };
+  $('#aic-ds-privacy').innerHTML = LOCK_SVG + '<span>Answers stay in your browser for this session only. Nothing is stored or sent.</span>';
+
+  function rowsHtml(list, prefix, opts, legend, state) {
+    return list.map(function (x) {
+      return '<div class="aic-rowq"><p class="aic-rowq-t">' + esc(x.t) + '</p><p class="aic-rowq-h">' + esc(x.h) + '</p>' + segQ(prefix + x.id, legend, opts, state[x.id]) + '</div>';
+    }).join('');
+  }
+  function bindRows(host, prefix, state, after) {
+    $all('input', host).forEach(function (inp) {
+      inp.addEventListener('change', function () {
+        startOnce(); state[inp.name.slice(prefix.length)] = parseInt(inp.value, 10); save(); after();
+      });
+    });
+  }
+  function renderS1() {
+    var h = $('#aic-ds-tools');
+    h.innerHTML = rowsHtml(TOOLSL, 'aic-ds-t-', ACCT, 'Used for work on', S.tools);
+    bindRows(h, 'aic-ds-t-', S.tools, s1state); s1state();
+  }
+  function s1state() {
+    var left = TOOLSL.filter(function (t) { return S.tools[t.id] == null; }).length;
+    var used = TOOLSL.filter(function (t) { return S.tools[t.id] > 0; }).length;
+    $('#aic-ds-s1hint').textContent = left ? left + ' still to answer' : used ? 'All answered' : 'Mark at least one tool as used';
+    $('#aic-ds-s1next').disabled = left > 0 || !used;
+  }
+  function renderS2() {
+    var h = $('#aic-ds-data');
+    h.innerHTML = rowsHtml(DATA, 'aic-ds-d-', FREQ, 'How often it goes into an AI tool', S.data);
+    bindRows(h, 'aic-ds-d-', S.data, s2state); s2state();
+  }
+  function s2state() {
+    var left = DATA.filter(function (d) { return S.data[d.id] == null; }).length;
+    $('#aic-ds-s2hint').textContent = left ? left + ' still to answer' : 'All answered';
+    $('#aic-ds-s2next').disabled = left > 0;
+  }
+  function renderS3() {
+    var h = $('#aic-ds-ctrl');
+    h.innerHTML = CTRL.map(function (c) { return radioQ('aic-ds-c-' + c.id, esc(c.q), c.o, S.ctrl[c.id]); }).join('');
+    $all('input', h).forEach(function (inp) {
+      inp.addEventListener('change', function () { startOnce(); S.ctrl[inp.name.slice(9)] = parseInt(inp.value, 10); save(); s3state(); });
+    });
+    s3state();
+  }
+  function s3state() {
+    var left = CTRL.filter(function (c) { return S.ctrl[c.id] == null; }).length;
+    $('#aic-ds-s3hint').textContent = left ? left + ' still to answer' : 'All answered';
+    $('#aic-ds-s3next').disabled = left > 0;
+  }
+
+  /* ---------- risk ---------- */
+  function cp(id) { var c = CTRL.filter(function (x) { return x.id === id; })[0]; return c.o[S.ctrl[id]][1]; }
+  function compute() {
+    var used = TOOLSL.filter(function (t) { return S.tools[t.id] > 0; });
+    var personal = used.filter(function (t) { return S.tools[t.id] === 1; });
+    var unsure = used.filter(function (t) { return S.tools[t.id] === 3; });
+    var business = used.filter(function (t) { return S.tools[t.id] === 2; });
+    var channel = personal.length ? 1 : unsure.length ? 0.9 : 0.35;
+    var ctrlSum = 0; CTRL.forEach(function (c) { ctrlSum += cp(c.id); });
+    var ctrl = ctrlSum / (CTRL.length * 3);
+    var FF = [0, 0.7, 1, 0.8];
+    var rows = DATA.map(function (d) {
+      var f = S.data[d.id], raw = d.s / 4 * FF[f] * channel * (1 - 0.45 * ctrl);
+      var lv = f === 0 ? 0 : d.id === 'secrets' ? 4 : d.s === 0 ? 5 : raw >= 0.5 ? 3 : raw >= 0.25 ? 2 : raw > 0 ? 1 : 0;
+      return { d: d, f: f, raw: raw, lv: lv };
+    });
+    var top = Math.max.apply(null, rows.map(function (r) { return r.lv === 5 ? 0 : r.lv; }));
+    var sensitiveIn = rows.filter(function (r) { return r.f > 0 && r.d.s >= 3; });
+    return { used: used, personal: personal, unsure: unsure, business: business, channel: channel, ctrl: ctrl, rows: rows, top: top, sensitiveIn: sensitiveIn };
+  }
+  var LV = [
+    { name: 'Low risk', tag: 'is-green', h: 'Low risk: nothing sensitive is going in' },
+    { name: 'Low risk', tag: 'is-green', h: 'Low risk: keep it that way' },
+    { name: 'Medium risk', tag: 'is-amber', h: 'Medium risk: the right instincts, gaps in the paperwork' },
+    { name: 'High risk', tag: 'is-red', h: 'High risk: sensitive data is reaching accounts you don’t control' },
+    { name: 'Critical', tag: 'is-red', h: 'Critical: secrets are going into AI tools' }
+  ];
+  var RISKTAG = [['Not going in', 'is-grey'], ['Low', 'is-green'], ['Medium', 'is-amber'], ['High', 'is-red'], ['Critical', 'is-red'], ['Fine', 'is-green']];
+  function names(list) {
+    var t = list;
+    if (t.length <= 1) return t.join('');
+    return t.slice(0, -1).join(', ') + ' and ' + t[t.length - 1];
+  }
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  var R = null;
+  function getResult() { return R ? { label: LV[R.top].name, score: Math.round(R.ctrl * 100) } : {}; }
+
+  function renderResults(fresh) {
+    R = compute();
+    var L = LV[R.top];
+    $('#aic-ds-leveltag').className = 'aic-tag ' + L.tag;
+    $('#aic-ds-leveltag').textContent = L.name;
+    $('#aic-ds-resh').textContent = L.h;
+    var hi = R.rows.filter(function (r) { return r.lv >= 3 && r.d.id !== 'secrets'; }).map(function (r) { return r.d.n; });
+    var desc;
+    if (R.top === 4) desc = 'Passwords, keys or recovery codes have gone into AI tools. Treat them as exposed: change them today, whatever account they went into. Then work down the list below.';
+    else if (R.top === 3) desc = cap(names(hi.slice(0, 3))) + (hi.length > 3 ? ' and more' : '') + ' ' + (hi.length > 1 ? 'are' : 'is') + ' going into ' + (R.personal.length ? 'personal accounts' : 'accounts nobody has checked') + '. On a personal account the consumer terms apply: chats can be kept, sometimes read by reviewers and, unless someone switched it off, used to train models. Moving the people who do this weekly onto business accounts removes most of the risk.';
+    else if (R.top === 2) desc = R.channel < 0.5 ? 'You’re on business accounts, which is the biggest single step. The gaps are in the paperwork around them: the written rule, the terms, and what happens after a mistake.' : 'Some sensitive data is going in, but not much and not often. The gaps are fixable in an afternoon: the accounts, a written rule, and one look at the terms.';
+    else if (R.top === 1) desc = 'Sensitive data that goes in, goes into business accounts with real controls around it. The job now is keeping it that way as people add new tools.';
+    else desc = 'From your answers, nothing sensitive is going into AI tools. Make sure that’s true, not hoped: the ten-minute inventory below takes ten minutes.';
+    $('#aic-ds-resp').textContent = desc;
+    $('#aic-ds-stats').innerHTML =
+      '<div><b class="aic-num">' + R.used.length + '</b><span>kinds of AI tool in use</span></div>' +
+      '<div><b class="aic-num">' + (R.personal.length + R.unsure.length) + '</b><span>on personal or unknown accounts</span></div>' +
+      '<div><b class="aic-num">' + R.sensitiveIn.length + '</b><span>kinds of sensitive data going in</span></div>' +
+      '<div><b class="aic-num">' + Math.round(R.ctrl * 100) + '%</b><span>of the basic controls in place</span></div>';
+
+    $('#aic-ds-tablep').textContent = 'Risk combines how sensitive the data is, how often it goes in, the weakest kind of account in use (' + (R.personal.length ? 'personal' : R.unsure.length ? 'unknown' : 'business') + '), and the controls you have.';
+    $('#aic-ds-table').innerHTML = '<thead><tr><th scope="col">Data</th><th scope="col">How often</th><th scope="col">Risk</th></tr></thead><tbody>' +
+      R.rows.slice().sort(function (a, b) { var o = function (x) { return x.lv === 5 ? 0.5 : x.lv; }; return o(b) - o(a) || b.raw - a.raw; }).map(function (r) {
+        return '<tr><td><strong>' + esc(r.d.t) + '</strong></td><td>' + esc(FREQ[r.f]) + '</td><td><span class="aic-tag ' + RISKTAG[r.lv][1] + '">' + RISKTAG[r.lv][0] + '</span></td></tr>';
+      }).join('') + '</tbody>';
+
+    /* fixes */
+    var F = [];
+    var dataIn = function (id) { return S.data[id] > 0; };
+    if (dataIn('secrets')) F.push(['Today', 'is-red', 'Stop pasting secrets, and change the ones that went in.', 'Passwords, API keys and recovery codes should never go into any AI tool, business account or not. Anything already pasted is exposed: change it today. For code, use placeholders and keep keys in a secrets manager.']);
+    if ((R.personal.length || R.unsure.length) && R.sensitiveIn.length) F.push(['This week', 'is-red', 'Move weekly users onto business accounts.', 'Anyone who uses AI on customer, staff or client material more than once a week should be on a business account the company controls. The data terms are the point, not the features: on the main business plans, providers say they don’t train on your data by default. Until then, personal accounts get public material only.']);
+    if (R.unsure.length || cp('approve') <= 1) F.push(['This week', 'is-amber', 'Run the ten-minute inventory.', 'Send one message: “Reply with every AI tool, extension or app you’ve used for work this month, including free ones.” Promise no consequences. The list you get back is the real starting point, and it’s usually longer than anyone expected.']);
+    if (cp('rule') <= 1) F.push(['This week', 'is-amber', 'Write the one-page rule.', 'It’s already drafted below from your answers. Fill in the names, print it, and walk the team through it with one real example of what not to paste.']);
+    if (cp('dpa') <= 1 && (dataIn('customer') || dataIn('special') || dataIn('meetings'))) F.push(['This month', 'is-amber', 'Get the business terms in place before personal data goes in.', 'Under the GDPR, a provider that processes personal data for you has to be bound by a contract with set terms (Article 28). Business AI plans usually come with a data processing agreement; personal accounts don’t. Outside the EU and UK, check your own data-protection law: most have an equivalent.']);
+    if (cp('terms') <= 1) F.push(['This month', 'is-amber', 'Read the data terms once, and write down what they say.', 'For each tool in use: does the provider train on what you type, how long does it keep it, can people at the provider read it, and how do you delete it? Write the answers on one page. The main providers’ answers are summarized below.']);
+    if (cp('notes') <= 1 && (S.tools.notes > 0 || dataIn('meetings'))) F.push(['This month', 'is-amber', 'Agree the note-taker rule.', 'Say at the start of every call that an AI note-taker is running, turn it off when anyone asks, and decide where transcripts are kept and for how long. Recording rules vary by country; for customer calls, check yours.']);
+    if (cp('habit') <= 1 && R.sensitiveIn.length) F.push(['This month', 'is-amber', 'Teach the swap: names out, placeholders in.', '“Client A” instead of the client’s name, “[account number]” instead of the number. Most tasks work just as well, and a mistake becomes a non-event. Show it once with a real example.']);
+    if (cp('oops') <= 1) F.push(['This quarter', 'is-amber', 'Make it safe to say “I pasted the wrong thing”.', 'Name one person to tell, promise no blame, and write the first hour down: what went in, which tool and account, delete the chat, change any secrets, and decide whether anyone has to be told. Under the GDPR some personal-data breaches must be reported to the regulator within 72 hours, so the first hour matters.']);
+    if (!F.length) F.push(['Ongoing', 'is-green', 'Treat this as a habit, not a project.', 'Tools, terms and features change every few months. Re-run the inventory twice a year, re-read the terms when a provider emails about an update, and retake this check in six months.']);
+    $('#aic-ds-fixes').innerHTML = F.slice(0, 6).map(function (f) {
+      return '<div class="aic-fix"><span class="aic-tag ' + f[1] + '">' + f[0] + '</span><div><h3 class="aic-h3">' + esc(f[2]) + '</h3><p>' + esc(f[3]) + '</p></div></div>';
+    }).join('');
+
+    $('#aic-ds-terms').innerHTML = '<div class="aic-scroll"><table class="aic-table"><thead><tr><th scope="col">Provider</th><th scope="col">Personal accounts</th><th scope="col">Business accounts</th></tr></thead><tbody>' +
+      '<tr><td><strong>OpenAI (ChatGPT)</strong></td><td>Content may be used to train models unless you turn off “Improve the model for everyone” in Data Controls. Temporary Chats aren’t used for training.</td><td>ChatGPT Business, Enterprise and the API: not used for training by default.</td></tr>' +
+      '<tr><td><strong>Anthropic (Claude)</strong></td><td>Free, Pro and Max users choose whether chats help train Claude. If you allow it, data is kept for up to five years; if not, 30 days.</td><td>Claude for Work, Government, Education and the API run under Anthropic’s Commercial Terms; the consumer setting doesn’t apply.</td></tr>' +
+      '<tr><td><strong>Google (Gemini)</strong></td><td>A subset of chats is read by human reviewers and kept for up to three years. Google asks you not to enter confidential information you wouldn’t want a reviewer to see.</td><td>Google Workspace doesn’t use customer data to train models without permission, and Gemini in Workspace content isn’t human-reviewed for training.</td></tr>' +
+      '<tr><td><strong>Microsoft (Copilot)</strong></td><td>Consumer Copilot has its own privacy settings. Check them in the app.</td><td>Microsoft 365 Copilot and Copilot Chat on a work account: covered by Microsoft’s Data Protection Addendum; prompts and responses aren’t used to train foundation models.</td></tr>' +
+      '</tbody></table></div><p style="margin-top:10px">Terms change, sometimes several times a year. Re-check when a provider emails about an update. Links are in the sources at the bottom.</p>';
+
+    renderRule();
+
+    var sol = R.top >= 3 || R.ctrl < 0.4
+      ? { kind: 'match', title: 'Get the accounts and terms set up properly', body: (R.top === 4 ? 'Secrets have gone into AI tools and ' : 'Sensitive data is reaching accounts you don’t control, and ') + 'fixing it means choosing business accounts, reading the terms and setting the controls. A member who advises businesses on AI adoption and governance can do that with you and leave the team with rules that stick.' }
+      : { kind: 'courses', title: 'Teach the team what’s safe to paste', body: 'Your accounts and rules are mostly in place. Rules only work when people understand why. A short course with a member shows the team what’s safe to put into AI, how to strip identifiers, and how to check what comes back.' };
+    renderHandoff($('#aic-ds-handoff'), {
+      next: { title: 'Check the next tool before it arrives', body: 'Before anyone signs up for a new AI tool, run it through the due diligence checklist: data, privacy, compliance and operational risk, with a printable summary.', href: contentUrl('ai-due-diligence-checklist'), label: 'Open the AI Due Diligence Checklist' },
+      sol: sol, getResult: getResult
+    });
+
+    $('#aic-ds-method').innerHTML = '<p>Each kind of data gets a risk level from four things: how sensitive it is (passwords and keys are always critical; health and HR data rank highest among personal data), how often it goes in, the weakest kind of account in use (personal, unknown, or business), and how many of the seven basic controls are in place. The overall level is the highest single risk. It’s a rule of thumb, not a legal assessment: it doesn’t tell you whether a particular use is lawful.</p>' +
+      '<p>Sources, checked November 2026:</p><ol class="aic-src">' +
+      '<li>OpenAI, “How your data is used to improve model performance”. <a href="https://help.openai.com/en/articles/5722486-how-your-data-is-used-to-improve-model-performance" target="_blank" rel="noopener">help.openai.com</a></li>' +
+      '<li>Anthropic, “Updates to Consumer Terms and Privacy Policy” (August 2025; existing users had until 8 October 2025 to choose). <a href="https://www.anthropic.com/news/updates-to-our-consumer-terms" target="_blank" rel="noopener">anthropic.com</a></li>' +
+      '<li>Google, Gemini Apps Privacy Hub (last updated October 2026). <a href="https://support.google.com/gemini/answer/13594961" target="_blank" rel="noopener">support.google.com/gemini</a></li>' +
+      '<li>Google, Generative AI in Google Workspace Privacy Hub. <a href="https://knowledge.workspace.google.com/admin/gemini/generative-ai-in-google-workspace-privacy-hub" target="_blank" rel="noopener">knowledge.workspace.google.com</a></li>' +
+      '<li>Microsoft Learn, Enterprise data protection in Microsoft 365 Copilot and Microsoft Copilot Chat. <a href="https://learn.microsoft.com/en-us/copilot/microsoft-365/enterprise-data-protection" target="_blank" rel="noopener">learn.microsoft.com</a></li>' +
+      '<li>GDPR Article 28 (processors) and Article 33 (breach notification within 72 hours where required). <a href="https://gdpr-info.eu/art-28-gdpr/" target="_blank" rel="noopener">gdpr-info.eu/art-28-gdpr</a> · <a href="https://gdpr-info.eu/art-33-gdpr/" target="_blank" rel="noopener">art-33-gdpr</a></li>' +
+      '<li>Samsung restricts generative AI after an internal source-code upload to ChatGPT, Bloomberg via The Japan Times, 2 May 2023. <a href="https://www.japantimes.co.jp/news/2023/05/02/business/tech/samsung-bans-chatgpt-workplace-use/" target="_blank" rel="noopener">japantimes.co.jp</a></li>' +
+      '<li>UK Cyber security breaches survey 2025/2026 (30 April 2026): of businesses using or considering AI, 24% have cyber security practices for managing AI risks. <a href="https://www.gov.uk/government/statistics/cyber-security-breaches-survey-20252026/cyber-security-breaches-survey-20252026" target="_blank" rel="noopener">gov.uk</a></li></ol>' +
+      '<p>General guidance, not legal advice. Obligations vary by country and sector.</p>';
+
+    if (fresh) {
+      emit('tool_completed', { assessment_result: LV[R.top].name, score: Math.round(R.ctrl * 100) });
+      emit('result_viewed', { assessment_result: LV[R.top].name, score: Math.round(R.ctrl * 100) });
+    }
+  }
+
+  function renderRule() {
+    var org = $('#aic-ds-org').value.trim(), owner = $('#aic-ds-owner').value.trim(), review = $('#aic-ds-review').value.trim();
+    var blank = '__________________';
+    var biz = TOOLSL.filter(function (t) { return S.tools[t.id] === 2; }).map(function (t) { return t.rule; });
+    var used = function (id) { return S.data[id] > 0; };
+    var approvedOnly = DATA.filter(function (d) { return d.s >= 2 && d.id !== 'secrets' && d.id !== 'special'; }).map(function (d) { return d.t; });
+    var specialLine = used('special') ? 'Health, HR and other sensitive personal information, unless ' + (owner || 'the person named below') + ' has approved a specific tool for that job' : 'Health, HR and other sensitive personal information';
+    var h = '<h3 class="aic-ds-ruleh">' + esc(org || 'Our') + (org ? '’s' : '') + ' AI data rule</h3>' +
+      '<p class="aic-small aic-soft">One page. If in doubt, leave it out and ask.</p>' +
+      '<ol class="aic-ds-rulelist">' +
+      '<li><strong>Use work accounts for work.</strong> ' + (biz.length ? 'Approved: ' + esc(biz.join('; ')) + ' on our business accounts.' : 'Approved business accounts: ' + blank + '.') + ' Personal AI accounts are for public material only. New tools, extensions and apps: ask ' + esc(owner || blank) + ' first.</li>' +
+      '<li><strong>Never, in any AI tool:</strong><ul><li>Passwords, API keys, recovery codes</li><li>' + esc(specialLine) + '</li></ul></li>' +
+      '<li><strong>Only in approved business accounts, and only what the task needs:</strong><ul>' + approvedOnly.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul></li>' +
+      '<li><strong>Fine anywhere:</strong> material that’s already public.</li>' +
+      '<li><strong>Before you paste:</strong> take out names, account numbers and anything the task doesn’t need. “Client A” works as well as the real name.</li>' +
+      '<li><strong>Before you use what comes back:</strong> a person checks anything that goes to a customer, into a decision, or out under our name. AI can be confidently wrong.</li>' +
+      '<li><strong>Note-takers:</strong> say so at the start of the call, and turn it off if anyone asks.</li>' +
+      '<li><strong>If you paste something you shouldn’t:</strong> tell ' + esc(owner || blank) + ' within the hour. No blame. Note what went in and where, delete the chat, and change any password or key that went in.</li>' +
+      '</ol>' +
+      '<p class="aic-small aic-soft">Review date: ' + esc(review || blank) + ' · Made with AI Channel’s AI Data-Sharing Risk Checker.</p>';
+    $('#aic-ds-ruletext').innerHTML = h;
+  }
+  ['#aic-ds-org', '#aic-ds-owner', '#aic-ds-review'].forEach(function (s) { $(s).addEventListener('input', renderRule); });
+  $('#aic-ds-print').addEventListener('click', function () { emit('cta_clicked', { cta_clicked: 'print_rule', assessment_result: getResult().label }); window.print(); });
+  $('#aic-ds-copy').addEventListener('click', function () {
+    var txt = $('#aic-ds-ruletext').innerText;
+    var done = function () { $('#aic-ds-copied').textContent = 'Copied.'; };
+    try {
+      if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(txt).then(done, fallback); }
+      else fallback();
+    } catch (e) { fallback(); }
+    function fallback() {
+      var ta = document.createElement('textarea'); ta.value = txt; ta.setAttribute('readonly', ''); ta.style.position = 'absolute'; ta.style.left = '-9999px';
+      root.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) { $('#aic-ds-copied').textContent = 'Select the text and copy it.'; }
+      root.removeChild(ta);
+    }
+    emit('cta_clicked', { cta_clicked: 'copy_rule', assessment_result: getResult().label });
+  });
+
+  function go(name) {
+    if (name === 's1') renderS1();
+    if (name === 's2') renderS2();
+    if (name === 's3') renderS3();
+    show(screens[name]);
+  }
+  $('#aic-ds-start').addEventListener('click', function () { startOnce(); go('s1'); });
+  $('#aic-ds-s1next').addEventListener('click', function () { go('s2'); });
+  $('#aic-ds-s2next').addEventListener('click', function () { go('s3'); });
+  $('#aic-ds-s3next').addEventListener('click', function () { renderResults(true); show(screens.res); });
+  $all('[data-back]').forEach(function (b) { b.addEventListener('click', function () { go(b.getAttribute('data-back')); }); });
+  $('#aic-ds-edit').addEventListener('click', function () { go('s1'); });
+  $('#aic-ds-restart').addEventListener('click', function () { S = { tools: {}, data: {}, ctrl: {} }; clearStore(); show(screens.intro); });
+  $all('.aic-screen').forEach(function (s) { s.hidden = s !== screens.intro; });
+
+})();
+</script>
+</div>
+<!-- ===== END AI CHANNEL TOOL ===== -->
+</body>
+</html>
+
+</body></html>
